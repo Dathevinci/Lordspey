@@ -278,7 +278,7 @@
           setTimeout(() => openTutorial(0), 300);
         }
       }
-    }, 550);
+    }, 700);
   }
 
   function playIntroSplash() {
