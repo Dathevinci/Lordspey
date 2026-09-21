@@ -418,15 +418,19 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       } else {
         localStorage.removeItem(MAP_IMAGE_KEY);
       }
+      return true;
     } catch {
-      // Storage quota or security error
+      return false;
     }
   }
 
   function clearCustomMapImage() {
     try {
       localStorage.removeItem(MAP_IMAGE_KEY);
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   // ── Deep Worldbuilding: Chronology & Event Timeline ──
@@ -468,6 +472,24 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
     _saveTimelineEvents(events);
   }
 
+  function _parseFrontmatter(body) {
+    if (!body || !body.startsWith('---')) return { frontmatter: {}, bodyWithoutFm: body || '' };
+    const match = body.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+    if (!match) return { frontmatter: {}, bodyWithoutFm: body || '' };
+    const raw = match[1];
+    const fm = {};
+    raw.split('\n').forEach(line => {
+      const colonIdx = line.indexOf(':');
+      if (colonIdx !== -1) {
+        const key = line.slice(0, colonIdx).trim().toLowerCase();
+        const val = line.slice(colonIdx + 1).trim();
+        fm[key] = val;
+      }
+    });
+    const bodyWithoutFm = body.slice(match[0].length);
+    return { frontmatter: fm, bodyWithoutFm };
+  }
+
   function _parseYearNumber(str) {
     if (typeof str === 'number') return str;
     if (!str) return 0;
@@ -495,33 +517,94 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
     const notes = providedNotes || getAllNotes();
     const parsed = [];
     const timelineRegex = /(?:@timeline|@event):\s*([^\n]+)/gi;
+    const inlineTagRegex = /#(?:timeline|event)\/([^\s#,]+)/gi;
 
     for (const note of notes) {
-      const body = note.body || '';
+      const fullBody = note.body || '';
+      const { frontmatter: fm, bodyWithoutFm } = _parseFrontmatter(fullBody);
+      let matchIdx = 0;
+
+      // 1. YAML Frontmatter timeline extraction
+      const fmTimeline = fm['timeline'] || fm['event'] || fm['timeline_event'];
+      const fmYear = fm['year'] || fm['date'];
+      const fmEra = fm['era'] || fm['epoch'];
+      if (fmTimeline || fmYear) {
+        matchIdx++;
+        let rawYear = fmYear || 'Unknown Date';
+        let rawEra = fmEra || '';
+        let rawTitle = note.title;
+        let rawDesc = `Recorded in [[${note.title}]]`;
+
+        if (fmTimeline) {
+          const parts = fmTimeline.split('|').map(s => s.trim());
+          if (parts.length === 1) {
+            rawYear = parts[0];
+          } else if (parts.length === 2) {
+            rawYear = parts[0];
+            rawTitle = parts[1];
+          } else if (parts.length === 3) {
+            if (/age|era|epoch|period|century|convergence|dynasty|bce/i.test(parts[1])) {
+              rawYear = parts[0];
+              rawEra = parts[1];
+              rawTitle = parts[2];
+            } else {
+              rawYear = parts[0];
+              rawTitle = parts[1];
+              rawDesc = parts[2];
+            }
+          } else if (parts.length >= 4) {
+            rawYear = parts[0];
+            rawEra = parts[1];
+            rawTitle = parts[2];
+            rawDesc = parts.slice(3).join(' | ');
+          }
+        }
+        if (fm['title']) rawTitle = fm['title'];
+        if (fm['description']) rawDesc = fm['description'];
+        if (!rawEra) rawEra = _inferEra(rawYear);
+
+        parsed.push({
+          id: `note-evt-fm-${note.id}-${matchIdx}`,
+          year: rawYear,
+          era: rawEra,
+          title: rawTitle,
+          description: rawDesc,
+          noteId: note.id,
+          noteTitle: note.title,
+          category: note.category,
+          source: 'note',
+          isNoteEvent: true,
+          createdAt: note.createdAt
+        });
+      }
+
+      // 2. @timeline: and @event: syntax
       timelineRegex.lastIndex = 0;
       let match;
-      let matchIdx = 0;
-      while ((match = timelineRegex.exec(body)) !== null) {
+      while ((match = timelineRegex.exec(bodyWithoutFm)) !== null) {
         matchIdx++;
         const content = match[1].trim();
         const parts = content.split('|').map(s => s.trim());
         let rawYear = 'Unknown Date';
-        let rawEra = 'General Era';
+        let rawEra = '';
         let rawTitle = note.title;
         let rawDesc = `Recorded in [[${note.title}]]`;
 
         if (parts.length === 1) {
           rawYear = parts[0];
-          rawEra = _inferEra(rawYear);
         } else if (parts.length === 2) {
           rawYear = parts[0];
-          rawEra = _inferEra(rawYear);
           rawTitle = parts[1];
         } else if (parts.length === 3) {
-          rawYear = parts[0];
-          rawEra = _inferEra(rawYear);
-          rawTitle = parts[1];
-          rawDesc = parts[2];
+          if (/age|era|epoch|period|century|convergence|dynasty|bce/i.test(parts[1])) {
+            rawYear = parts[0];
+            rawEra = parts[1];
+            rawTitle = parts[2];
+          } else {
+            rawYear = parts[0];
+            rawTitle = parts[1];
+            rawDesc = parts[2];
+          }
         } else if (parts.length >= 4) {
           rawYear = parts[0];
           rawEra = parts[1];
@@ -529,12 +612,35 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
           rawDesc = parts.slice(3).join(' | ');
         }
 
+        if (!rawEra) rawEra = _inferEra(rawYear);
+
         parsed.push({
           id: `note-evt-${note.id}-${matchIdx}`,
           year: rawYear || 'Unknown Date',
           era: rawEra || _inferEra(rawYear),
           title: rawTitle || note.title,
           description: rawDesc || `Recorded in [[${note.title}]]`,
+          noteId: note.id,
+          noteTitle: note.title,
+          category: note.category,
+          source: 'note',
+          isNoteEvent: true,
+          createdAt: note.createdAt
+        });
+      }
+
+      // 3. Inline timeline hashtag #timeline/Year-X
+      inlineTagRegex.lastIndex = 0;
+      let tagMatch;
+      while ((tagMatch = inlineTagRegex.exec(bodyWithoutFm)) !== null) {
+        matchIdx++;
+        const tagValue = tagMatch[1].replace(/[-_]/g, ' ').trim();
+        parsed.push({
+          id: `note-evt-tag-${note.id}-${matchIdx}`,
+          year: tagValue,
+          era: _inferEra(tagValue),
+          title: note.title,
+          description: `Timeline marker #${tagMatch[0]} in [[${note.title}]]`,
           noteId: note.id,
           noteTitle: note.title,
           category: note.category,
@@ -650,24 +756,24 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
     const relsFromNotes = [];
 
     const charRegex = /@character:\s*([^\n]+)/gi;
-    const relRegex = /(?:@relationship|@rel):\s*(?:\[\[([^\]]+)\]\]|([^|\n]+))\s*(?:\|\s*([^|\n]+))?(?:\|\s*([^\n]+))?/gi;
+    const relRegex = /(?:@relationship|@rel):\s*([^\n]+)/gi;
 
     for (const note of notes) {
       const tags = (note.tags || '').toLowerCase();
-      const body = note.body || '';
-      const isLoreOrChar = note.category === 'lore' || tags.includes('character') || tags.includes('protagonist') || tags.includes('antagonist') || tags.includes('mentor');
+      const fullBody = note.body || '';
+      const { frontmatter: fm, bodyWithoutFm } = _parseFrontmatter(fullBody);
 
-      let explicitCharFound = false;
+      let explicitCharsInNote = [];
+
       charRegex.lastIndex = 0;
       let match;
-      while ((match = charRegex.exec(body)) !== null) {
-        explicitCharFound = true;
+      while ((match = charRegex.exec(bodyWithoutFm)) !== null) {
         const parts = match[1].split('|').map(s => s.trim());
         const name = parts[0] || note.title;
         const archetype = parts[1] || 'Ally';
         const faction = parts[2] || 'Independent';
         const bio = parts.slice(3).join(' | ') || '';
-        charsFromNotes.push({
+        const charObj = {
           id: 'note-char-' + _slugify(name),
           name,
           archetype,
@@ -676,43 +782,82 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
           noteId: note.id,
           source: 'note',
           createdAt: note.createdAt
-        });
+        };
+        charsFromNotes.push(charObj);
+        explicitCharsInNote.push(charObj);
       }
 
-      if (!explicitCharFound && isLoreOrChar) {
-        let archetype = 'Ally';
-        if (tags.includes('protagonist') || /protagonist/i.test(body)) archetype = 'Protagonist';
-        else if (tags.includes('antagonist') || /antagonist/i.test(body)) archetype = 'Antagonist';
-        else if (tags.includes('mentor') || /mentor/i.test(body)) archetype = 'Mentor';
-        else if (tags.includes('rival') || /rival/i.test(body)) archetype = 'Rival';
+      // Frontmatter or tag character detection
+      const isFmChar = fm['type'] === 'character' || fm['character'] === 'true' || !!fm['archetype'] || !!fm['role'];
+      const hasCharTag = tags.includes('character') || tags.includes('#character') || fullBody.includes('#character');
+      const hasArchetypeTag = tags.includes('protagonist') || tags.includes('antagonist') || tags.includes('mentor') || tags.includes('rival') || tags.includes('ally');
 
-        let faction = 'Independent';
-        const factionMatch = body.match(/(?:faction|allegiance|order|fellowship):\s*([^\n]+)/i);
-        if (factionMatch) faction = factionMatch[1].trim();
+      // Note represents a character only if explicitly tagged or specified in frontmatter
+      if (explicitCharsInNote.length === 0 && (isFmChar || hasCharTag || hasArchetypeTag)) {
+        let archetype = fm['archetype'] || 'Ally';
+        if (!fm['archetype']) {
+          if (tags.includes('protagonist') || /protagonist/i.test(bodyWithoutFm)) archetype = 'Protagonist';
+          else if (tags.includes('antagonist') || /antagonist/i.test(bodyWithoutFm)) archetype = 'Antagonist';
+          else if (tags.includes('mentor') || /mentor/i.test(bodyWithoutFm)) archetype = 'Mentor';
+          else if (tags.includes('rival') || /rival/i.test(bodyWithoutFm)) archetype = 'Rival';
+        }
 
-        charsFromNotes.push({
+        let faction = fm['faction'] || fm['allegiance'] || 'Independent';
+        if (!fm['faction'] && !fm['allegiance']) {
+          const factionMatch = bodyWithoutFm.match(/(?:faction|allegiance|order|fellowship):\s*([^\n]+)/i);
+          if (factionMatch) faction = factionMatch[1].trim();
+        }
+
+        const charObj = {
           id: 'note-char-' + _slugify(note.title),
           name: note.title,
           archetype,
           faction,
-          bio: body.replace(/^[#\s*>-]+/gm, '').slice(0, 140).trim(),
+          role: fm['role'] || '',
+          bio: fm['bio'] || bodyWithoutFm.replace(/^[#\s*>-]+/gm, '').slice(0, 140).trim(),
           noteId: note.id,
           source: 'note',
           createdAt: note.createdAt
-        });
+        };
+        charsFromNotes.push(charObj);
+        explicitCharsInNote.push(charObj);
       }
 
+      // Parse relationships
       relRegex.lastIndex = 0;
       let rMatch;
-      while ((rMatch = relRegex.exec(body)) !== null) {
-        const targetTitle = (rMatch[1] || rMatch[2] || '').trim();
-        if (targetTitle) {
+      let relIdx = 0;
+      while ((rMatch = relRegex.exec(bodyWithoutFm)) !== null) {
+        relIdx++;
+        const line = rMatch[1].trim();
+        const parts = line.split('|').map(s => s.trim());
+        let sourceName = explicitCharsInNote.length > 0 ? explicitCharsInNote[0].name : note.title;
+        let targetName = '';
+        let relType = 'Allied with';
+        let relDesc = '';
+
+        // Check if syntax has -> e.g. "Vespera -> Corvus" or "[[Vespera]] -> [[Corvus]]"
+        const arrowMatch = parts[0].match(/(?:\[\[([^\]]+)\]\]|([^->]+))\s*->\s*(?:\[\[([^\]]+)\]\]|(.+))/);
+        if (arrowMatch) {
+          sourceName = (arrowMatch[1] || arrowMatch[2] || '').trim();
+          targetName = (arrowMatch[3] || arrowMatch[4] || '').trim();
+          relType = parts[1] || 'Allied with';
+          relDesc = parts.slice(2).join(' | ');
+        } else {
+          // Syntax: "[[Target]] | Type | Description" or "Target | Type | Description"
+          const cleanTarget = parts[0].replace(/^\[\[/, '').replace(/\]\]$/, '').trim();
+          targetName = cleanTarget;
+          relType = parts[1] || 'Allied with';
+          relDesc = parts.slice(2).join(' | ');
+        }
+
+        if (targetName) {
           relsFromNotes.push({
-            id: `note-rel-${note.id}-${_slugify(targetTitle)}`,
-            sourceNoteTitle: note.title,
-            targetTitle,
-            type: (rMatch[3] || 'Allied with').trim(),
-            description: (rMatch[4] || '').trim(),
+            id: `note-rel-${note.id}-${relIdx}-${_slugify(targetName)}`,
+            sourceName,
+            targetName,
+            type: relType,
+            description: relDesc,
             noteId: note.id,
             source: 'note'
           });
@@ -748,13 +893,14 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
     const charNameMap = new Map();
     chars.forEach(c => {
       charNameMap.set(c.name.trim().toLowerCase(), c.id);
+      charNameMap.set(_slugify(c.name), c.id);
     });
 
     const parsedNoteRels = [];
     for (const r of fromNotes) {
-      const sId = charNameMap.get(r.sourceNoteTitle.trim().toLowerCase());
-      const tId = charNameMap.get(r.targetTitle.trim().toLowerCase());
-      if (sId && tId) {
+      const sId = charNameMap.get((r.sourceName || '').trim().toLowerCase()) || charNameMap.get(_slugify(r.sourceName));
+      const tId = charNameMap.get((r.targetName || '').trim().toLowerCase()) || charNameMap.get(_slugify(r.targetName));
+      if (sId && tId && sId !== tId) {
         parsedNoteRels.push({
           id: r.id,
           sourceId: sId,

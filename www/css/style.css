@@ -3321,6 +3321,7 @@ body.zen-mode .format-bar:hover {
   background: #06070a;
   cursor: grab;
   user-select: none;
+  touch-action: none;
 }
 .map-viewport.panning {
   cursor: grabbing;
@@ -3598,6 +3599,9 @@ body.zen-mode .format-bar:hover {
   overflow-x: auto;
   overflow-y: hidden;
   position: relative;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y pinch-zoom;
 }
 .timeline-rail-scroll {
   min-width: 100%;
@@ -4061,6 +4065,7 @@ body.zen-mode .format-bar:hover {
   height: 100%;
   display: block;
   cursor: grab;
+  touch-action: none;
 }
 #codex-web-canvas:active {
   cursor: grabbing;

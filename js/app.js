@@ -3594,16 +3594,34 @@
   let mapPanStart = { x: 0, y: 0 };
   let mapDraggedPin = null;
   let mapDragDidMove = false;
+  let mapDragStartX = 0;
+  let mapDragStartY = 0;
   let mapTouchDist = 0;
   let mapTouchZoom = 1;
   let pendingPinClick = { x: 50, y: 50 };
 
   let timelineMode = 'rail'; // 'rail' or 'stream'
   let timelineFilter = 'all';
+  let timelineStepWidth = 320;
+  let isTimelinePanning = false;
+  let timelinePanStartX = 0;
+  let timelineScrollStart = 0;
+  let timelineTouchDist = 0;
+  let timelineTouchStartStep = 320;
+  let timelineDidPan = false;
 
   let codexMode = 'cards'; // 'cards' or 'web'
   let codexFilter = 'all';
   let hoveredCharId = null;
+  let codexWebCamera = { x: 0, y: 0, zoom: 1 };
+  let codexNodePositions = new Map();
+  let isCodexPanning = false;
+  let codexPanStart = { x: 0, y: 0 };
+  let codexDraggedNode = null;
+  let codexTouchDist = 0;
+  let codexTouchStartZoom = 1;
+  let codexDidDrag = false;
+  let codexDragStartScreen = { x: 0, y: 0 };
 
   function initWorldbuildingSystems() {
     initMapControls();
@@ -3665,10 +3683,54 @@
         if (!file) return;
         const reader = new FileReader();
         reader.onload = () => {
-          const dataUrl = reader.result;
-          Storage.saveCustomMapImage(dataUrl);
-          loadMapImage(dataUrl);
-          toast('Custom map image loaded', 'success');
+          const rawData = reader.result;
+          if (typeof Image !== 'undefined' && typeof document !== 'undefined' && typeof document.createElement === 'function') {
+            const img = new Image();
+            img.onload = () => {
+              const maxDim = 1920;
+              let w = img.width || 1600;
+              let h = img.height || 1000;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) {
+                  h = Math.round((h * maxDim) / w);
+                  w = maxDim;
+                } else {
+                  w = Math.round((w * maxDim) / h);
+                  h = maxDim;
+                }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext ? canvas.getContext('2d') : null;
+              let compressed = rawData;
+              if (ctx && typeof canvas.toDataURL === 'function') {
+                ctx.drawImage(img, 0, 0, w, h);
+                try {
+                  compressed = canvas.toDataURL('image/jpeg', 0.82) || rawData;
+                } catch {
+                  compressed = rawData;
+                }
+              }
+              const saved = Storage.saveCustomMapImage(compressed);
+              loadMapImage(compressed);
+              if (saved !== false) {
+                toast('Custom map image loaded', 'success');
+              } else {
+                toast('Map image loaded for session (storage quota full)', 'warning');
+              }
+            };
+            img.onerror = () => {
+              Storage.saveCustomMapImage(rawData);
+              loadMapImage(rawData);
+              toast('Custom map image loaded', 'success');
+            };
+            img.src = rawData;
+          } else {
+            Storage.saveCustomMapImage(rawData);
+            loadMapImage(rawData);
+            toast('Custom map image loaded', 'success');
+          }
         };
         reader.readAsDataURL(file);
       });
@@ -3703,6 +3765,9 @@
         if (isMapPlacementMode) {
           handleMapDropClick(e);
         }
+      });
+      mapViewport.addEventListener('dblclick', (e) => {
+        handleMapDropClick(e);
       });
       window.addEventListener('mousemove', onMapMouseMove);
       window.addEventListener('mouseup', onMapMouseUp);
@@ -4037,6 +4102,8 @@
         e.stopPropagation();
         mapDraggedPin = pin;
         mapDragDidMove = false;
+        mapDragStartX = e.clientX;
+        mapDragStartY = e.clientY;
         pinEl.classList.add('dragging');
       });
 
@@ -4045,6 +4112,8 @@
           e.stopPropagation();
           mapDraggedPin = pin;
           mapDragDidMove = false;
+          mapDragStartX = e.touches[0].clientX;
+          mapDragStartY = e.touches[0].clientY;
           pinEl.classList.add('dragging');
         }
       }, { passive: false });
@@ -4101,8 +4170,18 @@
       };
     }
 
+    mapPinPreview.onclick = (e) => {
+      if (e && e.target && typeof e.target.closest === 'function') {
+        if (e.target.closest('#btn-map-preview-close') || e.target.closest('#btn-map-delete-pin')) return;
+      }
+      if (btnMapOpenNote && typeof btnMapOpenNote.onclick === 'function') {
+        btnMapOpenNote.onclick();
+      }
+    };
+
     if (btnMapDeletePin) {
-      btnMapDeletePin.onclick = () => {
+      btnMapDeletePin.onclick = (e) => {
+        if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
         Storage.deleteMapPin(pin.id);
         mapPinPreview.classList.add('hidden');
         renderMapPins();
@@ -4114,7 +4193,6 @@
   function onMapMouseDown(e) {
     if (e.button !== undefined && e.button !== 0) return;
     if (isMapPlacementMode) {
-      handleMapDropClick(e);
       return;
     }
     isMapPanning = true;
@@ -4124,10 +4202,16 @@
 
   function onMapMouseMove(e) {
     if (mapDraggedPin) {
+      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+      const dist = Math.hypot(clientX - mapDragStartX, clientY - mapDragStartY);
+      if (dist < 5 && !mapDragDidMove) {
+        return;
+      }
       mapDragDidMove = true;
       const stageRect = mapStage && mapStage.getBoundingClientRect ? mapStage.getBoundingClientRect() : { left: 0, top: 0, width: 1600, height: 1000 };
-      const pctX = Math.max(0, Math.min(100, ((e.clientX - stageRect.left) / stageRect.width) * 100));
-      const pctY = Math.max(0, Math.min(100, ((e.clientY - stageRect.top) / stageRect.height) * 100));
+      const pctX = Math.max(0, Math.min(100, ((clientX - stageRect.left) / stageRect.width) * 100));
+      const pctY = Math.max(0, Math.min(100, ((clientY - stageRect.top) / stageRect.height) * 100));
       mapDraggedPin.x = pctX;
       mapDraggedPin.y = pctY;
       const el = $(`[data-id="${mapDraggedPin.id}"]`, mapPinsContainer);
@@ -4157,14 +4241,19 @@
 
   function onMapMouseUp() {
     if (mapDraggedPin) {
-      if (mapDragDidMove) {
-        Storage.saveMapPin(mapDraggedPin);
+      const wasMoved = mapDragDidMove;
+      const targetPin = mapDraggedPin;
+      if (wasMoved) {
+        Storage.saveMapPin(targetPin);
         toast('Pin position updated', 'info');
       }
-      const el = $(`[data-id="${mapDraggedPin.id}"]`, mapPinsContainer);
+      const el = $(`[data-id="${targetPin.id}"]`, mapPinsContainer);
       if (el) el.classList.remove('dragging');
       mapDraggedPin = null;
-      setTimeout(() => { mapDragDidMove = false; }, 50);
+      if (!wasMoved) {
+        showPinPreview(targetPin);
+      }
+      setTimeout(() => { mapDragDidMove = false; }, 100);
     }
     isMapPanning = false;
     if (mapViewport) mapViewport.classList.remove('panning');
@@ -4341,6 +4430,85 @@
     if (btnTimelineEventSave) {
       btnTimelineEventSave.addEventListener('click', saveTimelineEventFromModal);
     }
+
+    // Touch and mouse pan & pinch-zoom controls on timeline rail
+    if (timelineRailView) {
+      timelineRailView.addEventListener('touchstart', onTimelineTouchStart, { passive: false });
+      window.addEventListener('touchmove', onTimelineTouchMove, { passive: false });
+      window.addEventListener('touchend', onTimelineTouchEnd);
+
+      timelineRailView.addEventListener('mousedown', onTimelineMouseDown);
+      window.addEventListener('mousemove', onTimelineMouseMove);
+      window.addEventListener('mouseup', onTimelineMouseUp);
+      timelineRailView.addEventListener('wheel', onTimelineWheel, { passive: false });
+    }
+  }
+
+  function onTimelineTouchStart(e) {
+    if (e.touches && e.touches.length === 1) {
+      isTimelinePanning = true;
+      timelineDidPan = false;
+      timelinePanStartX = e.touches[0].clientX;
+      timelineScrollStart = timelineRailView ? (timelineRailView.scrollLeft || 0) : 0;
+    } else if (e.touches && e.touches.length === 2) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      isTimelinePanning = false;
+      timelineTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      timelineTouchStartStep = timelineStepWidth;
+    }
+  }
+
+  function onTimelineTouchMove(e) {
+    if (isTimelinePanning && e.touches && e.touches.length === 1 && timelineRailView) {
+      const dx = e.touches[0].clientX - timelinePanStartX;
+      if (Math.abs(dx) > 6) {
+        timelineDidPan = true;
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+      }
+      timelineRailView.scrollLeft = timelineScrollStart - dx;
+    } else if (e.touches && e.touches.length === 2 && timelineTouchDist > 0) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      const curDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      const scale = curDist / timelineTouchDist;
+      timelineStepWidth = Math.max(180, Math.min(640, Math.round(timelineTouchStartStep * scale)));
+      renderTimeline();
+    }
+  }
+
+  function onTimelineTouchEnd() {
+    isTimelinePanning = false;
+    setTimeout(() => { timelineDidPan = false; }, 100);
+  }
+
+  function onTimelineMouseDown(e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    if (e.target && e.target.closest && e.target.closest('.timeline-card-link')) return;
+    isTimelinePanning = true;
+    timelineDidPan = false;
+    timelinePanStartX = e.clientX;
+    timelineScrollStart = timelineRailView ? (timelineRailView.scrollLeft || 0) : 0;
+  }
+
+  function onTimelineMouseMove(e) {
+    if (isTimelinePanning && timelineRailView) {
+      const dx = e.clientX - timelinePanStartX;
+      if (Math.abs(dx) > 5) timelineDidPan = true;
+      timelineRailView.scrollLeft = timelineScrollStart - dx;
+    }
+  }
+
+  function onTimelineMouseUp() {
+    isTimelinePanning = false;
+    setTimeout(() => { timelineDidPan = false; }, 100);
+  }
+
+  function onTimelineWheel(e) {
+    if (e.ctrlKey || e.metaKey) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 0.87;
+      timelineStepWidth = Math.max(180, Math.min(640, Math.round(timelineStepWidth * factor)));
+      renderTimeline();
+    }
   }
 
   function openTimelineView() {
@@ -4396,7 +4564,7 @@
     timelineRailTrack.innerHTML = '';
     timelineRailEras.innerHTML = '';
 
-    const stepWidth = 320;
+    const stepWidth = timelineStepWidth;
     const totalWidth = Math.max(1200, (events.length + 1) * stepWidth);
     timelineRailTrack.style.width = `${totalWidth}px`;
     const canvasWrap = $('#timeline-rail-canvas-wrap');
@@ -4443,6 +4611,7 @@
       `;
 
       card.addEventListener('click', () => {
+        if (timelineDidPan) return;
         closeTimelineView();
         navigateToEventNote(evt);
       });
@@ -4558,6 +4727,158 @@
 
   // ── 3. Character Codex & Relationship Web ──
 
+  let activeCodexNodes = [];
+  let lastCodexChars = [];
+  let lastCodexRels = [];
+
+  function getCodexWorldCoords(clientX, clientY) {
+    const rect = codexWebCanvas && codexWebCanvas.getBoundingClientRect ? codexWebCanvas.getBoundingClientRect() : { left: 0, top: 0, width: 1200, height: 800 };
+    const scaleX = 1200 / (rect.width || 1200);
+    const scaleY = 800 / (rect.height || 800);
+    const canvasX = (clientX - rect.left) * scaleX;
+    const canvasY = (clientY - rect.top) * scaleY;
+    const worldX = (canvasX - codexWebCamera.x) / (codexWebCamera.zoom || 1);
+    const worldY = (canvasY - codexWebCamera.y) / (codexWebCamera.zoom || 1);
+    return { canvasX, canvasY, worldX, worldY };
+  }
+
+  function onCodexMouseDown(e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    const { worldX, worldY } = getCodexWorldCoords(e.clientX, e.clientY);
+    codexDragStartScreen = { x: e.clientX, y: e.clientY };
+    codexDidDrag = false;
+    let hit = null;
+    for (const n of activeCodexNodes) {
+      if (Math.hypot(n.x - worldX, n.y - worldY) <= n.r) {
+        hit = n;
+        break;
+      }
+    }
+    if (hit) {
+      codexDraggedNode = hit;
+    } else {
+      isCodexPanning = true;
+      codexPanStart = { x: e.clientX - codexWebCamera.x, y: e.clientY - codexWebCamera.y };
+    }
+  }
+
+  function onCodexMouseMove(e) {
+    if (codexDraggedNode) {
+      const dist = Math.hypot(e.clientX - codexDragStartScreen.x, e.clientY - codexDragStartScreen.y);
+      if (dist > 5) codexDidDrag = true;
+      const { worldX, worldY } = getCodexWorldCoords(e.clientX, e.clientY);
+      codexDraggedNode.x = worldX;
+      codexDraggedNode.y = worldY;
+      codexNodePositions.set(codexDraggedNode.char.id, { x: worldX, y: worldY });
+      renderCodexWeb(lastCodexChars, lastCodexRels);
+      return;
+    }
+    if (isCodexPanning) {
+      const dist = Math.hypot(e.clientX - codexDragStartScreen.x, e.clientY - codexDragStartScreen.y);
+      if (dist > 5) codexDidDrag = true;
+      codexWebCamera.x = e.clientX - codexPanStart.x;
+      codexWebCamera.y = e.clientY - codexPanStart.y;
+      renderCodexWeb(lastCodexChars, lastCodexRels);
+      return;
+    }
+    if (codexMode === 'web' && codexWebCanvas && codexModal && !codexModal.classList.contains('hidden')) {
+      const { worldX, worldY } = getCodexWorldCoords(e.clientX, e.clientY);
+      let hit = null;
+      for (const n of activeCodexNodes) {
+        if (Math.hypot(n.x - worldX, n.y - worldY) <= n.r) {
+          hit = n.char.id;
+          break;
+        }
+      }
+      if (hit !== hoveredCharId) {
+        hoveredCharId = hit;
+        renderCodexWeb(lastCodexChars, lastCodexRels);
+      }
+    }
+  }
+
+  function onCodexMouseUp() {
+    if (codexDraggedNode) {
+      if (!codexDidDrag) {
+        showWebInspector(codexDraggedNode.char, lastCodexRels, lastCodexChars);
+      }
+      codexDraggedNode = null;
+    }
+    isCodexPanning = false;
+    setTimeout(() => { codexDidDrag = false; }, 100);
+  }
+
+  function onCodexWheel(e) {
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+    const { canvasX, canvasY } = getCodexWorldCoords(e.clientX, e.clientY);
+    const factor = e.deltaY < 0 ? 1.14 : 0.88;
+    const newZoom = Math.min(3.0, Math.max(0.3, codexWebCamera.zoom * factor));
+    codexWebCamera.x = canvasX - (canvasX - codexWebCamera.x) * (newZoom / codexWebCamera.zoom);
+    codexWebCamera.y = canvasY - (canvasY - codexWebCamera.y) * (newZoom / codexWebCamera.zoom);
+    codexWebCamera.zoom = newZoom;
+    renderCodexWeb(lastCodexChars, lastCodexRels);
+  }
+
+  function onCodexTouchStart(e) {
+    if (e.touches && e.touches.length === 1) {
+      const touch = e.touches[0];
+      const { worldX, worldY } = getCodexWorldCoords(touch.clientX, touch.clientY);
+      codexDragStartScreen = { x: touch.clientX, y: touch.clientY };
+      codexDidDrag = false;
+      let hit = null;
+      for (const n of activeCodexNodes) {
+        if (Math.hypot(n.x - worldX, n.y - worldY) <= n.r) {
+          hit = n;
+          break;
+        }
+      }
+      if (hit) {
+        codexDraggedNode = hit;
+      } else {
+        isCodexPanning = true;
+        codexPanStart = { x: touch.clientX - codexWebCamera.x, y: touch.clientY - codexWebCamera.y };
+      }
+    } else if (e.touches && e.touches.length === 2) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      codexDraggedNode = null;
+      isCodexPanning = false;
+      codexTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      codexTouchStartZoom = codexWebCamera.zoom;
+    }
+  }
+
+  function onCodexTouchMove(e) {
+    if (codexDraggedNode && e.touches && e.touches.length === 1) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      const touch = e.touches[0];
+      const dist = Math.hypot(touch.clientX - codexDragStartScreen.x, touch.clientY - codexDragStartScreen.y);
+      if (dist > 5) codexDidDrag = true;
+      const { worldX, worldY } = getCodexWorldCoords(touch.clientX, touch.clientY);
+      codexDraggedNode.x = worldX;
+      codexDraggedNode.y = worldY;
+      codexNodePositions.set(codexDraggedNode.char.id, { x: worldX, y: worldY });
+      renderCodexWeb(lastCodexChars, lastCodexRels);
+    } else if (isCodexPanning && e.touches && e.touches.length === 1) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      const touch = e.touches[0];
+      const dist = Math.hypot(touch.clientX - codexDragStartScreen.x, touch.clientY - codexDragStartScreen.y);
+      if (dist > 5) codexDidDrag = true;
+      codexWebCamera.x = touch.clientX - codexPanStart.x;
+      codexWebCamera.y = touch.clientY - codexPanStart.y;
+      renderCodexWeb(lastCodexChars, lastCodexRels);
+    } else if (e.touches && e.touches.length === 2 && codexTouchDist > 0) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      const curDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      const ratio = curDist / codexTouchDist;
+      codexWebCamera.zoom = Math.min(3.0, Math.max(0.3, codexTouchStartZoom * ratio));
+      renderCodexWeb(lastCodexChars, lastCodexRels);
+    }
+  }
+
+  function onCodexTouchEnd() {
+    onCodexMouseUp();
+  }
+
   function initCodexControls() {
     if (btnCodexView) btnCodexView.addEventListener('click', openCodexView);
     if (menuBtnCodex) menuBtnCodex.addEventListener('click', openCodexView);
@@ -4624,6 +4945,17 @@
       btnInspectorClose.addEventListener('click', () => {
         if (codexWebInspector) codexWebInspector.classList.add('hidden');
       });
+    }
+
+    if (codexWebCanvas) {
+      codexWebCanvas.addEventListener('mousedown', onCodexMouseDown);
+      window.addEventListener('mousemove', onCodexMouseMove);
+      window.addEventListener('mouseup', onCodexMouseUp);
+      codexWebCanvas.addEventListener('wheel', onCodexWheel, { passive: false });
+
+      codexWebCanvas.addEventListener('touchstart', onCodexTouchStart, { passive: false });
+      window.addEventListener('touchmove', onCodexTouchMove, { passive: false });
+      window.addEventListener('touchend', onCodexTouchEnd);
     }
   }
 
@@ -4741,6 +5073,9 @@
   }
 
   function renderCodexWeb(chars, rels) {
+    lastCodexChars = chars || [];
+    lastCodexRels = rels || [];
+
     if (!codexWebCanvas || typeof codexWebCanvas.getContext !== 'function') return;
     const ctx = codexWebCanvas.getContext('2d');
     if (!ctx) return;
@@ -4752,25 +5087,40 @@
 
     if (ctx.clearRect) ctx.clearRect(0, 0, w, h);
 
-    const charNodes = [];
     const centerX = w / 2;
     const centerY = h / 2;
     const radius = Math.min(centerX, centerY) - 120;
 
-    chars.forEach((c, idx) => {
-      const angle = (idx / (chars.length || 1)) * Math.PI * 2 - Math.PI / 2;
+    const charNodes = [];
+    (chars || []).forEach((c, idx) => {
+      let x, y;
+      if (codexNodePositions.has(c.id)) {
+        const pos = codexNodePositions.get(c.id);
+        x = pos.x;
+        y = pos.y;
+      } else {
+        const angle = (idx / (chars.length || 1)) * Math.PI * 2 - Math.PI / 2;
+        x = centerX + Math.cos(angle) * radius;
+        y = centerY + Math.sin(angle) * radius;
+        codexNodePositions.set(c.id, { x, y });
+      }
       charNodes.push({
         char: c,
-        x: centerX + Math.cos(angle) * radius,
-        y: centerY + Math.sin(angle) * radius,
+        x,
+        y,
         r: 32
       });
     });
+    activeCodexNodes = charNodes;
+
+    if (ctx.save) ctx.save();
+    if (ctx.translate) ctx.translate(codexWebCamera.x, codexWebCamera.y);
+    if (ctx.scale) ctx.scale(codexWebCamera.zoom, codexWebCamera.zoom);
 
     const nodeMap = new Map();
     charNodes.forEach(n => nodeMap.set(n.char.id, n));
 
-    rels.forEach(r => {
+    (rels || []).forEach(r => {
       const sNode = nodeMap.get(r.sourceId);
       const tNode = nodeMap.get(r.targetId);
       if (!sNode || !tNode) return;
@@ -4855,39 +5205,22 @@
       if (ctx.restore) ctx.restore();
     });
 
-    codexWebCanvas.onmousemove = (e) => {
-      const rect = codexWebCanvas.getBoundingClientRect ? codexWebCanvas.getBoundingClientRect() : { left: 0, top: 0, width: w, height: h };
-      const scaleX = w / rect.width;
-      const scaleY = h / rect.height;
-      const mx = (e.clientX - rect.left) * scaleX;
-      const my = (e.clientY - rect.top) * scaleY;
+    if (ctx.restore) ctx.restore();
 
-      let hit = null;
-      for (const n of charNodes) {
-        if (Math.hypot(n.x - mx, n.y - my) <= n.r) {
-          hit = n.char.id;
-          break;
-        }
-      }
-      if (hit !== hoveredCharId) {
-        hoveredCharId = hit;
-        renderCodexWeb(chars, rels);
-      }
-    };
-
+    // Preserve mock/test onclick compatibility
     codexWebCanvas.onclick = (e) => {
-      const rect = codexWebCanvas.getBoundingClientRect ? codexWebCanvas.getBoundingClientRect() : { left: 0, top: 0, width: w, height: h };
-      const scaleX = w / rect.width;
-      const scaleY = h / rect.height;
-      const mx = (e.clientX - rect.left) * scaleX;
-      const my = (e.clientY - rect.top) * scaleY;
-
+      if (codexDidDrag) return;
+      const { worldX, worldY } = getCodexWorldCoords(e.clientX, e.clientY);
       for (const n of charNodes) {
-        if (Math.hypot(n.x - mx, n.y - my) <= n.r) {
+        if (Math.hypot(n.x - worldX, n.y - worldY) <= n.r) {
           showWebInspector(n.char, rels, chars);
           break;
         }
       }
+    };
+
+    codexWebCanvas.onmousemove = (e) => {
+      onCodexMouseMove(e);
     };
   }
 

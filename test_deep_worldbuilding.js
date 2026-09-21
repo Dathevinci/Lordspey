@@ -82,7 +82,7 @@ const event1 = Storage.saveTimelineEvent({
 assert(event1.id, 'Timeline event must have an ID');
 assert.strictEqual(Storage.getTimelineEvents().length, 1);
 
-// Scan notes for @timeline: and @event: tags
+// Scan notes for @timeline: and @event: tags, YAML frontmatter, and hashtags
 const testNotes = [
   {
     id: 'note-tl-1',
@@ -93,11 +93,23 @@ Some lore description.
 @timeline: 850 | Age of Ash | Fall of the Silver Bastion | Siege lasting ninety winters.
 @event: 920 | Treaty of Cinders | Truce signed in blood.
 `
+  },
+  {
+    id: 'note-tl-fm',
+    title: 'Astronomical Epochs',
+    category: 'lore',
+    body: `---
+timeline: Year 450 | Construction of High Spire
+era: Age of Foundations
+---
+Observatory founded.
+#timeline/Year-720
+`
   }
 ];
 
 const scannedEvents = Storage.scanNotesForEvents(testNotes);
-assert.strictEqual(scannedEvents.length, 2, 'Should extract 2 events from note');
+assert.strictEqual(scannedEvents.length, 4, 'Should extract 4 events from both notes (including frontmatter & hashtag)');
 assert.strictEqual(scannedEvents[0].year, '850');
 assert.strictEqual(scannedEvents[0].era, 'Age of Ash');
 assert.strictEqual(scannedEvents[0].title, 'Fall of the Silver Bastion');
@@ -108,13 +120,23 @@ assert.strictEqual(scannedEvents[0].noteId, 'note-tl-1');
 assert.strictEqual(scannedEvents[1].year, '920');
 assert.strictEqual(scannedEvents[1].title, 'Treaty of Cinders');
 
+// Frontmatter event
+assert.strictEqual(scannedEvents[2].year, 'Year 450');
+assert.strictEqual(scannedEvents[2].era, 'Age of Foundations');
+assert.strictEqual(scannedEvents[2].title, 'Construction of High Spire');
+
+// Hashtag event
+assert.strictEqual(scannedEvents[3].year, 'Year 720');
+
 // getAllTimelineEvents merges stored and scanned notes
 Storage.saveNote(testNotes[0]);
+Storage.saveNote(testNotes[1]);
 const combinedEvents = Storage.getAllTimelineEvents();
-assert.strictEqual(combinedEvents.length, 3, 'Combined events should include 1 manual + 2 scanned');
+assert.strictEqual(combinedEvents.length, 5, 'Combined events should include 1 manual + 4 scanned');
 Storage.deleteNote('note-tl-1');
+Storage.deleteNote('note-tl-fm');
 Storage.deleteTimelineEvent(event1.id);
-console.log('✓ Timeline Events CRUD & Note Tag Scanner (@timeline, @event) passed');
+console.log('✓ Timeline Events CRUD & Note Tag Scanner (@timeline, @event, frontmatter, & hashtags) passed');
 
 // Test 1.5: Character Codex & Relationship CRUD & Scanner
 const char1 = Storage.saveCharacter({
@@ -144,7 +166,7 @@ const rel1 = Storage.saveRelationship({
 assert(rel1.id);
 assert.strictEqual(Storage.getRelationships().length, 1);
 
-// Scan character notes with #character tag and @relationship: syntax
+// Scan character notes with #character tag, arrow relationships, and ensure non-character lore notes are NOT extracted as characters
 const charNote = {
   id: 'note-char-2',
   title: 'Vespera the Weaver',
@@ -152,23 +174,38 @@ const charNote = {
   tags: 'character, mentor',
   body: `# Vespera
 @character: Vespera the Weaver | Mentor | Astral Loom | Keeper of forgotten tapestries
-@relationship: Kaelen Vance | Mentor | Guided Kaelen during the Long Night
+@relationship: Vespera the Weaver -> Kaelen Vance | Mentor to | Guided Kaelen during the Long Night
+`
+};
+const nonCharLoreNote = {
+  id: 'note-lore-factions',
+  title: 'The Archives of Valoria',
+  category: 'lore',
+  tags: 'factions, history, lore',
+  body: `# Archives
+This is a history book. It discusses the protagonist in third person but is not a character.
 `
 };
 Storage.saveNote(charNote);
+Storage.saveNote(nonCharLoreNote);
 
 const scannedChars = Storage.scanNotesForCharacters(Storage.getAllNotes());
 const foundVespera = scannedChars.find(c => c.name === 'Vespera the Weaver');
 assert(foundVespera, 'Should discover character Vespera from note');
 assert.strictEqual(foundVespera.archetype, 'Mentor');
 
+const foundArchive = scannedChars.find(c => c.name === 'The Archives of Valoria');
+assert(!foundArchive, 'General lore notes must NOT be extracted as characters');
+
 const scannedRels = Storage.scanNotesForRelationships(Storage.getAllNotes());
 assert(scannedRels.length >= 1, 'Should discover relationship from note');
+assert(scannedRels.some(r => r.sourceName === 'Vespera the Weaver' && r.targetName === 'Kaelen Vance'));
 
 Storage.deleteCharacter(char1.id);
 Storage.deleteCharacter(char2.id);
 Storage.deleteRelationship(rel1.id);
 Storage.deleteNote('note-char-2');
+Storage.deleteNote('note-lore-factions');
 console.log('✓ Character Codex & Relationship CRUD & Note Tag Scanner passed');
 
 // Test 1.6: Starter Vault Populates Worldbuilding Data
@@ -178,7 +215,11 @@ assert(Storage.getAllMapPins().length > 0, 'Starter vault should populate starte
 assert(Storage.getTimelineEvents().length > 0, 'Starter vault should populate starter timeline events');
 assert(Storage.getCharacters().length > 0, 'Starter vault should populate starter characters');
 assert(Storage.getRelationships().length > 0, 'Starter vault should populate starter relationships');
-console.log('✓ Starter Vault cleanly initializes rich worldbuilding datasets');
+
+const starterChars = Storage.getAllCharacters();
+assert(!starterChars.some(c => c.name === 'The Order of Lore'), 'The Order of Lore must not be treated as a character');
+assert.strictEqual(starterChars.length, 2, 'Starter vault should have exactly 2 characters (Vespera and Corvus)');
+console.log('✓ Starter Vault cleanly initializes rich worldbuilding datasets without phantom character extraction');
 
 // Test 1.7: Export & Import JSON preserves Worldbuilding Data
 const exported = Storage.exportJSON();
@@ -285,7 +326,16 @@ function createMockElement(id = '', tag = 'div') {
       if (sel.startsWith('#')) return elementsMap[sel.slice(1)] || null;
       return null;
     },
-    querySelectorAll: () => []
+    querySelectorAll: () => [],
+    closest: function(sel) {
+      let curr = this;
+      while (curr) {
+        if (sel.startsWith('#') && curr.id === sel.slice(1)) return curr;
+        if (sel.startsWith('.') && curr.classList && curr.classList.contains(sel.slice(1))) return curr;
+        curr = curr.parentNode || curr.parentElement;
+      }
+      return null;
+    }
   };
 }
 
@@ -647,5 +697,133 @@ assert(!codexModal.classList.contains('hidden'), 'codexModal remains open');
 triggerKeydown('Escape');
 assert(codexModal.classList.contains('hidden'), 'codexModal dismissed on second Escape');
 console.log('✓ Test 2.5 Passed: Android Back / Escape dismissal hierarchy correctly handles sub-modals and parent modals');
+
+// ── Test 2.6: Timeline Touch Pan, Pinch-Zoom, & Drag Navigation Protection ──
+menuBtnTimeline.dispatchEvent('click');
+assert(!timelineModal.classList.contains('hidden'));
+
+const timelineRailView = elementsMap['timeline-rail-view'];
+assert(timelineRailView, 'timeline-rail-view must exist');
+
+// 1. Single touch drag pan
+timelineRailView.dispatchEvent('touchstart', { touches: [{ clientX: 300, clientY: 100 }] });
+if (windowListeners['touchmove']) {
+  windowListeners['touchmove'].forEach(fn => fn({ touches: [{ clientX: 200, clientY: 100 }] }));
+}
+if (windowListeners['touchend']) {
+  windowListeners['touchend'].forEach(fn => fn({}));
+}
+
+// 2. Two-finger pinch zoom
+timelineRailView.dispatchEvent('touchstart', {
+  touches: [{ clientX: 100, clientY: 100 }, { clientX: 200, clientY: 100 }],
+  preventDefault: () => {}
+});
+if (windowListeners['touchmove']) {
+  windowListeners['touchmove'].forEach(fn => fn({
+    touches: [{ clientX: 50, clientY: 100 }, { clientX: 350, clientY: 100 }],
+    preventDefault: () => {}
+  }));
+}
+if (windowListeners['touchend']) {
+  windowListeners['touchend'].forEach(fn => fn({}));
+}
+
+// 3. Wheel zoom with Ctrl key
+timelineRailView.dispatchEvent('wheel', {
+  ctrlKey: true,
+  deltaY: -100,
+  preventDefault: () => {}
+});
+
+elementsMap['btn-close-timeline'].dispatchEvent('click');
+assert(timelineModal.classList.contains('hidden'));
+console.log('✓ Test 2.6 Passed: Chronology Timeline mobile touch pan, pinch-zoom, and wheel zoom verified');
+
+// ── Test 2.7: Character Codex Web Canvas Touch, Wheel Zoom, & Node Interaction ──
+btnCodexView.dispatchEvent('click');
+assert(!codexModal.classList.contains('hidden'));
+btnCodexWeb.dispatchEvent('click');
+
+const codexWebCanvas = elementsMap['codex-web-canvas'];
+assert(codexWebCanvas, 'codex-web-canvas must exist');
+
+// 1. Wheel zoom on codex web canvas
+codexWebCanvas.dispatchEvent('wheel', {
+  deltaY: -120,
+  clientX: 600,
+  clientY: 400,
+  preventDefault: () => {}
+});
+
+// 2. Touch pan on codex web canvas
+codexWebCanvas.dispatchEvent('touchstart', { touches: [{ clientX: 500, clientY: 300 }] });
+if (windowListeners['touchmove']) {
+  windowListeners['touchmove'].forEach(fn => fn({ touches: [{ clientX: 450, clientY: 280 }], preventDefault: () => {} }));
+}
+if (windowListeners['touchend']) {
+  windowListeners['touchend'].forEach(fn => fn({}));
+}
+
+// 3. Two-finger pinch zoom on codex web canvas
+codexWebCanvas.dispatchEvent('touchstart', {
+  touches: [{ clientX: 200, clientY: 200 }, { clientX: 400, clientY: 200 }],
+  preventDefault: () => {}
+});
+if (windowListeners['touchmove']) {
+  windowListeners['touchmove'].forEach(fn => fn({
+    touches: [{ clientX: 150, clientY: 200 }, { clientX: 450, clientY: 200 }],
+    preventDefault: () => {}
+  }));
+}
+if (windowListeners['touchend']) {
+  windowListeners['touchend'].forEach(fn => fn({}));
+}
+
+elementsMap['btn-close-codex'].dispatchEvent('click');
+assert(codexModal.classList.contains('hidden'));
+console.log('✓ Test 2.7 Passed: Codex Web Canvas wheel zoom, touch drag pan, & pinch zoom verified');
+
+// ── Test 2.8: Map Double-Click Placement & Direct Preview Card Navigation ──
+btnMapView.dispatchEvent('click');
+assert(!mapModal.classList.contains('hidden'));
+
+// Double-click to place pin directly
+elementsMap['map-viewport'].dispatchEvent('dblclick', { clientX: 350, clientY: 250 });
+assert(!elementsMap['map-pin-modal'].classList.contains('hidden'), 'Double clicking map should open pin modal');
+elementsMap['btn-map-pin-cancel'].dispatchEvent('click');
+assert(elementsMap['map-pin-modal'].classList.contains('hidden'));
+
+// Preview card direct click opens note
+elementsMap['map-pin-preview'].classList.remove('hidden');
+elementsMap['map-pin-preview'].dispatchEvent('click', { target: elementsMap['map-pin-preview'] });
+assert(mapModal.classList.contains('hidden'), 'Clicking preview card should open note and close map');
+console.log('✓ Test 2.8 Passed: Map double-click pin placement & direct preview card navigation verified');
+
+// ── Test 2.9: Map Pin Drag Micro-Jitter Immunity ──
+btnMapView.dispatchEvent('click');
+assert(!mapModal.classList.contains('hidden'));
+
+// Place dummy pin element
+const testPinData = Storage.getAllMapPins()[0];
+if (testPinData) {
+  const pinEl = elementsMap['map-pins-container'].children.find(c => c.dataset && c.dataset.id === testPinData.id);
+  if (pinEl) {
+    // Mouse down
+    pinEl.dispatchEvent('mousedown', { button: 0, clientX: 100, clientY: 100, stopPropagation: () => {} });
+    // Micro jitter of 2px (less than 5px threshold)
+    if (windowListeners['mousemove']) {
+      windowListeners['mousemove'].forEach(fn => fn({ clientX: 102, clientY: 101 }));
+    }
+    // Mouse up
+    if (windowListeners['mouseup']) {
+      windowListeners['mouseup'].forEach(fn => fn({}));
+    }
+    // Pin preview should be shown since movement < 5px was treated as click, not drag
+    assert(!elementsMap['map-pin-preview'].classList.contains('hidden'), 'Pin preview should open on micro-jitter click');
+  }
+}
+elementsMap['btn-close-map'].dispatchEvent('click');
+console.log('✓ Test 2.9 Passed: Map pin drag micro-jitter immunity (<5px movement triggers click) verified');
 
 console.log('\n=== ALL DEEP WORLDBUILDING & LORE TESTS PASSED SUCCESSFULLY ===\n');
