@@ -210,8 +210,10 @@
   let findMatchCase       = false;
 
   // Intro Splash State
-  let introTimer          = null;
-  let isIntroActive       = true;
+  let introTimer              = null;
+  let dismissTimer            = null;
+  let isIntroActive           = true;
+  let isInitialTutorialHandled = false;
 
   // ── Init ──
   init();
@@ -231,11 +233,13 @@
 
     // Auto-dismiss intro splash after cinematic star animation
     if (introSplash && !introSplash.classList.contains('hidden')) {
-      introTimer = setTimeout(dismissIntroSplash, 2300);
+      if (introSplash.classList) introSplash.classList.add('intro-animating');
+      introTimer = setTimeout(dismissIntroSplash, 2400);
     } else {
       isIntroActive = false;
       // Launch tutorial on first visit
-      if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
+      if (!isInitialTutorialHandled && typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
+        isInitialTutorialHandled = true;
         setTimeout(() => openTutorial(0), 400);
       }
     }
@@ -243,27 +247,36 @@
 
   // ── Cinematic Intro Splash Screen ──
   function dismissIntroSplash() {
-    if (!introSplash || !isIntroActive) return;
-    isIntroActive = false;
+    if (!introSplash) return;
     if (introTimer) {
       clearTimeout(introTimer);
       introTimer = null;
     }
+    if (dismissTimer) {
+      clearTimeout(dismissTimer);
+      dismissTimer = null;
+    }
 
+    isIntroActive = false;
     if (introSplash.classList) {
       introSplash.classList.add('intro-fade-out');
     }
-    setTimeout(() => {
+    dismissTimer = setTimeout(() => {
+      dismissTimer = null;
       if (introSplash.classList) {
+        introSplash.classList.remove('intro-animating');
         introSplash.classList.add('hidden');
       }
       if (typeof introSplash.setAttribute === 'function') {
         introSplash.setAttribute('aria-hidden', 'true');
       }
 
-      // Launch tutorial on first visit if not yet seen
-      if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
-        setTimeout(() => openTutorial(0), 300);
+      // Launch tutorial strictly on initial app launch first visit
+      if (!isInitialTutorialHandled) {
+        isInitialTutorialHandled = true;
+        if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
+          setTimeout(() => openTutorial(0), 300);
+        }
       }
     }, 550);
   }
@@ -274,31 +287,28 @@
       clearTimeout(introTimer);
       introTimer = null;
     }
+    if (dismissTimer) {
+      clearTimeout(dismissTimer);
+      dismissTimer = null;
+    }
+
     isIntroActive = true;
     if (introSplash.classList) {
-      introSplash.classList.remove('hidden', 'intro-fade-out');
+      introSplash.classList.remove('hidden', 'intro-fade-out', 'intro-animating');
     }
     if (typeof introSplash.setAttribute === 'function') {
       introSplash.setAttribute('aria-hidden', 'false');
     }
 
-    // Trigger animation restart on containers if querySelector exists
-    if (typeof introSplash.querySelector === 'function') {
-      const container = introSplash.querySelector('.intro-container');
-      if (container) {
-        container.style.animation = 'none';
-        void container.offsetWidth;
-        container.style.animation = '';
-      }
-      const star = introSplash.querySelector('.intro-star-graphic');
-      if (star) {
-        star.style.animation = 'none';
-        void star.offsetWidth;
-        star.style.animation = '';
-      }
+    // Force DOM reflow to cleanly restart all CSS keyframe animations
+    if (typeof introSplash.offsetWidth !== 'undefined') {
+      void introSplash.offsetWidth;
+    }
+    if (introSplash.classList) {
+      introSplash.classList.add('intro-animating');
     }
 
-    introTimer = setTimeout(dismissIntroSplash, 2300);
+    introTimer = setTimeout(dismissIntroSplash, 2400);
   }
 
   // ── Main Menu / Dashboard ──
@@ -383,6 +393,12 @@
     }
     if (menuEmblem) {
       menuEmblem.addEventListener('click', playIntroSplash);
+      menuEmblem.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          playIntroSplash();
+        }
+      });
     }
 
     // Main menu cards
@@ -1479,7 +1495,7 @@
     }
 
     // Allow skipping intro with Esc, Space, or Enter
-    if (isIntroActive && introSplash && !introSplash.classList.contains('hidden')) {
+    if (introSplash && !introSplash.classList.contains('hidden')) {
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
         dismissIntroSplash();
@@ -1499,8 +1515,20 @@
   }
 
   function handleBackOrEscape() {
-    if (isIntroActive && introSplash && !introSplash.classList.contains('hidden')) {
-      dismissIntroSplash();
+    if (introSplash && !introSplash.classList.contains('hidden')) {
+      if (dismissTimer) {
+        clearTimeout(dismissTimer);
+        dismissTimer = null;
+        if (introSplash.classList) {
+          introSplash.classList.remove('intro-animating', 'intro-fade-out');
+          introSplash.classList.add('hidden');
+        }
+        if (typeof introSplash.setAttribute === 'function') {
+          introSplash.setAttribute('aria-hidden', 'true');
+        }
+      } else {
+        dismissIntroSplash();
+      }
       return true;
     }
     if (tutorialOverlay && !tutorialOverlay.classList.contains('hidden')) {

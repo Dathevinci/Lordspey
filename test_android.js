@@ -85,6 +85,7 @@ function createMockEl(id, isHidden = false) {
 
 // Test back button logic directly
 const mockElements = {
+  '#intro-splash': createMockEl('intro-splash', true),
   '#tutorial-overlay': createMockEl('tutorial-overlay', true),
   '#graph-modal': createMockEl('graph-modal', true),
   '#switcher-modal': createMockEl('switcher-modal', true),
@@ -100,6 +101,12 @@ const mockElements = {
 };
 
 function testBackHandler(windowWidth = 1024) {
+  const intro = mockElements['#intro-splash'];
+  if (intro && !intro.classList.contains('hidden')) {
+    intro.classList.add('hidden');
+    return true;
+  }
+
   // Check open modals
   const modalSelectors = [
     '#tutorial-overlay',
@@ -145,6 +152,11 @@ function testBackHandler(windowWidth = 1024) {
 
   return false;
 }
+
+// Scenario 0: Intro Splash active -> dismissed and returns true
+mockElements['#intro-splash'].classList.remove('hidden');
+assert.strictEqual(testBackHandler(), true, 'Back button should dismiss intro splash');
+assert(mockElements['#intro-splash'].classList.contains('hidden'), 'Intro splash must now be hidden');
 
 // Scenario A: Main Menu with no modals open -> returns false (OS handles exit)
 assert.strictEqual(testBackHandler(), false, 'Back button on clean main menu should return false');

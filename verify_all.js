@@ -90,6 +90,9 @@ assert(cssContent.includes('introFlareGlint'), 'Missing @keyframes introFlareGli
 const jsContent = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
 assert(jsContent.includes('dismissIntroSplash'), 'Missing dismissIntroSplash in js/app.js');
 assert(jsContent.includes('playIntroSplash'), 'Missing playIntroSplash in js/app.js');
+assert(jsContent.includes('dismissTimer'), 'Missing dismissTimer tracking to prevent leaking dismissal in js/app.js');
+assert(jsContent.includes('intro-animating'), 'Missing intro-animating animation reset class in js/app.js');
+assert(jsContent.includes('isInitialTutorialHandled'), 'Missing isInitialTutorialHandled to prevent spurious tutorial launch on replay in js/app.js');
 assert(jsContent.includes('introSplash.classList'), 'Missing introSplash classList handling in js/app.js');
 console.log('✓ Cinematic Crimson Star Intro markup, animations, & controller verified');
 
