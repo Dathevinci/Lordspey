@@ -1,0 +1,8 @@
+{
+  "appId": "com.lordspey.app",
+  "appName": "Lord Spey",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

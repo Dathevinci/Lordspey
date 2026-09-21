@@ -6,7 +6,9 @@
   "scripts": {
     "start": "electron .",
     "build:exe": "electron-builder --win --publish never",
-    "test": "node verify_all.js && node test_suite.js && node test_graph.js && node test_author_features.js && node test_extended_markdown.js"
+    "build:web": "node scripts/build-web.js",
+    "cap:sync": "node scripts/build-web.js && npx cap sync android",
+    "test": "node scripts/build-web.js && node verify_all.js && node test_suite.js && node test_graph.js && node test_author_features.js && node test_extended_markdown.js"
   },
   "keywords": [
     "author",
@@ -19,6 +21,8 @@
   "author": "Lord Spey",
   "license": "MIT",
   "devDependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
     "electron": "^33.2.0",
     "electron-builder": "^25.1.8"
   },
@@ -32,11 +36,15 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -46,5 +54,8 @@
       "js/**/*",
       "electron-main.js"
     ]
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.5.2"
   }
 }

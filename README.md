@@ -49,9 +49,28 @@ The compiled `.exe` files will be in the **`dist/`** directory.
 
 ---
 
+## 🤖 Building Android App (`.apk`)
+
+```bash
+# Install dependencies
+npm install
+
+# Sync web assets to Capacitor Android project
+npm run cap:sync
+
+# Build Android debug APK
+cd android && ./gradlew assembleDebug
+```
+The compiled `.apk` will be in **`android/app/build/outputs/apk/debug/app-debug.apk`**.
+
+---
+
 ## 📱 Releases & Downloads
 
-Pre-built binaries for **Windows (`.exe`)** can be downloaded directly from the **[Releases](https://github.com/Dathevinci/Lordspey/releases)** page.
+Pre-built binaries for **Windows (`.exe`)** and **Android (`.apk`)** can be downloaded directly from the **[Releases](https://github.com/Dathevinci/Lordspey/releases)** page:
+- **`Lord.Spey.apk` / `app-debug.apk`**: Sideloadable Android package.
+- **`Lord.Spey.Setup.1.0.0.exe`**: Windows NSIS installer.
+- **`Lord.Spey.1.0.0.exe`**: Standalone portable Windows executable.
 
 ---
 
