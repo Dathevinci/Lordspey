@@ -5,7 +5,7 @@
   "main": "electron-main.js",
   "scripts": {
     "start": "electron .",
-    "build:exe": "electron-builder --win",
+    "build:exe": "electron-builder --win --publish never",
     "test": "node verify_all.js && node test_suite.js && node test_graph.js && node test_author_features.js && node test_extended_markdown.js"
   },
   "keywords": [
