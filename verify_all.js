@@ -72,7 +72,12 @@ assert(htmlContent.includes('id="menu-btn-tutorial"'), 'Missing #menu-btn-tutori
 assert(htmlContent.includes('id="btn-tutorial-next"'), 'Missing #btn-tutorial-next in index.html');
 assert(htmlContent.includes('id="btn-tutorial-prev"'), 'Missing #btn-tutorial-prev in index.html');
 assert(htmlContent.includes('id="btn-tutorial-skip"'), 'Missing #btn-tutorial-skip in index.html');
-console.log('✓ Interactive Tutorial markup and controls verified in index.html');
+assert(htmlContent.includes('id="menu-btn-chapter"'), 'Missing #menu-btn-chapter in index.html');
+assert(htmlContent.includes('id="menu-btn-lore"'), 'Missing #menu-btn-lore in index.html');
+assert(htmlContent.includes('id="menu-btn-world"'), 'Missing #menu-btn-world in index.html');
+assert(htmlContent.includes('id="menu-btn-draft"'), 'Missing #menu-btn-draft in index.html');
+assert(htmlContent.includes('class="map-zoom-cluster"'), 'Missing .map-zoom-cluster in index.html');
+console.log('✓ Interactive Tutorial markup, dashboard action IDs, & controls verified in index.html');
 
 // 5. Verify Cinematic Crimson Star Intro / Splash screen markup, styles, & controller
 assert(htmlContent.includes('id="intro-splash"'), 'Missing #intro-splash in index.html');

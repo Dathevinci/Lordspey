@@ -126,7 +126,7 @@
 
         <!-- Serene Primary Hero Action & Quick Creation Cluster -->
         <div class="hero-actions">
-          <button class="hero-primary-btn menu-card" data-action="new-chapter" title="Start writing a new manuscript chapter">
+          <button class="hero-primary-btn menu-card" id="menu-btn-chapter" data-action="new-chapter" title="Start writing a new manuscript chapter">
             <span class="hero-primary-icon">✦</span>
             <div class="hero-primary-text">
               <span class="hero-primary-title font-cinzel">Start Writing</span>
@@ -136,15 +136,15 @@
           </button>
 
           <div class="hero-quick-actions">
-            <button class="hero-quick-btn menu-card" data-action="new-lore" title="New Lore Entry">
+            <button class="hero-quick-btn menu-card" id="menu-btn-lore" data-action="new-lore" title="New Lore Entry">
               <span class="quick-btn-dot dot-lore"></span>
               <span>+ New Lore</span>
             </button>
-            <button class="hero-quick-btn menu-card" data-action="new-world" title="New World Realm / Location">
+            <button class="hero-quick-btn menu-card" id="menu-btn-world" data-action="new-world" title="New World Realm / Location">
               <span class="quick-btn-dot dot-world"></span>
               <span>+ World Building</span>
             </button>
-            <button class="hero-quick-btn menu-card" data-action="new-draft" title="New Quick Draft / Outline">
+            <button class="hero-quick-btn menu-card" id="menu-btn-draft" data-action="new-draft" title="New Quick Draft / Outline">
               <span class="quick-btn-dot dot-draft"></span>
               <span>+ Quick Draft</span>
             </button>
@@ -596,9 +596,11 @@
             <button id="btn-map-reset-img" class="btn btn-sm btn-ghost" title="Reset to default cartography canvas">
               Reset Map
             </button>
-            <button id="btn-map-zoom-in" class="icon-btn btn-xs" title="Zoom in (+)">＋</button>
-            <button id="btn-map-zoom-out" class="icon-btn btn-xs" title="Zoom out (-)">－</button>
-            <button id="btn-map-zoom-reset" class="icon-btn btn-xs" title="Reset view">⊙</button>
+            <div class="map-zoom-cluster" title="Map Zoom Controls">
+              <button id="btn-map-zoom-in" class="icon-btn btn-xs" title="Zoom in (+)">＋</button>
+              <button id="btn-map-zoom-out" class="icon-btn btn-xs" title="Zoom out (-)">－</button>
+              <button id="btn-map-zoom-reset" class="icon-btn btn-xs" title="Reset view">⊙</button>
+            </div>
             <button id="btn-close-map" class="icon-btn" title="Close Map (Esc)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>

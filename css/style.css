@@ -766,6 +766,20 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Accessibility & Focus Rings */
+.hero-primary-btn:focus-visible,
+.hero-quick-btn:focus-visible,
+.menu-wb-card:focus-visible,
+.menu-recent-card:focus-visible,
+.menu-sec-btn:focus-visible,
+.fmt-btn:focus-visible,
+.filter-pill:focus-visible,
+.nav-empty-btn:focus-visible,
+.icon-btn:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--red-500) !important;
+  outline-offset: 2px !important;
+}
 
 /* Editor area */
 .editor-area {
@@ -1052,6 +1066,10 @@ body {
   align-items: center;
   gap: 3px;
   flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 2px 4px;
 }
 
 .format-sep {
@@ -2845,6 +2863,82 @@ body.zen-mode .format-bar:hover {
     gap: 8px;
     padding: 12px 14px;
   }
+
+  /* Main Menu / Dashboard Mobile Layout */
+  .main-menu {
+    padding: 24px 16px 36px;
+  }
+  .menu-title {
+    font-size: 1.85rem;
+    letter-spacing: 0.08em;
+  }
+  .menu-subtitle {
+    font-size: 0.85rem;
+  }
+  .hero-primary-btn {
+    padding: 12px 18px;
+  }
+  .hero-primary-title {
+    font-size: 1.05rem;
+  }
+  .hero-primary-sub {
+    font-size: 0.76rem;
+  }
+  .menu-wb-section {
+    padding: 16px 14px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+  }
+  .menu-recent-section {
+    padding: 14px 12px;
+    margin-top: 16px;
+  }
+  .menu-recent-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+  .map-header,
+  .timeline-header,
+  .codex-header {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  .map-controls,
+  .timeline-controls,
+  .codex-controls {
+    gap: 6px;
+  }
+  .map-search-wrap input,
+  .timeline-search-wrap input,
+  .codex-search-wrap input {
+    width: 110px;
+  }
+  .map-search-wrap input:focus,
+  .timeline-search-wrap input:focus,
+  .codex-search-wrap input:focus {
+    width: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-quick-actions {
+    gap: 6px;
+  }
+  .hero-quick-btn {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
+  .menu-wb-card {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  .menu-wb-icon {
+    width: 32px;
+    height: 32px;
+  }
+  .menu-wb-title {
+    font-size: 0.86rem;
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -3422,6 +3516,20 @@ body.zen-mode .format-bar:hover {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+.map-zoom-cluster {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(18, 20, 30, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2px 4px;
+  gap: 2px;
+}
+.map-zoom-cluster .icon-btn {
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
 }
 .map-upload-label {
   cursor: pointer;

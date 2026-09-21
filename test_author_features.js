@@ -305,4 +305,25 @@ formatButtons['highlight'].dispatchEvent('click');
 assert.strictEqual(noteBody.value, 'Text to ==mark==', 'Highlight insertion failed');
 console.log('✓ Strikethrough (~~) and Highlighter (==) insertions passed');
 
+// 8. Test Non-Action Format Buttons (Font controls immunity to selection erasure)
+noteBody.value = 'Selected pristine prose';
+noteBody.selectionStart = 9; noteBody.selectionEnd = 17; // 'pristine'
+const btnFontInc = getEl('btn-font-inc');
+btnFontInc.dispatchEvent('click');
+assert.strictEqual(noteBody.value, 'Selected pristine prose', 'Font controls should not delete note text');
+const btnLineSpacing = getEl('btn-line-spacing');
+btnLineSpacing.dispatchEvent('click');
+assert.strictEqual(noteBody.value, 'Selected pristine prose', 'Line spacing control should not delete note text');
+console.log('✓ Font size and line spacing controls: Selection preserved without erasure');
+
+// 9. Test Auto-Save Flush on returning to Main Menu
+const noteTitleEl = getEl('note-title');
+noteTitleEl.value = 'Chapter of the Stars';
+noteTitleEl.dispatchEvent('input');
+const btnBackMenu = getEl('btn-back-menu');
+btnBackMenu.dispatchEvent('click');
+const allNotes = Storage.getAllNotes();
+assert(allNotes.some(n => n.title === 'Chapter of the Stars'), 'Auto-save must be flushed on return to main menu');
+console.log('✓ Return to Dashboard: Pending auto-save cleanly flushed to storage');
+
 console.log('\nALL AUTHOR FEATURE TESTS PASSED SUCCESSFULLY!');

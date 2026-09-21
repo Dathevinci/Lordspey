@@ -455,6 +455,11 @@
 
   // ── Main Menu / Dashboard ──
   function showMainMenu() {
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+      saveNow();
+    }
     activeNoteId = null;
     mainMenu.classList.remove('hidden');
     editorArea.classList.add('hidden');
@@ -472,17 +477,18 @@
     const all = Storage.getAllNotes();
     if (all.length === 0) {
       menuRecentSection.classList.add('hidden');
+      menuRecentGrid.innerHTML = '';
       return;
     }
 
     menuRecentSection.classList.remove('hidden');
-    const sorted = [...all].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 6);
+    const sorted = [...all].sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0)).slice(0, 6);
 
     menuRecentGrid.innerHTML = sorted.map(n => `
-      <div class="menu-recent-card" data-id="${n.id}">
+      <div class="menu-recent-card" data-id="${n.id}" role="button" tabindex="0" title="Open ${escText(n.title || 'Untitled')}">
         <div class="menu-recent-header">
           <span class="menu-recent-card-title">${escText(n.title || 'Untitled')}</span>
-          <span class="badge badge-${n.category}">${n.category}</span>
+          <span class="badge badge-${n.category || 'draft'}">${n.category || 'draft'}</span>
         </div>
         <div class="menu-recent-card-preview">${escText((n.body || '').replace(/^[#\s*>-]+/gm, '').slice(0, 65) || 'Empty document')}</div>
       </div>
@@ -491,6 +497,12 @@
     $$('.menu-recent-card', menuRecentGrid).forEach(card => {
       card.addEventListener('click', () => {
         openNote(card.dataset.id);
+      });
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openNote(card.dataset.id);
+        }
       });
     });
   }
@@ -640,6 +652,9 @@
           });
           renderSidebar();
           openNote(note.id);
+          if (window.innerWidth <= 768) {
+            sidebar.classList.add('collapsed');
+          }
           toast(`Created new ${cat}`, 'success');
           setTimeout(() => {
             if (noteTitle) {
@@ -758,7 +773,11 @@
 
     // Format bar actions
     $$('.fmt-btn').forEach(btn => {
-      btn.addEventListener('click', () => applyFormat(btn.dataset.action));
+      btn.addEventListener('click', () => {
+        if (btn.dataset.action) {
+          applyFormat(btn.dataset.action);
+        }
+      });
     });
 
     // Typography & View Controls
@@ -1520,7 +1539,7 @@
 
   // ── Format bar ──
   function applyFormat(action) {
-    if (previewMode) return;
+    if (!action || previewMode) return;
     const ta = noteBody;
     const start = ta.selectionStart;
     const end = ta.selectionEnd;
