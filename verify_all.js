@@ -65,6 +65,30 @@ assert(htmlContent.includes('id="main-menu"'), 'Missing #main-menu in index.html
 assert(htmlContent.includes('id="logo-home"'), 'Missing #logo-home in index.html');
 assert(htmlContent.includes('id="btn-back-menu"'), 'Missing #btn-back-menu in index.html');
 
+// Clean Brand Header & Views Dock assertions
+assert(htmlContent.includes('sidebar-header'), 'Missing .sidebar-header in index.html');
+assert(htmlContent.includes('sidebar-tools-dock'), 'Missing .sidebar-tools-dock in index.html');
+assert(htmlContent.includes('sidebar-collapse-btn'), 'Missing .sidebar-collapse-btn in index.html');
+
+// Verify tool buttons are moved out of the logo line into the dedicated dock
+const headerEnd = htmlContent.indexOf('</div>', htmlContent.indexOf('class="sidebar-header"'));
+const headerSnippet = htmlContent.slice(htmlContent.indexOf('class="sidebar-header"'), headerEnd);
+assert(headerSnippet.includes('id="logo-home"'), 'Logo must be in sidebar-header');
+assert(headerSnippet.includes('id="sidebar-toggle"'), 'Collapse toggle must be in sidebar-header');
+assert(!headerSnippet.includes('id="btn-graph-view"'), 'Graph view button must not be crammed into sidebar-header');
+assert(!headerSnippet.includes('id="btn-map-view"'), 'Map view button must not be crammed into sidebar-header');
+assert(!headerSnippet.includes('id="btn-timeline-view"'), 'Timeline view button must not be crammed into sidebar-header');
+assert(!headerSnippet.includes('id="btn-codex-view"'), 'Codex view button must not be crammed into sidebar-header');
+
+// Verify dedicated dock has all 6 tool buttons
+const dockSection = htmlContent.slice(htmlContent.indexOf('class="sidebar-tools-dock"'), htmlContent.indexOf('class="sidebar-nav"'));
+assert(dockSection.includes('id="btn-graph-view"'), 'Missing btn-graph-view in sidebar-tools-dock');
+assert(dockSection.includes('id="btn-map-view"'), 'Missing btn-map-view in sidebar-tools-dock');
+assert(dockSection.includes('id="btn-timeline-view"'), 'Missing btn-timeline-view in sidebar-tools-dock');
+assert(dockSection.includes('id="btn-codex-view"'), 'Missing btn-codex-view in sidebar-tools-dock');
+assert(dockSection.includes('id="btn-quick-switcher"'), 'Missing btn-quick-switcher in sidebar-tools-dock');
+assert(dockSection.includes('id="btn-tutorial-sidebar"'), 'Missing btn-tutorial-sidebar in sidebar-tools-dock');
+
 // Tutorial assertions
 assert(htmlContent.includes('id="tutorial-overlay"'), 'Missing #tutorial-overlay in index.html');
 assert(htmlContent.includes('id="btn-tutorial-sidebar"'), 'Missing #btn-tutorial-sidebar in index.html');
@@ -77,7 +101,7 @@ assert(htmlContent.includes('id="menu-btn-lore"'), 'Missing #menu-btn-lore in in
 assert(htmlContent.includes('id="menu-btn-world"'), 'Missing #menu-btn-world in index.html');
 assert(htmlContent.includes('id="menu-btn-draft"'), 'Missing #menu-btn-draft in index.html');
 assert(htmlContent.includes('class="map-zoom-cluster"'), 'Missing .map-zoom-cluster in index.html');
-console.log('✓ Interactive Tutorial markup, dashboard action IDs, & controls verified in index.html');
+console.log('✓ Clean Brand Header, Views & Tools dock, & Interactive Tutorial markup verified in index.html');
 
 // 5. Verify Cinematic Crimson Star Intro / Splash screen markup, styles, & controller
 assert(htmlContent.includes('id="intro-splash"'), 'Missing #intro-splash in index.html');

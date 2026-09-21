@@ -15,31 +15,48 @@
   <!-- ───────── Sidebar ───────── -->
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
-      <h1 class="logo clickable" id="logo-home" title="Go to Main Menu">
-        <span class="logo-icon">✦</span> Lord Spey
+      <h1 class="logo clickable" id="logo-home" title="Lord Spey — Go to Main Menu">
+        <span class="logo-icon" aria-hidden="true">✦</span>
+        <span class="logo-text">LORD SPEY</span>
       </h1>
-      <div class="sidebar-header-actions">
-        <button id="btn-tutorial-sidebar" class="icon-btn" title="Tutorial & Workspace Guide">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </button>
-        <button id="btn-map-view" class="icon-btn" title="World Map & Pins (Ctrl+M)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-        </button>
-        <button id="btn-timeline-view" class="icon-btn" title="Chronology & Event Timeline (Ctrl+T)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </button>
-        <button id="btn-codex-view" class="icon-btn" title="Character Codex & Relationship Web (Ctrl+U)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </button>
-        <button id="btn-quick-switcher" class="icon-btn" title="Quick Switcher (Ctrl+K / Ctrl+O)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        </button>
-        <button id="btn-graph-view" class="icon-btn" title="Galaxy Graph (Ctrl+G)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="16.5"/><line x1="8.5" y1="6" x2="15.5" y2="6"/></svg>
-        </button>
-        <button id="sidebar-toggle" class="icon-btn sidebar-collapse-btn" title="Collapse sidebar">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
+      <button id="sidebar-toggle" class="icon-btn sidebar-collapse-btn" title="Collapse sidebar" aria-label="Collapse sidebar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-search">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="search-input" placeholder="Search vault… (Ctrl+K)" autocomplete="off" />
+    </div>
+
+    <div class="sidebar-tools-section">
+      <div class="sidebar-section-label">
+        <span>Views & Tools</span>
+      </div>
+      <div class="sidebar-tools-dock" role="toolbar" aria-label="Workspace Views and Tools">
+        <div class="tools-dock-group" aria-label="Worldbuilding Views">
+          <button id="btn-graph-view" class="icon-btn tool-dock-btn" title="Galaxy Graph (Ctrl+G)" aria-label="Galaxy Graph" data-tooltip="Galaxy Graph (Ctrl+G)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="16.5"/><line x1="8.5" y1="6" x2="15.5" y2="6"/></svg>
+          </button>
+          <button id="btn-map-view" class="icon-btn tool-dock-btn" title="World Map & Pins (Ctrl+M)" aria-label="World Map" data-tooltip="World Map (Ctrl+M)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          </button>
+          <button id="btn-timeline-view" class="icon-btn tool-dock-btn" title="Chronology & Event Timeline (Ctrl+T)" aria-label="Chronology Timeline" data-tooltip="Chronology (Ctrl+T)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </button>
+          <button id="btn-codex-view" class="icon-btn tool-dock-btn" title="Character Codex & Relationship Web (Ctrl+U)" aria-label="Character Codex" data-tooltip="Codex (Ctrl+U)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </button>
+        </div>
+        <div class="tools-dock-divider" role="separator" aria-orientation="vertical"></div>
+        <div class="tools-dock-group" aria-label="Workspace Utilities">
+          <button id="btn-quick-switcher" class="icon-btn tool-dock-btn" title="Quick Switcher (Ctrl+K / Ctrl+O)" aria-label="Quick Switcher" data-tooltip="Switcher (Ctrl+K)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+          <button id="btn-tutorial-sidebar" class="icon-btn tool-dock-btn" title="Tutorial & Workspace Guide" aria-label="Workspace Guide" data-tooltip="Guide & Tutorial">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </button>
+        </div>
       </div>
     </div>
 

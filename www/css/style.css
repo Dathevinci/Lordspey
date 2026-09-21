@@ -248,11 +248,17 @@ body {
   pointer-events: all;
 }
 
+/* ═══════════════════════════
+   SIDEBAR HEADER & BRANDING
+   ═══════════════════════════ */
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 14px 12px 18px;
+  padding: 16px 14px 14px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  margin-bottom: 2px;
+  position: relative;
 }
 
 .sidebar-header-actions {
@@ -263,38 +269,88 @@ body {
 
 .logo {
   font-family: 'Cinzel', serif;
-  font-size: 1.15rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--text-primary);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  letter-spacing: 0.05em;
+  gap: 9px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: opacity var(--transition);
+}
+.logo:hover {
+  opacity: 0.92;
 }
 
 .logo-icon {
   color: var(--red-500);
-  font-size: 1.1rem;
-  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.4));
+  font-size: 1.15rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.55));
+  transition: transform 200ms ease, filter 200ms ease;
+  display: inline-block;
+}
+.logo:hover .logo-icon {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 14px rgba(239, 68, 68, 0.9));
 }
 
-/* Search */
+.logo-text {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  color: var(--text-primary);
+  white-space: nowrap;
+  font-size: 1.05rem;
+}
+
+.sidebar-collapse-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.sidebar-collapse-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-color: var(--border);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ═══════════════════════════
+   SIDEBAR SEARCH
+   ═══════════════════════════ */
 .sidebar-search {
-  padding: 0 12px 8px;
+  padding: 10px 14px 10px;
   position: relative;
 }
 
 .search-icon {
   position: absolute;
-  left: 22px;
+  left: 24px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-faint);
   pointer-events: none;
+  transition: color var(--transition);
 }
 
 .sidebar-search input {
   width: 100%;
+  height: 34px;
   padding: 7px 10px 7px 34px;
   font-family: inherit;
   font-size: 0.8125rem;
@@ -303,14 +359,134 @@ body {
   border-radius: var(--radius-md);
   color: var(--text-primary);
   outline: none;
-  transition: border-color var(--transition), box-shadow var(--transition);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
 }
 .sidebar-search input::placeholder {
   color: var(--text-faint);
+  font-size: 0.8125rem;
 }
 .sidebar-search input:focus {
   border-color: var(--red-700);
+  background: var(--bg-primary);
   box-shadow: 0 0 0 2px var(--red-glow);
+}
+.sidebar-search:focus-within .search-icon {
+  color: var(--red-400);
+}
+
+/* ═══════════════════════════
+   SIDEBAR VIEWS & TOOLS DOCK
+   ═══════════════════════════ */
+.sidebar-tools-section {
+  padding: 0 14px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  margin-bottom: 6px;
+}
+
+.sidebar-section-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 6px;
+}
+
+.sidebar-section-label span {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.sidebar-tools-dock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 4px 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+
+.tools-dock-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.tools-dock-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.tool-dock-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.tool-dock-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: rgba(220, 38, 38, 0.35);
+  box-shadow: 0 0 10px var(--red-glow);
+  transform: translateY(-1px);
+}
+
+.tool-dock-btn:active {
+  transform: translateY(0) scale(0.96);
+  background: var(--red-glow);
+}
+
+.tool-dock-btn svg {
+  transition: transform var(--transition), color var(--transition);
+}
+.tool-dock-btn:hover svg {
+  color: var(--red-400);
+}
+
+/* Subtle micro-tooltip on hover */
+.tool-dock-btn[data-tooltip]::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 4px 8px;
+  background: #181820;
+  color: #f4f4f6;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 4px;
+  border: 1px solid #2a2a35;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 140ms ease, transform 140ms ease, visibility 140ms;
+  z-index: 50;
+}
+.tool-dock-btn[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* Nav sections */
@@ -2780,6 +2956,27 @@ body.zen-mode .format-bar:hover {
     box-shadow: var(--shadow-lg);
     padding-top: var(--safe-top);
     padding-bottom: var(--safe-bottom);
+  }
+
+  .sidebar-header {
+    padding: 14px 12px 12px 14px;
+  }
+
+  .sidebar-search {
+    padding: 8px 12px 8px;
+  }
+
+  .sidebar-tools-section {
+    padding: 0 12px 8px;
+  }
+
+  .sidebar-tools-dock {
+    padding: 3px 4px;
+  }
+
+  .tool-dock-btn {
+    width: 32px;
+    height: 30px;
   }
 
   .sidebar-backdrop {
