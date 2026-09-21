@@ -338,6 +338,10 @@
     sidebarExpand.addEventListener('click', () => sidebar.classList.remove('collapsed'));
     sidebarBackdrop.addEventListener('click', () => sidebar.classList.add('collapsed'));
 
+    // Android Hardware & Gesture Back Button Support
+    window.handleAndroidBack = handleBackOrEscape;
+    document.addEventListener('backbutton', handleBackOrEscape);
+
     $$('.nav-section-header').forEach(btn => {
       btn.addEventListener('click', () => {
         const expanded = btn.getAttribute('aria-expanded') === 'true';
@@ -1392,22 +1396,60 @@
     }
 
     if (e.key === 'Escape') {
-      if (findReplaceBar && !findReplaceBar.classList.contains('hidden')) {
-        closeFindBar();
-        return;
-      }
-      if (metricsModal && !metricsModal.classList.contains('hidden')) {
-        closeMetricsModal();
-        return;
-      }
-      if (!switcherModal.classList.contains('hidden')) closeQuickSwitcher();
-      if (!graphModal.classList.contains('hidden')) closeGraphView();
-      if (!goalModal.classList.contains('hidden')) goalModal.classList.add('hidden');
-      if (!outlineDrawer.classList.contains('hidden')) outlineDrawer.classList.add('hidden');
-      if (!wikicreateModal.classList.contains('hidden')) closeWikiCreateModal();
-      if (!modalOverlay.classList.contains('hidden')) closeNewNoteModal();
-      if (!deleteOverlay.classList.contains('hidden')) deleteOverlay.classList.add('hidden');
+      handleBackOrEscape();
     }
+  }
+
+  function handleBackOrEscape() {
+    if (tutorialOverlay && !tutorialOverlay.classList.contains('hidden')) {
+      closeTutorial();
+      return true;
+    }
+    if (findReplaceBar && !findReplaceBar.classList.contains('hidden')) {
+      closeFindBar();
+      return true;
+    }
+    if (metricsModal && !metricsModal.classList.contains('hidden')) {
+      closeMetricsModal();
+      return true;
+    }
+    if (switcherModal && !switcherModal.classList.contains('hidden')) {
+      closeQuickSwitcher();
+      return true;
+    }
+    if (graphModal && !graphModal.classList.contains('hidden')) {
+      closeGraphView();
+      return true;
+    }
+    if (goalModal && !goalModal.classList.contains('hidden')) {
+      goalModal.classList.add('hidden');
+      return true;
+    }
+    if (outlineDrawer && !outlineDrawer.classList.contains('hidden')) {
+      outlineDrawer.classList.add('hidden');
+      return true;
+    }
+    if (wikicreateModal && !wikicreateModal.classList.contains('hidden')) {
+      closeWikiCreateModal();
+      return true;
+    }
+    if (modalOverlay && !modalOverlay.classList.contains('hidden')) {
+      closeNewNoteModal();
+      return true;
+    }
+    if (deleteOverlay && !deleteOverlay.classList.contains('hidden')) {
+      deleteOverlay.classList.add('hidden');
+      return true;
+    }
+    if (window.innerWidth <= 768 && sidebar && !sidebar.classList.contains('collapsed')) {
+      sidebar.classList.add('collapsed');
+      return true;
+    }
+    if (editorArea && !editorArea.classList.contains('hidden')) {
+      showMainMenu();
+      return true;
+    }
+    return false;
   }
 
   function openNewNoteModal() {

@@ -69,6 +69,12 @@
   --editor-font:        'Lora', Georgia, serif;
   --editor-font-size:   15px;
   --editor-line-height: 1.8;
+
+  /* Safe Area Insets (Mobile / Notched Displays) */
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
 }
 
 html {
@@ -83,7 +89,12 @@ body {
   color: var(--text-primary);
   display: flex;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
 }
 
 ::selection {
@@ -222,8 +233,8 @@ body {
 
 .sidebar-expand-btn {
   position: fixed;
-  top: 12px;
-  left: 12px;
+  top: calc(12px + var(--safe-top));
+  left: calc(12px + var(--safe-left));
   z-index: 5;
   opacity: 0;
   pointer-events: none;
@@ -2640,8 +2651,11 @@ body.zen-mode .format-bar:hover {
     position: fixed;
     left: 0;
     top: 0;
+    bottom: 0;
     z-index: 25;
     box-shadow: var(--shadow-lg);
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
   }
 
   .sidebar-backdrop {
@@ -2665,8 +2679,19 @@ body.zen-mode .format-bar:hover {
   }
 
   .format-bar {
-    padding: 4px 16px;
+    padding: 6px 12px;
     overflow-x: auto;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .format-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .format-group {
+    flex-wrap: nowrap;
+    flex-shrink: 0;
   }
 
   .editor-textarea,
@@ -2675,7 +2700,30 @@ body.zen-mode .format-bar:hover {
   }
 
   .editor-toolbar {
-    padding: 8px 16px;
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .editor-meta {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .editor-actions {
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .editor-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  #editor-body-wrap.split-mode {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  #editor-body-wrap.split-mode .editor-textarea {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   .backlinks-panel {
@@ -2685,5 +2733,10 @@ body.zen-mode .format-bar:hover {
   .graph-dialog {
     width: 98vw;
     height: 94vh;
+  }
+  .graph-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 14px;
   }
 }

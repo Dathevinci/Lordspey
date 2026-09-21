@@ -234,7 +234,7 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
     a.href = url;
     a.download = `lordspey-vault-${_datestamp()}.json`;
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
   }
 
   function exportMarkdown(noteId) {
@@ -257,7 +257,7 @@ ${note.body || ''}`;
     a.href = url;
     a.download = `${safeTitle}.md`;
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
   }
 
   function importJSON(file) {
