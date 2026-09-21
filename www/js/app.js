@@ -505,16 +505,42 @@
       const filtered = notes.filter(n => n.category === cat);
 
       filtered.sort((a, b) => b.updatedAt - a.updatedAt);
-      countEl.textContent = filtered.length;
+      if (countEl) countEl.textContent = filtered.length;
 
-      list.innerHTML = filtered.map(n => `
-        <li class="nav-item">
-          <div class="nav-link ${n.id === activeNoteId ? 'active' : ''}" data-id="${n.id}">
-            <span class="nav-link-dot"></span>
-            <span class="nav-link-title">${escText(n.title || 'Untitled')}</span>
-          </div>
-        </li>
-      `).join('');
+      if (!list) continue;
+
+      if (filtered.length === 0) {
+        if (!filter) {
+          const suggestions = {
+            chapter: { text: 'No chapters yet', action: 'Draft opening scene' },
+            lore: { text: 'No lore entries', action: 'Record lore or faction' },
+            world: { text: 'No locations yet', action: 'Chart realm or landmark' },
+            draft: { text: 'No drafts yet', action: 'Capture quick idea' }
+          };
+          const sug = suggestions[cat] || { text: 'No documents yet', action: 'New document' };
+          list.innerHTML = `
+            <li class="nav-empty-state">
+              <span class="nav-empty-label">${sug.text}</span>
+              <button class="nav-empty-btn" data-category="${cat}" title="${sug.action}">+ ${sug.action}</button>
+            </li>
+          `;
+        } else {
+          list.innerHTML = `
+            <li class="nav-empty-state">
+              <span class="nav-empty-label">No matches in ${cat}</span>
+            </li>
+          `;
+        }
+      } else {
+        list.innerHTML = filtered.map(n => `
+          <li class="nav-item">
+            <div class="nav-link ${n.id === activeNoteId ? 'active' : ''}" data-id="${n.id}">
+              <span class="nav-link-dot"></span>
+              <span class="nav-link-title">${escText(n.title || 'Untitled')}</span>
+            </div>
+          </li>
+        `).join('');
+      }
     }
   }
 
@@ -598,6 +624,32 @@
 
     $$('.sidebar-nav').forEach(nav => {
       nav.addEventListener('click', e => {
+        const emptyBtn = e.target.closest('.nav-empty-btn');
+        if (emptyBtn) {
+          const cat = emptyBtn.dataset.category || 'draft';
+          let defaultTitle = 'Untitled';
+          if (cat === 'chapter') defaultTitle = 'Untitled Chapter';
+          if (cat === 'lore')    defaultTitle = 'Untitled Lore';
+          if (cat === 'world')   defaultTitle = 'Untitled Realm';
+          if (cat === 'draft')   defaultTitle = 'Untitled Draft';
+
+          const note = Storage.createNote({
+            title: defaultTitle,
+            category: cat,
+            body: `# ${defaultTitle}\n\n`,
+          });
+          renderSidebar();
+          openNote(note.id);
+          toast(`Created new ${cat}`, 'success');
+          setTimeout(() => {
+            if (noteTitle) {
+              noteTitle.focus();
+              noteTitle.select();
+            }
+          }, 100);
+          return;
+        }
+
         const link = e.target.closest('.nav-link');
         if (!link) return;
         openNote(link.dataset.id);

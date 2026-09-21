@@ -122,56 +122,52 @@
       <div class="menu-hero">
         <div class="menu-emblem" id="menu-emblem" role="button" tabindex="0" title="Replay intro animation">✦</div>
         <h2 class="menu-title font-cinzel">LORD SPEY</h2>
-        <p class="menu-subtitle">A minimal, distraction-free workspace for authors. Draft prose, organize chapters, and connect worldbuilding lore like Obsidian.</p>
+        <p class="menu-subtitle">Distraction-free workspace for crafting prose, connecting lore, and charting story worlds.</p>
+
+        <!-- Serene Primary Hero Action & Quick Creation Cluster -->
+        <div class="hero-actions">
+          <button class="hero-primary-btn menu-card" data-action="new-chapter" title="Start writing a new manuscript chapter">
+            <span class="hero-primary-icon">✦</span>
+            <div class="hero-primary-text">
+              <span class="hero-primary-title font-cinzel">Start Writing</span>
+              <span class="hero-primary-sub">Draft prose, opening scenes, and chapters</span>
+            </div>
+            <span class="hero-primary-arrow">→</span>
+          </button>
+
+          <div class="hero-quick-actions">
+            <button class="hero-quick-btn menu-card" data-action="new-lore" title="New Lore Entry">
+              <span class="quick-btn-dot dot-lore"></span>
+              <span>+ New Lore</span>
+            </button>
+            <button class="hero-quick-btn menu-card" data-action="new-world" title="New World Realm / Location">
+              <span class="quick-btn-dot dot-world"></span>
+              <span>+ World Building</span>
+            </button>
+            <button class="hero-quick-btn menu-card" data-action="new-draft" title="New Quick Draft / Outline">
+              <span class="quick-btn-dot dot-draft"></span>
+              <span>+ Quick Draft</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="menu-grid">
-        <button class="menu-card" data-action="new-chapter">
-          <div class="menu-card-icon cat-chapter">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-          </div>
-          <div class="menu-card-content">
-            <h3>New Chapter</h3>
-            <p>Draft prose, scenes, and manuscript chapters</p>
-          </div>
-        </button>
-
-        <button class="menu-card" data-action="new-lore">
-          <div class="menu-card-icon cat-lore">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-          </div>
-          <div class="menu-card-content">
-            <h3>New Lore Entry</h3>
-            <p>Characters, factions, magic systems, and history</p>
-          </div>
-        </button>
-
-        <button class="menu-card" data-action="new-world">
-          <div class="menu-card-icon cat-world">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-          </div>
-          <div class="menu-card-content">
-            <h3>World Building</h3>
-            <p>Locations, geography, cultures, and settings</p>
-          </div>
-        </button>
-
-        <button class="menu-card" data-action="new-draft">
-          <div class="menu-card-icon cat-draft">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          </div>
-          <div class="menu-card-content">
-            <h3>New Draft</h3>
-            <p>Outlines, rough ideas, and scene sketches</p>
-          </div>
-        </button>
+      <!-- Recent Notes Shelf (shown when notes exist) -->
+      <div id="menu-recent-section" class="menu-recent-section hidden">
+        <div class="menu-recent-header-row">
+          <h4 class="menu-recent-title">Recent Documents</h4>
+          <span class="menu-recent-hint">Resume your latest drafts</span>
+        </div>
+        <div id="menu-recent-grid" class="menu-recent-grid"></div>
       </div>
 
-      <!-- Prominent Deep Worldbuilding Launch Section -->
+      <!-- Progressive Worldbuilding & Lore Systems Suite -->
       <div class="menu-wb-section">
         <div class="menu-wb-header">
-          <span class="menu-wb-badge">✦ WORLDBUILDING & SYSTEMS</span>
-          <span class="menu-wb-hint">Deep universe lore & spatial story engines</span>
+          <div class="menu-wb-header-left">
+            <span class="menu-wb-badge">✦ WORLDBUILDING & LORE SYSTEMS</span>
+            <span class="menu-wb-hint">Spatial cartography, chronology, character dossiers & cosmos graph</span>
+          </div>
         </div>
         <div class="menu-wb-grid">
           <button class="menu-wb-card" id="dashboard-btn-map" title="Interactive World Map & Pin Placement (Ctrl+M)">
@@ -183,7 +179,7 @@
                 <span class="menu-wb-title font-cinzel">World Map</span>
                 <kbd class="shortcut-pill">Ctrl+M</kbd>
               </div>
-              <p class="menu-wb-desc">Cartographic canvas, spatial landmarks & custom fantasy map</p>
+              <p class="menu-wb-desc">Cartographic canvas, spatial landmarks & custom fantasy maps</p>
             </div>
           </button>
 
@@ -196,7 +192,7 @@
                 <span class="menu-wb-title font-cinzel">Timeline</span>
                 <kbd class="shortcut-pill">Ctrl+T</kbd>
               </div>
-              <p class="menu-wb-desc">Chronological rail, historical eras & note milestone tracking</p>
+              <p class="menu-wb-desc">Chronological rails, historical eras & narrative milestones</p>
             </div>
           </button>
 
@@ -212,43 +208,42 @@
               <p class="menu-wb-desc">Character dossiers, faction ties & dynamic relationship web</p>
             </div>
           </button>
+
+          <button class="menu-wb-card" id="menu-btn-graph" title="Visual Galaxy Graph (Ctrl+G)">
+            <div class="menu-wb-icon cat-draft">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="16.5"/><line x1="8.5" y1="6" x2="15.5" y2="6"/></svg>
+            </div>
+            <div class="menu-wb-body">
+              <div class="menu-wb-title-row">
+                <span class="menu-wb-title font-cinzel">Galaxy Graph</span>
+                <kbd class="shortcut-pill">Ctrl+G</kbd>
+              </div>
+              <p class="menu-wb-desc">Visual cosmos graph connecting notes, tags & Obsidian wiki-links</p>
+            </div>
+          </button>
         </div>
       </div>
 
+      <!-- Minimalist Utility Bar -->
       <div class="menu-secondary-actions">
+        <button class="menu-sec-btn" id="menu-btn-switcher" title="Quick Switcher (Ctrl+K)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          Quick Switcher <kbd>Ctrl+K</kbd>
+        </button>
         <button class="menu-sec-btn" id="menu-btn-tutorial" title="Interactive Step-by-Step Tutorial">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           Interactive Tutorial
-        </button>
-        <button class="menu-sec-btn" id="menu-btn-map" title="Interactive World Map & Pin Codex">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-          World Map <kbd>Ctrl+M</kbd>
-        </button>
-        <button class="menu-sec-btn" id="menu-btn-timeline" title="Chronology & Event Timeline">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Timeline <kbd>Ctrl+T</kbd>
-        </button>
-        <button class="menu-sec-btn" id="menu-btn-codex" title="Character Codex & Relationship Web">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Character Codex <kbd>Ctrl+U</kbd>
-        </button>
-        <button class="menu-sec-btn" id="menu-btn-graph" title="Visual Galaxy Graph">
-          <span class="sec-icon-star">✦</span> Galaxy Graph <kbd>Ctrl+G</kbd>
-        </button>
-        <button class="menu-sec-btn" id="menu-btn-switcher" title="Quick Switcher">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          Quick Switcher <kbd>Ctrl+K</kbd>
         </button>
         <button class="menu-sec-btn" id="menu-btn-sample" title="Optional: Load sample notes for inspiration">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           Load Sample Vault
         </button>
-      </div>
-
-      <!-- Recent Notes Section (shown when notes exist) -->
-      <div id="menu-recent-section" class="menu-recent-section hidden">
-        <h4 class="menu-recent-title">Recent Documents</h4>
-        <div id="menu-recent-grid" class="menu-recent-grid"></div>
+        <!-- Accessible fallback triggers for backward compatibility -->
+        <span class="visually-hidden" aria-hidden="true" style="display: none;">
+          <button id="menu-btn-map" aria-label="Open World Map"></button>
+          <button id="menu-btn-timeline" aria-label="Open Timeline"></button>
+          <button id="menu-btn-codex" aria-label="Open Character Codex"></button>
+        </span>
       </div>
     </div>
 
@@ -257,20 +252,22 @@
       <!-- Editor toolbar -->
       <div class="editor-toolbar">
         <div class="editor-meta">
-          <button id="btn-back-menu" class="icon-btn" title="Back to Main Menu">
+          <button id="btn-back-menu" class="icon-btn" title="Back to Main Menu (Esc)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           </button>
           <span class="meta-separator">|</span>
-          <select id="note-category" class="meta-select" title="Category">
+          <select id="note-category" class="meta-select" title="Document Category">
             <option value="chapter">Chapter</option>
             <option value="lore">Lore</option>
             <option value="world">World Building</option>
             <option value="draft">Draft</option>
           </select>
           <span class="meta-separator">·</span>
-          <span id="word-count" class="meta-info meta-clickable" title="Click for Detailed Manuscript Stats">0 words</span>
-          <span class="meta-separator">·</span>
-          <span id="reading-time" class="meta-info meta-clickable" title="Click for Detailed Manuscript Stats">0 min read</span>
+          <div class="editor-stats-cluster">
+            <span id="word-count" class="meta-info meta-clickable" title="Click for Detailed Manuscript Stats">0 words</span>
+            <span class="meta-separator">·</span>
+            <span id="reading-time" class="meta-info meta-clickable" title="Click for Detailed Manuscript Stats">0 min read</span>
+          </div>
           <span class="meta-separator">·</span>
 
           <!-- Daily Word Goal Meter -->
@@ -288,54 +285,63 @@
         </div>
 
         <div class="editor-actions">
-          <!-- Find & Replace -->
-          <button id="btn-find-toggle" class="icon-btn" title="Find & Replace (Ctrl+F / Ctrl+H)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-          </button>
-          <!-- Manuscript Metrics / Statistics -->
-          <button id="btn-metrics" class="icon-btn" title="Manuscript Statistics & Readability">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-          </button>
-          <!-- Typewriter Centered Scrolling Mode -->
-          <button id="btn-typewriter" class="icon-btn" title="Toggle Typewriter Scrolling (keeps active line centered)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="2" y1="18" x2="22" y2="18"/></svg>
-          </button>
-          <!-- Split View Button -->
-          <button id="btn-split" class="icon-btn" title="Live Side-by-Side Split View (Ctrl+\)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
-          </button>
-          <!-- Outline Button -->
-          <button id="btn-outline" class="icon-btn" title="Scene & Heading Outline (Alt+O)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          </button>
-          <!-- Zen Mode -->
-          <button id="btn-zen" class="icon-btn" title="Distraction-Free Zen Mode (Ctrl+Shift+F)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-          </button>
-          <!-- Export Markdown -->
-          <button id="btn-export-md" class="icon-btn" title="Export Note as Markdown (.md)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
-          </button>
-          <!-- Reading Mode Preview -->
-          <button id="btn-preview" class="icon-btn" title="Toggle Reading Preview (Ctrl+Shift+P)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+          <!-- Document Navigation & Views -->
+          <div class="toolbar-cluster" title="Navigation & Views">
+            <button id="btn-find-toggle" class="icon-btn" title="Find & Replace (Ctrl+F / Ctrl+H)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </button>
+            <button id="btn-outline" class="icon-btn" title="Scene & Heading Outline (Alt+O)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </button>
+            <button id="btn-split" class="icon-btn" title="Live Side-by-Side Split View (Ctrl+\)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+            </button>
+            <button id="btn-preview" class="icon-btn" title="Toggle Reading Preview (Ctrl+Shift+P)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+
           <span class="meta-separator">|</span>
+
+          <!-- Writing Ambience & Focus -->
+          <div class="toolbar-cluster" title="Focus & Ambience">
+            <button id="btn-typewriter" class="icon-btn" title="Toggle Typewriter Scrolling (keeps active line centered)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="2" y1="18" x2="22" y2="18"/></svg>
+            </button>
+            <button id="btn-zen" class="icon-btn" title="Distraction-Free Zen Mode (Ctrl+Shift+F)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </button>
+            <button id="btn-metrics" class="icon-btn" title="Manuscript Statistics & Readability">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            </button>
+          </div>
+
+          <span class="meta-separator">|</span>
+
           <!-- Worldbuilding Systems Quick Launch -->
-          <button id="btn-toolbar-map" class="icon-btn toolbar-wb-btn" title="World Map (Ctrl+M)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-          </button>
-          <button id="btn-toolbar-timeline" class="icon-btn toolbar-wb-btn" title="Chronology Timeline (Ctrl+T)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </button>
-          <button id="btn-toolbar-codex" class="icon-btn toolbar-wb-btn" title="Character Codex (Ctrl+U)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </button>
+          <div class="toolbar-cluster" title="Worldbuilding Systems">
+            <button id="btn-toolbar-map" class="icon-btn toolbar-wb-btn" title="World Map (Ctrl+M)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+            </button>
+            <button id="btn-toolbar-timeline" class="icon-btn toolbar-wb-btn" title="Chronology Timeline (Ctrl+T)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </button>
+            <button id="btn-toolbar-codex" class="icon-btn toolbar-wb-btn" title="Character Codex (Ctrl+U)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </button>
+          </div>
+
           <span class="meta-separator">|</span>
-          <!-- Delete -->
-          <button id="btn-delete" class="icon-btn btn-danger" title="Delete document">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-          </button>
+
+          <!-- Document Management -->
+          <div class="toolbar-cluster" title="File Operations">
+            <button id="btn-export-md" class="icon-btn" title="Export Note as Markdown (.md)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+            </button>
+            <button id="btn-delete" class="icon-btn btn-danger" title="Delete document">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -379,30 +385,43 @@
 
       <!-- Markdown formatting toolbar -->
       <div class="format-bar">
-        <div class="format-group">
+        <!-- Group 1: Text Style -->
+        <div class="format-group format-text-style" title="Text Style">
           <button class="fmt-btn" data-action="bold" title="Bold (Ctrl+B)"><strong>B</strong></button>
           <button class="fmt-btn" data-action="italic" title="Italic (Ctrl+I)"><em>I</em></button>
           <button class="fmt-btn" data-action="strike" title="Strikethrough (~~text~~)"><s>S</s></button>
           <button class="fmt-btn" data-action="highlight" title="Highlighter (==text==)"><span class="fmt-mark">H</span></button>
+          <button class="fmt-btn" data-action="code" title="Inline code (&lt;code&gt;)">&lt;/&gt;</button>
+        </div>
+
+        <div class="format-sep"></div>
+
+        <!-- Group 2: Narrative Structure -->
+        <div class="format-group format-structure" title="Narrative Structure">
           <button class="fmt-btn" data-action="heading" title="Heading (H1..H3)">H</button>
-          <button class="fmt-btn" data-action="wikilink" title="Obsidian Wiki-link [[...]]"><strong>[[ ]]</strong></button>
-          <button class="fmt-btn" data-action="task" title="Task checkbox - [ ]">☑</button>
-          <button class="fmt-btn" data-action="quote" title="Blockquote">❝</button>
-          <button class="fmt-btn" data-action="callout" title="Obsidian Callout Box (> [!NOTE])">[!]</button>
-          <button class="fmt-btn" data-action="ul" title="Bullet list">•</button>
-          <button class="fmt-btn" data-action="ol" title="Numbered list">1.</button>
-          <button class="fmt-btn" data-action="code" title="Inline code">&lt;/&gt;</button>
-          <button class="fmt-btn" data-action="link" title="Web link">🔗</button>
-          <button class="fmt-btn" data-action="table" title="Insert Markdown Table">▦</button>
-          <button class="fmt-btn" data-action="footnote" title="Footnote ([^1])">[^1]</button>
+          <button class="fmt-btn" data-action="quote" title="Blockquote (&gt;)">❝</button>
+          <button class="fmt-btn" data-action="ul" title="Bullet list (•)">•</button>
+          <button class="fmt-btn" data-action="ol" title="Numbered list (1.)">1.</button>
+          <button class="fmt-btn" data-action="task" title="Task checkbox (- [ ])">☑</button>
           <button id="fmt-divider" class="fmt-btn" data-action="divider" title="Horizontal rule (---)">—</button>
           <button class="fmt-btn" data-action="scene" title="Scene Separator (* * *)">* * *</button>
         </div>
 
         <div class="format-sep"></div>
 
-        <!-- Dialogue & Smart Typography Group -->
-        <div class="format-group">
+        <!-- Group 3: Special Inserts & Lore Links -->
+        <div class="format-group format-inserts" title="Special Inserts & Lore Links">
+          <button class="fmt-btn" data-action="wikilink" title="Obsidian Wiki-link [[...]]"><strong>[[ ]]</strong></button>
+          <button class="fmt-btn" data-action="callout" title="Obsidian Callout Box (&gt; [!NOTE])">[!]</button>
+          <button class="fmt-btn" data-action="table" title="Insert Markdown Table">▦</button>
+          <button class="fmt-btn" data-action="footnote" title="Footnote ([^1])">[^1]</button>
+          <button class="fmt-btn" data-action="link" title="Web link">🔗</button>
+        </div>
+
+        <div class="format-sep"></div>
+
+        <!-- Group 4: Dialogue & Smart Typography Group -->
+        <div class="format-group format-dialogue" title="Prose & Dialogue Typography">
           <button class="fmt-btn fmt-smart" data-action="dialogue-dash" title="Dialogue Em-Dash (—)">—</button>
           <button class="fmt-btn fmt-smart" data-action="smart-quotes" title="Curly Double Quotes (“ ”)">“ ”</button>
           <button class="fmt-btn fmt-smart" data-action="single-quotes" title="Curly Single Quotes (‘ ’)">‘ ’</button>
@@ -411,8 +430,8 @@
 
         <div class="format-sep"></div>
 
-        <!-- Author Typography Controls Group -->
-        <div class="format-group format-typography">
+        <!-- Group 5: Author Typography Controls Group -->
+        <div class="format-group format-typography" title="Editor Display & Typography">
           <select id="editor-font-select" class="meta-select font-select" title="Author Font Family">
             <option value="'Lora', Georgia, serif">Lora (Serif)</option>
             <option value="'Inter', -apple-system, sans-serif">Inter (Sans)</option>
