@@ -2820,12 +2820,12 @@ body.zen-mode .format-bar:hover {
 /* Emblem & Star Area */
 .intro-emblem-wrapper {
   position: relative;
-  width: 150px;
-  height: 150px;
+  width: 160px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 /* Luminous circular halo */
@@ -2910,11 +2910,34 @@ body.zen-mode .format-bar:hover {
   }
 }
 
+/* Smooth Continuous Rotating Star Stage */
+.intro-star-rotator {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  will-change: transform;
+}
+.intro-animating .intro-star-rotator {
+  animation: introStarRotate 10s linear infinite;
+}
+
+@keyframes introStarRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 /* The Star Graphic */
 .intro-star-graphic {
   position: relative;
-  width: 104px;
-  height: 104px;
+  width: 112px;
+  height: 112px;
+  transform-origin: center center;
   filter: drop-shadow(0 0 28px rgba(239, 68, 68, 0.85)) drop-shadow(0 0 60px rgba(185, 28, 28, 0.45));
   will-change: transform, filter;
   z-index: 2;

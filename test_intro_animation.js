@@ -27,19 +27,29 @@ const requiredKeyframes = [
   'introGemBloom',
   'introTaglineReveal',
   'introSkipReveal',
-  'introBgBreathe'
+  'introBgBreathe',
+  'introStarRotate'
 ];
 
 requiredKeyframes.forEach(kf => {
   assert(cssContent.includes(`@keyframes ${kf}`), `Missing @keyframes ${kf} in css/style.css`);
   assert(wwwCssContent.includes(`@keyframes ${kf}`), `Missing @keyframes ${kf} in www/css/style.css`);
 });
-console.log('✓ All 14 intro keyframes verified in css and www assets');
+console.log('✓ All 15 intro keyframes verified in css and www assets');
 
 // 2. Velocity continuity test: ensure no multi-interval velocity stops in star or title
 assert(!cssContent.includes('55% {'), 'introStarPop must not have a 55% inflection hitch');
 assert(!cssContent.includes('60% {'), 'introTitleReveal/introTaglineReveal must not have a 60% rasterizer hitch');
 console.log('✓ Continuous ease curves verified: 0 velocity inflection hitches');
+
+// 3. Isolated star verification: no titles or text branding inside #intro-splash
+assert(htmlContent.includes('class="intro-star-rotator"'), 'Missing intro-star-rotator in index.html');
+const introSplashSection = htmlContent.slice(htmlContent.indexOf('id="intro-splash"'), htmlContent.indexOf('id="toast-container"'));
+assert(!introSplashSection.includes('intro-title'), 'Intro splash must not contain intro-title');
+assert(!introSplashSection.includes('intro-branding'), 'Intro splash must not contain intro-branding');
+assert(!introSplashSection.includes('LORD SPEY'), 'Intro splash must not contain text title LORD SPEY');
+assert(!introSplashSection.includes('AUTHOR’S WORKSPACE'), 'Intro splash must not contain AUTHOR’S WORKSPACE text');
+console.log('✓ Intro splash clean star isolation verified: 0 titles or text branding inside splash');
 
 // 3. Gem squish protection
 assert(!cssContent.includes('.intro-sub-line {\n    transform: scaleX'), 'intro-sub-line must not squeeze the diamond gem with scaleX');
