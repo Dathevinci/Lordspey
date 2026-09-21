@@ -177,6 +177,113 @@
   const hudConnectionsCount = $('#hud-connections-count');
   const hudActionHint       = $('#hud-action-hint');
 
+  // World Map & Pin Codex
+  const btnMapView          = $('#btn-map-view');
+  const menuBtnMap          = $('#menu-btn-map');
+  const mapModal            = $('#map-modal');
+  const btnCloseMap         = $('#btn-close-map');
+  const mapViewport         = $('#map-viewport');
+  const mapStage            = $('#map-stage');
+  const mapCanvas           = $('#map-canvas');
+  const mapCustomImg        = $('#map-custom-img');
+  const mapPinsContainer    = $('#map-pins-container');
+  const mapPinCount         = $('#map-pin-count');
+  const mapCoordsIndicator  = $('#map-coords-indicator');
+  const mapPinSearch        = $('#map-pin-search');
+  const btnMapDropPin       = $('#btn-map-drop-pin');
+  const btnMapCancelDrop    = $('#btn-map-cancel-drop');
+  const mapPlacementHint    = $('#map-placement-hint');
+  const mapFileInput        = $('#map-file-input');
+  const btnMapResetImg      = $('#btn-map-reset-img');
+  const btnMapZoomIn        = $('#btn-map-zoom-in');
+  const btnMapZoomOut       = $('#btn-map-zoom-out');
+  const btnMapZoomReset     = $('#btn-map-zoom-reset');
+  const mapPinPreview       = $('#map-pin-preview');
+  const mapPreviewBadge     = $('#map-preview-badge');
+  const mapPreviewCoords    = $('#map-preview-coords');
+  const btnMapPreviewClose  = $('#btn-map-preview-close');
+  const mapPreviewTitle     = $('#map-preview-title');
+  const mapPreviewDesc      = $('#map-preview-desc');
+  const btnMapOpenNote      = $('#btn-map-open-note');
+  const btnMapDeletePin     = $('#btn-map-delete-pin');
+  const mapPinModal         = $('#map-pin-modal');
+  const mapModalNoteSelect  = $('#map-modal-note-select');
+  const mapModalPinTitle    = $('#map-modal-pin-title');
+  const mapModalPinCategory = $('#map-modal-pin-category');
+  const mapModalPinDesc     = $('#map-modal-pin-desc');
+  const btnMapPinCancel     = $('#btn-map-pin-cancel');
+  const btnMapPinSave       = $('#btn-map-pin-save');
+
+  // Chronology & Event Timeline
+  const btnTimelineView       = $('#btn-timeline-view');
+  const menuBtnTimeline       = $('#menu-btn-timeline');
+  const timelineModal         = $('#timeline-modal');
+  const btnCloseTimeline      = $('#btn-close-timeline');
+  const timelineEventCount    = $('#timeline-event-count');
+  const timelineSearch        = $('#timeline-search');
+  const btnTimelineModeRail   = $('#btn-timeline-mode-rail');
+  const btnTimelineModeStream = $('#btn-timeline-mode-stream');
+  const timelineRailView      = $('#timeline-rail-view');
+  const timelineStreamView    = $('#timeline-stream-view');
+  const timelineRailEras      = $('#timeline-rail-eras');
+  const timelineRailTrack     = $('#timeline-rail-track');
+  const timelineStreamContainer = $('#timeline-stream-container');
+  const timelineEmptyPrompt   = $('#timeline-empty-prompt');
+  const btnTimelineAdd        = $('#btn-timeline-add');
+  const btnTimelineEmptyAdd   = $('#btn-timeline-empty-add');
+  const timelineEventModal    = $('#timeline-event-modal');
+  const timelineInputYear     = $('#timeline-input-year');
+  const timelineInputEra      = $('#timeline-input-era');
+  const timelineInputTitle    = $('#timeline-input-title');
+  const timelineInputNote     = $('#timeline-input-note');
+  const timelineInputCategory = $('#timeline-input-category');
+  const timelineInputDesc     = $('#timeline-input-desc');
+  const btnTimelineEventCancel= $('#btn-timeline-event-cancel');
+  const btnTimelineEventSave  = $('#btn-timeline-event-save');
+
+  // Character Codex & Relationship Web
+  const btnCodexView          = $('#btn-codex-view');
+  const menuBtnCodex          = $('#menu-btn-codex');
+  const codexModal            = $('#codex-modal');
+  const btnCloseCodex         = $('#btn-close-codex');
+  const codexCharacterCount   = $('#codex-character-count');
+  const codexRelCount         = $('#codex-rel-count');
+  const codexSearch           = $('#codex-search');
+  const btnCodexModeCards     = $('#btn-codex-mode-cards');
+  const btnCodexModeWeb       = $('#btn-codex-mode-web');
+  const codexCardsView        = $('#codex-cards-view');
+  const codexWebView          = $('#codex-web-view');
+  const codexGrid             = $('#codex-grid');
+  const codexWebCanvas        = $('#codex-web-canvas');
+  const codexWebInspector     = $('#codex-web-inspector');
+  const btnInspectorClose     = $('#btn-inspector-close');
+  const inspectorArchetypeBadge = $('#inspector-archetype-badge');
+  const inspectorName         = $('#inspector-name');
+  const inspectorFaction      = $('#inspector-faction');
+  const inspectorBio          = $('#inspector-bio');
+  const inspectorRelsList     = $('#inspector-rels-list');
+  const btnInspectorOpenNote  = $('#btn-inspector-open-note');
+  const codexEmptyPrompt      = $('#codex-empty-prompt');
+  const btnCodexAddChar       = $('#btn-codex-add-char');
+  const btnCodexEmptyAdd      = $('#btn-codex-empty-add');
+  const btnCodexAddRel        = $('#btn-codex-add-rel');
+  const codexCharModal        = $('#codex-char-modal');
+  const codexInputName        = $('#codex-input-name');
+  const codexInputArchetype   = $('#codex-input-archetype');
+  const codexInputFaction     = $('#codex-input-faction');
+  const codexInputRole        = $('#codex-input-role');
+  const codexInputNote        = $('#codex-input-note');
+  const codexInputBio         = $('#codex-input-bio');
+  const btnCodexCharCancel    = $('#btn-codex-char-cancel');
+  const btnCodexCharSave      = $('#btn-codex-char-save');
+  const codexRelModal         = $('#codex-rel-modal');
+  const codexRelSource        = $('#codex-rel-source');
+  const codexRelType          = $('#codex-rel-type');
+  const codexRelTarget        = $('#codex-rel-target');
+  const codexRelDesc          = $('#codex-rel-desc');
+  const btnCodexRelCancel     = $('#btn-codex-rel-cancel');
+  const btnCodexRelSave       = $('#btn-codex-rel-save');
+
   const categories = ['chapter', 'lore', 'world', 'draft'];
 
   let activeNoteId      = null;
@@ -224,6 +331,7 @@
     applyTypewriterState();
     bindEvents();
     initGalaxyEngine();
+    initWorldbuildingSystems();
 
     if (window.innerWidth <= 768) {
       sidebar.classList.add('collapsed');
@@ -758,6 +866,22 @@
       buildGalaxyData();
       toast('Loaded sample vault', 'success');
     });
+
+    // Deep Worldbuilding View Triggers
+    if (btnMapView) btnMapView.addEventListener('click', openMapView);
+    if (menuBtnMap) menuBtnMap.addEventListener('click', openMapView);
+    if (btnCloseMap) btnCloseMap.addEventListener('click', closeMapView);
+    if (mapModal) mapModal.addEventListener('click', e => { if (e.target === mapModal) closeMapView(); });
+
+    if (btnTimelineView) btnTimelineView.addEventListener('click', openTimelineView);
+    if (menuBtnTimeline) menuBtnTimeline.addEventListener('click', openTimelineView);
+    if (btnCloseTimeline) btnCloseTimeline.addEventListener('click', closeTimelineView);
+    if (timelineModal) timelineModal.addEventListener('click', e => { if (e.target === timelineModal) closeTimelineView(); });
+
+    if (btnCodexView) btnCodexView.addEventListener('click', openCodexView);
+    if (menuBtnCodex) menuBtnCodex.addEventListener('click', openCodexView);
+    if (btnCloseCodex) btnCloseCodex.addEventListener('click', closeCodexView);
+    if (codexModal) codexModal.addEventListener('click', e => { if (e.target === codexModal) closeCodexView(); });
 
     // Global keyboard shortcuts
     document.addEventListener('keydown', handleGlobalShortcuts);
@@ -1443,6 +1567,24 @@
       return;
     }
 
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'm' && !e.shiftKey) {
+      e.preventDefault();
+      openMapView();
+      return;
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 't') {
+      e.preventDefault();
+      openTimelineView();
+      return;
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'u') {
+      e.preventDefault();
+      openCodexView();
+      return;
+    }
+
     if ((e.ctrlKey || e.metaKey) && e.key === '\\') {
       e.preventDefault();
       toggleSplitView();
@@ -1564,6 +1706,34 @@
     }
     if (graphModal && !graphModal.classList.contains('hidden')) {
       closeGraphView();
+      return true;
+    }
+    if (mapPinModal && !mapPinModal.classList.contains('hidden')) {
+      mapPinModal.classList.add('hidden');
+      return true;
+    }
+    if (timelineEventModal && !timelineEventModal.classList.contains('hidden')) {
+      timelineEventModal.classList.add('hidden');
+      return true;
+    }
+    if (codexCharModal && !codexCharModal.classList.contains('hidden')) {
+      codexCharModal.classList.add('hidden');
+      return true;
+    }
+    if (codexRelModal && !codexRelModal.classList.contains('hidden')) {
+      codexRelModal.classList.add('hidden');
+      return true;
+    }
+    if (mapModal && !mapModal.classList.contains('hidden')) {
+      closeMapView();
+      return true;
+    }
+    if (timelineModal && !timelineModal.classList.contains('hidden')) {
+      closeTimelineView();
+      return true;
+    }
+    if (codexModal && !codexModal.classList.contains('hidden')) {
+      closeCodexView();
       return true;
     }
     if (goalModal && !goalModal.classList.contains('hidden')) {
@@ -3410,6 +3580,1454 @@
     targetCamera.x = mouseX - (mouseX - targetCamera.x) * (newTargetZoom / targetCamera.zoom);
     targetCamera.y = mouseY - (mouseY - targetCamera.y) * (newTargetZoom / targetCamera.zoom);
     targetCamera.zoom = newTargetZoom;
+  }
+
+  // ═══════════════════════════════════════════════
+  // DEEP WORLDBUILDING & LORE SYSTEMS (OBSIDIAN PLUS)
+  // ═══════════════════════════════════════════════
+
+  // State
+  let mapCamera = { x: 0, y: 0, zoom: 1 };
+  let mapFilter = 'all';
+  let isMapPlacementMode = false;
+  let isMapPanning = false;
+  let mapPanStart = { x: 0, y: 0 };
+  let mapDraggedPin = null;
+  let mapDragDidMove = false;
+  let mapTouchDist = 0;
+  let mapTouchZoom = 1;
+  let pendingPinClick = { x: 50, y: 50 };
+
+  let timelineMode = 'rail'; // 'rail' or 'stream'
+  let timelineFilter = 'all';
+
+  let codexMode = 'cards'; // 'cards' or 'web'
+  let codexFilter = 'all';
+  let hoveredCharId = null;
+
+  function initWorldbuildingSystems() {
+    initMapControls();
+    initTimelineControls();
+    initCodexControls();
+  }
+
+  // ── 1. Interactive World Map & Pin Codex ──
+
+  function initMapControls() {
+    if (btnMapView) btnMapView.addEventListener('click', openMapView);
+    if (menuBtnMap) menuBtnMap.addEventListener('click', openMapView);
+    if (btnCloseMap) btnCloseMap.addEventListener('click', closeMapView);
+    if (mapModal) mapModal.addEventListener('click', e => { if (e.target === mapModal) closeMapView(); });
+
+    // Filter pills
+    $$('.filter-pill[data-map-filter]').forEach(pill => {
+      pill.addEventListener('click', () => {
+        $$('.filter-pill[data-map-filter]').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        mapFilter = pill.dataset.mapFilter;
+        renderMapPins();
+      });
+    });
+
+    if (mapPinSearch) {
+      mapPinSearch.addEventListener('input', () => renderMapPins());
+    }
+
+    if (btnMapDropPin) {
+      btnMapDropPin.addEventListener('click', () => {
+        isMapPlacementMode = !isMapPlacementMode;
+        updateMapPlacementUI();
+      });
+    }
+
+    if (btnMapCancelDrop) {
+      btnMapCancelDrop.addEventListener('click', () => {
+        isMapPlacementMode = false;
+        updateMapPlacementUI();
+      });
+    }
+
+    if (btnMapResetImg) {
+      btnMapResetImg.addEventListener('click', () => {
+        Storage.clearCustomMapImage();
+        if (mapCustomImg) mapCustomImg.classList.add('hidden');
+        if (mapCanvas) {
+          mapCanvas.classList.remove('hidden');
+          renderDefaultMap();
+        }
+        toast('Reset to default cartography map', 'info');
+      });
+    }
+
+    if (mapFileInput) {
+      mapFileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result;
+          Storage.saveCustomMapImage(dataUrl);
+          loadMapImage(dataUrl);
+          toast('Custom map image loaded', 'success');
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Zoom controls
+    if (btnMapZoomIn) btnMapZoomIn.addEventListener('click', () => zoomMap(1.2));
+    if (btnMapZoomOut) btnMapZoomOut.addEventListener('click', () => zoomMap(0.8));
+    if (btnMapZoomReset) btnMapZoomReset.addEventListener('click', () => resetMapCamera());
+
+    // Preview actions
+    if (btnMapPreviewClose) {
+      btnMapPreviewClose.addEventListener('click', () => {
+        if (mapPinPreview) mapPinPreview.classList.add('hidden');
+      });
+    }
+
+    // Modal Pin creation
+    if (btnMapPinCancel) {
+      btnMapPinCancel.addEventListener('click', () => {
+        if (mapPinModal) mapPinModal.classList.add('hidden');
+      });
+    }
+    if (btnMapPinSave) {
+      btnMapPinSave.addEventListener('click', savePinFromModal);
+    }
+
+    // Map viewport pan & click interactions
+    if (mapViewport) {
+      mapViewport.addEventListener('mousedown', onMapMouseDown);
+      mapViewport.addEventListener('click', (e) => {
+        if (isMapPlacementMode) {
+          handleMapDropClick(e);
+        }
+      });
+      window.addEventListener('mousemove', onMapMouseMove);
+      window.addEventListener('mouseup', onMapMouseUp);
+      mapViewport.addEventListener('wheel', onMapWheel, { passive: false });
+
+      // Touch events for mobile
+      mapViewport.addEventListener('touchstart', onMapTouchStart, { passive: false });
+      window.addEventListener('touchmove', onMapTouchMove, { passive: false });
+      window.addEventListener('touchend', onMapTouchEnd);
+    }
+  }
+
+  function updateMapPlacementUI() {
+    if (!mapViewport) return;
+    if (isMapPlacementMode) {
+      mapViewport.classList.add('placement-active');
+      if (mapPlacementHint) mapPlacementHint.classList.remove('hidden');
+      if (btnMapDropPin) btnMapDropPin.classList.add('active');
+    } else {
+      mapViewport.classList.remove('placement-active');
+      if (mapPlacementHint) mapPlacementHint.classList.add('hidden');
+      if (btnMapDropPin) btnMapDropPin.classList.remove('active');
+    }
+  }
+
+  function openMapView() {
+    if (!mapModal) return;
+    mapModal.classList.remove('hidden');
+    isMapPlacementMode = false;
+    updateMapPlacementUI();
+    if (mapPinPreview) mapPinPreview.classList.add('hidden');
+
+    resetMapCamera();
+
+    const customImg = Storage.getCustomMapImage();
+    if (customImg) {
+      loadMapImage(customImg);
+    } else {
+      if (mapCustomImg) mapCustomImg.classList.add('hidden');
+      if (mapCanvas) mapCanvas.classList.remove('hidden');
+      renderDefaultMap();
+    }
+
+    renderMapPins();
+  }
+
+  function closeMapView() {
+    if (!mapModal) return;
+    mapModal.classList.add('hidden');
+    if (mapPinModal) mapPinModal.classList.add('hidden');
+    if (mapPinPreview) mapPinPreview.classList.add('hidden');
+    isMapPlacementMode = false;
+    updateMapPlacementUI();
+  }
+
+  function resetMapCamera() {
+    if (!mapViewport || !mapStage) return;
+    const vpRect = mapViewport.getBoundingClientRect ? mapViewport.getBoundingClientRect() : { width: 1000, height: 700 };
+    const scale = Math.min((vpRect.width - 40) / 1600, (vpRect.height - 40) / 1000, 1);
+    mapCamera.zoom = Math.max(0.3, scale);
+    mapCamera.x = (vpRect.width - 1600 * mapCamera.zoom) / 2;
+    mapCamera.y = (vpRect.height - 1000 * mapCamera.zoom) / 2;
+    applyMapTransform();
+  }
+
+  function zoomMap(factor) {
+    if (!mapViewport) return;
+    const vpRect = mapViewport.getBoundingClientRect ? mapViewport.getBoundingClientRect() : { width: 1000, height: 700 };
+    const midX = vpRect.width / 2;
+    const midY = vpRect.height / 2;
+    const newZoom = Math.min(3.5, Math.max(0.2, mapCamera.zoom * factor));
+    const zoomRatio = newZoom / mapCamera.zoom;
+    mapCamera.x = midX - (midX - mapCamera.x) * zoomRatio;
+    mapCamera.y = midY - (midY - mapCamera.y) * zoomRatio;
+    mapCamera.zoom = newZoom;
+    applyMapTransform();
+  }
+
+  function applyMapTransform() {
+    if (!mapStage) return;
+    mapStage.style.transform = `translate(${mapCamera.x}px, ${mapCamera.y}px) scale(${mapCamera.zoom})`;
+  }
+
+  function loadMapImage(dataUrl) {
+    if (!mapCustomImg || !mapCanvas) return;
+    mapCanvas.classList.add('hidden');
+    mapCustomImg.classList.remove('hidden');
+    mapCustomImg.src = dataUrl;
+  }
+
+  function renderDefaultMap() {
+    if (!mapCanvas || typeof mapCanvas.getContext !== 'function') return;
+    const ctx = mapCanvas.getContext('2d');
+    if (!ctx) return;
+
+    const w = 1600;
+    const h = 1000;
+    mapCanvas.width = w;
+    mapCanvas.height = h;
+
+    // Background cosmic ocean
+    if (ctx.createRadialGradient) {
+      const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, 900);
+      bgGrad.addColorStop(0, '#0a0d16');
+      bgGrad.addColorStop(0.6, '#06070c');
+      bgGrad.addColorStop(1, '#020306');
+      ctx.fillStyle = bgGrad;
+    } else {
+      ctx.fillStyle = '#06070c';
+    }
+    ctx.fillRect(0, 0, w, h);
+
+    // Coordinate grid lines
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.07)';
+    ctx.lineWidth = 1;
+    if (ctx.setLineDash) ctx.setLineDash([4, 6]);
+
+    for (let x = 160; x < w; x += 160) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.stroke();
+    }
+    for (let y = 100; y < h; y += 100) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+      ctx.stroke();
+    }
+    if (ctx.setLineDash) ctx.setLineDash([]);
+
+    // Outer border
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
+    ctx.lineWidth = 2;
+    if (ctx.strokeRect) ctx.strokeRect(20, 20, w - 40, h - 40);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    if (ctx.strokeRect) ctx.strokeRect(28, 28, w - 56, h - 56);
+
+    // Decorative corner diamond runes
+    const corners = [[20, 20], [w - 20, 20], [20, h - 20], [w - 20, h - 20]];
+    ctx.fillStyle = '#ef4444';
+    corners.forEach(([cx, cy]) => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Western Continent: The Ashen Highlands
+    if (ctx.save) ctx.save();
+    ctx.fillStyle = '#12141e';
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(140, 320);
+    if (ctx.bezierCurveTo) {
+      ctx.bezierCurveTo(220, 180, 480, 160, 560, 280);
+      ctx.bezierCurveTo(620, 360, 680, 440, 640, 560);
+      ctx.bezierCurveTo(580, 680, 520, 840, 340, 860);
+      ctx.bezierCurveTo(180, 870, 120, 720, 180, 580);
+      ctx.bezierCurveTo(200, 520, 120, 420, 140, 320);
+    } else {
+      ctx.lineTo(560, 280);
+      ctx.lineTo(640, 560);
+      ctx.lineTo(340, 860);
+      ctx.lineTo(180, 580);
+    }
+    if (ctx.closePath) ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    if (ctx.restore) ctx.restore();
+
+    // Eastern Continent: The Starfall Expanse
+    if (ctx.save) ctx.save();
+    ctx.fillStyle = '#11131c';
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(960, 240);
+    if (ctx.bezierCurveTo) {
+      ctx.bezierCurveTo(1120, 140, 1380, 160, 1460, 300);
+      ctx.bezierCurveTo(1520, 420, 1480, 640, 1380, 740);
+      ctx.bezierCurveTo(1240, 840, 1040, 780, 940, 660);
+      ctx.bezierCurveTo(860, 540, 840, 340, 960, 240);
+    } else {
+      ctx.lineTo(1460, 300);
+      ctx.lineTo(1380, 740);
+      ctx.lineTo(940, 660);
+    }
+    if (ctx.closePath) ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    if (ctx.restore) ctx.restore();
+
+    // Central Mountain Divide (The Obsidian Ridge)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    const ridgePoints = [
+      [360, 260], [420, 240], [480, 280], [530, 330],
+      [570, 410], [600, 490], [580, 570], [520, 640],
+      [440, 720], [380, 760]
+    ];
+    ridgePoints.forEach(([px, py], i) => {
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+      ctx.moveTo(px, py);
+      ctx.lineTo(px - 6, py + 12);
+      ctx.moveTo(px, py);
+      ctx.lineTo(px + 6, py + 12);
+    });
+    ctx.stroke();
+
+    // The Bleeding Chasm (crimson rift)
+    if (ctx.save) ctx.save();
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(600, 510);
+    ctx.lineTo(650, 560);
+    ctx.lineTo(630, 610);
+    ctx.lineTo(710, 680);
+    ctx.lineTo(760, 720);
+    ctx.stroke();
+    if (ctx.restore) ctx.restore();
+
+    // Southern Archipelago
+    const islands = [
+      [720, 820, 28], [790, 860, 22], [850, 840, 18], [680, 890, 14]
+    ];
+    ctx.fillStyle = '#141724';
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+    ctx.lineWidth = 1.5;
+    islands.forEach(([ix, iy, r]) => {
+      ctx.beginPath();
+      ctx.arc(ix, iy, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    // Compass Rose / Astrolabe at (1440, 850)
+    const astrolabeX = 1440;
+    const astrolabeY = 850;
+    if (ctx.save) ctx.save();
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(astrolabeX, astrolabeY, 54, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(astrolabeX, astrolabeY, 44, 0, Math.PI * 2);
+    ctx.stroke();
+
+    for (let a = 0; a < 8; a++) {
+      const angle = (a * Math.PI) / 4;
+      const len = a % 2 === 0 ? 50 : 32;
+      ctx.fillStyle = a % 2 === 0 ? '#ef4444' : 'rgba(255, 255, 255, 0.4)';
+      ctx.beginPath();
+      ctx.moveTo(astrolabeX, astrolabeY);
+      ctx.lineTo(astrolabeX + Math.cos(angle - 0.15) * 14, astrolabeY + Math.sin(angle - 0.15) * 14);
+      ctx.lineTo(astrolabeX + Math.cos(angle) * len, astrolabeY + Math.sin(angle) * len);
+      ctx.lineTo(astrolabeX + Math.cos(angle + 0.15) * 14, astrolabeY + Math.sin(angle + 0.15) * 14);
+      if (ctx.closePath) ctx.closePath();
+      ctx.fill();
+    }
+
+    if (typeof ctx.fillText === 'function') {
+      ctx.font = "bold 13px 'Cinzel', serif";
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('N', astrolabeX, astrolabeY - 66);
+      ctx.fillText('S', astrolabeX, astrolabeY + 66);
+      ctx.fillText('E', astrolabeX + 66, astrolabeY);
+      ctx.fillText('W', astrolabeX - 66, astrolabeY);
+
+      // Geographical Titles
+      ctx.font = "14px 'Cinzel', serif";
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.fillText('THE ASHEN HIGHLANDS', 370, 390);
+      ctx.fillText('THE OBSIDIAN GATE PASS', 560, 470);
+      ctx.fillText('THE STARFALL EXPANSE', 1180, 480);
+      ctx.fillText('THE TWILIGHT SEA', 800, 360);
+      ctx.font = "11px 'Cinzel', serif";
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.6)';
+      ctx.fillText('THE BLEEDING CHASM', 720, 620);
+      ctx.fillText('SUNLESS ARCHIPELAGO', 780, 920);
+    }
+    if (ctx.restore) ctx.restore();
+  }
+
+  function renderMapPins() {
+    if (!mapPinsContainer) return;
+    mapPinsContainer.innerHTML = '';
+
+    const allPins = Storage.getAllMapPins();
+    const query = mapPinSearch ? mapPinSearch.value.trim().toLowerCase() : '';
+
+    const filtered = allPins.filter(pin => {
+      if (mapFilter !== 'all' && pin.category !== mapFilter) return false;
+      if (query && !(pin.title || '').toLowerCase().includes(query) && !(pin.description || '').toLowerCase().includes(query)) return false;
+      return true;
+    });
+
+    if (mapPinCount) {
+      mapPinCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'pin' : 'pins'}`;
+    }
+
+    filtered.forEach(pin => {
+      const pinEl = document.createElement('div');
+      pinEl.className = 'map-pin';
+      pinEl.dataset.id = pin.id;
+      pinEl.dataset.category = pin.category || 'world';
+      pinEl.style.left = `${pin.x}%`;
+      pinEl.style.top = `${pin.y}%`;
+
+      pinEl.innerHTML = `
+        <div class="map-pin-head">
+          <div class="map-pin-pulse"></div>
+          <div class="map-pin-dot"></div>
+        </div>
+        <div class="map-pin-label">${escText(pin.title || 'Landmark')}</div>
+      `;
+
+      pinEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (mapDragDidMove) return;
+        showPinPreview(pin);
+      });
+
+      pinEl.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        e.stopPropagation();
+        mapDraggedPin = pin;
+        mapDragDidMove = false;
+        pinEl.classList.add('dragging');
+      });
+
+      pinEl.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches.length === 1) {
+          e.stopPropagation();
+          mapDraggedPin = pin;
+          mapDragDidMove = false;
+          pinEl.classList.add('dragging');
+        }
+      }, { passive: false });
+
+      mapPinsContainer.appendChild(pinEl);
+    });
+  }
+
+  function showPinPreview(pin) {
+    if (!mapPinPreview) return;
+    mapPinPreview.classList.remove('hidden');
+
+    if (mapPreviewBadge) {
+      mapPreviewBadge.className = `badge badge-${pin.category || 'world'}`;
+      mapPreviewBadge.textContent = (pin.category || 'world').toUpperCase();
+    }
+    if (mapPreviewCoords) {
+      mapPreviewCoords.textContent = `${Number(pin.x).toFixed(1)}%, ${Number(pin.y).toFixed(1)}%`;
+    }
+    if (mapPreviewTitle) {
+      mapPreviewTitle.textContent = pin.title || 'Untitled Pin';
+    }
+
+    let summaryText = pin.description || '';
+    let linkedNote = pin.noteId ? Storage.getNote(pin.noteId) : null;
+    if (!linkedNote && pin.title) {
+      linkedNote = Storage.findNoteByTitle(pin.title);
+    }
+    if (linkedNote && linkedNote.body) {
+      const plain = linkedNote.body.replace(/^[#\s*>-]+/gm, '').trim();
+      summaryText = summaryText ? `${summaryText}\n\n${plain.slice(0, 160)}` : plain.slice(0, 160);
+    }
+    if (mapPreviewDesc) {
+      mapPreviewDesc.textContent = summaryText || 'No detailed note entry yet. Click below to open or create.';
+    }
+
+    if (btnMapOpenNote) {
+      btnMapOpenNote.onclick = () => {
+        closeMapView();
+        if (linkedNote) {
+          openNote(linkedNote.id);
+        } else if (pin.noteId) {
+          openNote(pin.noteId);
+        } else {
+          const newNote = Storage.createNote({
+            title: pin.title || 'Untitled Landmark',
+            category: pin.category || 'world',
+            body: `# ${pin.title || 'Untitled Landmark'}\n\n${pin.description || ''}`
+          });
+          renderSidebar();
+          openNote(newNote.id);
+          toast('Created note for pin', 'success');
+        }
+      };
+    }
+
+    if (btnMapDeletePin) {
+      btnMapDeletePin.onclick = () => {
+        Storage.deleteMapPin(pin.id);
+        mapPinPreview.classList.add('hidden');
+        renderMapPins();
+        toast('Pin deleted', 'info');
+      };
+    }
+  }
+
+  function onMapMouseDown(e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    if (isMapPlacementMode) {
+      handleMapDropClick(e);
+      return;
+    }
+    isMapPanning = true;
+    mapPanStart = { x: e.clientX - mapCamera.x, y: e.clientY - mapCamera.y };
+    if (mapViewport) mapViewport.classList.add('panning');
+  }
+
+  function onMapMouseMove(e) {
+    if (mapDraggedPin) {
+      mapDragDidMove = true;
+      const stageRect = mapStage && mapStage.getBoundingClientRect ? mapStage.getBoundingClientRect() : { left: 0, top: 0, width: 1600, height: 1000 };
+      const pctX = Math.max(0, Math.min(100, ((e.clientX - stageRect.left) / stageRect.width) * 100));
+      const pctY = Math.max(0, Math.min(100, ((e.clientY - stageRect.top) / stageRect.height) * 100));
+      mapDraggedPin.x = pctX;
+      mapDraggedPin.y = pctY;
+      const el = $(`[data-id="${mapDraggedPin.id}"]`, mapPinsContainer);
+      if (el) {
+        el.style.left = `${pctX}%`;
+        el.style.top = `${pctY}%`;
+      }
+      if (mapCoordsIndicator) {
+        mapCoordsIndicator.textContent = `X: ${pctX.toFixed(1)}% · Y: ${pctY.toFixed(1)}%`;
+      }
+      return;
+    }
+
+    if (isMapPanning) {
+      mapCamera.x = e.clientX - mapPanStart.x;
+      mapCamera.y = e.clientY - mapPanStart.y;
+      applyMapTransform();
+    }
+
+    if (mapStage && mapCoordsIndicator && mapStage.getBoundingClientRect) {
+      const stageRect = mapStage.getBoundingClientRect();
+      const pctX = Math.max(0, Math.min(100, ((e.clientX - stageRect.left) / stageRect.width) * 100));
+      const pctY = Math.max(0, Math.min(100, ((e.clientY - stageRect.top) / stageRect.height) * 100));
+      mapCoordsIndicator.textContent = `X: ${pctX.toFixed(1)}% · Y: ${pctY.toFixed(1)}%`;
+    }
+  }
+
+  function onMapMouseUp() {
+    if (mapDraggedPin) {
+      if (mapDragDidMove) {
+        Storage.saveMapPin(mapDraggedPin);
+        toast('Pin position updated', 'info');
+      }
+      const el = $(`[data-id="${mapDraggedPin.id}"]`, mapPinsContainer);
+      if (el) el.classList.remove('dragging');
+      mapDraggedPin = null;
+      setTimeout(() => { mapDragDidMove = false; }, 50);
+    }
+    isMapPanning = false;
+    if (mapViewport) mapViewport.classList.remove('panning');
+  }
+
+  function onMapWheel(e) {
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+    if (!mapViewport) return;
+    const vpRect = mapViewport.getBoundingClientRect ? mapViewport.getBoundingClientRect() : { left: 0, top: 0, width: 1000, height: 700 };
+    const mouseX = e.clientX - vpRect.left;
+    const mouseY = e.clientY - vpRect.top;
+
+    const zoomFactor = e.deltaY < 0 ? 1.14 : 0.88;
+    const newZoom = Math.min(3.5, Math.max(0.2, mapCamera.zoom * zoomFactor));
+
+    mapCamera.x = mouseX - (mouseX - mapCamera.x) * (newZoom / mapCamera.zoom);
+    mapCamera.y = mouseY - (mouseY - mapCamera.y) * (newZoom / mapCamera.zoom);
+    mapCamera.zoom = newZoom;
+    applyMapTransform();
+  }
+
+  function handleMapDropClick(e) {
+    if (!mapStage) return;
+    const stageRect = mapStage.getBoundingClientRect ? mapStage.getBoundingClientRect() : { left: 0, top: 0, width: 1600, height: 1000 };
+    const pctX = Math.max(0, Math.min(100, ((e.clientX - stageRect.left) / stageRect.width) * 100));
+    const pctY = Math.max(0, Math.min(100, ((e.clientY - stageRect.top) / stageRect.height) * 100));
+
+    pendingPinClick = { x: pctX, y: pctY };
+    isMapPlacementMode = false;
+    updateMapPlacementUI();
+    openPinModalWithCoords(pctX, pctY);
+  }
+
+  function openPinModalWithCoords(pctX, pctY) {
+    if (!mapPinModal) return;
+    mapPinModal.classList.remove('hidden');
+
+    if (mapModalNoteSelect) {
+      const notes = Storage.getAllNotes();
+      mapModalNoteSelect.innerHTML = `<option value="">-- No linked note (standalone pin) --</option>` +
+        notes.map(n => `<option value="${n.id}">${escText(n.title)} (${n.category})</option>`).join('');
+
+      mapModalNoteSelect.onchange = () => {
+        const selId = mapModalNoteSelect.value;
+        const note = Storage.getNote(selId);
+        if (note) {
+          if (mapModalPinTitle) mapModalPinTitle.value = note.title;
+          if (mapModalPinCategory) mapModalPinCategory.value = note.category;
+          if (mapModalPinDesc) mapModalPinDesc.value = note.body.replace(/^[#\s*>-]+/gm, '').slice(0, 100).trim();
+        }
+      };
+    }
+
+    if (mapModalPinTitle) mapModalPinTitle.value = '';
+    if (mapModalPinDesc) mapModalPinDesc.value = '';
+    if (mapModalPinTitle && typeof mapModalPinTitle.focus === 'function') setTimeout(() => mapModalPinTitle.focus(), 100);
+  }
+
+  function savePinFromModal() {
+    const title = (mapModalPinTitle && mapModalPinTitle.value.trim()) || 'Landmark Pin';
+    const noteId = (mapModalNoteSelect && mapModalNoteSelect.value) || null;
+    const category = (mapModalPinCategory && mapModalPinCategory.value) || 'world';
+    const desc = (mapModalPinDesc && mapModalPinDesc.value.trim()) || '';
+
+    const newPin = {
+      x: pendingPinClick.x,
+      y: pendingPinClick.y,
+      title,
+      noteId,
+      category,
+      description: desc
+    };
+
+    Storage.saveMapPin(newPin);
+    if (mapPinModal) mapPinModal.classList.add('hidden');
+    renderMapPins();
+    toast(`Pin "${title}" placed`, 'success');
+  }
+
+  function onMapTouchStart(e) {
+    if (e.touches && e.touches.length === 1) {
+      if (isMapPlacementMode) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        handleMapDropClick(e.touches[0]);
+        return;
+      }
+      isMapPanning = true;
+      mapPanStart = { x: e.touches[0].clientX - mapCamera.x, y: e.touches[0].clientY - mapCamera.y };
+    } else if (e.touches && e.touches.length === 2) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      isMapPanning = false;
+      mapTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      mapTouchZoom = mapCamera.zoom;
+    }
+  }
+
+  function onMapTouchMove(e) {
+    if (mapDraggedPin && e.touches && e.touches.length === 1) {
+      onMapMouseMove(e.touches[0]);
+      return;
+    }
+
+    if (isMapPanning && e.touches && e.touches.length === 1) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      mapCamera.x = e.touches[0].clientX - mapPanStart.x;
+      mapCamera.y = e.touches[0].clientY - mapPanStart.y;
+      applyMapTransform();
+    } else if (e.touches && e.touches.length === 2 && mapTouchDist > 0) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      const currentDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      const ratio = currentDist / mapTouchDist;
+      mapCamera.zoom = Math.min(3.5, Math.max(0.2, mapTouchZoom * ratio));
+      applyMapTransform();
+    }
+  }
+
+  function onMapTouchEnd() {
+    onMapMouseUp();
+  }
+
+  // ── 2. Chronology & Event Timeline ──
+
+  function initTimelineControls() {
+    if (btnTimelineView) btnTimelineView.addEventListener('click', openTimelineView);
+    if (menuBtnTimeline) menuBtnTimeline.addEventListener('click', openTimelineView);
+    if (btnCloseTimeline) btnCloseTimeline.addEventListener('click', closeTimelineView);
+    if (timelineModal) timelineModal.addEventListener('click', e => { if (e.target === timelineModal) closeTimelineView(); });
+
+    if (btnTimelineModeRail) {
+      btnTimelineModeRail.addEventListener('click', () => {
+        timelineMode = 'rail';
+        btnTimelineModeRail.classList.add('active');
+        if (btnTimelineModeStream) btnTimelineModeStream.classList.remove('active');
+        if (timelineRailView) timelineRailView.classList.remove('hidden');
+        if (timelineStreamView) timelineStreamView.classList.add('hidden');
+        renderTimeline();
+      });
+    }
+    if (btnTimelineModeStream) {
+      btnTimelineModeStream.addEventListener('click', () => {
+        timelineMode = 'stream';
+        btnTimelineModeStream.classList.add('active');
+        if (btnTimelineModeRail) btnTimelineModeRail.classList.remove('active');
+        if (timelineRailView) timelineRailView.classList.add('hidden');
+        if (timelineStreamView) timelineStreamView.classList.remove('hidden');
+        renderTimeline();
+      });
+    }
+
+    $$('.filter-pill[data-timeline-filter]').forEach(pill => {
+      pill.addEventListener('click', () => {
+        $$('.filter-pill[data-timeline-filter]').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        timelineFilter = pill.dataset.timelineFilter;
+        renderTimeline();
+      });
+    });
+
+    if (timelineSearch) {
+      timelineSearch.addEventListener('input', () => renderTimeline());
+    }
+
+    if (btnTimelineAdd) {
+      btnTimelineAdd.addEventListener('click', openAddTimelineEventModal);
+    }
+    if (btnTimelineEmptyAdd) {
+      btnTimelineEmptyAdd.addEventListener('click', openAddTimelineEventModal);
+    }
+    if (btnTimelineEventCancel) {
+      btnTimelineEventCancel.addEventListener('click', () => {
+        if (timelineEventModal) timelineEventModal.classList.add('hidden');
+      });
+    }
+    if (btnTimelineEventSave) {
+      btnTimelineEventSave.addEventListener('click', saveTimelineEventFromModal);
+    }
+  }
+
+  function openTimelineView() {
+    if (!timelineModal) return;
+    timelineModal.classList.remove('hidden');
+    renderTimeline();
+  }
+
+  function closeTimelineView() {
+    if (!timelineModal) return;
+    timelineModal.classList.add('hidden');
+    if (timelineEventModal) timelineEventModal.classList.add('hidden');
+  }
+
+  function renderTimeline() {
+    const allEvents = Storage.getAllTimelineEvents();
+    const query = timelineSearch ? timelineSearch.value.trim().toLowerCase() : '';
+
+    const filtered = allEvents.filter(evt => {
+      if (timelineFilter !== 'all' && evt.category !== timelineFilter) return false;
+      if (query) {
+        const text = `${evt.year} ${evt.title} ${evt.description} ${evt.era || ''}`.toLowerCase();
+        if (!text.includes(query)) return false;
+      }
+      return true;
+    });
+
+    if (timelineEventCount) {
+      timelineEventCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'event' : 'events'}`;
+    }
+
+    if (filtered.length === 0) {
+      if (timelineEmptyPrompt) timelineEmptyPrompt.classList.remove('hidden');
+      if (timelineRailView) timelineRailView.classList.add('hidden');
+      if (timelineStreamView) timelineStreamView.classList.add('hidden');
+      return;
+    }
+
+    if (timelineEmptyPrompt) timelineEmptyPrompt.classList.add('hidden');
+    if (timelineMode === 'rail') {
+      if (timelineRailView) timelineRailView.classList.remove('hidden');
+      if (timelineStreamView) timelineStreamView.classList.add('hidden');
+      renderTimelineRail(filtered);
+    } else {
+      if (timelineRailView) timelineRailView.classList.add('hidden');
+      if (timelineStreamView) timelineStreamView.classList.remove('hidden');
+      renderTimelineStream(filtered);
+    }
+  }
+
+  function renderTimelineRail(events) {
+    if (!timelineRailTrack || !timelineRailEras) return;
+    timelineRailTrack.innerHTML = '';
+    timelineRailEras.innerHTML = '';
+
+    const stepWidth = 320;
+    const totalWidth = Math.max(1200, (events.length + 1) * stepWidth);
+    timelineRailTrack.style.width = `${totalWidth}px`;
+    const canvasWrap = $('#timeline-rail-canvas-wrap');
+    if (canvasWrap) canvasWrap.style.width = `${totalWidth + 120}px`;
+
+    const erasMap = new Map();
+    events.forEach((evt, idx) => {
+      const era = evt.era || 'Historical Epoch';
+      if (!erasMap.has(era)) {
+        erasMap.set(era, { name: era, startIdx: idx, count: 1 });
+      } else {
+        erasMap.get(era).count++;
+      }
+    });
+
+    erasMap.forEach(era => {
+      const eraChip = document.createElement('div');
+      eraChip.className = 'timeline-era-chip';
+      eraChip.textContent = `✦ ${era.name}`;
+      eraChip.style.left = `${(era.startIdx * stepWidth) + 80}px`;
+      timelineRailEras.appendChild(eraChip);
+    });
+
+    events.forEach((evt, idx) => {
+      const isAbove = idx % 2 === 0;
+      const xPos = 80 + (idx * stepWidth);
+
+      const card = document.createElement('div');
+      card.className = `timeline-node-card ${isAbove ? 'pos-above' : 'pos-below'}`;
+      card.style.left = `${xPos}px`;
+
+      card.innerHTML = `
+        <div class="timeline-node-bullet"></div>
+        <div class="timeline-node-stem"></div>
+        <div class="timeline-card-header">
+          <span class="timeline-card-year">${escText(evt.year)}</span>
+          <span class="badge badge-${evt.category || 'lore'}">${evt.category || 'lore'}</span>
+        </div>
+        <h4 class="timeline-card-title">${escText(evt.title)}</h4>
+        <p class="timeline-card-desc">${escText(evt.description)}</p>
+        <div class="timeline-card-link">
+          <span>Open Note ↗</span>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        closeTimelineView();
+        navigateToEventNote(evt);
+      });
+
+      timelineRailTrack.appendChild(card);
+    });
+  }
+
+  function renderTimelineStream(events) {
+    if (!timelineStreamContainer) return;
+    timelineStreamContainer.innerHTML = '';
+
+    let currentEra = '';
+    events.forEach((evt, idx) => {
+      const era = evt.era || 'Historical Chronicle';
+      if (era !== currentEra) {
+        currentEra = era;
+        const eraBanner = document.createElement('div');
+        eraBanner.className = 'timeline-stream-era-header';
+        eraBanner.innerHTML = `<span>✦ ${escText(era)}</span>`;
+        timelineStreamContainer.appendChild(eraBanner);
+      }
+
+      const isLeft = idx % 2 === 0;
+      const item = document.createElement('div');
+      item.className = `timeline-stream-item ${isLeft ? 'side-left' : 'side-right'}`;
+
+      item.innerHTML = `
+        <div class="timeline-stream-dot"></div>
+        <div class="timeline-node-card">
+          <div class="timeline-card-header">
+            <span class="timeline-card-year">${escText(evt.year)}</span>
+            <span class="badge badge-${evt.category || 'lore'}">${evt.category || 'lore'}</span>
+          </div>
+          <h4 class="timeline-card-title">${escText(evt.title)}</h4>
+          <p class="timeline-card-desc">${escText(evt.description)}</p>
+          <div class="timeline-card-link">
+            <span>Open Note ↗</span>
+          </div>
+        </div>
+      `;
+
+      item.addEventListener('click', () => {
+        closeTimelineView();
+        navigateToEventNote(evt);
+      });
+
+      timelineStreamContainer.appendChild(item);
+    });
+  }
+
+  function navigateToEventNote(evt) {
+    let note = evt.noteId ? Storage.getNote(evt.noteId) : null;
+    if (!note && evt.title) {
+      note = Storage.findNoteByTitle(evt.title);
+    }
+    if (!note && evt.noteTitle) {
+      note = Storage.findNoteByTitle(evt.noteTitle);
+    }
+    if (note) {
+      openNote(note.id);
+    } else {
+      const newNote = Storage.createNote({
+        title: evt.title,
+        category: evt.category || 'lore',
+        body: `# ${evt.title}\n\n**Timeline:** ${evt.year} (${evt.era || 'Epoch'})\n\n${evt.description}\n\n`
+      });
+      renderSidebar();
+      openNote(newNote.id);
+      toast('Created note for timeline event', 'success');
+    }
+  }
+
+  function openAddTimelineEventModal() {
+    if (!timelineEventModal) return;
+    timelineEventModal.classList.remove('hidden');
+
+    if (timelineInputNote) {
+      const notes = Storage.getAllNotes();
+      timelineInputNote.innerHTML = `<option value="">-- No linked note --</option>` +
+        notes.map(n => `<option value="${n.id}">${escText(n.title)} (${n.category})</option>`).join('');
+    }
+
+    if (timelineInputYear) timelineInputYear.value = '';
+    if (timelineInputEra) timelineInputEra.value = '';
+    if (timelineInputTitle) timelineInputTitle.value = '';
+    if (timelineInputDesc) timelineInputDesc.value = '';
+    if (timelineInputYear && typeof timelineInputYear.focus === 'function') setTimeout(() => timelineInputYear.focus(), 100);
+  }
+
+  function saveTimelineEventFromModal() {
+    const year = (timelineInputYear && timelineInputYear.value.trim()) || 'Year 1';
+    const era = (timelineInputEra && timelineInputEra.value.trim()) || '';
+    const title = (timelineInputTitle && timelineInputTitle.value.trim()) || 'Historical Event';
+    const noteId = (timelineInputNote && timelineInputNote.value) || null;
+    const category = (timelineInputCategory && timelineInputCategory.value) || 'lore';
+    const desc = (timelineInputDesc && timelineInputDesc.value.trim()) || '';
+
+    const newEvt = {
+      year,
+      era,
+      title,
+      noteId,
+      category,
+      description: desc
+    };
+
+    Storage.saveTimelineEvent(newEvt);
+    if (timelineEventModal) timelineEventModal.classList.add('hidden');
+    renderTimeline();
+    toast(`Event "${title}" recorded`, 'success');
+  }
+
+  // ── 3. Character Codex & Relationship Web ──
+
+  function initCodexControls() {
+    if (btnCodexView) btnCodexView.addEventListener('click', openCodexView);
+    if (menuBtnCodex) menuBtnCodex.addEventListener('click', openCodexView);
+    if (btnCloseCodex) btnCloseCodex.addEventListener('click', closeCodexView);
+    if (codexModal) codexModal.addEventListener('click', e => { if (e.target === codexModal) closeCodexView(); });
+
+    if (btnCodexModeCards) {
+      btnCodexModeCards.addEventListener('click', () => {
+        codexMode = 'cards';
+        btnCodexModeCards.classList.add('active');
+        if (btnCodexModeWeb) btnCodexModeWeb.classList.remove('active');
+        if (codexCardsView) codexCardsView.classList.remove('hidden');
+        if (codexWebView) codexWebView.classList.add('hidden');
+        renderCodex();
+      });
+    }
+    if (btnCodexModeWeb) {
+      btnCodexModeWeb.addEventListener('click', () => {
+        codexMode = 'web';
+        btnCodexModeWeb.classList.add('active');
+        if (btnCodexModeCards) btnCodexModeCards.classList.remove('active');
+        if (codexCardsView) codexCardsView.classList.add('hidden');
+        if (codexWebView) codexWebView.classList.remove('hidden');
+        renderCodex();
+      });
+    }
+
+    $$('.filter-pill[data-codex-filter]').forEach(pill => {
+      pill.addEventListener('click', () => {
+        $$('.filter-pill[data-codex-filter]').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        codexFilter = pill.dataset.codexFilter;
+        renderCodex();
+      });
+    });
+
+    if (codexSearch) {
+      codexSearch.addEventListener('input', () => renderCodex());
+    }
+
+    if (btnCodexAddChar) btnCodexAddChar.addEventListener('click', openAddCharacterModal);
+    if (btnCodexEmptyAdd) btnCodexEmptyAdd.addEventListener('click', openAddCharacterModal);
+    if (btnCodexAddRel) btnCodexAddRel.addEventListener('click', openAddRelationshipModal);
+
+    if (btnCodexCharCancel) {
+      btnCodexCharCancel.addEventListener('click', () => {
+        if (codexCharModal) codexCharModal.classList.add('hidden');
+      });
+    }
+    if (btnCodexCharSave) {
+      btnCodexCharSave.addEventListener('click', saveCharacterFromModal);
+    }
+
+    if (btnCodexRelCancel) {
+      btnCodexRelCancel.addEventListener('click', () => {
+        if (codexRelModal) codexRelModal.classList.add('hidden');
+      });
+    }
+    if (btnCodexRelSave) {
+      btnCodexRelSave.addEventListener('click', saveRelationshipFromModal);
+    }
+
+    if (btnInspectorClose) {
+      btnInspectorClose.addEventListener('click', () => {
+        if (codexWebInspector) codexWebInspector.classList.add('hidden');
+      });
+    }
+  }
+
+  function openCodexView() {
+    if (!codexModal) return;
+    codexModal.classList.remove('hidden');
+    renderCodex();
+  }
+
+  function closeCodexView() {
+    if (!codexModal) return;
+    codexModal.classList.add('hidden');
+    if (codexCharModal) codexCharModal.classList.add('hidden');
+    if (codexRelModal) codexRelModal.classList.add('hidden');
+    if (codexWebInspector) codexWebInspector.classList.add('hidden');
+  }
+
+  function renderCodex() {
+    const allChars = Storage.getAllCharacters();
+    const allRels = Storage.getAllRelationships();
+    const query = codexSearch ? codexSearch.value.trim().toLowerCase() : '';
+
+    const filtered = allChars.filter(c => {
+      if (codexFilter !== 'all' && c.archetype !== codexFilter) return false;
+      if (query) {
+        const text = `${c.name} ${c.archetype} ${c.faction || ''} ${c.role || ''} ${c.bio || ''}`.toLowerCase();
+        if (!text.includes(query)) return false;
+      }
+      return true;
+    });
+
+    if (codexCharacterCount) {
+      codexCharacterCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'character' : 'characters'}`;
+    }
+    if (codexRelCount) {
+      codexRelCount.textContent = `${allRels.length} ${allRels.length === 1 ? 'relationship' : 'relationships'}`;
+    }
+
+    if (filtered.length === 0) {
+      if (codexEmptyPrompt) codexEmptyPrompt.classList.remove('hidden');
+      if (codexCardsView) codexCardsView.classList.add('hidden');
+      if (codexWebView) codexWebView.classList.add('hidden');
+      return;
+    }
+
+    if (codexEmptyPrompt) codexEmptyPrompt.classList.add('hidden');
+    if (codexMode === 'cards') {
+      if (codexCardsView) codexCardsView.classList.remove('hidden');
+      if (codexWebView) codexWebView.classList.add('hidden');
+      renderCodexCards(filtered, allRels, allChars);
+    } else {
+      if (codexCardsView) codexCardsView.classList.add('hidden');
+      if (codexWebView) codexWebView.classList.remove('hidden');
+      renderCodexWeb(filtered, allRels);
+    }
+  }
+
+  function renderCodexCards(chars, rels, allChars) {
+    if (!codexGrid) return;
+    codexGrid.innerHTML = '';
+
+    const charMap = new Map();
+    allChars.forEach(c => charMap.set(c.id, c));
+
+    chars.forEach(c => {
+      const myRels = rels.filter(r => r.sourceId === c.id || r.targetId === c.id);
+
+      const card = document.createElement('div');
+      card.className = 'codex-card';
+      card.dataset.id = c.id;
+
+      const initial = (c.name || 'C').charAt(0).toUpperCase();
+
+      const relsHtml = myRels.map(r => {
+        const otherId = r.sourceId === c.id ? r.targetId : r.sourceId;
+        const other = charMap.get(otherId);
+        const otherName = other ? other.name : 'Unknown';
+        return `<span class="codex-rel-chip"><span class="rel-type">${escText(r.type)}</span> ${escText(otherName)}</span>`;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="codex-card-top">
+          <div class="codex-avatar">${initial}</div>
+          <div class="codex-card-meta">
+            <h4 class="codex-card-name">${escText(c.name)}</h4>
+            <div class="codex-badges">
+              <span class="badge-archetype" data-type="${escText(c.archetype || 'Ally')}">${escText(c.archetype || 'Ally')}</span>
+              <span class="codex-card-faction">${escText(c.faction || 'Independent')}</span>
+            </div>
+          </div>
+        </div>
+        <p class="codex-card-bio">${escText(c.bio || 'No background recorded yet.')}</p>
+        ${myRels.length > 0 ? `
+          <div class="codex-card-rels">
+            <div class="codex-rels-header">Relationships</div>
+            <div class="codex-rels-chips">${relsHtml}</div>
+          </div>
+        ` : ''}
+        <div class="codex-card-actions">
+          <span class="text-xs text-muted">${escText(c.role || 'Dossier')}</span>
+          <button class="btn btn-xs btn-primary btn-open-dossier">Open Dossier ↗</button>
+        </div>
+      `;
+
+      const btn = $('.btn-open-dossier', card);
+      if (btn) {
+        btn.addEventListener('click', () => {
+          closeCodexView();
+          navigateToCharacterNote(c);
+        });
+      }
+
+      codexGrid.appendChild(card);
+    });
+  }
+
+  function renderCodexWeb(chars, rels) {
+    if (!codexWebCanvas || typeof codexWebCanvas.getContext !== 'function') return;
+    const ctx = codexWebCanvas.getContext('2d');
+    if (!ctx) return;
+
+    const w = 1200;
+    const h = 800;
+    codexWebCanvas.width = w;
+    codexWebCanvas.height = h;
+
+    if (ctx.clearRect) ctx.clearRect(0, 0, w, h);
+
+    const charNodes = [];
+    const centerX = w / 2;
+    const centerY = h / 2;
+    const radius = Math.min(centerX, centerY) - 120;
+
+    chars.forEach((c, idx) => {
+      const angle = (idx / (chars.length || 1)) * Math.PI * 2 - Math.PI / 2;
+      charNodes.push({
+        char: c,
+        x: centerX + Math.cos(angle) * radius,
+        y: centerY + Math.sin(angle) * radius,
+        r: 32
+      });
+    });
+
+    const nodeMap = new Map();
+    charNodes.forEach(n => nodeMap.set(n.char.id, n));
+
+    rels.forEach(r => {
+      const sNode = nodeMap.get(r.sourceId);
+      const tNode = nodeMap.get(r.targetId);
+      if (!sNode || !tNode) return;
+
+      const isHighlighted = hoveredCharId === r.sourceId || hoveredCharId === r.targetId;
+      const isDimmed = hoveredCharId && !isHighlighted;
+
+      if (ctx.save) ctx.save();
+      if (isDimmed) {
+        ctx.globalAlpha = 0.15;
+      } else if (isHighlighted) {
+        ctx.globalAlpha = 1;
+        ctx.lineWidth = 3;
+      } else {
+        ctx.globalAlpha = 0.6;
+        ctx.lineWidth = 1.5;
+      }
+
+      let color = '#94a3b8';
+      const typeLower = (r.type || '').toLowerCase();
+      if (typeLower.includes('allied') || typeLower.includes('mentor') || typeLower.includes('pupil')) {
+        color = '#10b981';
+      } else if (typeLower.includes('rival') || typeLower.includes('enemy')) {
+        color = '#ef4444';
+      } else if (typeLower.includes('kin') || typeLower.includes('bound')) {
+        color = '#a855f7';
+      }
+
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(sNode.x, sNode.y);
+      const midX = (sNode.x + tNode.x) / 2 + (sNode.y - tNode.y) * 0.15;
+      const midY = (sNode.y + tNode.y) / 2 + (tNode.x - sNode.x) * 0.15;
+      if (ctx.quadraticCurveTo) {
+        ctx.quadraticCurveTo(midX, midY, tNode.x, tNode.y);
+      } else {
+        ctx.lineTo(tNode.x, tNode.y);
+      }
+      ctx.stroke();
+
+      if (!isDimmed && typeof ctx.fillText === 'function') {
+        ctx.font = "10px sans-serif";
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(r.type, midX, midY);
+      }
+      if (ctx.restore) ctx.restore();
+    });
+
+    charNodes.forEach(n => {
+      const isHovered = hoveredCharId === n.char.id;
+      const isDimmed = hoveredCharId && hoveredCharId !== n.char.id;
+
+      if (ctx.save) ctx.save();
+      if (isDimmed) ctx.globalAlpha = 0.3;
+
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = isHovered ? 20 : 8;
+
+      ctx.fillStyle = '#0f111a';
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = isHovered ? '#ef4444' : 'rgba(239, 68, 68, 0.5)';
+      ctx.lineWidth = isHovered ? 3 : 2;
+      ctx.stroke();
+
+      if (typeof ctx.fillText === 'function') {
+        ctx.font = "bold 16px 'Cinzel', serif";
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText((n.char.name || 'C').charAt(0), n.x, n.y);
+
+        ctx.font = "12px sans-serif";
+        ctx.fillStyle = isHovered ? '#fff' : '#cbd5e1';
+        ctx.fillText(n.char.name, n.x, n.y + n.r + 16);
+      }
+
+      if (ctx.restore) ctx.restore();
+    });
+
+    codexWebCanvas.onmousemove = (e) => {
+      const rect = codexWebCanvas.getBoundingClientRect ? codexWebCanvas.getBoundingClientRect() : { left: 0, top: 0, width: w, height: h };
+      const scaleX = w / rect.width;
+      const scaleY = h / rect.height;
+      const mx = (e.clientX - rect.left) * scaleX;
+      const my = (e.clientY - rect.top) * scaleY;
+
+      let hit = null;
+      for (const n of charNodes) {
+        if (Math.hypot(n.x - mx, n.y - my) <= n.r) {
+          hit = n.char.id;
+          break;
+        }
+      }
+      if (hit !== hoveredCharId) {
+        hoveredCharId = hit;
+        renderCodexWeb(chars, rels);
+      }
+    };
+
+    codexWebCanvas.onclick = (e) => {
+      const rect = codexWebCanvas.getBoundingClientRect ? codexWebCanvas.getBoundingClientRect() : { left: 0, top: 0, width: w, height: h };
+      const scaleX = w / rect.width;
+      const scaleY = h / rect.height;
+      const mx = (e.clientX - rect.left) * scaleX;
+      const my = (e.clientY - rect.top) * scaleY;
+
+      for (const n of charNodes) {
+        if (Math.hypot(n.x - mx, n.y - my) <= n.r) {
+          showWebInspector(n.char, rels, chars);
+          break;
+        }
+      }
+    };
+  }
+
+  function showWebInspector(char, rels, allChars) {
+    if (!codexWebInspector) return;
+    codexWebInspector.classList.remove('hidden');
+
+    if (inspectorArchetypeBadge) {
+      inspectorArchetypeBadge.textContent = char.archetype || 'Ally';
+      inspectorArchetypeBadge.dataset.type = char.archetype || 'Ally';
+    }
+    if (inspectorName) inspectorName.textContent = char.name;
+    if (inspectorFaction) inspectorFaction.textContent = `Faction: ${char.faction || 'Independent'} · ${char.role || 'Character'}`;
+    if (inspectorBio) inspectorBio.textContent = char.bio || 'No detailed background recorded.';
+
+    const charMap = new Map();
+    allChars.forEach(c => charMap.set(c.id, c));
+
+    const myRels = rels.filter(r => r.sourceId === char.id || r.targetId === char.id);
+    if (inspectorRelsList) {
+      inspectorRelsList.innerHTML = myRels.length > 0 ? myRels.map(r => {
+        const otherId = r.sourceId === char.id ? r.targetId : r.sourceId;
+        const other = charMap.get(otherId);
+        return `<div class="text-xs"><strong>${escText(r.type)}:</strong> ${escText(other ? other.name : 'Unknown')}</div>`;
+      }).join('') : '<div class="text-xs text-muted">No explicit relationships recorded.</div>';
+    }
+
+    if (btnInspectorOpenNote) {
+      btnInspectorOpenNote.onclick = () => {
+        closeCodexView();
+        navigateToCharacterNote(char);
+      };
+    }
+  }
+
+  function navigateToCharacterNote(char) {
+    let note = char.noteId ? Storage.getNote(char.noteId) : null;
+    if (!note && char.name) {
+      note = Storage.findNoteByTitle(char.name);
+    }
+    if (note) {
+      openNote(note.id);
+    } else {
+      const newNote = Storage.createNote({
+        title: char.name,
+        category: 'lore',
+        tags: 'character, ' + (char.archetype || '').toLowerCase(),
+        body: `# ${char.name}\n\n**Archetype:** ${char.archetype || 'Ally'}  \n**Faction:** ${char.faction || 'Independent'}  \n**Role:** ${char.role || 'Acolyte'}  \n\n### Character Dossier\n${char.bio || ''}\n\n`
+      });
+      renderSidebar();
+      openNote(newNote.id);
+      toast('Created character lore note', 'success');
+    }
+  }
+
+  function openAddCharacterModal() {
+    if (!codexCharModal) return;
+    codexCharModal.classList.remove('hidden');
+
+    if (codexInputNote) {
+      const notes = Storage.getAllNotes();
+      codexInputNote.innerHTML = `<option value="">-- Auto-create new Lore Dossier Note --</option>` +
+        notes.map(n => `<option value="${n.id}">${escText(n.title)} (${n.category})</option>`).join('');
+    }
+
+    if (codexInputName) codexInputName.value = '';
+    if (codexInputFaction) codexInputFaction.value = '';
+    if (codexInputRole) codexInputRole.value = '';
+    if (codexInputBio) codexInputBio.value = '';
+    if (codexInputName && typeof codexInputName.focus === 'function') setTimeout(() => codexInputName.focus(), 100);
+  }
+
+  function saveCharacterFromModal() {
+    const name = (codexInputName && codexInputName.value.trim()) || 'New Character';
+    const archetype = (codexInputArchetype && codexInputArchetype.value) || 'Protagonist';
+    const faction = (codexInputFaction && codexInputFaction.value.trim()) || 'Independent';
+    const role = (codexInputRole && codexInputRole.value.trim()) || '';
+    const bio = (codexInputBio && codexInputBio.value.trim()) || '';
+    let noteId = (codexInputNote && codexInputNote.value) || null;
+
+    if (!noteId) {
+      const created = Storage.createNote({
+        title: name,
+        category: 'lore',
+        tags: `character, ${archetype.toLowerCase()}`,
+        body: `# ${name}\n\n**Archetype:** ${archetype}  \n**Faction:** ${faction}  \n**Role:** ${role}  \n\n### Character Dossier\n${bio}\n\n`
+      });
+      noteId = created.id;
+      renderSidebar();
+    }
+
+    Storage.saveCharacter({
+      name,
+      archetype,
+      faction,
+      role,
+      bio,
+      noteId
+    });
+
+    if (codexCharModal) codexCharModal.classList.add('hidden');
+    renderCodex();
+    toast(`Character "${name}" added to codex`, 'success');
+  }
+
+  function openAddRelationshipModal() {
+    if (!codexRelModal) return;
+    codexRelModal.classList.remove('hidden');
+
+    const chars = Storage.getAllCharacters();
+    if (codexRelSource) {
+      codexRelSource.innerHTML = chars.map(c => `<option value="${c.id}">${escText(c.name)}</option>`).join('');
+    }
+    if (codexRelTarget) {
+      codexRelTarget.innerHTML = chars.map(c => `<option value="${c.id}">${escText(c.name)}</option>`).join('');
+    }
+    if (codexRelDesc) codexRelDesc.value = '';
+  }
+
+  function saveRelationshipFromModal() {
+    const sourceId = codexRelSource && codexRelSource.value;
+    const targetId = codexRelTarget && codexRelTarget.value;
+    const type = (codexRelType && codexRelType.value) || 'Allied with';
+    const desc = (codexRelDesc && codexRelDesc.value.trim()) || '';
+
+    if (!sourceId || !targetId || sourceId === targetId) {
+      toast('Please choose two different characters', 'error');
+      return;
+    }
+
+    Storage.saveRelationship({
+      sourceId,
+      targetId,
+      type,
+      description: desc
+    });
+
+    if (codexRelModal) codexRelModal.classList.add('hidden');
+    renderCodex();
+    toast('Relationship established', 'success');
   }
 
 })();

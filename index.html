@@ -22,6 +22,15 @@
         <button id="btn-tutorial-sidebar" class="icon-btn" title="Tutorial & Workspace Guide">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </button>
+        <button id="btn-map-view" class="icon-btn" title="World Map & Pins (Ctrl+M)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        </button>
+        <button id="btn-timeline-view" class="icon-btn" title="Chronology & Event Timeline (Ctrl+T)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button id="btn-codex-view" class="icon-btn" title="Character Codex & Relationship Web (Ctrl+U)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </button>
         <button id="btn-quick-switcher" class="icon-btn" title="Quick Switcher (Ctrl+K / Ctrl+O)">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </button>
@@ -162,6 +171,18 @@
         <button class="menu-sec-btn" id="menu-btn-tutorial" title="Interactive Step-by-Step Tutorial">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           Interactive Tutorial
+        </button>
+        <button class="menu-sec-btn" id="menu-btn-map" title="Interactive World Map & Pin Codex">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          World Map <kbd>Ctrl+M</kbd>
+        </button>
+        <button class="menu-sec-btn" id="menu-btn-timeline" title="Chronology & Event Timeline">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Timeline <kbd>Ctrl+T</kbd>
+        </button>
+        <button class="menu-sec-btn" id="menu-btn-codex" title="Character Codex & Relationship Web">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Character Codex <kbd>Ctrl+U</kbd>
         </button>
         <button class="menu-sec-btn" id="menu-btn-graph" title="Visual Galaxy Graph">
           <span class="sec-icon-star">✦</span> Galaxy Graph <kbd>Ctrl+G</kbd>
@@ -455,6 +476,401 @@
           <span class="legend-item"><span class="legend-branch-line"></span> Sub-branch</span>
         </div>
         <div class="graph-hint">Click note to open in editor · Click category hub to focus branch · Drag to move · Scroll to zoom</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── World Map & Pin Codex Modal ───────── -->
+  <div id="map-modal" class="modal-overlay map-overlay hidden">
+    <div class="map-dialog">
+      <div class="map-header">
+        <div class="map-title-group">
+          <span class="logo-icon">🗺️</span>
+          <h3>World Map & Pin Codex</h3>
+          <div class="map-stats">
+            <span id="map-pin-count">0 pins</span>
+            <span class="hud-sep">·</span>
+            <span id="map-coords-indicator">X: 50.0% · Y: 50.0%</span>
+          </div>
+        </div>
+        <div class="map-controls">
+          <div class="map-search-wrap">
+            <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="map-pin-search" placeholder="Filter pins…" autocomplete="off" />
+          </div>
+          <div class="map-filter-tags">
+            <button class="filter-pill active" data-map-filter="all">All</button>
+            <button class="filter-pill" data-map-filter="chapter">Chapters</button>
+            <button class="filter-pill" data-map-filter="lore">Lore</button>
+            <button class="filter-pill" data-map-filter="world">World</button>
+            <button class="filter-pill" data-map-filter="draft">Drafts</button>
+          </div>
+          <div class="map-action-btns">
+            <button id="btn-map-drop-pin" class="btn btn-sm btn-primary" title="Click to enter pin drop mode">
+              <span>+ Drop Pin</span>
+            </button>
+            <label class="btn btn-sm btn-ghost map-upload-label" title="Upload custom map image">
+              <span>Upload Map</span>
+              <input type="file" id="map-file-input" accept="image/*" hidden />
+            </label>
+            <button id="btn-map-reset-img" class="btn btn-sm btn-ghost" title="Reset to default cartography canvas">
+              Reset Map
+            </button>
+            <button id="btn-map-zoom-in" class="icon-btn btn-xs" title="Zoom in (+)">＋</button>
+            <button id="btn-map-zoom-out" class="icon-btn btn-xs" title="Zoom out (-)">－</button>
+            <button id="btn-map-zoom-reset" class="icon-btn btn-xs" title="Reset view">⊙</button>
+            <button id="btn-close-map" class="icon-btn" title="Close Map (Esc)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-viewport" id="map-viewport">
+        <!-- Floating placement banner when drop pin mode is on -->
+        <div id="map-placement-hint" class="map-placement-hint hidden">
+          <span>✦ Pin Placement Mode: Click anywhere on the map to drop a pin.</span>
+          <button id="btn-map-cancel-drop" class="btn btn-xs btn-ghost">Cancel</button>
+        </div>
+
+        <div class="map-stage" id="map-stage">
+          <canvas id="map-canvas" width="1600" height="1000"></canvas>
+          <img id="map-custom-img" class="map-custom-img hidden" alt="Custom World Map" />
+          <div id="map-pins-container" class="map-pins-container"></div>
+        </div>
+
+        <!-- Pin Hover / Click Preview Card -->
+        <div id="map-pin-preview" class="map-pin-preview hidden">
+          <div class="map-preview-header">
+            <span id="map-preview-badge" class="badge badge-world">World</span>
+            <span id="map-preview-coords" class="map-preview-coords">50.0%, 50.0%</span>
+            <button id="btn-map-preview-close" class="icon-btn btn-xs" title="Close preview">✕</button>
+          </div>
+          <h4 id="map-preview-title" class="map-preview-title font-cinzel">Location Title</h4>
+          <p id="map-preview-desc" class="map-preview-desc">Note summary excerpt appears here…</p>
+          <div class="map-preview-actions">
+            <button id="btn-map-open-note" class="btn btn-sm btn-primary">Open Note in Editor ↗</button>
+            <button id="btn-map-delete-pin" class="btn btn-sm btn-danger">Delete Pin</button>
+          </div>
+        </div>
+
+        <div class="map-legend">
+          <span class="legend-item"><span class="legend-dot dot-chapter"></span> Chapter Pins</span>
+          <span class="legend-item"><span class="legend-dot dot-lore"></span> Lore Pins</span>
+          <span class="legend-item"><span class="legend-dot dot-world"></span> World Pins</span>
+          <span class="legend-item"><span class="legend-dot dot-draft"></span> Draft Pins</span>
+          <span class="legend-sep">|</span>
+          <span class="legend-hint">Click & drag to pan · Scroll / pinch to zoom · Drag pins to move</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Place Pin Modal -->
+  <div id="map-pin-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 class="modal-title font-cinzel">Place Map Pin</h3>
+      <div class="modal-field">
+        <label for="map-modal-note-select">Link to Note</label>
+        <select id="map-modal-note-select">
+          <option value="">-- No linked note (standalone pin) --</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="map-modal-pin-title">Pin Label / Landmark Title</label>
+        <input type="text" id="map-modal-pin-title" placeholder="e.g. The Obsidian Gate, Citadel of Stars" autocomplete="off" />
+      </div>
+      <div class="modal-field">
+        <label for="map-modal-pin-category">Category</label>
+        <select id="map-modal-pin-category">
+          <option value="world" selected>World Building</option>
+          <option value="chapter">Chapter</option>
+          <option value="lore">Lore</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="map-modal-pin-desc">Description / Lore Note</label>
+        <textarea id="map-modal-pin-desc" rows="3" placeholder="Brief landmark description or lore context…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-map-pin-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="btn-map-pin-save" class="btn btn-primary">Place Pin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Chronology & Event Timeline Modal ───────── -->
+  <div id="timeline-modal" class="modal-overlay timeline-overlay hidden">
+    <div class="timeline-dialog">
+      <div class="timeline-header">
+        <div class="timeline-title-group">
+          <span class="logo-icon">⏳</span>
+          <h3>Chronology & Event Timeline</h3>
+          <div class="timeline-stats">
+            <span id="timeline-event-count">0 events</span>
+          </div>
+        </div>
+        <div class="timeline-controls">
+          <div class="timeline-search-wrap">
+            <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="timeline-search" placeholder="Search timeline events…" autocomplete="off" />
+          </div>
+          <div class="timeline-filter-tags">
+            <button class="filter-pill active" data-timeline-filter="all">All</button>
+            <button class="filter-pill" data-timeline-filter="chapter">Chapters</button>
+            <button class="filter-pill" data-timeline-filter="lore">Lore</button>
+            <button class="filter-pill" data-timeline-filter="world">World</button>
+            <button class="filter-pill" data-timeline-filter="draft">Drafts</button>
+          </div>
+          <div class="timeline-view-modes">
+            <button id="btn-timeline-mode-rail" class="btn btn-sm btn-ghost active" title="Horizontal Chronology Rail">Rail View</button>
+            <button id="btn-timeline-mode-stream" class="btn btn-sm btn-ghost" title="Vertical Story Stream">Stream View</button>
+          </div>
+          <button id="btn-timeline-add" class="btn btn-sm btn-primary" title="Add custom timeline event">
+            <span>+ Add Event</span>
+          </button>
+          <button id="btn-close-timeline" class="icon-btn" title="Close Timeline (Esc)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="timeline-body" id="timeline-body">
+        <!-- Horizontal Rail View -->
+        <div id="timeline-rail-view" class="timeline-rail-view">
+          <div class="timeline-rail-scroll" id="timeline-rail-scroll">
+            <div class="timeline-rail-canvas-wrap" id="timeline-rail-canvas-wrap">
+              <div class="timeline-rail-eras" id="timeline-rail-eras"></div>
+              <div class="timeline-rail-track" id="timeline-rail-track"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vertical Stream View -->
+        <div id="timeline-stream-view" class="timeline-stream-view hidden">
+          <div class="timeline-stream-container" id="timeline-stream-container"></div>
+        </div>
+
+        <!-- Empty state prompt -->
+        <div id="timeline-empty-prompt" class="timeline-empty-prompt hidden">
+          <div class="timeline-empty-icon">⏳</div>
+          <h3 class="font-cinzel">No Timeline Events Yet</h3>
+          <p>Parse events automatically by writing <code>@timeline: Year 342 | The Fall of the Gate</code> in your notes, or click "+ Add Event" to manually record milestones.</p>
+          <button id="btn-timeline-empty-add" class="btn btn-primary">+ Add First Event</button>
+        </div>
+      </div>
+      <div class="timeline-footer">
+        <span class="timeline-footer-hint">Tip: Use @timeline: Year [X] | [Event Title] | [Summary] in any note body for automatic chronology tracking.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Timeline Event Modal -->
+  <div id="timeline-event-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 class="modal-title font-cinzel" id="timeline-modal-title">Record Timeline Event</h3>
+      <div class="modal-field">
+        <label for="timeline-input-year">Year / Date Label</label>
+        <input type="text" id="timeline-input-year" placeholder="e.g. Year 342, 1050, First Age" autocomplete="off" />
+      </div>
+      <div class="modal-field">
+        <label for="timeline-input-era">Era / Age Grouping (Optional)</label>
+        <input type="text" id="timeline-input-era" placeholder="e.g. Age of Foundations, The Convergence" autocomplete="off" />
+      </div>
+      <div class="modal-field">
+        <label for="timeline-input-title">Event Title</label>
+        <input type="text" id="timeline-input-title" placeholder="e.g. The Fall of the Obsidian Gate" autocomplete="off" />
+      </div>
+      <div class="modal-field">
+        <label for="timeline-input-note">Associated Note</label>
+        <select id="timeline-input-note">
+          <option value="">-- No linked note --</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="timeline-input-category">Category</label>
+        <select id="timeline-input-category">
+          <option value="chapter">Chapter</option>
+          <option value="lore" selected>Lore</option>
+          <option value="world">World</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="timeline-input-desc">Event Description / Significance</label>
+        <textarea id="timeline-input-desc" rows="3" placeholder="What occurred during this event and why it matters…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-timeline-event-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="btn-timeline-event-save" class="btn btn-primary">Save Event</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Character Codex & Relationship Web Modal ───────── -->
+  <div id="codex-modal" class="modal-overlay codex-overlay hidden">
+    <div class="codex-dialog">
+      <div class="codex-header">
+        <div class="codex-title-group">
+          <span class="logo-icon">👥</span>
+          <h3>Character Codex & Relationship Web</h3>
+          <div class="codex-stats">
+            <span id="codex-character-count">0 characters</span>
+            <span class="hud-sep">·</span>
+            <span id="codex-rel-count">0 relationships</span>
+          </div>
+        </div>
+        <div class="codex-controls">
+          <div class="codex-search-wrap">
+            <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="codex-search" placeholder="Search characters or factions…" autocomplete="off" />
+          </div>
+          <div class="codex-filter-tags">
+            <button class="filter-pill active" data-codex-filter="all">All</button>
+            <button class="filter-pill" data-codex-filter="Protagonist">Protagonist</button>
+            <button class="filter-pill" data-codex-filter="Antagonist">Antagonist</button>
+            <button class="filter-pill" data-codex-filter="Mentor">Mentor</button>
+            <button class="filter-pill" data-codex-filter="Ally">Ally</button>
+            <button class="filter-pill" data-codex-filter="Rival">Rival</button>
+          </div>
+          <div class="codex-view-modes">
+            <button id="btn-codex-mode-cards" class="btn btn-sm btn-ghost active" title="Dossier Cards">Dossiers</button>
+            <button id="btn-codex-mode-web" class="btn btn-sm btn-ghost" title="Interactive Relationship Web">Relationship Web</button>
+          </div>
+          <button id="btn-codex-add-char" class="btn btn-sm btn-primary" title="Create new character dossier">
+            <span>+ Character</span>
+          </button>
+          <button id="btn-codex-add-rel" class="btn btn-sm btn-ghost" title="Connect two characters">
+            <span>+ Relationship</span>
+          </button>
+          <button id="btn-close-codex" class="icon-btn" title="Close Codex (Esc)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="codex-body" id="codex-body">
+        <!-- Cards Grid View -->
+        <div id="codex-cards-view" class="codex-cards-view">
+          <div id="codex-grid" class="codex-grid"></div>
+        </div>
+
+        <!-- Interactive Relationship Web View -->
+        <div id="codex-web-view" class="codex-web-view hidden">
+          <div class="codex-web-canvas-wrap" id="codex-web-canvas-wrap">
+            <canvas id="codex-web-canvas" width="1200" height="800"></canvas>
+            <!-- Character web inspector -->
+            <div id="codex-web-inspector" class="codex-web-inspector hidden">
+              <div class="inspector-header">
+                <span id="inspector-archetype-badge" class="badge badge-archetype">Protagonist</span>
+                <button id="btn-inspector-close" class="icon-btn btn-xs">✕</button>
+              </div>
+              <h4 id="inspector-name" class="font-cinzel">Character Name</h4>
+              <div id="inspector-faction" class="inspector-faction">Faction: Independent</div>
+              <p id="inspector-bio" class="inspector-bio">Character bio snippet…</p>
+              <div class="inspector-rels-title">Relationships:</div>
+              <div id="inspector-rels-list" class="inspector-rels-list"></div>
+              <button id="btn-inspector-open-note" class="btn btn-sm btn-primary">Open Dossier Note ↗</button>
+            </div>
+          </div>
+          <div class="codex-web-legend">
+            <span class="legend-item"><span class="legend-dot dot-allied"></span> Allied / Mentor</span>
+            <span class="legend-item"><span class="legend-dot dot-rival"></span> Rival / Enemy</span>
+            <span class="legend-item"><span class="legend-dot dot-kin"></span> Kin / Bound</span>
+            <span class="legend-sep">|</span>
+            <span class="legend-hint">Hover node to trace bonds · Click node to inspect dossier · Scroll to zoom</span>
+          </div>
+        </div>
+
+        <!-- Empty state prompt -->
+        <div id="codex-empty-prompt" class="codex-empty-prompt hidden">
+          <div class="codex-empty-icon">👥</div>
+          <h3 class="font-cinzel">No Characters in Codex</h3>
+          <p>Tag notes with <code>#character</code> or category <code>lore</code>, use <code>@character: Name | Archetype | Faction</code>, or click "+ Character" to start building your cast.</p>
+          <button id="btn-codex-empty-add" class="btn btn-primary">+ Create First Character</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Character Modal -->
+  <div id="codex-char-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 class="modal-title font-cinzel">Create Character Dossier</h3>
+      <div class="modal-field">
+        <label for="codex-input-name">Character Name</label>
+        <input type="text" id="codex-input-name" placeholder="e.g. Vespera, Lord Commander Corvus" autocomplete="off" />
+      </div>
+      <div class="modal-field">
+        <label for="codex-input-archetype">Archetype</label>
+        <select id="codex-input-archetype">
+          <option value="Protagonist" selected>Protagonist</option>
+          <option value="Antagonist">Antagonist</option>
+          <option value="Mentor">Mentor</option>
+          <option value="Ally">Ally</option>
+          <option value="Rival">Rival</option>
+          <option value="Deuteragonist">Deuteragonist</option>
+          <option value="Neutral">Neutral</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="codex-input-faction">Faction / Allegiance</label>
+        <input type="text" id="codex-input-faction" placeholder="e.g. The Order of Lore, Inquisitors, Independent" autocomplete="off" />
+      </div>
+      <div class="modal-field">
+        <label for="codex-input-role">Title / Role</label>
+        <input type="text" id="codex-input-role" placeholder="e.g. Acolyte of the Veil, Master of Blades" autocomplete="off" />
+      </div>
+      <div class="modal-field">
+        <label for="codex-input-note">Link to Existing Note (Optional)</label>
+        <select id="codex-input-note">
+          <option value="">-- Auto-create new Lore Dossier Note --</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="codex-input-bio">Character Dossier & Description</label>
+        <textarea id="codex-input-bio" rows="3" placeholder="Key motivations, background, appearance, and secrets…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-codex-char-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="btn-codex-char-save" class="btn btn-primary">Save Character</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Relationship Modal -->
+  <div id="codex-rel-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 class="modal-title font-cinzel">Connect Characters</h3>
+      <div class="modal-field">
+        <label for="codex-rel-source">Source Character</label>
+        <select id="codex-rel-source"></select>
+      </div>
+      <div class="modal-field">
+        <label for="codex-rel-type">Relationship Type</label>
+        <select id="codex-rel-type">
+          <option value="Allied with" selected>Allied with</option>
+          <option value="Mentor to">Mentor to</option>
+          <option value="Pupil of">Pupil of</option>
+          <option value="Rival of">Rival of</option>
+          <option value="Enemy of">Enemy of</option>
+          <option value="Kin to">Kin to</option>
+          <option value="Bound to">Bound to</option>
+          <option value="Acquaintance of">Acquaintance of</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="codex-rel-target">Target Character</label>
+        <select id="codex-rel-target"></select>
+      </div>
+      <div class="modal-field">
+        <label for="codex-rel-desc">Context / Dynamic (Optional)</label>
+        <input type="text" id="codex-rel-desc" placeholder="e.g. Sworn comrades since the Fall, Secret distrust" autocomplete="off" />
+      </div>
+      <div class="modal-actions">
+        <button id="btn-codex-rel-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="btn-codex-rel-save" class="btn btn-primary">Save Relationship</button>
       </div>
     </div>
   </div>
