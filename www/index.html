@@ -167,6 +167,54 @@
         </button>
       </div>
 
+      <!-- Prominent Deep Worldbuilding Launch Section -->
+      <div class="menu-wb-section">
+        <div class="menu-wb-header">
+          <span class="menu-wb-badge">✦ WORLDBUILDING & SYSTEMS</span>
+          <span class="menu-wb-hint">Deep universe lore & spatial story engines</span>
+        </div>
+        <div class="menu-wb-grid">
+          <button class="menu-wb-card" id="dashboard-btn-map" title="Interactive World Map & Pin Placement (Ctrl+M)">
+            <div class="menu-wb-icon cat-world">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+            </div>
+            <div class="menu-wb-body">
+              <div class="menu-wb-title-row">
+                <span class="menu-wb-title font-cinzel">World Map</span>
+                <kbd class="shortcut-pill">Ctrl+M</kbd>
+              </div>
+              <p class="menu-wb-desc">Cartographic canvas, spatial landmarks & custom fantasy map</p>
+            </div>
+          </button>
+
+          <button class="menu-wb-card" id="dashboard-btn-timeline" title="Chronology & Event Timeline (Ctrl+T)">
+            <div class="menu-wb-icon cat-chapter">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="menu-wb-body">
+              <div class="menu-wb-title-row">
+                <span class="menu-wb-title font-cinzel">Timeline</span>
+                <kbd class="shortcut-pill">Ctrl+T</kbd>
+              </div>
+              <p class="menu-wb-desc">Chronological rail, historical eras & note milestone tracking</p>
+            </div>
+          </button>
+
+          <button class="menu-wb-card" id="dashboard-btn-codex" title="Character Codex & Relationship Web (Ctrl+U)">
+            <div class="menu-wb-icon cat-lore">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="menu-wb-body">
+              <div class="menu-wb-title-row">
+                <span class="menu-wb-title font-cinzel">Character Codex</span>
+                <kbd class="shortcut-pill">Ctrl+U</kbd>
+              </div>
+              <p class="menu-wb-desc">Character dossiers, faction ties & dynamic relationship web</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
       <div class="menu-secondary-actions">
         <button class="menu-sec-btn" id="menu-btn-tutorial" title="Interactive Step-by-Step Tutorial">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -272,6 +320,18 @@
           <button id="btn-preview" class="icon-btn" title="Toggle Reading Preview (Ctrl+Shift+P)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
+          <span class="meta-separator">|</span>
+          <!-- Worldbuilding Systems Quick Launch -->
+          <button id="btn-toolbar-map" class="icon-btn toolbar-wb-btn" title="World Map (Ctrl+M)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          </button>
+          <button id="btn-toolbar-timeline" class="icon-btn toolbar-wb-btn" title="Chronology Timeline (Ctrl+T)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </button>
+          <button id="btn-toolbar-codex" class="icon-btn toolbar-wb-btn" title="Character Codex (Ctrl+U)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </button>
+          <span class="meta-separator">|</span>
           <!-- Delete -->
           <button id="btn-delete" class="icon-btn btn-danger" title="Delete document">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
@@ -506,6 +566,7 @@
             <button class="filter-pill" data-map-filter="draft">Drafts</button>
           </div>
           <div class="map-action-btns">
+            <button id="btn-map-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="World Map Guide & Cheat Sheet">? Tutorial</button>
             <button id="btn-map-drop-pin" class="btn btn-sm btn-primary" title="Click to enter pin drop mode">
               <span>+ Drop Pin</span>
             </button>
@@ -535,7 +596,7 @@
 
         <div class="map-stage" id="map-stage">
           <canvas id="map-canvas" width="1600" height="1000"></canvas>
-          <img id="map-custom-img" class="map-custom-img hidden" alt="Custom World Map" />
+          <img id="map-custom-img" class="map-custom-img hidden" alt="Custom World Map" style="display: none;" />
           <div id="map-pins-container" class="map-pins-container"></div>
         </div>
 
@@ -627,6 +688,7 @@
             <button id="btn-timeline-mode-rail" class="btn btn-sm btn-ghost active" title="Horizontal Chronology Rail">Rail View</button>
             <button id="btn-timeline-mode-stream" class="btn btn-sm btn-ghost" title="Vertical Story Stream">Stream View</button>
           </div>
+          <button id="btn-timeline-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Timeline Guide & Cheat Sheet">? Tutorial</button>
           <button id="btn-timeline-add" class="btn btn-sm btn-primary" title="Add custom timeline event">
             <span>+ Add Event</span>
           </button>
@@ -738,6 +800,7 @@
             <button id="btn-codex-mode-cards" class="btn btn-sm btn-ghost active" title="Dossier Cards">Dossiers</button>
             <button id="btn-codex-mode-web" class="btn btn-sm btn-ghost" title="Interactive Relationship Web">Relationship Web</button>
           </div>
+          <button id="btn-codex-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Character Codex Guide & Cheat Sheet">? Tutorial</button>
           <button id="btn-codex-add-char" class="btn btn-sm btn-primary" title="Create new character dossier">
             <span>+ Character</span>
           </button>
@@ -760,8 +823,8 @@
         <div id="codex-web-view" class="codex-web-view hidden">
           <div class="codex-web-canvas-wrap" id="codex-web-canvas-wrap">
             <canvas id="codex-web-canvas" width="1200" height="800"></canvas>
-            <!-- Character web inspector -->
-            <div id="codex-web-inspector" class="codex-web-inspector hidden">
+            <!-- Character preview & web inspector card -->
+            <div id="codex-char-preview" data-alias="codex-web-inspector" class="codex-web-inspector codex-char-preview hidden">
               <div class="inspector-header">
                 <span id="inspector-archetype-badge" class="badge badge-archetype">Protagonist</span>
                 <button id="btn-inspector-close" class="icon-btn btn-xs">✕</button>
@@ -1059,6 +1122,152 @@
           <button id="btn-tutorial-prev" class="btn btn-ghost">← Back</button>
           <button id="btn-tutorial-next" class="btn btn-primary">Next →</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── World Map Tutorial Modal ───────── -->
+  <div id="map-tutorial-modal" class="modal-overlay wb-tutorial-overlay hidden">
+    <div class="modal wb-tutorial-dialog">
+      <div class="wb-tutorial-header">
+        <div class="wb-tutorial-title-wrap">
+          <span class="wb-tutorial-icon">🗺️</span>
+          <div>
+            <h3 class="modal-title font-cinzel">World Map Guide & Tutorial</h3>
+            <span class="wb-tutorial-sub">Spatial cartography, landmarks & geography</span>
+          </div>
+        </div>
+        <button id="btn-close-map-tutorial" class="icon-btn btn-xs" title="Close">✕</button>
+      </div>
+      <div class="wb-tutorial-body">
+        <div class="wb-tutorial-summary">
+          <p>The <strong>World Map</strong> provides a spatial visual canvas for your story universe. Pin citadels, waypoints, and regions across a procedural cartography grid or your own uploaded high-res fantasy map.</p>
+        </div>
+        <div class="wb-tutorial-section">
+          <h4 class="wb-tutorial-heading">How to Use the Map</h4>
+          <ol class="wb-tutorial-steps">
+            <li><strong>Pan & Zoom:</strong> Click and drag anywhere on the map to pan. Use your mouse scroll wheel, trackpad pinch, or the <strong>＋</strong> / <strong>－</strong> buttons to zoom.</li>
+            <li><strong>Place Landmark Pins:</strong> Click <strong>+ Drop Pin</strong> (or double-click anywhere on the map) to enter placement mode, then click the desired location. Give your pin a title and link it to an existing note.</li>
+            <li><strong>Inspect & Jump into Notes:</strong> Click any map pin to reveal its dossier preview card. Click <strong>Open Note in Editor ↗</strong> to jump straight into writing that location's lore.</li>
+            <li><strong>Upload Custom Maps:</strong> Click <strong>Upload Map</strong> to import your own custom cartography image (PNG, JPG, WebP). Reset anytime with <strong>Reset Map</strong>.</li>
+          </ol>
+        </div>
+        <div class="wb-tutorial-section">
+          <h4 class="wb-tutorial-heading">Markdown Cheat Sheet</h4>
+          <p class="wb-tutorial-text">Designate locations directly in your note prose:</p>
+          <div class="wb-cheatsheet-box">
+            <div class="wb-cheat-row">
+              <code class="copyable-code" title="Click to copy">#world</code>
+              <span>Tag note with hashtag or set category to <strong>World Building</strong></span>
+            </div>
+            <div class="wb-cheat-row">
+              <code class="copyable-code" title="Click to copy">[[The Obsidian Gate]]</code>
+              <span>Link landmarks in any note to generate graph connections</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-dismiss-map-tutorial" class="btn btn-primary">Got it, Explore Map</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Chronology Timeline Tutorial Modal ───────── -->
+  <div id="timeline-tutorial-modal" class="modal-overlay wb-tutorial-overlay hidden">
+    <div class="modal wb-tutorial-dialog">
+      <div class="wb-tutorial-header">
+        <div class="wb-tutorial-title-wrap">
+          <span class="wb-tutorial-icon">⏳</span>
+          <div>
+            <h3 class="modal-title font-cinzel">Timeline Guide & Tutorial</h3>
+            <span class="wb-tutorial-sub">Chronology, epochs & narrative milestones</span>
+          </div>
+        </div>
+        <button id="btn-close-timeline-tutorial" class="icon-btn btn-xs" title="Close">✕</button>
+      </div>
+      <div class="wb-tutorial-body">
+        <div class="wb-tutorial-summary">
+          <p>The <strong>Chronology Timeline</strong> organizes historical events, character arcs, and world milestones across an interactive timeline rail and vertical story stream.</p>
+        </div>
+        <div class="wb-tutorial-section">
+          <h4 class="wb-tutorial-heading">How to Use the Timeline</h4>
+          <ol class="wb-tutorial-steps">
+            <li><strong>Switch Views:</strong> Toggle between <strong>Rail View</strong> (horizontal timeline clustered by Eras) and <strong>Stream View</strong> (vertical story feed).</li>
+            <li><strong>Add Milestones:</strong> Click <strong>+ Add Event</strong> to manually record a date/year (e.g. <em>Year 342</em>), era grouping (e.g. <em>Age of Foundations</em>), event title, and significance.</li>
+            <li><strong>Pan & Zoom Rail:</strong> Drag left or right on the horizontal rail to navigate through time. Scroll wheel or trackpad pinch zooms the timeline density.</li>
+            <li><strong>Jump into Notes:</strong> Click any event card in rail or stream view to open or auto-create its corresponding note in the editor.</li>
+          </ol>
+        </div>
+        <div class="wb-tutorial-section">
+          <h4 class="wb-tutorial-heading">Markdown Cheat Sheet (Auto-Scanning)</h4>
+          <p class="wb-tutorial-text">Write naturally in any note body—Lord Spey auto-indexes timeline tags:</p>
+          <div class="wb-cheatsheet-box">
+            <div class="wb-cheat-row">
+              <code class="copyable-code" title="Click to copy">@timeline: Year 342 | The Fall of the Gate | The outer walls fall.</code>
+            </div>
+            <div class="wb-cheat-row">
+              <code class="copyable-code" title="Click to copy">@event: 1050 | The First Convergence</code>
+            </div>
+            <div class="wb-cheat-row">
+              <code class="copyable-code" title="Click to copy">#timeline/AgeOfFoundations</code>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-dismiss-timeline-tutorial" class="btn btn-primary">Got it, Explore Timeline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Character Codex Tutorial Modal ───────── -->
+  <div id="codex-tutorial-modal" class="modal-overlay wb-tutorial-overlay hidden">
+    <div class="modal wb-tutorial-dialog">
+      <div class="wb-tutorial-header">
+        <div class="wb-tutorial-title-wrap">
+          <span class="wb-tutorial-icon">👥</span>
+          <div>
+            <h3 class="modal-title font-cinzel">Character Codex Guide & Tutorial</h3>
+            <span class="wb-tutorial-sub">Character dossiers, factions & relationship web</span>
+          </div>
+        </div>
+        <button id="btn-close-codex-tutorial" class="icon-btn btn-xs" title="Close">✕</button>
+      </div>
+      <div class="wb-tutorial-body">
+        <div class="wb-tutorial-summary">
+          <p>The <strong>Character Codex</strong> tracks your narrative cast and dynamic allegiances. Inspect character dossiers or explore alliances, rivalries, and bloodlines in the interactive relationship web.</p>
+        </div>
+        <div class="wb-tutorial-section">
+          <h4 class="wb-tutorial-heading">How to Use the Codex</h4>
+          <ol class="wb-tutorial-steps">
+            <li><strong>Dossiers vs Web:</strong> Toggle between <strong>Dossiers</strong> (card grid with archetype badges and lore snippets) and <strong>Relationship Web</strong> (interactive force graph).</li>
+            <li><strong>Create Characters:</strong> Click <strong>+ Character</strong> to record name, archetype (<em>Protagonist, Antagonist, Ally, Mentor, Rival</em>), faction, role, and bio.</li>
+            <li><strong>Connect Relationships:</strong> Click <strong>+ Relationship</strong> to bind two characters with relationships (<em>Allied with, Rival of, Kin to, Mentor to, Bound to</em>) and notes.</li>
+            <li><strong>Inspect & Jump to Dossier:</strong> Click any character card or web node to inspect relationships, or click <strong>Open Dossier Note ↗</strong> to edit their full lore note.</li>
+          </ol>
+        </div>
+        <div class="wb-tutorial-section">
+          <h4 class="wb-tutorial-heading">Markdown Cheat Sheet (Auto-Scanning)</h4>
+          <p class="wb-tutorial-text">Tag characters and relationships directly inside your note prose:</p>
+          <div class="wb-cheatsheet-box">
+            <div class="wb-cheat-row">
+              <code class="copyable-code" title="Click to copy">@character: Vespera | Protagonist | Order of Lore | Master Scribe</code>
+            </div>
+            <div class="wb-cheat-row">
+              <code class="copyable-code" title="Click to copy">@rel: [[Corvus]] | Allied with | Sworn comrades since the Fall</code>
+            </div>
+            <div class="wb-cheat-row">
+              <code class="copyable-code" title="Click to copy">@relation: Corvus -> Vespera | Rival | Secret distrust</code>
+            </div>
+            <div class="wb-cheat-row">
+              <code class="copyable-code" title="Click to copy">#character #protagonist</code>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-dismiss-codex-tutorial" class="btn btn-primary">Got it, Explore Codex</button>
       </div>
     </div>
   </div>

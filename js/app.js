@@ -180,6 +180,8 @@
   // World Map & Pin Codex
   const btnMapView          = $('#btn-map-view');
   const menuBtnMap          = $('#menu-btn-map');
+  const dashboardBtnMap     = $('#dashboard-btn-map');
+  const btnToolbarMap       = $('#btn-toolbar-map');
   const mapModal            = $('#map-modal');
   const btnCloseMap         = $('#btn-close-map');
   const mapViewport         = $('#map-viewport');
@@ -213,10 +215,16 @@
   const mapModalPinDesc     = $('#map-modal-pin-desc');
   const btnMapPinCancel     = $('#btn-map-pin-cancel');
   const btnMapPinSave       = $('#btn-map-pin-save');
+  const btnMapTutorial      = $('#btn-map-tutorial');
+  const mapTutorialModal    = $('#map-tutorial-modal');
+  const btnCloseMapTutorial = $('#btn-close-map-tutorial');
+  const btnDismissMapTutorial = $('#btn-dismiss-map-tutorial');
 
   // Chronology & Event Timeline
   const btnTimelineView       = $('#btn-timeline-view');
   const menuBtnTimeline       = $('#menu-btn-timeline');
+  const dashboardBtnTimeline  = $('#dashboard-btn-timeline');
+  const btnToolbarTimeline    = $('#btn-toolbar-timeline');
   const timelineModal         = $('#timeline-modal');
   const btnCloseTimeline      = $('#btn-close-timeline');
   const timelineEventCount    = $('#timeline-event-count');
@@ -240,10 +248,16 @@
   const timelineInputDesc     = $('#timeline-input-desc');
   const btnTimelineEventCancel= $('#btn-timeline-event-cancel');
   const btnTimelineEventSave  = $('#btn-timeline-event-save');
+  const btnTimelineTutorial   = $('#btn-timeline-tutorial');
+  const timelineTutorialModal = $('#timeline-tutorial-modal');
+  const btnCloseTimelineTutorial = $('#btn-close-timeline-tutorial');
+  const btnDismissTimelineTutorial = $('#btn-dismiss-timeline-tutorial');
 
   // Character Codex & Relationship Web
   const btnCodexView          = $('#btn-codex-view');
   const menuBtnCodex          = $('#menu-btn-codex');
+  const dashboardBtnCodex     = $('#dashboard-btn-codex');
+  const btnToolbarCodex       = $('#btn-toolbar-codex');
   const codexModal            = $('#codex-modal');
   const btnCloseCodex         = $('#btn-close-codex');
   const codexCharacterCount   = $('#codex-character-count');
@@ -255,7 +269,8 @@
   const codexWebView          = $('#codex-web-view');
   const codexGrid             = $('#codex-grid');
   const codexWebCanvas        = $('#codex-web-canvas');
-  const codexWebInspector     = $('#codex-web-inspector');
+  const codexCharPreview      = $('#codex-char-preview') || $('#codex-web-inspector');
+  const codexWebInspector     = codexCharPreview;
   const btnInspectorClose     = $('#btn-inspector-close');
   const inspectorArchetypeBadge = $('#inspector-archetype-badge');
   const inspectorName         = $('#inspector-name');
@@ -283,6 +298,10 @@
   const codexRelDesc          = $('#codex-rel-desc');
   const btnCodexRelCancel     = $('#btn-codex-rel-cancel');
   const btnCodexRelSave       = $('#btn-codex-rel-save');
+  const btnCodexTutorial      = $('#btn-codex-tutorial');
+  const codexTutorialModal    = $('#codex-tutorial-modal');
+  const btnCloseCodexTutorial = $('#btn-close-codex-tutorial');
+  const btnDismissCodexTutorial = $('#btn-dismiss-codex-tutorial');
 
   const categories = ['chapter', 'lore', 'world', 'draft'];
 
@@ -870,18 +889,54 @@
     // Deep Worldbuilding View Triggers
     if (btnMapView) btnMapView.addEventListener('click', openMapView);
     if (menuBtnMap) menuBtnMap.addEventListener('click', openMapView);
+    if (dashboardBtnMap) dashboardBtnMap.addEventListener('click', openMapView);
+    if (btnToolbarMap) btnToolbarMap.addEventListener('click', openMapView);
     if (btnCloseMap) btnCloseMap.addEventListener('click', closeMapView);
     if (mapModal) mapModal.addEventListener('click', e => { if (e.target === mapModal) closeMapView(); });
 
     if (btnTimelineView) btnTimelineView.addEventListener('click', openTimelineView);
     if (menuBtnTimeline) menuBtnTimeline.addEventListener('click', openTimelineView);
+    if (dashboardBtnTimeline) dashboardBtnTimeline.addEventListener('click', openTimelineView);
+    if (btnToolbarTimeline) btnToolbarTimeline.addEventListener('click', openTimelineView);
     if (btnCloseTimeline) btnCloseTimeline.addEventListener('click', closeTimelineView);
     if (timelineModal) timelineModal.addEventListener('click', e => { if (e.target === timelineModal) closeTimelineView(); });
 
     if (btnCodexView) btnCodexView.addEventListener('click', openCodexView);
     if (menuBtnCodex) menuBtnCodex.addEventListener('click', openCodexView);
+    if (dashboardBtnCodex) dashboardBtnCodex.addEventListener('click', openCodexView);
+    if (btnToolbarCodex) btnToolbarCodex.addEventListener('click', openCodexView);
     if (btnCloseCodex) btnCloseCodex.addEventListener('click', closeCodexView);
     if (codexModal) codexModal.addEventListener('click', e => { if (e.target === codexModal) closeCodexView(); });
+
+    // Worldbuilding Feature Tutorial Triggers
+    if (btnMapTutorial) btnMapTutorial.addEventListener('click', () => openWorldbuildingTutorial('map'));
+    if (btnCloseMapTutorial) btnCloseMapTutorial.addEventListener('click', () => closeWorldbuildingTutorial('map'));
+    if (btnDismissMapTutorial) btnDismissMapTutorial.addEventListener('click', () => closeWorldbuildingTutorial('map'));
+    if (mapTutorialModal) mapTutorialModal.addEventListener('click', e => { if (e.target === mapTutorialModal) closeWorldbuildingTutorial('map'); });
+
+    if (btnTimelineTutorial) btnTimelineTutorial.addEventListener('click', () => openWorldbuildingTutorial('timeline'));
+    if (btnCloseTimelineTutorial) btnCloseTimelineTutorial.addEventListener('click', () => closeWorldbuildingTutorial('timeline'));
+    if (btnDismissTimelineTutorial) btnDismissTimelineTutorial.addEventListener('click', () => closeWorldbuildingTutorial('timeline'));
+    if (timelineTutorialModal) timelineTutorialModal.addEventListener('click', e => { if (e.target === timelineTutorialModal) closeWorldbuildingTutorial('timeline'); });
+
+    if (btnCodexTutorial) btnCodexTutorial.addEventListener('click', () => openWorldbuildingTutorial('codex'));
+    if (btnCloseCodexTutorial) btnCloseCodexTutorial.addEventListener('click', () => closeWorldbuildingTutorial('codex'));
+    if (btnDismissCodexTutorial) btnDismissCodexTutorial.addEventListener('click', () => closeWorldbuildingTutorial('codex'));
+    if (codexTutorialModal) codexTutorialModal.addEventListener('click', e => { if (e.target === codexTutorialModal) closeWorldbuildingTutorial('codex'); });
+
+    // Copyable syntax cheat sheet code snippets
+    $$('.copyable-code').forEach(el => {
+      el.addEventListener('click', () => {
+        const text = el.textContent.trim();
+        if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => {
+            toast('Cheat sheet syntax copied to clipboard', 'info');
+          }).catch(() => {});
+        } else {
+          toast('Syntax copied', 'info');
+        }
+      });
+    });
 
     // Global keyboard shortcuts
     document.addEventListener('keydown', handleGlobalShortcuts);
@@ -1706,6 +1761,18 @@
     }
     if (graphModal && !graphModal.classList.contains('hidden')) {
       closeGraphView();
+      return true;
+    }
+    if (mapTutorialModal && !mapTutorialModal.classList.contains('hidden')) {
+      mapTutorialModal.classList.add('hidden');
+      return true;
+    }
+    if (timelineTutorialModal && !timelineTutorialModal.classList.contains('hidden')) {
+      timelineTutorialModal.classList.add('hidden');
+      return true;
+    }
+    if (codexTutorialModal && !codexTutorialModal.classList.contains('hidden')) {
+      codexTutorialModal.classList.add('hidden');
       return true;
     }
     if (mapPinModal && !mapPinModal.classList.contains('hidden')) {
@@ -3668,7 +3735,15 @@
     if (btnMapResetImg) {
       btnMapResetImg.addEventListener('click', () => {
         Storage.clearCustomMapImage();
-        if (mapCustomImg) mapCustomImg.classList.add('hidden');
+        if (mapCustomImg) {
+          mapCustomImg.classList.add('hidden');
+          mapCustomImg.style.display = 'none';
+          if (typeof mapCustomImg.removeAttribute === 'function') {
+            mapCustomImg.removeAttribute('src');
+          } else {
+            mapCustomImg.src = '';
+          }
+        }
         if (mapCanvas) {
           mapCanvas.classList.remove('hidden');
           renderDefaultMap();
@@ -3744,7 +3819,10 @@
     // Preview actions
     if (btnMapPreviewClose) {
       btnMapPreviewClose.addEventListener('click', () => {
-        if (mapPinPreview) mapPinPreview.classList.add('hidden');
+        if (mapPinPreview) {
+          mapPinPreview.classList.add('hidden');
+          mapPinPreview.style.display = 'none';
+        }
       });
     }
 
@@ -3793,21 +3871,55 @@
     }
   }
 
+  function openWorldbuildingTutorial(type) {
+    if (type === 'map' && mapTutorialModal) {
+      mapTutorialModal.classList.remove('hidden');
+    } else if (type === 'timeline' && timelineTutorialModal) {
+      timelineTutorialModal.classList.remove('hidden');
+    } else if (type === 'codex' && codexTutorialModal) {
+      codexTutorialModal.classList.remove('hidden');
+    }
+  }
+
+  function closeWorldbuildingTutorial(type) {
+    if (type === 'map' && mapTutorialModal) {
+      mapTutorialModal.classList.add('hidden');
+    } else if (type === 'timeline' && timelineTutorialModal) {
+      timelineTutorialModal.classList.add('hidden');
+    } else if (type === 'codex' && codexTutorialModal) {
+      codexTutorialModal.classList.add('hidden');
+    }
+  }
+
   function openMapView() {
     if (!mapModal) return;
     mapModal.classList.remove('hidden');
     isMapPlacementMode = false;
     updateMapPlacementUI();
-    if (mapPinPreview) mapPinPreview.classList.add('hidden');
+    if (mapPinPreview) {
+      mapPinPreview.classList.add('hidden');
+      mapPinPreview.style.display = 'none';
+    }
 
     resetMapCamera();
 
     const customImg = Storage.getCustomMapImage();
-    if (customImg) {
+    if (customImg && typeof customImg === 'string' && customImg.trim().length > 0) {
       loadMapImage(customImg);
     } else {
-      if (mapCustomImg) mapCustomImg.classList.add('hidden');
-      if (mapCanvas) mapCanvas.classList.remove('hidden');
+      if (mapCustomImg) {
+        mapCustomImg.classList.add('hidden');
+        mapCustomImg.style.display = 'none';
+        if (typeof mapCustomImg.removeAttribute === 'function') {
+          mapCustomImg.removeAttribute('src');
+        } else {
+          mapCustomImg.src = '';
+        }
+      }
+      if (mapCanvas) {
+        mapCanvas.classList.remove('hidden');
+        mapCanvas.style.display = 'block';
+      }
       renderDefaultMap();
     }
 
@@ -3818,7 +3930,11 @@
     if (!mapModal) return;
     mapModal.classList.add('hidden');
     if (mapPinModal) mapPinModal.classList.add('hidden');
-    if (mapPinPreview) mapPinPreview.classList.add('hidden');
+    if (mapPinPreview) {
+      mapPinPreview.classList.add('hidden');
+      mapPinPreview.style.display = 'none';
+    }
+    if (mapTutorialModal) mapTutorialModal.classList.add('hidden');
     isMapPlacementMode = false;
     updateMapPlacementUI();
   }
@@ -3854,8 +3970,10 @@
   function loadMapImage(dataUrl) {
     if (!mapCustomImg || !mapCanvas) return;
     mapCanvas.classList.add('hidden');
-    mapCustomImg.classList.remove('hidden');
+    mapCanvas.style.display = 'none';
     mapCustomImg.src = dataUrl;
+    mapCustomImg.style.display = 'block';
+    mapCustomImg.classList.remove('hidden');
   }
 
   function renderDefaultMap() {
@@ -4124,6 +4242,7 @@
 
   function showPinPreview(pin) {
     if (!mapPinPreview) return;
+    mapPinPreview.style.display = 'block';
     mapPinPreview.classList.remove('hidden');
 
     if (mapPreviewBadge) {
@@ -4184,6 +4303,7 @@
         if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
         Storage.deleteMapPin(pin.id);
         mapPinPreview.classList.add('hidden');
+        mapPinPreview.style.display = 'none';
         renderMapPins();
         toast('Pin deleted', 'info');
       };
@@ -4521,6 +4641,7 @@
     if (!timelineModal) return;
     timelineModal.classList.add('hidden');
     if (timelineEventModal) timelineEventModal.classList.add('hidden');
+    if (timelineTutorialModal) timelineTutorialModal.classList.add('hidden');
   }
 
   function renderTimeline() {
@@ -4895,6 +5016,20 @@
         renderCodex();
       });
     }
+    if (btnCodexModeCards) {
+      btnCodexModeCards.addEventListener('click', () => {
+        codexMode = 'cards';
+        btnCodexModeCards.classList.add('active');
+        if (btnCodexModeWeb) btnCodexModeWeb.classList.remove('active');
+        if (codexCardsView) codexCardsView.classList.remove('hidden');
+        if (codexWebView) codexWebView.classList.add('hidden');
+        if (codexCharPreview) {
+          codexCharPreview.classList.add('hidden');
+          codexCharPreview.style.display = 'none';
+        }
+        renderCodex();
+      });
+    }
     if (btnCodexModeWeb) {
       btnCodexModeWeb.addEventListener('click', () => {
         codexMode = 'web';
@@ -4902,6 +5037,10 @@
         if (btnCodexModeCards) btnCodexModeCards.classList.remove('active');
         if (codexCardsView) codexCardsView.classList.add('hidden');
         if (codexWebView) codexWebView.classList.remove('hidden');
+        if (codexCharPreview) {
+          codexCharPreview.classList.add('hidden');
+          codexCharPreview.style.display = 'none';
+        }
         renderCodex();
       });
     }
@@ -4943,7 +5082,10 @@
 
     if (btnInspectorClose) {
       btnInspectorClose.addEventListener('click', () => {
-        if (codexWebInspector) codexWebInspector.classList.add('hidden');
+        if (codexCharPreview) {
+          codexCharPreview.classList.add('hidden');
+          codexCharPreview.style.display = 'none';
+        }
       });
     }
 
@@ -4962,6 +5104,10 @@
   function openCodexView() {
     if (!codexModal) return;
     codexModal.classList.remove('hidden');
+    if (codexCharPreview) {
+      codexCharPreview.classList.add('hidden');
+      codexCharPreview.style.display = 'none';
+    }
     renderCodex();
   }
 
@@ -4970,7 +5116,11 @@
     codexModal.classList.add('hidden');
     if (codexCharModal) codexCharModal.classList.add('hidden');
     if (codexRelModal) codexRelModal.classList.add('hidden');
-    if (codexWebInspector) codexWebInspector.classList.add('hidden');
+    if (codexCharPreview) {
+      codexCharPreview.classList.add('hidden');
+      codexCharPreview.style.display = 'none';
+    }
+    if (codexTutorialModal) codexTutorialModal.classList.add('hidden');
   }
 
   function renderCodex() {
@@ -4998,6 +5148,10 @@
       if (codexEmptyPrompt) codexEmptyPrompt.classList.remove('hidden');
       if (codexCardsView) codexCardsView.classList.add('hidden');
       if (codexWebView) codexWebView.classList.add('hidden');
+      if (codexCharPreview) {
+        codexCharPreview.classList.add('hidden');
+        codexCharPreview.style.display = 'none';
+      }
       return;
     }
 
@@ -5225,8 +5379,9 @@
   }
 
   function showWebInspector(char, rels, allChars) {
-    if (!codexWebInspector) return;
-    codexWebInspector.classList.remove('hidden');
+    if (!codexCharPreview) return;
+    codexCharPreview.style.display = 'block';
+    codexCharPreview.classList.remove('hidden');
 
     if (inspectorArchetypeBadge) {
       inspectorArchetypeBadge.textContent = char.archetype || 'Ally';

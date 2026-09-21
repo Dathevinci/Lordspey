@@ -271,6 +271,10 @@ function createMockElement(id = '', tag = 'div') {
     },
     dataset,
     style: {},
+    attributes: {},
+    setAttribute: function(k, v) { this.attributes[k] = String(v); if (k === 'src') this.src = String(v); },
+    getAttribute: function(k) { return this.attributes[k] !== undefined ? this.attributes[k] : null; },
+    removeAttribute: function(k) { delete this.attributes[k]; if (k === 'src') delete this.src; },
     value: '',
     textContent: '',
     innerHTML: '',
@@ -400,7 +404,15 @@ const allMockIds = [
   'btn-codex-add-rel', 'codex-char-modal', 'codex-input-name', 'codex-input-archetype',
   'codex-input-faction', 'codex-input-role', 'codex-input-note', 'codex-input-bio',
   'btn-codex-char-cancel', 'btn-codex-char-save', 'codex-rel-modal', 'codex-rel-source',
-  'codex-rel-type', 'codex-rel-target', 'codex-rel-desc', 'btn-codex-rel-cancel', 'btn-codex-rel-save'
+  'codex-rel-type', 'codex-rel-target', 'codex-rel-desc', 'btn-codex-rel-cancel', 'btn-codex-rel-save',
+
+  // Deep Worldbuilding - Launchers & Tutorials
+  'dashboard-btn-map', 'dashboard-btn-timeline', 'dashboard-btn-codex',
+  'btn-toolbar-map', 'btn-toolbar-timeline', 'btn-toolbar-codex',
+  'btn-map-tutorial', 'btn-timeline-tutorial', 'btn-codex-tutorial',
+  'map-tutorial-modal', 'timeline-tutorial-modal', 'codex-tutorial-modal',
+  'btn-close-map-tutorial', 'btn-close-timeline-tutorial', 'btn-close-codex-tutorial',
+  'codex-char-preview'
 ];
 
 allMockIds.forEach(id => {
@@ -408,7 +420,7 @@ allMockIds.forEach(id => {
 });
 
 // Set hidden initial states
-['tutorial-overlay', 'graph-modal', 'map-modal', 'timeline-modal', 'codex-modal', 'map-pin-modal', 'timeline-event-modal', 'codex-char-modal', 'codex-rel-modal', 'editor-area', 'intro-splash', 'metrics-modal', 'switcher-modal', 'goal-modal', 'outline-drawer', 'wikicreate-modal', 'find-replace-bar', 'modal-overlay', 'delete-overlay'].forEach(id => {
+['tutorial-overlay', 'graph-modal', 'map-modal', 'timeline-modal', 'codex-modal', 'map-pin-modal', 'timeline-event-modal', 'codex-char-modal', 'codex-rel-modal', 'editor-area', 'intro-splash', 'metrics-modal', 'switcher-modal', 'goal-modal', 'outline-drawer', 'wikicreate-modal', 'find-replace-bar', 'modal-overlay', 'delete-overlay', 'map-tutorial-modal', 'timeline-tutorial-modal', 'codex-tutorial-modal', 'map-pin-preview', 'codex-char-preview', 'codex-web-inspector'].forEach(id => {
   if (elementsMap[id]) elementsMap[id].classList.add('hidden');
 });
 elementsMap['main-menu'].classList.remove('hidden');
@@ -826,4 +838,79 @@ if (testPinData) {
 elementsMap['btn-close-map'].dispatchEvent('click');
 console.log('✓ Test 2.9 Passed: Map pin drag micro-jitter immunity (<5px movement triggers click) verified');
 
+// ── Test 2.10: Dashboard & Toolbar Launch Buttons Integration ──
+// Dashboard buttons
+elementsMap['dashboard-btn-map'].dispatchEvent('click');
+assert(!elementsMap['map-modal'].classList.contains('hidden'), 'Dashboard World Map button should open map modal');
+elementsMap['btn-close-map'].dispatchEvent('click');
+assert(elementsMap['map-modal'].classList.contains('hidden'));
+
+elementsMap['dashboard-btn-timeline'].dispatchEvent('click');
+assert(!elementsMap['timeline-modal'].classList.contains('hidden'), 'Dashboard Timeline button should open timeline modal');
+elementsMap['btn-close-timeline'].dispatchEvent('click');
+assert(elementsMap['timeline-modal'].classList.contains('hidden'));
+
+elementsMap['dashboard-btn-codex'].dispatchEvent('click');
+assert(!elementsMap['codex-modal'].classList.contains('hidden'), 'Dashboard Codex button should open codex modal');
+elementsMap['btn-close-codex'].dispatchEvent('click');
+assert(elementsMap['codex-modal'].classList.contains('hidden'));
+
+// Toolbar buttons
+elementsMap['btn-toolbar-map'].dispatchEvent('click');
+assert(!elementsMap['map-modal'].classList.contains('hidden'), 'Toolbar World Map button should open map modal');
+elementsMap['btn-close-map'].dispatchEvent('click');
+
+elementsMap['btn-toolbar-timeline'].dispatchEvent('click');
+assert(!elementsMap['timeline-modal'].classList.contains('hidden'), 'Toolbar Timeline button should open timeline modal');
+elementsMap['btn-close-timeline'].dispatchEvent('click');
+
+elementsMap['btn-toolbar-codex'].dispatchEvent('click');
+assert(!elementsMap['codex-modal'].classList.contains('hidden'), 'Toolbar Codex button should open codex modal');
+elementsMap['btn-close-codex'].dispatchEvent('click');
+console.log('✓ Test 2.10 Passed: Dashboard & Toolbar launch buttons for Map, Timeline, & Codex verified');
+
+// ── Test 2.11: Worldbuilding Tutorials & Escape Dismissal ──
+// World Map Tutorial
+elementsMap['btn-map-view'].dispatchEvent('click');
+elementsMap['btn-map-tutorial'].dispatchEvent('click');
+assert(!elementsMap['map-tutorial-modal'].classList.contains('hidden'), 'Map tutorial modal should open');
+elementsMap['btn-close-map-tutorial'].dispatchEvent('click');
+assert(elementsMap['map-tutorial-modal'].classList.contains('hidden'), 'Map tutorial close button should hide modal');
+
+elementsMap['btn-map-tutorial'].dispatchEvent('click');
+assert(!elementsMap['map-tutorial-modal'].classList.contains('hidden'));
+if (globalDocumentListeners['keydown']) {
+  globalDocumentListeners['keydown'].forEach(fn => fn({ key: 'Escape', preventDefault: () => {} }));
+}
+assert(elementsMap['map-tutorial-modal'].classList.contains('hidden'), 'Escape should dismiss map tutorial modal');
+elementsMap['btn-close-map'].dispatchEvent('click');
+
+// Chronology Timeline Tutorial
+elementsMap['btn-timeline-view'].dispatchEvent('click');
+elementsMap['btn-timeline-tutorial'].dispatchEvent('click');
+assert(!elementsMap['timeline-tutorial-modal'].classList.contains('hidden'), 'Timeline tutorial modal should open');
+elementsMap['btn-close-timeline-tutorial'].dispatchEvent('click');
+assert(elementsMap['timeline-tutorial-modal'].classList.contains('hidden'), 'Timeline tutorial close button should hide modal');
+elementsMap['btn-close-timeline'].dispatchEvent('click');
+
+// Character Codex Tutorial
+elementsMap['btn-codex-view'].dispatchEvent('click');
+elementsMap['btn-codex-tutorial'].dispatchEvent('click');
+assert(!elementsMap['codex-tutorial-modal'].classList.contains('hidden'), 'Codex tutorial modal should open');
+elementsMap['btn-close-codex-tutorial'].dispatchEvent('click');
+assert(elementsMap['codex-tutorial-modal'].classList.contains('hidden'), 'Codex tutorial close button should hide modal');
+elementsMap['btn-close-codex'].dispatchEvent('click');
+console.log('✓ Test 2.11 Passed: Dedicated Worldbuilding Tutorial modals & Escape dismissal verified');
+
+// ── Test 2.12: Strict Preview Card Hidden Enforcement ──
+elementsMap['btn-map-view'].dispatchEvent('click');
+assert(elementsMap['map-pin-preview'].classList.contains('hidden'), 'Map pin preview must start hidden when map is opened');
+elementsMap['btn-close-map'].dispatchEvent('click');
+
+elementsMap['btn-codex-view'].dispatchEvent('click');
+assert(elementsMap['codex-char-preview'].classList.contains('hidden') || elementsMap['codex-web-inspector'].classList.contains('hidden'), 'Codex character preview card must start hidden when codex is opened');
+elementsMap['btn-close-codex'].dispatchEvent('click');
+console.log('✓ Test 2.12 Passed: Strict preview card hidden enforcement verified');
+
 console.log('\n=== ALL DEEP WORLDBUILDING & LORE TESTS PASSED SUCCESSFULLY ===\n');
+
