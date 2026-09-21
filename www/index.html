@@ -567,8 +567,8 @@
           </div>
           <div class="map-action-btns">
             <button id="btn-map-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="World Map Guide & Cheat Sheet">? Tutorial</button>
-            <button id="btn-map-drop-pin" class="btn btn-sm btn-primary" title="Click to enter pin drop mode">
-              <span>+ Drop Pin</span>
+            <button id="btn-map-drop-pin" class="btn btn-sm btn-primary" title="Click to enter pin drop mode or place a pin">
+              <span>+ Add Pin</span>
             </button>
             <label class="btn btn-sm btn-ghost map-upload-label" title="Upload custom map image">
               <span>Upload Map</span>
@@ -596,12 +596,11 @@
 
         <div class="map-stage" id="map-stage">
           <canvas id="map-canvas" width="1600" height="1000"></canvas>
-          <img id="map-custom-img" class="map-custom-img hidden" alt="Custom World Map" style="display: none;" />
           <div id="map-pins-container" class="map-pins-container"></div>
         </div>
 
         <!-- Pin Hover / Click Preview Card -->
-        <div id="map-pin-preview" class="map-pin-preview hidden">
+        <div id="map-pin-preview" class="map-pin-preview hidden" style="display: none;">
           <div class="map-preview-header">
             <span id="map-preview-badge" class="badge badge-world">World</span>
             <span id="map-preview-coords" class="map-preview-coords">50.0%, 50.0%</span>
@@ -824,7 +823,7 @@
           <div class="codex-web-canvas-wrap" id="codex-web-canvas-wrap">
             <canvas id="codex-web-canvas" width="1200" height="800"></canvas>
             <!-- Character preview & web inspector card -->
-            <div id="codex-char-preview" data-alias="codex-web-inspector" class="codex-web-inspector codex-char-preview hidden">
+            <div id="codex-char-preview" data-alias="codex-web-inspector" class="codex-web-inspector codex-char-preview hidden" style="display: none;">
               <div class="inspector-header">
                 <span id="inspector-archetype-badge" class="badge badge-archetype">Protagonist</span>
                 <button id="btn-inspector-close" class="icon-btn btn-xs">✕</button>
@@ -834,7 +833,10 @@
               <p id="inspector-bio" class="inspector-bio">Character bio snippet…</p>
               <div class="inspector-rels-title">Relationships:</div>
               <div id="inspector-rels-list" class="inspector-rels-list"></div>
-              <button id="btn-inspector-open-note" class="btn btn-sm btn-primary">Open Dossier Note ↗</button>
+              <div class="inspector-actions">
+                <button id="btn-inspector-open-note" class="btn btn-sm btn-primary">Open Dossier Note ↗</button>
+                <button id="btn-inspector-delete-char" class="btn btn-sm btn-danger">Delete Character</button>
+              </div>
             </div>
           </div>
           <div class="codex-web-legend">
@@ -914,11 +916,15 @@
         <label for="codex-rel-type">Relationship Type</label>
         <select id="codex-rel-type">
           <option value="Allied with" selected>Allied with</option>
+          <option value="Ally">Ally</option>
           <option value="Mentor to">Mentor to</option>
+          <option value="Mentor">Mentor</option>
           <option value="Pupil of">Pupil of</option>
           <option value="Rival of">Rival of</option>
+          <option value="Rival">Rival</option>
           <option value="Enemy of">Enemy of</option>
           <option value="Kin to">Kin to</option>
+          <option value="Kin">Kin</option>
           <option value="Bound to">Bound to</option>
           <option value="Acquaintance of">Acquaintance of</option>
         </select>

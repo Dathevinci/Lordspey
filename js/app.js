@@ -187,7 +187,7 @@
   const mapViewport         = $('#map-viewport');
   const mapStage            = $('#map-stage');
   const mapCanvas           = $('#map-canvas');
-  const mapCustomImg        = $('#map-custom-img');
+  let mapCustomImg          = $('#map-custom-img');
   const mapPinsContainer    = $('#map-pins-container');
   const mapPinCount         = $('#map-pin-count');
   const mapCoordsIndicator  = $('#map-coords-indicator');
@@ -1761,6 +1761,21 @@
     }
     if (graphModal && !graphModal.classList.contains('hidden')) {
       closeGraphView();
+      return true;
+    }
+    if (mapPinPreview && !mapPinPreview.classList.contains('hidden')) {
+      mapPinPreview.classList.add('hidden');
+      mapPinPreview.style.display = 'none';
+      return true;
+    }
+    if (codexCharPreview && !codexCharPreview.classList.contains('hidden')) {
+      codexCharPreview.classList.add('hidden');
+      codexCharPreview.style.display = 'none';
+      return true;
+    }
+    if (isMapPlacementMode) {
+      isMapPlacementMode = false;
+      updateMapPlacementUI();
       return true;
     }
     if (mapTutorialModal && !mapTutorialModal.classList.contains('hidden')) {
@@ -3735,19 +3750,8 @@
     if (btnMapResetImg) {
       btnMapResetImg.addEventListener('click', () => {
         Storage.clearCustomMapImage();
-        if (mapCustomImg) {
-          mapCustomImg.classList.add('hidden');
-          mapCustomImg.style.display = 'none';
-          if (typeof mapCustomImg.removeAttribute === 'function') {
-            mapCustomImg.removeAttribute('src');
-          } else {
-            mapCustomImg.src = '';
-          }
-        }
-        if (mapCanvas) {
-          mapCanvas.classList.remove('hidden');
-          renderDefaultMap();
-        }
+        clearMapImageElement();
+        renderDefaultMap();
         toast('Reset to default cartography map', 'info');
       });
     }
@@ -3891,6 +3895,28 @@
     }
   }
 
+  function clearMapImageElement() {
+    const img = $('#map-custom-img') || mapCustomImg;
+    if (img) {
+      if (typeof img.remove === 'function') {
+        img.remove();
+      } else {
+        img.classList.add('hidden');
+        img.style.display = 'none';
+        if (typeof img.removeAttribute === 'function') {
+          img.removeAttribute('src');
+        } else {
+          img.src = '';
+        }
+      }
+    }
+    mapCustomImg = null;
+    if (mapCanvas) {
+      mapCanvas.classList.remove('hidden');
+      mapCanvas.style.display = 'block';
+    }
+  }
+
   function openMapView() {
     if (!mapModal) return;
     mapModal.classList.remove('hidden');
@@ -3907,19 +3933,7 @@
     if (customImg && typeof customImg === 'string' && customImg.trim().length > 0) {
       loadMapImage(customImg);
     } else {
-      if (mapCustomImg) {
-        mapCustomImg.classList.add('hidden');
-        mapCustomImg.style.display = 'none';
-        if (typeof mapCustomImg.removeAttribute === 'function') {
-          mapCustomImg.removeAttribute('src');
-        } else {
-          mapCustomImg.src = '';
-        }
-      }
-      if (mapCanvas) {
-        mapCanvas.classList.remove('hidden');
-        mapCanvas.style.display = 'block';
-      }
+      clearMapImageElement();
       renderDefaultMap();
     }
 
@@ -3968,12 +3982,30 @@
   }
 
   function loadMapImage(dataUrl) {
-    if (!mapCustomImg || !mapCanvas) return;
+    if (!mapStage || !mapCanvas) return;
     mapCanvas.classList.add('hidden');
     mapCanvas.style.display = 'none';
-    mapCustomImg.src = dataUrl;
-    mapCustomImg.style.display = 'block';
-    mapCustomImg.classList.remove('hidden');
+
+    let img = $('#map-custom-img') || mapCustomImg;
+    if (!img) {
+      if (typeof document !== 'undefined' && typeof document.createElement === 'function') {
+        img = document.createElement('img');
+        img.id = 'map-custom-img';
+        img.className = 'map-custom-img';
+        img.alt = 'Custom World Map';
+        if (mapPinsContainer && mapPinsContainer.parentNode === mapStage) {
+          mapStage.insertBefore(img, mapPinsContainer);
+        } else {
+          mapStage.appendChild(img);
+        }
+      }
+    }
+    if (img) {
+      img.src = dataUrl;
+      img.style.display = 'block';
+      img.classList.remove('hidden');
+      mapCustomImg = img;
+    }
   }
 
   function renderDefaultMap() {
@@ -4712,6 +4744,8 @@
     events.forEach((evt, idx) => {
       const isAbove = idx % 2 === 0;
       const xPos = 80 + (idx * stepWidth);
+      const isManual = !evt.isNoteEvent && (!evt.id || !evt.id.startsWith('note-evt-'));
+      const delBtnHtml = isManual ? `<button class="btn-del-timeline-evt" title="Delete event" data-id="${evt.id}">✕</button>` : '';
 
       const card = document.createElement('div');
       card.className = `timeline-node-card ${isAbove ? 'pos-above' : 'pos-below'}`;
@@ -4723,6 +4757,7 @@
         <div class="timeline-card-header">
           <span class="timeline-card-year">${escText(evt.year)}</span>
           <span class="badge badge-${evt.category || 'lore'}">${evt.category || 'lore'}</span>
+          ${delBtnHtml}
         </div>
         <h4 class="timeline-card-title">${escText(evt.title)}</h4>
         <p class="timeline-card-desc">${escText(evt.description)}</p>
@@ -4731,7 +4766,18 @@
         </div>
       `;
 
-      card.addEventListener('click', () => {
+      const delBtn = card.querySelector('.btn-del-timeline-evt');
+      if (delBtn) {
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          Storage.deleteTimelineEvent(evt.id);
+          renderTimeline();
+          toast(`Deleted event "${evt.title}"`, 'info');
+        });
+      }
+
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-del-timeline-evt')) return;
         if (timelineDidPan) return;
         closeTimelineView();
         navigateToEventNote(evt);
@@ -4757,6 +4803,9 @@
       }
 
       const isLeft = idx % 2 === 0;
+      const isManual = !evt.isNoteEvent && (!evt.id || !evt.id.startsWith('note-evt-'));
+      const delBtnHtml = isManual ? `<button class="btn-del-timeline-evt" title="Delete event" data-id="${evt.id}">✕</button>` : '';
+
       const item = document.createElement('div');
       item.className = `timeline-stream-item ${isLeft ? 'side-left' : 'side-right'}`;
 
@@ -4766,6 +4815,7 @@
           <div class="timeline-card-header">
             <span class="timeline-card-year">${escText(evt.year)}</span>
             <span class="badge badge-${evt.category || 'lore'}">${evt.category || 'lore'}</span>
+            ${delBtnHtml}
           </div>
           <h4 class="timeline-card-title">${escText(evt.title)}</h4>
           <p class="timeline-card-desc">${escText(evt.description)}</p>
@@ -4775,7 +4825,18 @@
         </div>
       `;
 
-      item.addEventListener('click', () => {
+      const delBtn = item.querySelector('.btn-del-timeline-evt');
+      if (delBtn) {
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          Storage.deleteTimelineEvent(evt.id);
+          renderTimeline();
+          toast(`Deleted event "${evt.title}"`, 'info');
+        });
+      }
+
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-del-timeline-evt')) return;
         closeTimelineView();
         navigateToEventNote(evt);
       });
@@ -5210,17 +5271,28 @@
         ` : ''}
         <div class="codex-card-actions">
           <span class="text-xs text-muted">${escText(c.role || 'Dossier')}</span>
-          <button class="btn btn-xs btn-primary btn-open-dossier">Open Dossier ↗</button>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            ${(!c.source || c.source !== 'note') ? `<button class="btn-del-char" title="Delete character" data-id="${c.id}">✕</button>` : ''}
+            <button class="btn btn-xs btn-primary btn-open-dossier">Open Dossier ↗</button>
+          </div>
         </div>
       `;
 
-      const btn = $('.btn-open-dossier', card);
-      if (btn) {
-        btn.addEventListener('click', () => {
-          closeCodexView();
-          navigateToCharacterNote(c);
+      const delBtn = card.querySelector('.btn-del-char');
+      if (delBtn) {
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          Storage.deleteCharacter(c.id);
+          renderCodex();
+          toast(`Deleted character "${c.name}"`, 'info');
         });
       }
+
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-del-char')) return;
+        closeCodexView();
+        navigateToCharacterNote(c);
+      });
 
       codexGrid.appendChild(card);
     });
@@ -5295,7 +5367,7 @@
 
       let color = '#94a3b8';
       const typeLower = (r.type || '').toLowerCase();
-      if (typeLower.includes('allied') || typeLower.includes('mentor') || typeLower.includes('pupil')) {
+      if (typeLower.includes('allied') || typeLower.includes('ally') || typeLower.includes('mentor') || typeLower.includes('pupil')) {
         color = '#10b981';
       } else if (typeLower.includes('rival') || typeLower.includes('enemy')) {
         color = '#ef4444';
@@ -5399,14 +5471,42 @@
       inspectorRelsList.innerHTML = myRels.length > 0 ? myRels.map(r => {
         const otherId = r.sourceId === char.id ? r.targetId : r.sourceId;
         const other = charMap.get(otherId);
-        return `<div class="text-xs"><strong>${escText(r.type)}:</strong> ${escText(other ? other.name : 'Unknown')}</div>`;
+        const isManual = !r.id || !r.id.startsWith('note-rel-');
+        const delRelBtn = isManual ? `<button class="btn-del-rel" data-rel-id="${r.id}" title="Remove relationship" style="float: right;">✕</button>` : '';
+        return `<div class="text-xs" style="margin-bottom: 4px; overflow: hidden;"><strong>${escText(r.type)}:</strong> ${escText(other ? other.name : 'Unknown')} ${delRelBtn}</div>`;
       }).join('') : '<div class="text-xs text-muted">No explicit relationships recorded.</div>';
+
+      inspectorRelsList.querySelectorAll('.btn-del-rel').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const relId = btn.dataset.relId;
+          Storage.deleteRelationship(relId);
+          renderCodex();
+          const updatedChars = Storage.getAllCharacters();
+          const updatedRels = Storage.getAllRelationships();
+          showWebInspector(char, updatedRels, updatedChars);
+          toast('Relationship removed', 'info');
+        });
+      });
     }
 
     if (btnInspectorOpenNote) {
       btnInspectorOpenNote.onclick = () => {
         closeCodexView();
         navigateToCharacterNote(char);
+      };
+    }
+
+    const btnInspectorDeleteChar = $('#btn-inspector-delete-char');
+    if (btnInspectorDeleteChar) {
+      btnInspectorDeleteChar.onclick = () => {
+        Storage.deleteCharacter(char.id);
+        if (codexCharPreview) {
+          codexCharPreview.classList.add('hidden');
+          codexCharPreview.style.display = 'none';
+        }
+        renderCodex();
+        toast(`Deleted character "${char.name}"`, 'info');
       };
     }
   }
@@ -5483,14 +5583,23 @@
 
   function openAddRelationshipModal() {
     if (!codexRelModal) return;
-    codexRelModal.classList.remove('hidden');
-
     const chars = Storage.getAllCharacters();
+    if (chars.length < 2) {
+      toast('Add at least two characters to the Codex before connecting relationships.', 'info');
+      openAddCharacterModal();
+      return;
+    }
+
+    codexRelModal.classList.remove('hidden');
+    if (codexTutorialModal) codexTutorialModal.classList.add('hidden');
+
     if (codexRelSource) {
       codexRelSource.innerHTML = chars.map(c => `<option value="${c.id}">${escText(c.name)}</option>`).join('');
+      codexRelSource.value = chars[0].id;
     }
     if (codexRelTarget) {
       codexRelTarget.innerHTML = chars.map(c => `<option value="${c.id}">${escText(c.name)}</option>`).join('');
+      codexRelTarget.value = chars[1].id;
     }
     if (codexRelDesc) codexRelDesc.value = '';
   }

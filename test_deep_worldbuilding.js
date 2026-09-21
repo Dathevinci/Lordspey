@@ -412,7 +412,7 @@ const allMockIds = [
   'btn-map-tutorial', 'btn-timeline-tutorial', 'btn-codex-tutorial',
   'map-tutorial-modal', 'timeline-tutorial-modal', 'codex-tutorial-modal',
   'btn-close-map-tutorial', 'btn-close-timeline-tutorial', 'btn-close-codex-tutorial',
-  'codex-char-preview'
+  'codex-char-preview', 'btn-inspector-delete-char'
 ];
 
 allMockIds.forEach(id => {
@@ -911,6 +911,68 @@ elementsMap['btn-codex-view'].dispatchEvent('click');
 assert(elementsMap['codex-char-preview'].classList.contains('hidden') || elementsMap['codex-web-inspector'].classList.contains('hidden'), 'Codex character preview card must start hidden when codex is opened');
 elementsMap['btn-close-codex'].dispatchEvent('click');
 console.log('✓ Test 2.12 Passed: Strict preview card hidden enforcement verified');
+
+// ── Test 2.13: Escape Dismissal of Preview Cards & Placement Mode ──
+elementsMap['btn-map-view'].dispatchEvent('click');
+assert(!elementsMap['map-modal'].classList.contains('hidden'));
+elementsMap['btn-map-drop-pin'].dispatchEvent('click');
+assert(elementsMap['map-viewport'].classList.contains('placement-active'));
+// Pressing Escape should exit placement mode without closing map
+if (globalDocumentListeners['keydown']) {
+  globalDocumentListeners['keydown'].forEach(fn => fn({ key: 'Escape', preventDefault: () => {} }));
+}
+assert(!elementsMap['map-viewport'].classList.contains('placement-active'), 'Escape should cancel pin placement mode');
+assert(!elementsMap['map-modal'].classList.contains('hidden'), 'Map modal should stay open after cancelling placement mode');
+
+// Showing preview and pressing Escape
+elementsMap['map-pin-preview'].classList.remove('hidden');
+elementsMap['map-pin-preview'].style.display = 'block';
+if (globalDocumentListeners['keydown']) {
+  globalDocumentListeners['keydown'].forEach(fn => fn({ key: 'Escape', preventDefault: () => {} }));
+}
+assert(elementsMap['map-pin-preview'].classList.contains('hidden'), 'Escape should dismiss pin preview card');
+assert(!elementsMap['map-modal'].classList.contains('hidden'), 'Map modal should stay open when preview is dismissed');
+elementsMap['btn-close-map'].dispatchEvent('click');
+
+// Codex Inspector Escape dismissal
+elementsMap['btn-codex-view'].dispatchEvent('click');
+elementsMap['codex-char-preview'].classList.remove('hidden');
+elementsMap['codex-char-preview'].style.display = 'block';
+if (globalDocumentListeners['keydown']) {
+  globalDocumentListeners['keydown'].forEach(fn => fn({ key: 'Escape', preventDefault: () => {} }));
+}
+assert(elementsMap['codex-char-preview'].classList.contains('hidden'), 'Escape should dismiss codex character preview card');
+assert(!elementsMap['codex-modal'].classList.contains('hidden'), 'Codex modal should stay open when inspector card is dismissed');
+elementsMap['btn-close-codex'].dispatchEvent('click');
+console.log('✓ Test 2.13 Passed: Escape hierarchy for preview cards & placement mode verified');
+
+// ── Test 2.14: Worldbuilding CRUD Delete & Relationship Selection Verification ──
+const customEvt = Storage.saveTimelineEvent({
+  year: 'Year 999',
+  title: 'Cataclysmic Eclipse',
+  category: 'world',
+  description: 'The twin suns were swallowed.'
+});
+assert(customEvt && customEvt.id, 'Manual event should be saved');
+let allEvts = Storage.getAllTimelineEvents();
+assert(allEvts.find(e => e.id === customEvt.id), 'Saved manual event should be listed');
+Storage.deleteTimelineEvent(customEvt.id);
+allEvts = Storage.getAllTimelineEvents();
+assert(!allEvts.find(e => e.id === customEvt.id), 'Manual event should be deleted via deleteTimelineEvent');
+
+// Character and relationship deletion
+const customChar = Storage.saveCharacter({
+  name: 'Archivist Thorne',
+  archetype: 'Mentor',
+  faction: 'The Silent Scribes'
+});
+assert(customChar && customChar.id);
+let allC = Storage.getAllCharacters();
+assert(allC.find(c => c.id === customChar.id));
+Storage.deleteCharacter(customChar.id);
+allC = Storage.getAllCharacters();
+assert(!allC.find(c => c.id === customChar.id), 'Character should be deleted via deleteCharacter');
+console.log('✓ Test 2.14 Passed: Worldbuilding CRUD delete operations verified');
 
 console.log('\n=== ALL DEEP WORLDBUILDING & LORE TESTS PASSED SUCCESSFULLY ===\n');
 

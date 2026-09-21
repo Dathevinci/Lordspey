@@ -3214,7 +3214,7 @@ body.zen-mode .format-bar:hover {
               visibility 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .map-overlay.hidden {
-  display: flex !important;
+  display: none !important;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -3548,7 +3548,7 @@ img.map-custom-img[src=""] {
               visibility 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .timeline-overlay.hidden {
-  display: flex !important;
+  display: none !important;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -3863,7 +3863,7 @@ img.map-custom-img[src=""] {
               visibility 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .codex-overlay.hidden {
-  display: flex !important;
+  display: none !important;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -4197,7 +4197,10 @@ img.map-custom-img[src=""] {
 #map-pin-modal,
 #timeline-event-modal,
 #codex-char-modal,
-#codex-rel-modal,
+#codex-rel-modal {
+  z-index: 250 !important;
+}
+
 #map-tutorial-modal,
 #timeline-tutorial-modal,
 #codex-tutorial-modal,
@@ -4235,6 +4238,17 @@ img.map-custom-img[src=""] {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.96) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.map-dialog,
+.timeline-dialog,
+.codex-dialog {
+  animation: modalScaleIn 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 @keyframes wbTabFade {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
@@ -4245,6 +4259,27 @@ img.map-custom-img[src=""] {
 .codex-cards-view:not(.hidden),
 .codex-web-view:not(.hidden) {
   animation: wbTabFade 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-del-timeline-evt,
+.btn-del-char,
+.btn-del-rel {
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  line-height: 1;
+  transition: color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+.btn-del-timeline-evt:hover,
+.btn-del-char:hover,
+.btn-del-rel:hover {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.15);
+  transform: scale(1.1);
 }
 
 /* ─────────────────────────────────────────────────────────────
