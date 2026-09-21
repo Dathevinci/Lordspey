@@ -1,0 +1,50 @@
+{
+  "name": "lord-spey",
+  "version": "1.0.0",
+  "description": "Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding.",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:exe": "electron-builder --win",
+    "test": "node verify_all.js && node test_suite.js && node test_graph.js"
+  },
+  "keywords": [
+    "author",
+    "writing",
+    "obsidian",
+    "markdown",
+    "novel",
+    "worldbuilding"
+  ],
+  "author": "Lord Spey",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.lordspey.app",
+    "productName": "Lord Spey",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "files": [
+      "index.html",
+      "css/**/*",
+      "js/**/*",
+      "electron-main.js"
+    ]
+  }
+}

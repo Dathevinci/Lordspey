@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lord Spey — Author's Workspace</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%2308080a'/><text x='50' y='68' text-anchor='middle' font-size='55' fill='%23ef4444'>✦</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ───────── Sidebar ───────── -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <h1 class="logo clickable" id="logo-home" title="Go to Main Menu">
+        <span class="logo-icon">✦</span> Lord Spey
+      </h1>
+      <div class="sidebar-header-actions">
+        <button id="btn-tutorial-sidebar" class="icon-btn" title="Tutorial & Workspace Guide">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
+        <button id="btn-quick-switcher" class="icon-btn" title="Quick Switcher (Ctrl+K / Ctrl+O)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+        <button id="btn-graph-view" class="icon-btn" title="Galaxy Graph (Ctrl+G)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="16.5"/><line x1="8.5" y1="6" x2="15.5" y2="6"/></svg>
+        </button>
+        <button id="sidebar-toggle" class="icon-btn sidebar-collapse-btn" title="Collapse sidebar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-search">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="search-input" placeholder="Search vault… (Ctrl+K)" autocomplete="off" />
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- Chapters -->
+      <div class="nav-section" data-category="chapter">
+        <button class="nav-section-header" aria-expanded="true">
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          <span>Chapters</span>
+          <span class="note-count" data-count="chapter">0</span>
+        </button>
+        <ul class="nav-list" id="list-chapter"></ul>
+      </div>
+
+      <!-- Lore -->
+      <div class="nav-section" data-category="lore">
+        <button class="nav-section-header" aria-expanded="true">
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          <span>Lore</span>
+          <span class="note-count" data-count="lore">0</span>
+        </button>
+        <ul class="nav-list" id="list-lore"></ul>
+      </div>
+
+      <!-- World Building -->
+      <div class="nav-section" data-category="world">
+        <button class="nav-section-header" aria-expanded="true">
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          <span>World Building</span>
+          <span class="note-count" data-count="world">0</span>
+        </button>
+        <ul class="nav-list" id="list-world"></ul>
+      </div>
+
+      <!-- Drafts -->
+      <div class="nav-section" data-category="draft">
+        <button class="nav-section-header" aria-expanded="true">
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Drafts</span>
+          <span class="note-count" data-count="draft">0</span>
+        </button>
+        <ul class="nav-list" id="list-draft"></ul>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button id="btn-new-note" class="btn btn-primary btn-new" title="Create a new document">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Note
+      </button>
+      <button id="btn-export" class="icon-btn" title="Export vault as JSON">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <button id="btn-import" class="icon-btn" title="Import vault from JSON">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </button>
+      <input type="file" id="import-file" accept=".json" hidden />
+    </div>
+  </aside>
+
+  <!-- Sidebar expand button (visible when collapsed) -->
+  <button id="sidebar-expand" class="icon-btn sidebar-expand-btn" title="Expand sidebar">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+
+  <!-- Mobile sidebar backdrop -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+  <!-- ───────── Main Content ───────── -->
+  <main id="main" class="main">
+    <!-- Clean Main Menu / Dashboard -->
+    <div id="main-menu" class="main-menu">
+      <div class="menu-hero">
+        <div class="menu-emblem">✦</div>
+        <h2 class="menu-title font-cinzel">LORD SPEY</h2>
+        <p class="menu-subtitle">A minimal, distraction-free workspace for authors. Draft prose, organize chapters, and connect worldbuilding lore like Obsidian.</p>
+      </div>
+
+      <div class="menu-grid">
+        <button class="menu-card" data-action="new-chapter">
+          <div class="menu-card-icon cat-chapter">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          </div>
+          <div class="menu-card-content">
+            <h3>New Chapter</h3>
+            <p>Draft prose, scenes, and manuscript chapters</p>
+          </div>
+        </button>
+
+        <button class="menu-card" data-action="new-lore">
+          <div class="menu-card-icon cat-lore">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="menu-card-content">
+            <h3>New Lore Entry</h3>
+            <p>Characters, factions, magic systems, and history</p>
+          </div>
+        </button>
+
+        <button class="menu-card" data-action="new-world">
+          <div class="menu-card-icon cat-world">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          </div>
+          <div class="menu-card-content">
+            <h3>World Building</h3>
+            <p>Locations, geography, cultures, and settings</p>
+          </div>
+        </button>
+
+        <button class="menu-card" data-action="new-draft">
+          <div class="menu-card-icon cat-draft">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="menu-card-content">
+            <h3>New Draft</h3>
+            <p>Outlines, rough ideas, and scene sketches</p>
+          </div>
+        </button>
+      </div>
+
+      <div class="menu-secondary-actions">
+        <button class="menu-sec-btn" id="menu-btn-tutorial" title="Interactive Step-by-Step Tutorial">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Interactive Tutorial
+        </button>
+        <button class="menu-sec-btn" id="menu-btn-graph" title="Visual Galaxy Graph">
+          <span class="sec-icon-star">✦</span> Galaxy Graph <kbd>Ctrl+G</kbd>
+        </button>
+        <button class="menu-sec-btn" id="menu-btn-switcher" title="Quick Switcher">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          Quick Switcher <kbd>Ctrl+K</kbd>
+        </button>
+        <button class="menu-sec-btn" id="menu-btn-sample" title="Optional: Load sample notes for inspiration">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Load Sample Vault
+        </button>
+      </div>
+
+      <!-- Recent Notes Section (shown when notes exist) -->
+      <div id="menu-recent-section" class="menu-recent-section hidden">
+        <h4 class="menu-recent-title">Recent Documents</h4>
+        <div id="menu-recent-grid" class="menu-recent-grid"></div>
+      </div>
+    </div>
+
+    <!-- Editor area -->
+    <div id="editor-area" class="editor-area hidden">
+      <!-- Editor toolbar -->
+      <div class="editor-toolbar">
+        <div class="editor-meta">
+          <button id="btn-back-menu" class="icon-btn" title="Back to Main Menu">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </button>
+          <span class="meta-separator">|</span>
+          <select id="note-category" class="meta-select" title="Category">
+            <option value="chapter">Chapter</option>
+            <option value="lore">Lore</option>
+            <option value="world">World Building</option>
+            <option value="draft">Draft</option>
+          </select>
+          <span class="meta-separator">·</span>
+          <span id="word-count" class="meta-info meta-clickable" title="Click for Detailed Manuscript Stats">0 words</span>
+          <span class="meta-separator">·</span>
+          <span id="reading-time" class="meta-info meta-clickable" title="Click for Detailed Manuscript Stats">0 min read</span>
+          <span class="meta-separator">·</span>
+
+          <!-- Daily Word Goal Meter -->
+          <div class="meta-goal" id="meta-goal" title="Click to adjust word count goal & sprint timer">
+            <span id="goal-progress" class="goal-label">0 / 500w</span>
+            <div class="goal-meter"><div id="goal-fill" class="goal-fill" style="width: 0%"></div></div>
+          </div>
+          <button id="btn-sprint" class="icon-btn sprint-btn" title="Writing Sprint Timer (20 min)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="sprint-timer-text" class="sprint-text hidden">20:00</span>
+          </button>
+
+          <span class="meta-separator">·</span>
+          <span id="save-status" class="meta-info save-status">Saved</span>
+        </div>
+
+        <div class="editor-actions">
+          <!-- Find & Replace -->
+          <button id="btn-find-toggle" class="icon-btn" title="Find & Replace (Ctrl+F / Ctrl+H)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+          <!-- Manuscript Metrics / Statistics -->
+          <button id="btn-metrics" class="icon-btn" title="Manuscript Statistics & Readability">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          </button>
+          <!-- Typewriter Centered Scrolling Mode -->
+          <button id="btn-typewriter" class="icon-btn" title="Toggle Typewriter Scrolling (keeps active line centered)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="2" y1="18" x2="22" y2="18"/></svg>
+          </button>
+          <!-- Split View Button -->
+          <button id="btn-split" class="icon-btn" title="Live Side-by-Side Split View (Ctrl+\)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+          </button>
+          <!-- Outline Button -->
+          <button id="btn-outline" class="icon-btn" title="Scene & Heading Outline (Alt+O)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+          <!-- Zen Mode -->
+          <button id="btn-zen" class="icon-btn" title="Distraction-Free Zen Mode (Ctrl+Shift+F)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </button>
+          <!-- Export Markdown -->
+          <button id="btn-export-md" class="icon-btn" title="Export Note as Markdown (.md)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+          </button>
+          <!-- Reading Mode Preview -->
+          <button id="btn-preview" class="icon-btn" title="Toggle Reading Preview (Ctrl+Shift+P)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <!-- Delete -->
+          <button id="btn-delete" class="icon-btn btn-danger" title="Delete document">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Title & Tags container -->
+      <div class="editor-header">
+        <input type="text" id="note-title" class="editor-title" placeholder="Untitled Note" autocomplete="off" spellcheck="true" />
+        <div class="tags-row">
+          <svg class="tags-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <input type="text" id="note-tags" class="tags-input" placeholder="Add tags (comma separated)…" autocomplete="off" />
+        </div>
+      </div>
+
+      <!-- In-Editor Find & Replace Bar -->
+      <div id="find-replace-bar" class="find-replace-bar hidden">
+        <div class="find-row">
+          <div class="find-input-wrap">
+            <svg class="find-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="find-input" class="find-input" placeholder="Find in note… (Enter for next, Shift+Enter for prev)" autocomplete="off" />
+            <span id="find-counter" class="find-counter">0/0</span>
+          </div>
+          <div class="find-nav-buttons">
+            <button id="btn-find-prev" class="find-btn" title="Previous Match (Shift+Enter)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+            </button>
+            <button id="btn-find-next" class="find-btn" title="Next Match (Enter)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <button id="btn-find-case" class="find-btn" title="Toggle Case Sensitive (Alt+C)">Aa</button>
+          </div>
+          <div class="find-divider"></div>
+          <div class="find-input-wrap replace-wrap">
+            <input type="text" id="replace-input" class="find-input" placeholder="Replace with…" autocomplete="off" />
+          </div>
+          <div class="replace-buttons">
+            <button id="btn-replace-one" class="find-action-btn" title="Replace Current Match">Replace</button>
+            <button id="btn-replace-all" class="find-action-btn" title="Replace All Occurrences">All</button>
+          </div>
+          <button id="btn-find-close" class="find-btn find-close-btn" title="Close (Esc)">✕</button>
+        </div>
+      </div>
+
+      <!-- Markdown formatting toolbar -->
+      <div class="format-bar">
+        <div class="format-group">
+          <button class="fmt-btn" data-action="bold" title="Bold (Ctrl+B)"><strong>B</strong></button>
+          <button class="fmt-btn" data-action="italic" title="Italic (Ctrl+I)"><em>I</em></button>
+          <button class="fmt-btn" data-action="strike" title="Strikethrough (~~text~~)"><s>S</s></button>
+          <button class="fmt-btn" data-action="highlight" title="Highlighter (==text==)"><span class="fmt-mark">H</span></button>
+          <button class="fmt-btn" data-action="heading" title="Heading (H1..H3)">H</button>
+          <button class="fmt-btn" data-action="wikilink" title="Obsidian Wiki-link [[...]]"><strong>[[ ]]</strong></button>
+          <button class="fmt-btn" data-action="task" title="Task checkbox - [ ]">☑</button>
+          <button class="fmt-btn" data-action="quote" title="Blockquote">❝</button>
+          <button class="fmt-btn" data-action="callout" title="Obsidian Callout Box (> [!NOTE])">[!]</button>
+          <button class="fmt-btn" data-action="ul" title="Bullet list">•</button>
+          <button class="fmt-btn" data-action="ol" title="Numbered list">1.</button>
+          <button class="fmt-btn" data-action="code" title="Inline code">&lt;/&gt;</button>
+          <button class="fmt-btn" data-action="link" title="Web link">🔗</button>
+          <button class="fmt-btn" data-action="table" title="Insert Markdown Table">▦</button>
+          <button class="fmt-btn" data-action="footnote" title="Footnote ([^1])">[^1]</button>
+          <button id="fmt-divider" class="fmt-btn" data-action="divider" title="Horizontal rule (---)">—</button>
+          <button class="fmt-btn" data-action="scene" title="Scene Separator (* * *)">* * *</button>
+        </div>
+
+        <div class="format-sep"></div>
+
+        <!-- Dialogue & Smart Typography Group -->
+        <div class="format-group">
+          <button class="fmt-btn fmt-smart" data-action="dialogue-dash" title="Dialogue Em-Dash (—)">—</button>
+          <button class="fmt-btn fmt-smart" data-action="smart-quotes" title="Curly Double Quotes (“ ”)">“ ”</button>
+          <button class="fmt-btn fmt-smart" data-action="single-quotes" title="Curly Single Quotes (‘ ’)">‘ ’</button>
+          <button class="fmt-btn fmt-smart" data-action="ellipsis" title="Ellipsis (…)">…</button>
+        </div>
+
+        <div class="format-sep"></div>
+
+        <!-- Author Typography Controls Group -->
+        <div class="format-group format-typography">
+          <select id="editor-font-select" class="meta-select font-select" title="Author Font Family">
+            <option value="'Lora', Georgia, serif">Lora (Serif)</option>
+            <option value="'Inter', -apple-system, sans-serif">Inter (Sans)</option>
+            <option value="'JetBrains Mono', monospace">JetBrains (Mono)</option>
+            <option value="'Playfair Display', Georgia, serif">Playfair (Serif)</option>
+          </select>
+          <div class="font-size-cluster">
+            <button id="btn-font-dec" class="fmt-btn font-ctrl-btn" title="Decrease Font Size (A-)">A-</button>
+            <span id="font-size-val" class="font-size-val">15px</span>
+            <button id="btn-font-inc" class="fmt-btn font-ctrl-btn" title="Increase Font Size (A+)">A+</button>
+          </div>
+          <button id="btn-line-spacing" class="fmt-btn line-spacing-btn" title="Line Spacing (Cycle 1.5, 1.8, 2.1)">
+            <span id="line-spacing-val">↕ 1.8</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Editor / Preview Scroll Area -->
+      <div class="editor-scroll-container">
+        <!-- Floating Outline Panel -->
+        <aside id="outline-drawer" class="outline-drawer hidden">
+          <div class="outline-header">
+            <div class="outline-title"><span class="outline-icon">✦</span> Document Outline</div>
+            <button id="btn-close-outline" class="icon-btn btn-xs" title="Close outline">×</button>
+          </div>
+          <ul id="outline-list" class="outline-list"></ul>
+        </aside>
+
+        <div id="editor-body-wrap" class="editor-body">
+          <textarea id="note-body" class="editor-textarea" placeholder="Start writing… Type [[ to link notes, or use Markdown formatting." spellcheck="true"></textarea>
+          <div id="note-preview" class="editor-preview hidden"></div>
+        </div>
+
+        <!-- Backlinks / Linked Mentions Panel -->
+        <section id="backlinks-panel" class="backlinks-panel">
+          <div class="backlinks-header" id="backlinks-toggle-header">
+            <div class="backlinks-title">
+              <span class="backlinks-icon">✦</span>
+              <span>Linked Mentions</span>
+              <span id="backlinks-count" class="backlinks-count">0</span>
+            </div>
+            <button id="btn-toggle-backlinks" class="icon-btn btn-xs" title="Toggle Mentions">
+              <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+          </div>
+          <div id="backlinks-content" class="backlinks-content">
+            <div id="backlinks-list" class="backlinks-list"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- ───────── Galaxy Graph Modal ───────── -->
+  <div id="graph-modal" class="modal-overlay graph-overlay hidden">
+    <div class="graph-dialog">
+      <div class="graph-header">
+        <div class="graph-title-group">
+          <span class="logo-icon galaxy-pulse">✦</span>
+          <h3>Galaxy Graph</h3>
+          <div class="graph-stats">
+            <span id="graph-node-count">0 notes</span> · <span id="graph-edge-count">0 links</span>
+          </div>
+        </div>
+        <div class="graph-controls">
+          <div class="graph-filter-tags">
+            <button class="filter-pill active" data-filter="all">All</button>
+            <button class="filter-pill" data-filter="chapter">Chapters</button>
+            <button class="filter-pill" data-filter="lore">Lore</button>
+            <button class="filter-pill" data-filter="world">World</button>
+            <button class="filter-pill" data-filter="draft">Drafts</button>
+          </div>
+          <button id="btn-close-graph" class="icon-btn" title="Close Graph (Esc)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="graph-canvas-wrapper" id="graph-wrapper">
+        <canvas id="graph-canvas"></canvas>
+
+        <!-- Location Breadcrumb HUD -->
+        <div id="graph-location-hud" class="graph-location-hud hidden" role="button" tabindex="0" title="Click to open in editor">
+          <div class="graph-location-path">
+            <span class="hud-vault">Vault</span>
+            <span class="hud-sep">›</span>
+            <span id="hud-category-dot" class="hud-category-dot"></span>
+            <span id="hud-category-name">CHAPTERS</span>
+            <span class="hud-sep">›</span>
+            <span id="hud-sub-branch">Act 1</span>
+          </div>
+          <div id="hud-node-title" class="graph-location-title">Chapter I: The Obsidian Gate</div>
+          <div class="graph-location-meta">
+            <span id="hud-connections-count">2 links</span>
+            <span class="hud-sep">·</span>
+            <span id="hud-action-hint">Click to open in editor</span>
+          </div>
+        </div>
+
+        <!-- Galaxy Empty Prompt (if 0 notes exist) -->
+        <div id="galaxy-empty-prompt" class="galaxy-empty-prompt hidden">
+          <div class="galaxy-emblem">✦</div>
+          <h3 class="font-cinzel">Galaxy Graph</h3>
+          <p>No notes in this graph yet.<br/>Create notes and link them using [[Note Title]] to visualize connections across your universe.</p>
+          <div class="galaxy-prompt-actions">
+            <button class="btn btn-primary" id="galaxy-btn-create-first">
+              + New Note
+            </button>
+            <button class="btn btn-ghost" id="galaxy-btn-load-demo">
+              Load Sample Vault
+            </button>
+          </div>
+        </div>
+
+        <div class="graph-legend">
+          <span class="legend-item"><span class="legend-dot dot-chapter"></span> Chapters</span>
+          <span class="legend-item"><span class="legend-dot dot-lore"></span> Lore</span>
+          <span class="legend-item"><span class="legend-dot dot-world"></span> World Building</span>
+          <span class="legend-item"><span class="legend-dot dot-draft"></span> Drafts</span>
+          <span class="legend-sep">|</span>
+          <span class="legend-item"><span class="legend-hub-symbol">✦</span> Category Hub</span>
+          <span class="legend-item"><span class="legend-branch-line"></span> Sub-branch</span>
+        </div>
+        <div class="graph-hint">Click note to open in editor · Click category hub to focus branch · Drag to move · Scroll to zoom</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Word Goal & Sprint Modal ───────── -->
+  <div id="goal-modal" class="modal-overlay hidden">
+    <div class="modal modal-sm">
+      <h3 class="modal-title font-cinzel">Writing Target & Sprint</h3>
+      <div class="modal-field">
+        <label for="input-word-goal">Session Word Target</label>
+        <input type="number" id="input-word-goal" value="500" min="50" step="50" />
+      </div>
+      <div class="modal-field">
+        <label for="input-sprint-minutes">Sprint Timer (minutes)</label>
+        <input type="number" id="input-sprint-minutes" value="20" min="5" max="120" step="5" />
+      </div>
+      <div class="modal-actions">
+        <button id="btn-cancel-goal" class="btn btn-ghost">Cancel</button>
+        <button id="btn-save-goal" class="btn btn-primary">Save & Start</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Detailed Writing Metrics Modal ───────── -->
+  <div id="metrics-modal" class="modal-overlay hidden">
+    <div class="modal metrics-dialog">
+      <div class="metrics-dialog-header">
+        <div class="metrics-dialog-title font-cinzel">
+          <span class="text-accent">✦</span> Manuscript Statistics
+        </div>
+        <button id="btn-close-metrics" class="icon-btn btn-xs" title="Close">✕</button>
+      </div>
+
+      <div class="metrics-summary-grid">
+        <div class="metric-box">
+          <span class="metric-num" id="stat-words">0</span>
+          <span class="metric-name">Words</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-num" id="stat-chars-spaces">0</span>
+          <span class="metric-name">Characters (with spaces)</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-num" id="stat-chars-nospaces">0</span>
+          <span class="metric-name">Characters (no spaces)</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-num" id="stat-paragraphs">0</span>
+          <span class="metric-name">Paragraphs</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-num" id="stat-sentences">0</span>
+          <span class="metric-name">Sentences</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-num" id="stat-avg-words-sentence">0</span>
+          <span class="metric-name">Avg Words / Sentence</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-num" id="stat-read-time">0 min</span>
+          <span class="metric-name">Reading Time (~200 wpm)</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-num" id="stat-speak-time">0 min</span>
+          <span class="metric-name">Speaking Time (~130 wpm)</span>
+        </div>
+        <div class="metric-box metric-box-wide">
+          <div class="metric-level-wrap">
+            <span class="metric-num" id="stat-reading-level">—</span>
+            <span class="metric-badge" id="stat-reading-badge">Grade 7</span>
+          </div>
+          <span class="metric-name">Readability (Flesch-Kincaid & Reading Ease)</span>
+        </div>
+      </div>
+
+      <div id="selection-stats-wrap" class="selection-stats-card hidden">
+        <div class="selection-stats-header">Selected Range</div>
+        <div class="selection-stats-body">
+          <span id="stat-sel-words">0 words</span> · <span id="stat-sel-chars">0 characters</span>
+        </div>
+      </div>
+
+      <div class="metrics-dialog-footer">
+        <span class="metrics-tip">Targeting commercial fiction? Aim for Grade 6–8 and 12–16 words per sentence.</span>
+        <button id="btn-metrics-done" class="btn btn-primary">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Quick Switcher (Ctrl+K / Ctrl+O) ───────── -->
+  <div id="switcher-modal" class="modal-overlay switcher-overlay hidden">
+    <div class="modal switcher-dialog">
+      <div class="switcher-search-box">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="switcher-input" placeholder="Jump to note or search lore… (↑↓ arrows, Enter to open)" autocomplete="off" />
+        <span class="switcher-hint">Esc to close</span>
+      </div>
+      <ul id="switcher-results" class="switcher-results"></ul>
+    </div>
+  </div>
+
+  <!-- ───────── Create Linked Note Modal (Wiki-link Fallback) ───────── -->
+  <div id="wikicreate-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 class="modal-title font-cinzel">Create Linked Note</h3>
+      <p class="modal-text">The note "<strong id="wikicreate-target" class="text-accent"></strong>" does not exist yet. Where would you like to create it?</p>
+      <div class="modal-field">
+        <label for="wikicreate-category">Category</label>
+        <select id="wikicreate-category">
+          <option value="lore" selected>Lore</option>
+          <option value="world">World Building</option>
+          <option value="chapter">Chapter</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button id="wikicreate-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="wikicreate-confirm" class="btn btn-primary">Create Note</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── New Note Modal ───────── -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 class="modal-title font-cinzel">Create New Document</h3>
+      <div class="modal-field">
+        <label for="modal-note-title">Title</label>
+        <input type="text" id="modal-note-title" placeholder="e.g. Chapter I, The High Citadel, Arc Outlines…" autocomplete="off" />
+      </div>
+      <div class="modal-field">
+        <label for="modal-note-category">Category</label>
+        <select id="modal-note-category">
+          <option value="chapter">Chapter</option>
+          <option value="lore">Lore</option>
+          <option value="world">World Building</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="modal-create" class="btn btn-primary">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Delete Confirm Modal ───────── -->
+  <div id="delete-overlay" class="modal-overlay hidden">
+    <div class="modal modal-sm">
+      <h3 class="modal-title font-cinzel">Delete Document</h3>
+      <p class="modal-text">Are you sure you want to delete this document? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button id="delete-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="delete-confirm" class="btn btn-danger-fill">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Interactive Tutorial Modal ───────── -->
+  <div id="tutorial-overlay" class="modal-overlay tutorial-overlay hidden">
+    <div class="tutorial-card">
+      <div class="tutorial-card-header">
+        <div class="tutorial-step-indicator">
+          <span class="tutorial-step-badge" id="tutorial-step-badge">Step 1 of 6</span>
+          <span class="tutorial-category-tag" id="tutorial-category-tag">Welcome</span>
+        </div>
+        <button id="btn-skip-tutorial-top" class="tutorial-skip-btn" title="Skip Tutorial (Esc)">
+          Skip Tutorial ✕
+        </button>
+      </div>
+
+      <div class="tutorial-card-body">
+        <div class="tutorial-icon-box" id="tutorial-icon-box">✦</div>
+        <h3 class="tutorial-card-title font-cinzel" id="tutorial-title">Welcome to Lord Spey</h3>
+        <p class="tutorial-card-desc" id="tutorial-desc"></p>
+        
+        <div class="tutorial-features" id="tutorial-features"></div>
+
+        <div class="tutorial-tip" id="tutorial-tip"></div>
+      </div>
+
+      <div class="tutorial-card-footer">
+        <div class="tutorial-dots" id="tutorial-dots"></div>
+        <div class="tutorial-actions">
+          <button id="btn-tutorial-skip" class="btn btn-ghost">Skip</button>
+          <button id="btn-tutorial-prev" class="btn btn-ghost">← Back</button>
+          <button id="btn-tutorial-next" class="btn btn-primary">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/markdown.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
