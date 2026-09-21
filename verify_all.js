@@ -89,6 +89,13 @@ assert(dockSection.includes('id="btn-codex-view"'), 'Missing btn-codex-view in s
 assert(dockSection.includes('id="btn-quick-switcher"'), 'Missing btn-quick-switcher in sidebar-tools-dock');
 assert(dockSection.includes('id="btn-tutorial-sidebar"'), 'Missing btn-tutorial-sidebar in sidebar-tools-dock');
 
+// Strict uniqueness of sidebar search & no duplicate search inputs
+const searchInputMatches = htmlContent.match(/id="search-input"/g) || [];
+assert.strictEqual(searchInputMatches.length, 1, `There must be exactly one #search-input in index.html (found ${searchInputMatches.length})`);
+const sidebarSearchMatches = htmlContent.match(/class="sidebar-search"/g) || [];
+assert.strictEqual(sidebarSearchMatches.length, 1, `There must be exactly one .sidebar-search in index.html (found ${sidebarSearchMatches.length})`);
+assert(!dockSection.includes('class="sidebar-search"'), 'Duplicate .sidebar-search must not exist inside or below dock');
+
 // Tutorial assertions
 assert(htmlContent.includes('id="tutorial-overlay"'), 'Missing #tutorial-overlay in index.html');
 assert(htmlContent.includes('id="btn-tutorial-sidebar"'), 'Missing #btn-tutorial-sidebar in index.html');
@@ -116,6 +123,12 @@ assert(!introSplashSection.includes('intro-branding'), 'Intro splash must not co
 assert(!introSplashSection.includes('LORD SPEY'), 'Intro splash must not contain text title LORD SPEY');
 
 const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
+assert(cssContent.includes('.sidebar-tools-dock'), 'Missing .sidebar-tools-dock in css/style.css');
+assert(cssContent.includes('.tool-dock-btn'), 'Missing .tool-dock-btn in css/style.css');
+assert(cssContent.includes('.tool-dock-btn[data-tooltip]::before'), 'Missing micro-tooltip ::before in css/style.css');
+assert(cssContent.includes('.tools-dock-group:first-child .tool-dock-btn:first-child[data-tooltip]::before'), 'Missing first-child tooltip safety alignment in css/style.css');
+assert(cssContent.includes('.tools-dock-group:last-child .tool-dock-btn:last-child[data-tooltip]::before'), 'Missing last-child tooltip safety alignment in css/style.css');
+assert(cssContent.includes('@media (hover: none)'), 'Missing touch hover:none tooltip suppression in css/style.css');
 assert(cssContent.includes('.intro-splash'), 'Missing .intro-splash in css/style.css');
 assert(cssContent.includes('introStarPop'), 'Missing @keyframes introStarPop in css/style.css');
 assert(cssContent.includes('introStarBreathe'), 'Missing @keyframes introStarBreathe in css/style.css');
