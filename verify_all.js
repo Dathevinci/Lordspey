@@ -79,15 +79,22 @@ assert(htmlContent.includes('id="intro-splash"'), 'Missing #intro-splash in inde
 assert(htmlContent.includes('id="intro-skip-btn"'), 'Missing #intro-skip-btn in index.html');
 assert(htmlContent.includes('id="menu-emblem"'), 'Missing #menu-emblem in index.html');
 assert(htmlContent.includes('class="intro-star-graphic"'), 'Missing intro star SVG graphic in index.html');
-assert(htmlContent.includes('AUTHOR’S WORKSPACE'), 'Missing intro tagline in index.html');
+assert(htmlContent.includes('class="intro-star-rotator"'), 'Missing intro-star-rotator in index.html');
+
+const introSplashSection = htmlContent.slice(htmlContent.indexOf('id="intro-splash"'), htmlContent.indexOf('id="toast-container"'));
+assert(!introSplashSection.includes('intro-title'), 'Intro splash must not contain intro-title');
+assert(!introSplashSection.includes('intro-branding'), 'Intro splash must not contain intro-branding');
+assert(!introSplashSection.includes('LORD SPEY'), 'Intro splash must not contain text title LORD SPEY');
 
 const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
 assert(cssContent.includes('.intro-splash'), 'Missing .intro-splash in css/style.css');
 assert(cssContent.includes('introStarPop'), 'Missing @keyframes introStarPop in css/style.css');
 assert(cssContent.includes('introStarBreathe'), 'Missing @keyframes introStarBreathe in css/style.css');
+assert(cssContent.includes('introStarRotate'), 'Missing @keyframes introStarRotate in css/style.css');
 assert(cssContent.includes('introFlareGlint'), 'Missing @keyframes introFlareGlint in css/style.css');
 assert(cssContent.includes('introHaloBloom'), 'Missing @keyframes introHaloBloom in css/style.css');
-assert(cssContent.includes('introGemBloom'), 'Missing @keyframes introGemBloom in css/style.css');
+assert(!cssContent.includes('introTitleReveal'), 'Stale introTitleReveal keyframe must not exist in css/style.css');
+assert(!cssContent.includes('introGemBloom'), 'Stale introGemBloom keyframe must not exist in css/style.css');
 assert(!cssContent.includes('filter: blur(2px)'), 'Harsh full-screen GPU blur penalty detected in intro-fade-out');
 
 const jsContent = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');

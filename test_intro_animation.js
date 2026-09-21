@@ -12,7 +12,7 @@ const wwwCssContent = fs.readFileSync(path.join(__dirname, 'www/css/style.css'),
 const jsContent = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
 const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 
-// 1. Keyframe structural validation
+// 1. Keyframe structural validation (10 active intro keyframes for clean star stage)
 const requiredKeyframes = [
   'introStarPop',
   'introStarBreathe',
@@ -21,11 +21,6 @@ const requiredKeyframes = [
   'introHaloPulse',
   'introFlareGlint',
   'introSparkleFloat',
-  'introTitleReveal',
-  'introSubLineFade',
-  'introRuleExpand',
-  'introGemBloom',
-  'introTaglineReveal',
   'introSkipReveal',
   'introBgBreathe',
   'introStarRotate'
@@ -35,12 +30,26 @@ requiredKeyframes.forEach(kf => {
   assert(cssContent.includes(`@keyframes ${kf}`), `Missing @keyframes ${kf} in css/style.css`);
   assert(wwwCssContent.includes(`@keyframes ${kf}`), `Missing @keyframes ${kf} in www/css/style.css`);
 });
-console.log('✓ All 15 intro keyframes verified in css and www assets');
+console.log('✓ All 10 active intro keyframes verified in css and www assets');
 
-// 2. Velocity continuity test: ensure no multi-interval velocity stops in star or title
+// Purged dead branding keyframes validation
+const deadKeyframes = [
+  'introTitleReveal',
+  'introSubLineFade',
+  'introRuleExpand',
+  'introGemBloom',
+  'introTaglineReveal'
+];
+deadKeyframes.forEach(kf => {
+  assert(!cssContent.includes(`@keyframes ${kf}`), `Dead @keyframes ${kf} must not exist in css/style.css`);
+  assert(!wwwCssContent.includes(`@keyframes ${kf}`), `Dead @keyframes ${kf} must not exist in www/css/style.css`);
+});
+console.log('✓ Stale typography & branding keyframes cleanly purged from stylesheets');
+
+// 2. Velocity continuity test: ensure continuous easing curve on introStarRotate with matching boundary velocity
 assert(!cssContent.includes('55% {'), 'introStarPop must not have a 55% inflection hitch');
-assert(!cssContent.includes('60% {'), 'introTitleReveal/introTaglineReveal must not have a 60% rasterizer hitch');
-console.log('✓ Continuous ease curves verified: 0 velocity inflection hitches');
+assert(cssContent.includes('cubic-bezier(0.35, 0.15, 0.65, 0.85)'), 'introStarRotate must have continuous easing with matching boundary velocity');
+console.log('✓ Continuous ease curves verified: 0 velocity inflection hitches & continuous boundary velocity');
 
 // 3. Isolated star verification: no titles or text branding inside #intro-splash
 assert(htmlContent.includes('class="intro-star-rotator"'), 'Missing intro-star-rotator in index.html');
@@ -50,10 +59,6 @@ assert(!introSplashSection.includes('intro-branding'), 'Intro splash must not co
 assert(!introSplashSection.includes('LORD SPEY'), 'Intro splash must not contain text title LORD SPEY');
 assert(!introSplashSection.includes('AUTHOR’S WORKSPACE'), 'Intro splash must not contain AUTHOR’S WORKSPACE text');
 console.log('✓ Intro splash clean star isolation verified: 0 titles or text branding inside splash');
-
-// 3. Gem squish protection
-assert(!cssContent.includes('.intro-sub-line {\n    transform: scaleX'), 'intro-sub-line must not squeeze the diamond gem with scaleX');
-console.log('✓ Gem bloom geometry verified: diamond center gem preserves aspect ratio');
 
 // 4. Ghost click protection during dissolve
 assert(cssContent.includes('.intro-splash.intro-fade-out {\n  opacity: 0;\n  transform: scale(1.015);\n  pointer-events: auto;'), 'intro-fade-out must absorb clicks to protect dashboard');

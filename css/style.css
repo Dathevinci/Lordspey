@@ -2913,6 +2913,8 @@ body.zen-mode .format-bar:hover {
 /* Smooth Continuous Rotating Star Stage */
 .intro-star-rotator {
   position: relative;
+  width: 112px;
+  height: 112px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2920,7 +2922,7 @@ body.zen-mode .format-bar:hover {
   will-change: transform;
 }
 .intro-animating .intro-star-rotator {
-  animation: introStarRotate 10s linear infinite;
+  animation: introStarRotate 5s cubic-bezier(0.35, 0.15, 0.65, 0.85) infinite;
 }
 
 @keyframes introStarRotate {
@@ -3099,144 +3101,6 @@ body.zen-mode .format-bar:hover {
   }
 }
 
-/* Typography & Titles */
-.intro-branding {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-  text-align: center;
-  position: relative;
-  z-index: 3;
-}
-
-.intro-title {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(2rem, 5.5vw, 3.1rem);
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: 0.24em;
-  text-indent: 0.24em;
-  text-shadow: 0 0 28px rgba(239, 68, 68, 0.5), 0 2px 14px rgba(0, 0, 0, 0.95);
-  line-height: 1.15;
-  will-change: transform, opacity;
-}
-.intro-animating .intro-title {
-  animation: introTitleReveal 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
-}
-
-@keyframes introTitleReveal {
-  0% {
-    opacity: 0;
-    transform: translateY(12px);
-    letter-spacing: 0.18em;
-    text-indent: 0.18em;
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    letter-spacing: 0.24em;
-    text-indent: 0.24em;
-  }
-}
-
-.intro-sub-line {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin: 12px 0 10px;
-}
-.intro-animating .intro-sub-line {
-  animation: introSubLineFade 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
-}
-
-.intro-rule {
-  width: 54px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.65));
-  transform-origin: right center;
-}
-.intro-sub-line .intro-rule:last-child {
-  background: linear-gradient(90deg, rgba(239, 68, 68, 0.65), transparent);
-  transform-origin: left center;
-}
-.intro-animating .intro-rule {
-  animation: introRuleExpand 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
-}
-
-.intro-gem {
-  color: var(--red-500);
-  font-size: 0.75rem;
-  line-height: 1;
-  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.85));
-}
-.intro-animating .intro-gem {
-  animation: introGemBloom 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
-}
-
-@keyframes introSubLineFade {
-  0% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes introRuleExpand {
-  0% {
-    opacity: 0;
-    transform: scaleX(0.2);
-  }
-  100% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes introGemBloom {
-  0% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.intro-tagline {
-  font-family: 'Inter', sans-serif;
-  font-size: clamp(0.7rem, 2vw, 0.82rem);
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  text-indent: 0.32em;
-  color: rgba(228, 228, 231, 0.72);
-  will-change: transform, opacity;
-}
-.intro-animating .intro-tagline {
-  animation: introTaglineReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.42s both;
-}
-
-@keyframes introTaglineReveal {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-    letter-spacing: 0.26em;
-    text-indent: 0.26em;
-  }
-  100% {
-    opacity: 0.85;
-    transform: translateY(0);
-    letter-spacing: 0.32em;
-    text-indent: 0.32em;
-  }
-}
-
 /* Skip Control */
 .intro-skip-btn {
   position: absolute;
@@ -3305,6 +3169,10 @@ body.zen-mode .format-bar:hover {
   .intro-emblem-wrapper {
     width: 120px;
     height: 120px;
+  }
+  .intro-star-rotator {
+    width: 84px;
+    height: 84px;
   }
   .intro-star-graphic {
     width: 84px;
