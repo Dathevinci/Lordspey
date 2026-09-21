@@ -74,7 +74,26 @@ assert(htmlContent.includes('id="btn-tutorial-prev"'), 'Missing #btn-tutorial-pr
 assert(htmlContent.includes('id="btn-tutorial-skip"'), 'Missing #btn-tutorial-skip in index.html');
 console.log('✓ Interactive Tutorial markup and controls verified in index.html');
 
-// 5. Un-slop verification: ensure no AI purple prose or gimmicky forge exists
+// 5. Verify Cinematic Crimson Star Intro / Splash screen markup, styles, & controller
+assert(htmlContent.includes('id="intro-splash"'), 'Missing #intro-splash in index.html');
+assert(htmlContent.includes('id="intro-skip-btn"'), 'Missing #intro-skip-btn in index.html');
+assert(htmlContent.includes('id="menu-emblem"'), 'Missing #menu-emblem in index.html');
+assert(htmlContent.includes('class="intro-star-graphic"'), 'Missing intro star SVG graphic in index.html');
+assert(htmlContent.includes('AUTHOR’S WORKSPACE'), 'Missing intro tagline in index.html');
+
+const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
+assert(cssContent.includes('.intro-splash'), 'Missing .intro-splash in css/style.css');
+assert(cssContent.includes('introStarPop'), 'Missing @keyframes introStarPop in css/style.css');
+assert(cssContent.includes('introStarBreathe'), 'Missing @keyframes introStarBreathe in css/style.css');
+assert(cssContent.includes('introFlareGlint'), 'Missing @keyframes introFlareGlint in css/style.css');
+
+const jsContent = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+assert(jsContent.includes('dismissIntroSplash'), 'Missing dismissIntroSplash in js/app.js');
+assert(jsContent.includes('playIntroSplash'), 'Missing playIntroSplash in js/app.js');
+assert(jsContent.includes('introSplash.classList'), 'Missing introSplash classList handling in js/app.js');
+console.log('✓ Cinematic Crimson Star Intro markup, animations, & controller verified');
+
+// 6. Un-slop verification: ensure no AI purple prose or gimmicky forge exists
 assert(!htmlContent.includes('btn-name-forge'), 'Sloppy Name Forge button still in index.html');
 assert(!htmlContent.includes('id="forge-modal"'), 'Sloppy Forge modal still in index.html');
 assert(!htmlContent.includes('bend spacetime'), 'Sloppy "bend spacetime" still in index.html');

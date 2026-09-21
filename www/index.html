@@ -110,7 +110,7 @@
     <!-- Clean Main Menu / Dashboard -->
     <div id="main-menu" class="main-menu">
       <div class="menu-hero">
-        <div class="menu-emblem">✦</div>
+        <div class="menu-emblem" id="menu-emblem" role="button" tabindex="0" title="Replay intro animation">✦</div>
         <h2 class="menu-title font-cinzel">LORD SPEY</h2>
         <p class="menu-subtitle">A minimal, distraction-free workspace for authors. Draft prose, organize chapters, and connect worldbuilding lore like Obsidian.</p>
       </div>
@@ -644,6 +644,70 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ───────── Cinematic Crimson Star Intro / Splash ───────── -->
+  <div id="intro-splash" class="intro-splash" role="dialog" aria-modal="true" aria-label="Lord Spey Intro">
+    <div class="intro-bg-ambient"></div>
+    <div class="intro-stars-field"></div>
+    <div class="intro-container">
+      <div class="intro-emblem-wrapper">
+        <div class="intro-radial-halo"></div>
+        <div class="intro-cross-flare"></div>
+        
+        <!-- Precision Four-Pointed Crimson Sparkle Star -->
+        <svg class="intro-star-graphic" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="starCrimsonGrad" x1="15%" y1="10%" x2="85%" y2="90%">
+              <stop offset="0%" stop-color="#ff6b6b" />
+              <stop offset="45%" stop-color="#ef4444" />
+              <stop offset="80%" stop-color="#dc2626" />
+              <stop offset="100%" stop-color="#991b1b" />
+            </linearGradient>
+            <radialGradient id="starCoreLight" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+              <stop offset="40%" stop-color="#fca5a5" stop-opacity="0.8" />
+              <stop offset="100%" stop-color="#ef4444" stop-opacity="0" />
+            </radialGradient>
+            <filter id="starBloom" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          
+          <!-- Outer subtle aura ring -->
+          <circle cx="64" cy="64" r="46" stroke="rgba(239, 68, 68, 0.2)" stroke-width="1" stroke-dasharray="4 6" class="intro-aura-ring" />
+          
+          <!-- Precision 4-pointed sparkle star path matching the emblem -->
+          <path class="intro-star-body" d="M 64 6 C 64 42 42 64 6 64 C 42 64 64 86 64 122 C 64 86 86 64 122 64 C 86 64 64 42 64 6 Z" fill="url(#starCrimsonGrad)" filter="url(#starBloom)" />
+          
+          <!-- Brilliant luminous center spark -->
+          <circle cx="64" cy="64" r="5" fill="url(#starCoreLight)" class="intro-core-sparkle" />
+        </svg>
+
+        <!-- Floating ambient sparkles -->
+        <div class="intro-sparkle s1">✦</div>
+        <div class="intro-sparkle s2">✦</div>
+        <div class="intro-sparkle s3">✦</div>
+        <div class="intro-sparkle s4">✦</div>
+      </div>
+
+      <div class="intro-branding">
+        <h1 class="intro-title font-cinzel">LORD SPEY</h1>
+        <div class="intro-sub-line">
+          <span class="intro-rule"></span>
+          <span class="intro-gem">✦</span>
+          <span class="intro-rule"></span>
+        </div>
+        <p class="intro-tagline">AUTHOR’S WORKSPACE</p>
+      </div>
+    </div>
+    <button id="intro-skip-btn" class="intro-skip-btn" title="Skip Intro (Esc / Space / Click)">
+      Skip <span class="intro-skip-key">Esc</span>
+    </button>
   </div>
 
   <!-- Toast container -->

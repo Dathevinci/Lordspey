@@ -20,6 +20,11 @@
   const logoHome        = $('#logo-home');
   const btnTutorialSidebar = $('#btn-tutorial-sidebar');
 
+  // Cinematic Intro Splash
+  const introSplash     = $('#intro-splash');
+  const introSkipBtn    = $('#intro-skip-btn');
+  const menuEmblem      = $('#menu-emblem');
+
   // Main Menu & Editor
   const mainMenu          = $('#main-menu');
   const menuBtnTutorial   = $('#menu-btn-tutorial');
@@ -204,6 +209,10 @@
   let findCurrentIndex    = -1;
   let findMatchCase       = false;
 
+  // Intro Splash State
+  let introTimer          = null;
+  let isIntroActive       = true;
+
   // ── Init ──
   init();
 
@@ -220,10 +229,76 @@
 
     showMainMenu();
 
-    // Launch tutorial on first visit
-    if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
-      setTimeout(() => openTutorial(0), 400);
+    // Auto-dismiss intro splash after cinematic star animation
+    if (introSplash && !introSplash.classList.contains('hidden')) {
+      introTimer = setTimeout(dismissIntroSplash, 2300);
+    } else {
+      isIntroActive = false;
+      // Launch tutorial on first visit
+      if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
+        setTimeout(() => openTutorial(0), 400);
+      }
     }
+  }
+
+  // ── Cinematic Intro Splash Screen ──
+  function dismissIntroSplash() {
+    if (!introSplash || !isIntroActive) return;
+    isIntroActive = false;
+    if (introTimer) {
+      clearTimeout(introTimer);
+      introTimer = null;
+    }
+
+    if (introSplash.classList) {
+      introSplash.classList.add('intro-fade-out');
+    }
+    setTimeout(() => {
+      if (introSplash.classList) {
+        introSplash.classList.add('hidden');
+      }
+      if (typeof introSplash.setAttribute === 'function') {
+        introSplash.setAttribute('aria-hidden', 'true');
+      }
+
+      // Launch tutorial on first visit if not yet seen
+      if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
+        setTimeout(() => openTutorial(0), 300);
+      }
+    }, 550);
+  }
+
+  function playIntroSplash() {
+    if (!introSplash) return;
+    if (introTimer) {
+      clearTimeout(introTimer);
+      introTimer = null;
+    }
+    isIntroActive = true;
+    if (introSplash.classList) {
+      introSplash.classList.remove('hidden', 'intro-fade-out');
+    }
+    if (typeof introSplash.setAttribute === 'function') {
+      introSplash.setAttribute('aria-hidden', 'false');
+    }
+
+    // Trigger animation restart on containers if querySelector exists
+    if (typeof introSplash.querySelector === 'function') {
+      const container = introSplash.querySelector('.intro-container');
+      if (container) {
+        container.style.animation = 'none';
+        void container.offsetWidth;
+        container.style.animation = '';
+      }
+      const star = introSplash.querySelector('.intro-star-graphic');
+      if (star) {
+        star.style.animation = 'none';
+        void star.offsetWidth;
+        star.style.animation = '';
+      }
+    }
+
+    introTimer = setTimeout(dismissIntroSplash, 2300);
   }
 
   // ── Main Menu / Dashboard ──
@@ -295,6 +370,20 @@
   function bindEvents() {
     logoHome.addEventListener('click', showMainMenu);
     btnBackMenu.addEventListener('click', showMainMenu);
+
+    // Intro splash & replay events
+    if (introSkipBtn) {
+      introSkipBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        dismissIntroSplash();
+      });
+    }
+    if (introSplash) {
+      introSplash.addEventListener('click', dismissIntroSplash);
+    }
+    if (menuEmblem) {
+      menuEmblem.addEventListener('click', playIntroSplash);
+    }
 
     // Main menu cards
     $$('.menu-card').forEach(card => {
@@ -1389,6 +1478,15 @@
       return;
     }
 
+    // Allow skipping intro with Esc, Space, or Enter
+    if (isIntroActive && introSplash && !introSplash.classList.contains('hidden')) {
+      if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        dismissIntroSplash();
+        return;
+      }
+    }
+
     if (!tutorialOverlay.classList.contains('hidden')) {
       if (e.key === 'ArrowRight') { nextTutorialStep(); return; }
       if (e.key === 'ArrowLeft') { prevTutorialStep(); return; }
@@ -1401,6 +1499,10 @@
   }
 
   function handleBackOrEscape() {
+    if (isIntroActive && introSplash && !introSplash.classList.contains('hidden')) {
+      dismissIntroSplash();
+      return true;
+    }
     if (tutorialOverlay && !tutorialOverlay.classList.contains('hidden')) {
       closeTutorial();
       return true;
