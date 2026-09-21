@@ -234,7 +234,7 @@
     // Auto-dismiss intro splash after cinematic star animation
     if (introSplash && !introSplash.classList.contains('hidden')) {
       if (introSplash.classList) introSplash.classList.add('intro-animating');
-      introTimer = setTimeout(dismissIntroSplash, 2400);
+      introTimer = setTimeout(dismissIntroSplash, 2500);
     } else {
       isIntroActive = false;
       // Launch tutorial on first visit
@@ -252,9 +252,24 @@
       clearTimeout(introTimer);
       introTimer = null;
     }
+    // If already in the middle of fading out, fast-dismiss immediately on second trigger
     if (dismissTimer) {
       clearTimeout(dismissTimer);
       dismissTimer = null;
+      if (introSplash.classList) {
+        introSplash.classList.remove('intro-animating', 'intro-fade-out');
+        introSplash.classList.add('hidden');
+      }
+      if (typeof introSplash.setAttribute === 'function') {
+        introSplash.setAttribute('aria-hidden', 'true');
+      }
+      if (!isInitialTutorialHandled) {
+        isInitialTutorialHandled = true;
+        if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
+          setTimeout(() => openTutorial(0), 300);
+        }
+      }
+      return;
     }
 
     isIntroActive = false;
@@ -264,7 +279,7 @@
     dismissTimer = setTimeout(() => {
       dismissTimer = null;
       if (introSplash.classList) {
-        introSplash.classList.remove('intro-animating');
+        introSplash.classList.remove('intro-animating', 'intro-fade-out');
         introSplash.classList.add('hidden');
       }
       if (typeof introSplash.setAttribute === 'function') {
@@ -278,7 +293,7 @@
           setTimeout(() => openTutorial(0), 300);
         }
       }
-    }, 700);
+    }, 650);
   }
 
   function playIntroSplash() {
@@ -308,7 +323,7 @@
       introSplash.classList.add('intro-animating');
     }
 
-    introTimer = setTimeout(dismissIntroSplash, 2400);
+    introTimer = setTimeout(dismissIntroSplash, 2500);
   }
 
   // ── Main Menu / Dashboard ──

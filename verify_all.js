@@ -86,6 +86,9 @@ assert(cssContent.includes('.intro-splash'), 'Missing .intro-splash in css/style
 assert(cssContent.includes('introStarPop'), 'Missing @keyframes introStarPop in css/style.css');
 assert(cssContent.includes('introStarBreathe'), 'Missing @keyframes introStarBreathe in css/style.css');
 assert(cssContent.includes('introFlareGlint'), 'Missing @keyframes introFlareGlint in css/style.css');
+assert(cssContent.includes('introHaloBloom'), 'Missing @keyframes introHaloBloom in css/style.css');
+assert(cssContent.includes('introGemBloom'), 'Missing @keyframes introGemBloom in css/style.css');
+assert(!cssContent.includes('filter: blur(2px)'), 'Harsh full-screen GPU blur penalty detected in intro-fade-out');
 
 const jsContent = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
 assert(jsContent.includes('dismissIntroSplash'), 'Missing dismissIntroSplash in js/app.js');
