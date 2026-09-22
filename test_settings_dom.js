@@ -72,28 +72,35 @@ function createMockElement(id = '', tag = 'div') {
       if (listeners[type]) listeners[type].forEach(fn => fn(payload || ev));
     },
     click: function() {
-      // Simulate real browser bubbling to document
+      const ev = { type: 'click', target: this, preventDefault: () => {}, stopPropagation: () => {} };
       if (listeners['click']) {
-        listeners['click'].forEach(fn => fn({ type: 'click', target: this, preventDefault: () => {}, stopPropagation: () => {} }));
+        listeners['click'].forEach(fn => fn(ev));
+      }
+      let parent = this.parentElement;
+      while (parent) {
+        if (parent.listeners && parent.listeners['click']) {
+          parent.listeners['click'].forEach(fn => fn(ev));
+        }
+        parent = parent.parentElement;
       }
       if (global.document && global.document.dispatchEvent) {
-        global.document.dispatchEvent({
-          type: 'click',
-          target: this,
-          preventDefault: () => {},
-          stopPropagation: () => {}
-        });
+        global.document.dispatchEvent(ev);
       }
     },
+    listeners,
     closest: function(sel) {
-      const selectors = sel.split(',').map(s => s.trim());
-      for (const s of selectors) {
-        if (s.startsWith('#') && this.id === s.slice(1)) return this;
-        if (s.startsWith('.') && this.classList.contains(s.slice(1))) return this;
-        if (s.includes('[data-action=') && this.dataset.action) {
-          const match = s.match(/\[data-action="?([^"\]]+)"?\]/);
-          if (match && this.dataset.action === match[1]) return this;
+      let current = this;
+      while (current && current.classList) {
+        const selectors = sel.split(',').map(s => s.trim());
+        for (const s of selectors) {
+          if (s.startsWith('#') && current.id === s.slice(1)) return current;
+          if (s.startsWith('.') && current.classList.contains(s.slice(1))) return current;
+          if (s.includes('[data-action=') && current.dataset && current.dataset.action) {
+            const match = s.match(/\[data-action="?([^"\]]+)"?\]/);
+            if (match && current.dataset.action === match[1]) return current;
+          }
         }
+        current = current.parentElement;
       }
       return null;
     },
@@ -242,5 +249,68 @@ assert(!modal.classList.contains('hidden'), 'Ctrl+, must toggle open Settings mo
 global.document.dispatchEvent({ type: 'keydown', key: ',', ctrlKey: true, preventDefault: () => {} });
 assert(modal.classList.contains('hidden'), 'Ctrl+, must toggle closed Settings modal');
 console.log('✓ Keyboard shortcuts (Escape & Ctrl+,) cleanly toggle and dismiss Settings modal');
+
+console.log('--- 6. Simulating Inner SVG Child Click Bubbling ---');
+const mockSvgChild = createMockElement('', 'path');
+btnSidebarGear.appendChild(mockSvgChild);
+mockSvgChild.click();
+assert(!modal.classList.contains('hidden'), 'Clicking inner SVG child must bubble and open Settings modal');
+btnClose.click();
+assert(modal.classList.contains('hidden'));
+console.log('✓ Inner SVG icon click correctly opens Settings modal');
+
+console.log('--- 7. Simulating Compatibility Aliases & Fallbacks ---');
+const btnSettingsAlias = global.document.getElementById('btn-settings');
+assert(btnSettingsAlias, 'document.getElementById("btn-settings") alias must resolve');
+const menuBtnProjectSettings = elementsMap['menu-btn-project-settings'];
+assert(menuBtnProjectSettings, '#menu-btn-project-settings must exist');
+menuBtnProjectSettings.click();
+assert(!modal.classList.contains('hidden'), 'Clicking fallback menu-btn-project-settings must open Settings modal');
+btnClose.click();
+assert(modal.classList.contains('hidden'));
+
+btnSettingsAlias.click();
+assert(!modal.classList.contains('hidden'), 'Clicking #btn-settings alias must open Settings modal');
+btnClose.click();
+assert(modal.classList.contains('hidden'));
+console.log('✓ Fallback triggers (#btn-settings, #menu-btn-project-settings) successfully activate modal');
+
+console.log('--- 8. Verifying Global Window Exports ---');
+assert.strictEqual(typeof global.window.openSettingsModal, 'function', 'window.openSettingsModal must be a function');
+assert.strictEqual(typeof global.window.closeSettingsModal, 'function', 'window.closeSettingsModal must be a function');
+assert.strictEqual(typeof global.window.isSettingsModalOpen, 'function', 'window.isSettingsModalOpen must be a function');
+
+global.window.openSettingsModal();
+assert(!modal.classList.contains('hidden'), 'window.openSettingsModal must open modal');
+assert.strictEqual(global.window.isSettingsModalOpen(), true, 'window.isSettingsModalOpen must return true');
+
+global.window.closeSettingsModal();
+assert(modal.classList.contains('hidden'), 'window.closeSettingsModal must close modal');
+assert.strictEqual(global.window.isSettingsModalOpen(), false, 'window.isSettingsModalOpen must return false');
+console.log('✓ Window global helpers (openSettingsModal, closeSettingsModal, isSettingsModalOpen) verified');
+
+console.log('--- 9. Verifying Alias Selector Resolution ---');
+const resolvedModal = global.document.getElementById('settings-modal');
+assert(resolvedModal, 'document.getElementById("settings-modal") must resolve to settings modal');
+const resolvedModalByQuery = global.document.querySelector('#settings-modal');
+assert(resolvedModalByQuery, 'document.querySelector("#settings-modal") must resolve to settings modal');
+console.log('✓ #settings-modal selector alias correctly resolves to settings modal');
+
+console.log('--- 10. Verifying Nested Modal Escape Hierarchy ---');
+btnSidebarGear.click();
+assert(!modal.classList.contains('hidden'), 'Settings modal must be open');
+const vaultConfirm = elementsMap['vault-reset-confirm-modal'];
+assert(vaultConfirm, 'Vault reset confirm modal must exist');
+vaultConfirm.classList.remove('hidden'); // User opens Danger Zone confirmation
+
+// First Escape should close the confirmation dialog, NOT the settings modal
+global.document.dispatchEvent({ type: 'keydown', key: 'Escape', preventDefault: () => {} });
+assert(vaultConfirm.classList.contains('hidden'), 'First Escape must close danger confirmation modal');
+assert(!modal.classList.contains('hidden'), 'Settings modal must remain open after dismissing danger confirmation');
+
+// Second Escape should close the settings modal
+global.document.dispatchEvent({ type: 'keydown', key: 'Escape', preventDefault: () => {} });
+assert(modal.classList.contains('hidden'), 'Second Escape must close Settings modal');
+console.log('✓ Nested modal Escape hierarchy verified (danger confirm dismissed first, settings modal dismissed second)');
 
 console.log('\n=== ALL DOM INTERACTION TESTS PASSED (100%) ===\n');

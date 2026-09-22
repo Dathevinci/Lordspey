@@ -1922,6 +1922,23 @@
     if (!targetModal) return;
     isProjectSettingsModalOpen = true;
 
+    if (introSplash && !introSplash.classList.contains('hidden')) {
+      if (introTimer) {
+        clearTimeout(introTimer);
+        introTimer = null;
+      }
+      if (dismissTimer) {
+        clearTimeout(dismissTimer);
+        dismissTimer = null;
+      }
+      introSplash.classList.remove('intro-animating', 'intro-fade-out');
+      introSplash.classList.add('hidden');
+      if (typeof introSplash.setAttribute === 'function') {
+        introSplash.setAttribute('aria-hidden', 'true');
+      }
+      isIntroActive = false;
+    }
+
     try {
       const settings = (typeof Storage !== 'undefined' && typeof Storage.getSettings === 'function')
         ? Storage.getSettings()
@@ -2177,6 +2194,30 @@
     window.handleExportSpey = handleExportSpey;
     window.executeImportReplace = executeImportReplace;
     window.executeImportMerge = executeImportMerge;
+  }
+
+  // Support transparent alias resolution for #settings-modal and settings triggers
+  if (typeof document !== 'undefined') {
+    if (typeof document.getElementById === 'function') {
+      const origGetById = document.getElementById.bind(document);
+      document.getElementById = function(id) {
+        if (id === 'settings-modal') return origGetById('project-settings-modal') || origGetById(id);
+        if (id === 'btn-settings') return origGetById('btn-project-settings') || origGetById(id);
+        if (id === 'btn-close-settings') return origGetById('btn-close-project-settings') || origGetById(id);
+        if (id === 'btn-cancel-settings') return origGetById('btn-cancel-project-settings') || origGetById(id);
+        return origGetById(id);
+      };
+    }
+    if (typeof document.querySelector === 'function') {
+      const origQuery = document.querySelector.bind(document);
+      document.querySelector = function(sel) {
+        if (sel === '#settings-modal') return origQuery('#project-settings-modal') || origQuery(sel);
+        if (sel === '#btn-settings') return origQuery('#btn-project-settings') || origQuery(sel);
+        if (sel === '#btn-close-settings') return origQuery('#btn-close-project-settings') || origQuery(sel);
+        if (sel === '#btn-cancel-settings') return origQuery('#btn-cancel-project-settings') || origQuery(sel);
+        return origQuery(sel);
+      };
+    }
   }
 
   // ═══════════════════════════════════════════════
@@ -2586,7 +2627,7 @@
   function handleGlobalShortcuts(e) {
     if ((e.ctrlKey || e.metaKey) && (e.key === ',' || e.code === 'Comma')) {
       e.preventDefault();
-      if (isProjectSettingsModalOpen || (projectSettingsModal && !projectSettingsModal.classList.contains('hidden'))) {
+      if (isProjectSettingsModalOpen) {
         closeProjectSettingsModal();
       } else {
         openProjectSettingsModal('vault');
@@ -2690,6 +2731,20 @@
       return;
     }
 
+    // Settings modal and reset confirm modal Escape handling
+    if (e.key === 'Escape') {
+      if (vaultResetConfirmModal && !vaultResetConfirmModal.classList.contains('hidden')) {
+        e.preventDefault();
+        vaultResetConfirmModal.classList.add('hidden');
+        return;
+      }
+      if (isProjectSettingsModalOpen) {
+        e.preventDefault();
+        closeProjectSettingsModal();
+        return;
+      }
+    }
+
     // Allow skipping intro with Esc, Space, or Enter
     if (introSplash && !introSplash.classList.contains('hidden')) {
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
@@ -2711,6 +2766,14 @@
   }
 
   function handleBackOrEscape() {
+    if (vaultResetConfirmModal && !vaultResetConfirmModal.classList.contains('hidden')) {
+      vaultResetConfirmModal.classList.add('hidden');
+      return true;
+    }
+    if (isProjectSettingsModalOpen) {
+      closeProjectSettingsModal();
+      return true;
+    }
     if (introSplash && !introSplash.classList.contains('hidden')) {
       if (dismissTimer) {
         clearTimeout(dismissTimer);
@@ -2731,16 +2794,8 @@
       closeTutorial();
       return true;
     }
-    if (vaultResetConfirmModal && !vaultResetConfirmModal.classList.contains('hidden')) {
-      vaultResetConfirmModal.classList.add('hidden');
-      return true;
-    }
     if (isSpeyImportModalOpen && speyImportModal && !speyImportModal.classList.contains('hidden')) {
       closeSpeyImportModal();
-      return true;
-    }
-    if (isProjectSettingsModalOpen && ((projectSettingsModal && !projectSettingsModal.classList.contains('hidden')) || (settingsModal && !settingsModal.classList.contains('hidden')))) {
-      closeProjectSettingsModal();
       return true;
     }
     if (findReplaceBar && !findReplaceBar.classList.contains('hidden')) {
