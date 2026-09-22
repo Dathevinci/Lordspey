@@ -33,18 +33,49 @@ app.whenReady().then(async () => {
   try {
     console.log('=== RUNNING LIVE CHROMIUM SETTINGS VERIFICATION TEST ===\n');
 
-    // 1. Load URL and pre-seed localStorage preferences so intro splash is never started
-    console.log('1. Loading http://localhost:8095 and configuring preferences...');
+    // 1. Fresh User State Verification (no pre-seeding)
+    console.log('1. Loading http://localhost:8095 in fresh initial state...');
     await win.loadURL('http://localhost:8095');
+    await win.webContents.executeJavaScript('localStorage.clear()');
+    await win.loadURL('http://localhost:8095');
+    await new Promise(r => setTimeout(r, 400));
+
+    console.log('   Testing settings trigger during startup intro...');
+    const freshIntroResult = await win.webContents.executeJavaScript(`
+      (() => {
+        const btn = document.getElementById('btn-project-settings');
+        btn.click();
+        const modal = document.getElementById('project-settings-modal');
+        const modalCs = window.getComputedStyle(modal);
+        const splash = document.getElementById('intro-splash');
+        return {
+          display: modalCs.display,
+          visibility: modalCs.visibility,
+          opacity: modalCs.opacity,
+          splashHidden: splash.classList.contains('hidden') || splash.style.display === 'none'
+        };
+      })()
+    `);
+    assert.strictEqual(freshIntroResult.display, 'flex', 'Settings modal must open even if triggered during intro');
+    assert.strictEqual(freshIntroResult.visibility, 'visible');
+    assert.strictEqual(freshIntroResult.opacity, '1');
+    assert(freshIntroResult.splashHidden, 'Intro splash must be hidden when settings opens');
+    console.log('✓ Fresh state intro override verified');
+
+    // Close modal
+    await win.webContents.executeJavaScript(`
+      document.getElementById('btn-close-project-settings').click();
+    `);
+
+    // 2. Configure Preferences & Test Sidebar Settings Gear Button Click
+    console.log('\n2. Testing click on #btn-project-settings (Sidebar Gear Button)...');
     await win.webContents.executeJavaScript(`
       localStorage.setItem('lordspey_skip_intro', 'true');
       localStorage.setItem('lordspey_tutorial_seen', 'true');
     `);
     await win.loadURL('http://localhost:8095');
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 500));
 
-    // 2. Test Sidebar Settings Gear Button Click
-    console.log('2. Testing click on #btn-project-settings (Sidebar Gear Button)...');
     const sidebarResult = await win.webContents.executeJavaScript(`
       (() => {
         const btn = document.getElementById('btn-project-settings');
@@ -212,13 +243,38 @@ app.whenReady().then(async () => {
     assert.strictEqual(backdropResult, 'none', 'Backdrop click must close settings modal');
     console.log('✓ Test 6 Passed: Backdrop click cleanly dismisses Settings modal');
 
-    // 8. Verify No Browser Runtime Errors Occurred
-    console.log('\n8. Checking browser runtime error log...');
+    // 8. Test Native File Loading (win.loadFile('index.html'))
+    console.log('\n8. Testing native Electron loadFile("index.html")...');
+    const indexHtmlPath = path.join(__dirname, '../index.html');
+    await win.loadFile(indexHtmlPath);
+    await new Promise(r => setTimeout(r, 500));
+
+    const loadFileResult = await win.webContents.executeJavaScript(`
+      (() => {
+        const btn = document.getElementById('btn-project-settings');
+        btn.click();
+        const modal = document.getElementById('project-settings-modal');
+        const modalCs = window.getComputedStyle(modal);
+        return {
+          display: modalCs.display,
+          visibility: modalCs.visibility,
+          opacity: modalCs.opacity,
+          zIndex: modalCs.zIndex
+        };
+      })()
+    `);
+    assert.strictEqual(loadFileResult.display, 'flex', 'Settings modal must open in loadFile mode');
+    assert.strictEqual(loadFileResult.visibility, 'visible');
+    assert.strictEqual(loadFileResult.opacity, '1');
+    console.log('✓ Test 7 Passed: Settings modal opens cleanly under native file:// protocol');
+
+    // 9. Verify No Browser Runtime Errors Occurred
+    console.log('\n9. Checking browser runtime error log...');
     if (uncaughtErrors.length > 0) {
       console.error('Captured uncaught browser errors:', uncaughtErrors);
       exitCode = 1;
     } else {
-      console.log('✓ Test 7 Passed: Zero uncaught runtime errors during all browser interactions');
+      console.log('✓ Test 8 Passed: Zero uncaught runtime errors during all browser interactions');
     }
 
     console.log('\n=== ALL LIVE CHROMIUM BROWSER TESTS PASSED (100%) ===\n');

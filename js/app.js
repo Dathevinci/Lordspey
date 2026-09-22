@@ -458,6 +458,7 @@
   // Intro Splash State
   let introTimer              = null;
   let dismissTimer            = null;
+  let tutorialTimer           = null;
   let isIntroActive           = true;
   let isInitialTutorialHandled = false;
 
@@ -589,7 +590,11 @@
       isIntroActive = false;
       if (!isInitialTutorialHandled && typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
         isInitialTutorialHandled = true;
-        setTimeout(() => openTutorial(0), 400);
+        if (tutorialTimer) clearTimeout(tutorialTimer);
+        tutorialTimer = setTimeout(() => {
+          tutorialTimer = null;
+          openTutorial(0);
+        }, 400);
       }
     } else if (introSplash && !introSplash.classList.contains('hidden')) {
       if (introSplash.classList) introSplash.classList.add('intro-animating');
@@ -599,7 +604,11 @@
       // Launch tutorial on first visit
       if (!isInitialTutorialHandled && typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
         isInitialTutorialHandled = true;
-        setTimeout(() => openTutorial(0), 400);
+        if (tutorialTimer) clearTimeout(tutorialTimer);
+        tutorialTimer = setTimeout(() => {
+          tutorialTimer = null;
+          openTutorial(0);
+        }, 400);
       }
     }
   }
@@ -625,7 +634,11 @@
       if (!isInitialTutorialHandled) {
         isInitialTutorialHandled = true;
         if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
-          setTimeout(() => openTutorial(0), 300);
+          if (tutorialTimer) clearTimeout(tutorialTimer);
+          tutorialTimer = setTimeout(() => {
+            tutorialTimer = null;
+            openTutorial(0);
+          }, 300);
         }
       }
       return;
@@ -649,7 +662,11 @@
       if (!isInitialTutorialHandled) {
         isInitialTutorialHandled = true;
         if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
-          setTimeout(() => openTutorial(0), 300);
+          if (tutorialTimer) clearTimeout(tutorialTimer);
+          tutorialTimer = setTimeout(() => {
+            tutorialTimer = null;
+            openTutorial(0);
+          }, 300);
         }
       }
     }, 650);
@@ -1983,6 +2000,10 @@
       clearTimeout(dismissTimer);
       dismissTimer = null;
     }
+    if (tutorialTimer) {
+      clearTimeout(tutorialTimer);
+      tutorialTimer = null;
+    }
     isInitialTutorialHandled = true;
 
     if (introSplash) {
@@ -2333,6 +2354,7 @@
   ];
 
   function openTutorial(step = 0) {
+    if (isProjectSettingsModalOpen) return;
     currentTutorialStep = Math.max(0, Math.min(step, TUTORIAL_STEPS.length - 1));
     renderTutorialStep(currentTutorialStep);
     tutorialOverlay.classList.remove('hidden');
