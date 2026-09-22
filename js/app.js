@@ -8,9 +8,8 @@
 (function () {
   'use strict';
 
-  // ── DOM refs ──
-  const $ = (s, ctx = document) => ctx.querySelector(s);
-  const $$ = (s, ctx = document) => [...ctx.querySelectorAll(s)];
+  const $ = (s, ctx = document) => (ctx && typeof ctx.querySelector === 'function' ? ctx.querySelector(s) : null);
+  const $$ = (s, ctx = document) => (ctx && typeof ctx.querySelectorAll === 'function' ? [...(ctx.querySelectorAll(s) || [])] : []);
 
   const sidebar         = $('#sidebar');
   const sidebarToggle   = $('#sidebar-toggle');
@@ -114,18 +113,44 @@
 
   const projectSettingsModal   = $('#project-settings-modal');
   const btnCloseProjectSettings = $('#btn-close-project-settings');
+  const btnCancelProjectSettings = $('#btn-cancel-project-settings');
   const settingProjectTitle    = $('#setting-project-title');
   const settingProjectAuthor   = $('#setting-project-author');
   const settingsStatsGrid      = $('#settings-stats-grid');
   const settingsBtnExportSpey  = $('#settings-btn-export-spey');
+  const settingsBtnOpenSpey    = $('#settings-btn-open-spey');
   const settingsBtnExportJson  = $('#settings-btn-export-json');
+  const settingsBtnImportJson  = $('#settings-btn-import-json');
+  const settingsImportJsonFile = $('#settings-import-json-file');
   const settingsBtnBackupVault = $('#settings-btn-backup-vault');
+  const settingsBtnRestoreVault = $('#settings-btn-restore-vault');
+  const settingsBtnClearVault  = $('#settings-btn-clear-vault');
   const btnSaveProjectSettings = $('#btn-save-project-settings');
+
+  const settingFontFamily      = $('#setting-font-family');
+  const settingFontSize        = $('#setting-font-size');
+  const settingLineHeight      = $('#setting-line-height');
+  const settingTypewriterToggle = $('#setting-typewriter-toggle');
+  const settingAutoEmdash      = $('#setting-auto-emdash');
+  const settingSmartQuotes     = $('#setting-smart-quotes');
+  const settingIntroStarToggle = $('#setting-intro-star-toggle');
+  const settingBtnPreviewIntro = $('#setting-btn-preview-intro');
+
+  const settingsBtnTourGeneral  = $('#settings-btn-tour-general');
+  const settingsBtnTourMap      = $('#settings-btn-tour-map');
+  const settingsBtnTourTimeline = $('#settings-btn-tour-timeline');
+  const settingsBtnTourCodex    = $('#settings-btn-tour-codex');
+
+  const vaultResetConfirmModal  = $('#vault-reset-confirm-modal');
+  const btnCloseResetConfirm    = $('#btn-close-reset-confirm');
+  const btnCancelResetVault     = $('#btn-cancel-reset-vault');
+  const btnConfirmResetVault    = $('#btn-confirm-reset-vault');
 
   const speyDropzone           = $('#spey-dropzone');
 
   if (speyImportModal && speyImportModal.classList) speyImportModal.classList.add('hidden');
   if (projectSettingsModal && projectSettingsModal.classList) projectSettingsModal.classList.add('hidden');
+  if (vaultResetConfirmModal && vaultResetConfirmModal.classList) vaultResetConfirmModal.classList.add('hidden');
   if (speyDropzone && speyDropzone.classList) speyDropzone.classList.add('hidden');
 
   // Find & Replace
@@ -369,6 +394,9 @@
   let currentFontSize     = (typeof localStorage !== 'undefined' && parseInt(localStorage.getItem('lordspey_editor_font_size'), 10)) || 15;
   let currentLineHeight   = (typeof localStorage !== 'undefined' && parseFloat(localStorage.getItem('lordspey_editor_line_spacing'))) || 1.8;
   let typewriterMode      = typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_typewriter_mode') === 'true';
+  let autoEmDash          = typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_auto_emdash') !== 'false';
+  let smartQuotes         = typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_smart_quotes') === 'true';
+  let currentAccentTheme  = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_accent_theme')) || 'crimson';
 
   // Find & Replace State
   let findMatches         = [];
@@ -381,11 +409,95 @@
   let isIntroActive           = true;
   let isInitialTutorialHandled = false;
 
+  // ── Appearance & Accent Theme Palettes ──
+  const ACCENT_THEMES = {
+    crimson: {
+      accent: '#ef4444',
+      red400: '#f87171',
+      red500: '#ef4444',
+      red600: '#dc2626',
+      redGlow: 'rgba(239, 68, 68, 0.15)',
+      redGlowStrong: 'rgba(239, 68, 68, 0.3)'
+    },
+    ruby: {
+      accent: '#e11d48',
+      red400: '#fb7185',
+      red500: '#e11d48',
+      red600: '#be123c',
+      redGlow: 'rgba(225, 29, 72, 0.15)',
+      redGlowStrong: 'rgba(225, 29, 72, 0.3)'
+    },
+    amber: {
+      accent: '#f59e0b',
+      red400: '#fbbf24',
+      red500: '#f59e0b',
+      red600: '#d97706',
+      redGlow: 'rgba(245, 158, 11, 0.15)',
+      redGlowStrong: 'rgba(245, 158, 11, 0.3)'
+    },
+    gold: {
+      accent: '#f59e0b',
+      red400: '#fbbf24',
+      red500: '#f59e0b',
+      red600: '#d97706',
+      redGlow: 'rgba(245, 158, 11, 0.15)',
+      redGlowStrong: 'rgba(245, 158, 11, 0.3)'
+    },
+    amethyst: {
+      accent: '#a855f7',
+      red400: '#c084fc',
+      red500: '#a855f7',
+      red600: '#9333ea',
+      redGlow: 'rgba(168, 85, 247, 0.15)',
+      redGlowStrong: 'rgba(168, 85, 247, 0.3)'
+    },
+    emerald: {
+      accent: '#10b981',
+      red400: '#34d399',
+      red500: '#10b981',
+      red600: '#059669',
+      redGlow: 'rgba(168, 85, 247, 0.15)',
+      redGlowStrong: 'rgba(16, 185, 129, 0.3)'
+    }
+  };
+
+  function applyAccentTheme(themeName) {
+    const key = (themeName && ACCENT_THEMES[themeName.toLowerCase()]) ? themeName.toLowerCase() : 'crimson';
+    currentAccentTheme = key;
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('lordspey_accent_theme', key);
+    }
+    const theme = ACCENT_THEMES[key];
+    const rootEl = document.documentElement || document.body;
+    if (rootEl && rootEl.style && typeof rootEl.style.setProperty === 'function') {
+      rootEl.style.setProperty('--accent', theme.accent);
+      rootEl.style.setProperty('--red-400', theme.red400);
+      rootEl.style.setProperty('--red-500', theme.red500);
+      rootEl.style.setProperty('--red-600', theme.red600);
+      rootEl.style.setProperty('--red-glow', theme.redGlow);
+      rootEl.style.setProperty('--red-glow-strong', theme.redGlowStrong);
+    }
+    if (rootEl && typeof rootEl.setAttribute === 'function') {
+      rootEl.setAttribute('data-accent', key);
+    }
+    if (typeof $$ === 'function') {
+      $$('.accent-theme-card').forEach(card => {
+        if (!card) return;
+        const cardTheme = card.dataset && card.dataset.theme;
+        const isMatch = cardTheme === key || (key === 'gold' && cardTheme === 'amber') || (key === 'amber' && cardTheme === 'gold');
+        if (card.classList && typeof card.classList.toggle === 'function') {
+          card.classList.toggle('active', isMatch);
+        }
+      });
+    }
+  }
+
   // ── Init ──
   init();
 
   function init() {
     renderSidebar();
+    applyAccentTheme(currentAccentTheme);
     applyTypographySettings();
     applyTypewriterState();
     bindEvents();
@@ -398,8 +510,18 @@
 
     showMainMenu();
 
-    // Auto-dismiss intro splash after cinematic star animation
-    if (introSplash && !introSplash.classList.contains('hidden')) {
+    // Check startup intro skip preference
+    const skipIntroPref = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_skip_intro') === 'true') ||
+                          (Storage.getSettings() && Storage.getSettings().skipIntro === true);
+    if (skipIntroPref && introSplash) {
+      introSplash.classList.remove('intro-animating');
+      introSplash.classList.add('hidden');
+      isIntroActive = false;
+      if (!isInitialTutorialHandled && typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
+        isInitialTutorialHandled = true;
+        setTimeout(() => openTutorial(0), 400);
+      }
+    } else if (introSplash && !introSplash.classList.contains('hidden')) {
       if (introSplash.classList) introSplash.classList.add('intro-animating');
       introTimer = setTimeout(dismissIntroSplash, 2500);
     } else {
@@ -800,12 +922,36 @@
 
     // Project Settings Modal
     if (btnCloseProjectSettings) btnCloseProjectSettings.addEventListener('click', closeProjectSettingsModal);
+    if (btnCancelProjectSettings) btnCancelProjectSettings.addEventListener('click', closeProjectSettingsModal);
     if (btnSaveProjectSettings) btnSaveProjectSettings.addEventListener('click', saveProjectSettings);
+
+    // Settings Navigation Tabs
+    $$('.settings-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchSettingsTab(btn.dataset.tab);
+      });
+    });
+
+    // Settings .spey & Vault Buttons
     if (settingsBtnExportSpey) settingsBtnExportSpey.addEventListener('click', handleExportSpey);
+    if (settingsBtnOpenSpey) settingsBtnOpenSpey.addEventListener('click', handleOpenSpeyFilePicker);
     if (settingsBtnExportJson) {
       settingsBtnExportJson.addEventListener('click', () => {
         Storage.exportJSON();
         toast('Vault exported as JSON', 'success');
+      });
+    }
+    if (settingsBtnImportJson) {
+      settingsBtnImportJson.addEventListener('click', () => {
+        if (settingsImportJsonFile) settingsImportJsonFile.click();
+      });
+    }
+    if (settingsImportJsonFile) {
+      settingsImportJsonFile.addEventListener('change', () => {
+        if (!settingsImportJsonFile.files || !settingsImportJsonFile.files.length) return;
+        const file = settingsImportJsonFile.files[0];
+        processIncomingSpeyFile(file, file.name);
+        settingsImportJsonFile.value = '';
       });
     }
     if (settingsBtnBackupVault) {
@@ -814,9 +960,101 @@
         toast('Vault snapshot archived in storage', 'success');
       });
     }
+    if (settingsBtnRestoreVault) {
+      settingsBtnRestoreVault.addEventListener('click', () => {
+        const b = Storage.getVaultBackup();
+        if (!b) {
+          toast('No vault snapshot found in storage', 'info');
+          return;
+        }
+        if (confirm('Restore workspace from latest in-browser snapshot? Current unsaved modifications will be replaced.')) {
+          const success = Storage.restoreVaultBackup();
+          if (success) {
+            renderSidebar();
+            renderProjectSettingsStats();
+            toast('Vault restored from snapshot', 'success');
+          } else {
+            toast('Failed to restore snapshot', 'error');
+          }
+        }
+      });
+    }
+
+    // Vault Reset Danger Action
+    if (settingsBtnClearVault) {
+      settingsBtnClearVault.addEventListener('click', () => {
+        if (vaultResetConfirmModal) {
+          vaultResetConfirmModal.classList.remove('hidden');
+        } else if (confirm('Are you sure you want to reset your vault? All notes, maps, timelines, and characters will be erased.')) {
+          executeVaultReset();
+        }
+      });
+    }
+    if (btnCancelResetVault) {
+      btnCancelResetVault.addEventListener('click', () => {
+        if (vaultResetConfirmModal) vaultResetConfirmModal.classList.add('hidden');
+      });
+    }
+    if (btnCloseResetConfirm) {
+      btnCloseResetConfirm.addEventListener('click', () => {
+        if (vaultResetConfirmModal) vaultResetConfirmModal.classList.add('hidden');
+      });
+    }
+    if (btnConfirmResetVault) {
+      btnConfirmResetVault.addEventListener('click', () => {
+        executeVaultReset();
+      });
+    }
+
+    // Accent Themes Swatches
+    $$('.accent-theme-card').forEach(card => {
+      card.addEventListener('click', () => {
+        applyAccentTheme(card.dataset.theme);
+      });
+    });
+
+    // Preview Intro Animation
+    if (settingBtnPreviewIntro) {
+      settingBtnPreviewIntro.addEventListener('click', () => {
+        closeProjectSettingsModal();
+        playIntroSplash();
+      });
+    }
+
+    // Guided Tutorials from Settings
+    if (settingsBtnTourGeneral) {
+      settingsBtnTourGeneral.addEventListener('click', () => {
+        closeProjectSettingsModal();
+        openTutorial(0);
+      });
+    }
+    if (settingsBtnTourMap) {
+      settingsBtnTourMap.addEventListener('click', () => {
+        closeProjectSettingsModal();
+        openWorldbuildingTutorial('map');
+      });
+    }
+    if (settingsBtnTourTimeline) {
+      settingsBtnTourTimeline.addEventListener('click', () => {
+        closeProjectSettingsModal();
+        openWorldbuildingTutorial('timeline');
+      });
+    }
+    if (settingsBtnTourCodex) {
+      settingsBtnTourCodex.addEventListener('click', () => {
+        closeProjectSettingsModal();
+        openWorldbuildingTutorial('codex');
+      });
+    }
+
     if (projectSettingsModal) {
       projectSettingsModal.addEventListener('click', e => {
         if (e.target === projectSettingsModal) closeProjectSettingsModal();
+      });
+    }
+    if (vaultResetConfirmModal) {
+      vaultResetConfirmModal.addEventListener('click', e => {
+        if (e.target === vaultResetConfirmModal) vaultResetConfirmModal.classList.add('hidden');
       });
     }
 
@@ -1117,7 +1355,7 @@
     // Global keyboard shortcuts
     document.addEventListener('keydown', handleGlobalShortcuts);
 
-    // Tab key inside textarea
+    // Tab key & Smart Typography inside textarea
     noteBody.addEventListener('keydown', e => {
       if (e.key === 'Tab') {
         e.preventDefault();
@@ -1126,6 +1364,49 @@
         noteBody.value = noteBody.value.substring(0, start) + '  ' + noteBody.value.substring(end);
         noteBody.selectionStart = noteBody.selectionEnd = start + 2;
         scheduleSave();
+        return;
+      }
+
+      // Smart Typography: Auto Em-Dash (--)
+      if (autoEmDash && e.key === '-' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const start = noteBody.selectionStart;
+        const end = noteBody.selectionEnd;
+        const val = noteBody.value;
+        if (start === end && start > 0 && val[start - 1] === '-') {
+          e.preventDefault();
+          noteBody.value = val.substring(0, start - 1) + '—' + val.substring(start);
+          noteBody.selectionStart = noteBody.selectionEnd = start;
+          noteBody.dispatchEvent(new Event('input'));
+          return;
+        }
+      }
+
+      // Smart Typography: Smart Curly Quotes
+      if (smartQuotes && (e.key === '"' || e.key === "'") && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        const start = noteBody.selectionStart;
+        const end = noteBody.selectionEnd;
+        const val = noteBody.value;
+        const prevChar = start > 0 ? val[start - 1] : '';
+        const isOpening = !prevChar || /\s|[([{<‘“]/.test(prevChar);
+        let openQ = '“';
+        let closeQ = '”';
+        if (e.key === "'") {
+          openQ = '‘';
+          closeQ = '’';
+        }
+        if (start !== end) {
+          const selected = val.substring(start, end);
+          noteBody.value = val.substring(0, start) + openQ + selected + closeQ + val.substring(end);
+          noteBody.selectionStart = start + 1;
+          noteBody.selectionEnd = end + 1;
+        } else {
+          const quote = isOpening ? openQ : closeQ;
+          noteBody.value = val.substring(0, start) + quote + val.substring(end);
+          noteBody.selectionStart = noteBody.selectionEnd = start + 1;
+        }
+        noteBody.dispatchEvent(new Event('input'));
+        return;
       }
     });
   }
@@ -1508,10 +1789,22 @@
     }
   }
 
-  function openProjectSettingsModal() {
+  function switchSettingsTab(tabName) {
+    $$('.settings-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    $$('.settings-pane').forEach(pane => {
+      pane.classList.toggle('active', pane.id === `settings-pane-${tabName}`);
+    });
+  }
+
+  function openProjectSettingsModal(initialTab = 'vault') {
+    if (typeof initialTab !== 'string') initialTab = 'vault';
     if (!projectSettingsModal) return;
     isProjectSettingsModalOpen = true;
     const settings = Storage.getSettings();
+
+    // 1. Project Identity
     if (settingProjectTitle) {
       settingProjectTitle.value = settings.projectTitle || Storage.getProjectTitle();
     }
@@ -1519,6 +1812,38 @@
       settingProjectAuthor.value = settings.projectAuthor || 'Lord Spey';
     }
     renderProjectSettingsStats();
+
+    // 2. Editor & Writing Preferences
+    if (settingFontFamily) {
+      settingFontFamily.value = currentEditorFont;
+    }
+    if (settingFontSize) {
+      settingFontSize.value = String(currentFontSize);
+    }
+    if (settingLineHeight) {
+      settingLineHeight.value = String(currentLineHeight);
+    }
+    if (settingTypewriterToggle) {
+      settingTypewriterToggle.checked = typewriterMode;
+    }
+    if (settingAutoEmdash) {
+      settingAutoEmdash.checked = autoEmDash;
+    }
+    if (settingSmartQuotes) {
+      settingSmartQuotes.checked = smartQuotes;
+    }
+
+    // 3. Appearance & Accent Theme
+    const isSkipIntro = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_skip_intro') === 'true') ||
+                        (settings && settings.skipIntro === true);
+    if (settingIntroStarToggle) {
+      settingIntroStarToggle.checked = !isSkipIntro;
+    }
+    applyAccentTheme(currentAccentTheme);
+
+    // Switch tab
+    switchSettingsTab(initialTab);
+
     projectSettingsModal.classList.remove('hidden');
   }
 
@@ -1568,8 +1893,62 @@
     if (settingProjectAuthor) {
       Storage.saveSetting('projectAuthor', settingProjectAuthor.value.trim());
     }
-    toast('Project settings saved', 'success');
+
+    // Editor settings
+    if (settingFontFamily) {
+      currentEditorFont = settingFontFamily.value;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('lordspey_editor_font', currentEditorFont);
+      Storage.saveSetting('defaultFontFamily', currentEditorFont);
+    }
+    if (settingFontSize) {
+      currentFontSize = parseInt(settingFontSize.value, 10) || 15;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('lordspey_editor_font_size', String(currentFontSize));
+      Storage.saveSetting('defaultFontSize', currentFontSize);
+    }
+    if (settingLineHeight) {
+      currentLineHeight = parseFloat(settingLineHeight.value) || 1.8;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('lordspey_editor_line_spacing', String(currentLineHeight));
+      Storage.saveSetting('defaultLineHeight', currentLineHeight);
+    }
+    if (settingTypewriterToggle) {
+      typewriterMode = settingTypewriterToggle.checked;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('lordspey_typewriter_mode', String(typewriterMode));
+      Storage.saveSetting('typewriterMode', typewriterMode);
+      applyTypewriterState();
+    }
+    if (settingAutoEmdash) {
+      autoEmDash = settingAutoEmdash.checked;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('lordspey_auto_emdash', String(autoEmDash));
+      Storage.saveSetting('autoEmDash', autoEmDash);
+    }
+    if (settingSmartQuotes) {
+      smartQuotes = settingSmartQuotes.checked;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('lordspey_smart_quotes', String(smartQuotes));
+      Storage.saveSetting('smartQuotes', smartQuotes);
+    }
+
+    // Appearance & theme settings
+    if (settingIntroStarToggle) {
+      const skipIntro = !settingIntroStarToggle.checked;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('lordspey_skip_intro', String(skipIntro));
+      Storage.saveSetting('skipIntro', skipIntro);
+    }
+    Storage.saveSetting('accentTheme', currentAccentTheme);
+
+    applyTypographySettings();
+    applyAccentTheme(currentAccentTheme);
+    toast('Settings saved', 'success');
     closeProjectSettingsModal();
+  }
+
+  function executeVaultReset() {
+    Storage.clearVault();
+    if (vaultResetConfirmModal) vaultResetConfirmModal.classList.add('hidden');
+    renderSidebar();
+    showMainMenu();
+    renderProjectSettingsStats();
+    closeProjectSettingsModal();
+    toast('Vault cleared and reset to pristine state', 'info');
   }
 
   function closeProjectSettingsModal() {
@@ -2185,6 +2564,10 @@
       closeTutorial();
       return true;
     }
+    if (vaultResetConfirmModal && !vaultResetConfirmModal.classList.contains('hidden')) {
+      vaultResetConfirmModal.classList.add('hidden');
+      return true;
+    }
     if (isSpeyImportModalOpen && speyImportModal && !speyImportModal.classList.contains('hidden')) {
       closeSpeyImportModal();
       return true;
@@ -2714,7 +3097,13 @@
     container.appendChild(el);
     setTimeout(() => {
       el.style.animation = 'toastOut 200ms ease forwards';
-      setTimeout(() => el.remove(), 200);
+      setTimeout(() => {
+        if (typeof el.remove === 'function') {
+          el.remove();
+        } else if (el.parentElement && typeof el.parentElement.removeChild === 'function') {
+          el.parentElement.removeChild(el);
+        }
+      }, 200);
     }, 2400);
   }
 

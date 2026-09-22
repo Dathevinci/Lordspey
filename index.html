@@ -110,21 +110,16 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           New Note
         </button>
-        <button id="btn-export-spey" class="icon-btn" title="Export Project (.spey)" aria-label="Export Project (.spey)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </button>
-        <button id="btn-open-spey" class="icon-btn" title="Open .spey Project" aria-label="Open .spey Project">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        </button>
-        <button id="btn-project-settings" class="icon-btn" title="Project Settings &amp; Bundle" aria-label="Project Settings">
+        <button id="btn-project-settings" class="icon-btn btn-settings-gear" title="Settings (Vault, Editor, Theme, Guides)" aria-label="Settings">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
-        <button id="btn-export" class="icon-btn visually-hidden" title="Export vault as JSON" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </button>
-        <button id="btn-import" class="icon-btn visually-hidden" title="Import vault from JSON" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        </button>
+      </div>
+      <!-- Hidden compatibility triggers for test harnesses & file pickers -->
+      <div class="hidden" aria-hidden="true" style="display: none;">
+        <button id="btn-export-spey" aria-hidden="true" tabindex="-1"></button>
+        <button id="btn-open-spey" aria-hidden="true" tabindex="-1"></button>
+        <button id="btn-export" aria-hidden="true" tabindex="-1"></button>
+        <button id="btn-import" aria-hidden="true" tabindex="-1"></button>
       </div>
       <input type="file" id="import-file" accept=".spey,.json" hidden />
     </div>
@@ -1407,53 +1402,367 @@
     </div>
   </div>
 
-  <!-- Project Settings & Export Modal -->
+  <!-- Comprehensive Obsidian-Grade Settings Modal -->
   <div id="project-settings-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
     <div class="modal-card project-settings-card">
       <div class="modal-header">
         <div class="modal-header-left">
-          <span class="settings-modal-badge font-cinzel">✦ PROJECT CONFIGURATION</span>
-          <h3 class="modal-title font-cinzel" id="settings-modal-title">Project Settings &amp; Bundle</h3>
+          <span class="settings-modal-badge font-cinzel">✦ WORKSPACE PREFERENCES &amp; VAULT</span>
+          <h3 class="modal-title font-cinzel" id="settings-modal-title">Lord Spey Settings</h3>
         </div>
-        <button id="btn-close-project-settings" class="icon-btn modal-close-btn" title="Close (Esc)">✕</button>
+        <button id="btn-close-project-settings" class="icon-btn modal-close-btn" title="Close Settings (Esc)">✕</button>
       </div>
-      <div class="modal-body settings-modal-body">
-        <div class="form-group">
-          <label class="form-label" for="setting-project-title">Project Title</label>
-          <input type="text" id="setting-project-title" class="form-input" placeholder="e.g. The Obsidian Gate, Chronicles of Spey" autocomplete="off" />
-          <span class="form-hint">Used for .spey package exports and workspace metadata.</span>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="setting-project-author">Author / Byline</label>
-          <input type="text" id="setting-project-author" class="form-input" placeholder="e.g. Lord Spey" autocomplete="off" />
-        </div>
 
-        <div class="settings-stats-panel">
-          <div class="settings-stats-header">Current Workspace Overview</div>
-          <div class="settings-stats-grid" id="settings-stats-grid">
-            <!-- Dynamically populated stats -->
+      <div class="settings-modal-body-wrapper">
+        <!-- Obsidian Left Tab Navigation -->
+        <nav class="settings-nav" aria-label="Settings Categories">
+          <button type="button" class="settings-tab-btn active" data-tab="vault">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>Project &amp; Vault</span>
+          </button>
+          <button type="button" class="settings-tab-btn" data-tab="editor">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span>Editor &amp; Writing</span>
+          </button>
+          <button type="button" class="settings-tab-btn" data-tab="appearance">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 0 0 0 14c1.66 0 3-1.34 3-3 0-.8-.32-1.52-.84-2.04A2.99 2.99 0 0 1 14 9c0-1.66 1.34-3 3-3h3.5A9.96 9.96 0 0 0 12 2z"/></svg>
+            <span>Appearance &amp; Theme</span>
+          </button>
+          <button type="button" class="settings-tab-btn" data-tab="keybindings">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6" y2="8"/><line x1="10" y1="8" x2="10" y2="8"/><line x1="14" y1="8" x2="14" y2="8"/><line x1="18" y1="8" x2="18" y2="8"/><line x1="8" y1="16" x2="16" y2="16"/></svg>
+            <span>Shortcuts &amp; Guides</span>
+          </button>
+        </nav>
+
+        <!-- Right Content Panes -->
+        <div class="settings-panes">
+          <!-- ── Tab 1: Project & .spey Vault ── -->
+          <div class="settings-pane active" id="settings-pane-vault">
+            <div class="settings-group">
+              <h4 class="settings-group-title">Project Identity</h4>
+              <p class="settings-group-desc">Metadata embedded within your universe and .spey bundle packages.</p>
+              
+              <div class="form-group">
+                <label class="form-label" for="setting-project-title">Project Title</label>
+                <input type="text" id="setting-project-title" class="form-input" placeholder="e.g. The Obsidian Gate, Chronicles of Spey" autocomplete="off" />
+                <span class="form-hint">Used for .spey package exports, story bundle headers, and window title.</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="setting-project-author">Author / Byline</label>
+                <input type="text" id="setting-project-author" class="form-input" placeholder="e.g. Lord Spey" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Current Workspace Overview</h4>
+              <p class="settings-group-desc">Summary of indexed chapters, world notes, and worldbuilding lore.</p>
+              <div class="settings-stats-panel">
+                <div class="settings-stats-grid" id="settings-stats-grid">
+                  <!-- Dynamically populated stats -->
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Lord Spey Project Package (.spey)</h4>
+              <p class="settings-group-desc">One-click portable package containing all manuscript chapters, worldbuilding lore, map pins, chronology timeline events, character codices, and relational links.</p>
+              <div class="settings-action-row">
+                <button type="button" id="settings-btn-export-spey" class="btn btn-primary" title="Export complete project as .spey bundle">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export .spey Project Package
+                </button>
+                <button type="button" id="settings-btn-open-spey" class="btn btn-secondary" title="Open local .spey project package">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Open / Import .spey Package
+                </button>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Vault Snapshots &amp; Raw JSON</h4>
+              <p class="settings-group-desc">Export or import raw JSON archives and manage browser-local snapshots.</p>
+              <div class="settings-action-row">
+                <button type="button" id="settings-btn-export-json" class="btn btn-secondary" title="Export vault as raw JSON">
+                  Export Vault (.json)
+                </button>
+                <button type="button" id="settings-btn-import-json" class="btn btn-secondary" title="Import vault from JSON file">
+                  Import Vault (.json)
+                </button>
+                <button type="button" id="settings-btn-backup-vault" class="btn btn-ghost" title="Save an in-browser snapshot of your current vault">
+                  Snapshot Vault
+                </button>
+                <button type="button" id="settings-btn-restore-vault" class="btn btn-ghost" title="Restore workspace from latest in-browser snapshot">
+                  Restore Snapshot
+                </button>
+              </div>
+              <input type="file" id="settings-import-json-file" accept=".json" hidden />
+            </div>
+
+            <div class="settings-group settings-group-danger">
+              <h4 class="settings-group-title" style="color: var(--red-400);">Danger Zone</h4>
+              <p class="settings-group-desc">Clear all notes, maps, timelines, and character dossiers from your browser storage.</p>
+              <button type="button" id="settings-btn-clear-vault" class="btn btn-danger" title="Clear and reset current vault">
+                Reset / Clear Vault…
+              </button>
+            </div>
+          </div>
+
+          <!-- ── Tab 2: Editor & Writing Preferences ── -->
+          <div class="settings-pane" id="settings-pane-editor">
+            <div class="settings-group">
+              <h4 class="settings-group-title">Typography &amp; Layout</h4>
+              <p class="settings-group-desc">Customize default typography for distraction-free prose authoring.</p>
+              
+              <div class="form-group">
+                <label class="form-label" for="setting-font-family">Default Font Family</label>
+                <select id="setting-font-family" class="form-input">
+                  <option value="'Lora', Georgia, serif">Lora (Book Serif)</option>
+                  <option value="'Inter', -apple-system, BlinkMacSystemFont, sans-serif">Inter (Clean Sans)</option>
+                  <option value="'JetBrains Mono', monospace">JetBrains Mono (Monospace)</option>
+                  <option value="'Playfair Display', Georgia, serif">Playfair Display (Editorial Display)</option>
+                </select>
+              </div>
+
+              <div class="settings-row">
+                <div class="settings-row-label">
+                  <div class="settings-row-title">Default Font Size</div>
+                  <div class="settings-row-hint">Base reading font size for markdown editor and live preview.</div>
+                </div>
+                <select id="setting-font-size" class="form-input form-input-sm" style="width: 110px;">
+                  <option value="13">13 px</option>
+                  <option value="14">14 px</option>
+                  <option value="15" selected>15 px</option>
+                  <option value="16">16 px</option>
+                  <option value="18">18 px</option>
+                  <option value="20">20 px</option>
+                  <option value="24">24 px</option>
+                </select>
+              </div>
+
+              <div class="settings-row">
+                <div class="settings-row-label">
+                  <div class="settings-row-title">Default Line Height</div>
+                  <div class="settings-row-hint">Line spacing multiplier for comfortable reading and editing flow.</div>
+                </div>
+                <select id="setting-line-height" class="form-input form-input-sm" style="width: 130px;">
+                  <option value="1.4">1.4 (Compact)</option>
+                  <option value="1.5">1.5 (Standard)</option>
+                  <option value="1.8" selected>1.8 (Serene)</option>
+                  <option value="2.0">2.0 (Spacious)</option>
+                  <option value="2.2">2.2 (Airy)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Writing Modes</h4>
+              <p class="settings-group-desc">Immersive tools to maintain creative flow and focus.</p>
+
+              <div class="settings-row">
+                <div class="settings-row-label">
+                  <div class="settings-row-title">Typewriter Scrolling Mode</div>
+                  <div class="settings-row-hint">Keeps your active typing cursor line vertically centered on screen.</div>
+                </div>
+                <label class="switch-control">
+                  <input type="checkbox" id="setting-typewriter-toggle" />
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Smart Typography</h4>
+              <p class="settings-group-desc">Instant keystroke expansions for publication-grade punctuation.</p>
+
+              <div class="settings-row">
+                <div class="settings-row-label">
+                  <div class="settings-row-title">Auto Em-Dash (—)</div>
+                  <div class="settings-row-hint">Automatically converts double hyphen (<code>--</code>) into an em-dash (<code>—</code>).</div>
+                </div>
+                <label class="switch-control">
+                  <input type="checkbox" id="setting-auto-emdash" />
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+
+              <div class="settings-row">
+                <div class="settings-row-label">
+                  <div class="settings-row-title">Smart Curly Quotes (“ ” &amp; ‘ ’)</div>
+                  <div class="settings-row-hint">Automatically converts straight quotes into curly opening and closing quotes.</div>
+                </div>
+                <label class="switch-control">
+                  <input type="checkbox" id="setting-smart-quotes" />
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Tab 3: Appearance & Accent Theme ── -->
+          <div class="settings-pane" id="settings-pane-appearance">
+            <div class="settings-group">
+              <h4 class="settings-group-title">Accent Theme</h4>
+              <p class="settings-group-desc">Select your signature palette tint for workspace highlights, buttons, and cosmic glows.</p>
+              
+              <div class="accent-theme-grid">
+                <div class="accent-theme-card active" data-theme="crimson" style="--theme-color: #ef4444; --theme-glow: rgba(239, 68, 68, 0.3);">
+                  <div class="accent-color-circle" style="background: #ef4444;"></div>
+                  <span class="accent-theme-name">Crimson Red</span>
+                  <span class="accent-theme-hex">#ef4444</span>
+                </div>
+                <div class="accent-theme-card" data-theme="ruby" style="--theme-color: #e11d48; --theme-glow: rgba(225, 29, 72, 0.3);">
+                  <div class="accent-color-circle" style="background: #e11d48;"></div>
+                  <span class="accent-theme-name">Blood Moon Ruby</span>
+                  <span class="accent-theme-hex">#e11d48</span>
+                </div>
+                <div class="accent-theme-card" data-theme="amber" style="--theme-color: #f59e0b; --theme-glow: rgba(245, 158, 11, 0.3);">
+                  <div class="accent-color-circle" style="background: #f59e0b;"></div>
+                  <span class="accent-theme-name">Royal Amber / Gold</span>
+                  <span class="accent-theme-hex">#f59e0b</span>
+                </div>
+                <div class="accent-theme-card" data-theme="amethyst" style="--theme-color: #a855f7; --theme-glow: rgba(168, 85, 247, 0.3);">
+                  <div class="accent-color-circle" style="background: #a855f7;"></div>
+                  <span class="accent-theme-name">Void Amethyst</span>
+                  <span class="accent-theme-hex">#a855f7</span>
+                </div>
+                <div class="accent-theme-card" data-theme="emerald" style="--theme-color: #10b981; --theme-glow: rgba(16, 185, 129, 0.3);">
+                  <div class="accent-color-circle" style="background: #10b981;"></div>
+                  <span class="accent-theme-name">Emerald Lore</span>
+                  <span class="accent-theme-hex">#10b981</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Startup Animation</h4>
+              <p class="settings-group-desc">Control whether Lord Spey begins with the cinematic rotating star splash.</p>
+
+              <div class="settings-row">
+                <div class="settings-row-label">
+                  <div class="settings-row-title">Cinematic Crimson Star Intro</div>
+                  <div class="settings-row-hint">Play the rotating sparkle emblem animation on startup (disable to launch directly into the dashboard).</div>
+                </div>
+                <label class="switch-control">
+                  <input type="checkbox" id="setting-intro-star-toggle" checked />
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+
+              <div style="margin-top: 12px;">
+                <button type="button" id="setting-btn-preview-intro" class="btn btn-secondary">
+                  ✦ Preview Intro Star Animation
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Tab 4: Shortcuts & Guides ── -->
+          <div class="settings-pane" id="settings-pane-keybindings">
+            <div class="settings-group">
+              <h4 class="settings-group-title">Keyboard Shortcuts Cheat Sheet</h4>
+              <p class="settings-group-desc">Fast navigation and editor commands for authoring productivity.</p>
+
+              <table class="shortcuts-table">
+                <thead>
+                  <tr>
+                    <th>Shortcut</th>
+                    <th>Action</th>
+                    <th>Scope</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>G</kbd></td>
+                    <td>Galaxy Cosmos Graph View</td>
+                    <td>Global</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>M</kbd></td>
+                    <td>Interactive World Map &amp; Cartography Pins</td>
+                    <td>Global</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>T</kbd></td>
+                    <td>Chronology &amp; Event Timeline</td>
+                    <td>Global</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>U</kbd></td>
+                    <td>Character Codex &amp; Relationship Web</td>
+                    <td>Global</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>K</kbd> / <kbd>Ctrl</kbd> + <kbd>O</kbd></td>
+                    <td>Quick Switcher &amp; Note Finder</td>
+                    <td>Global</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>F</kbd></td>
+                    <td>Find &amp; Replace Drawer</td>
+                    <td>Editor</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
+                    <td>Instant Save Active Note</td>
+                    <td>Editor</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>Esc</kbd></td>
+                    <td>Dismiss Active Modal / Return to Dashboard</td>
+                    <td>Global</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Feature Guides &amp; Interactive Tutorials</h4>
+              <p class="settings-group-desc">Need a refresher on worldbuilding tools or markdown syntax? Revisit interactive guides anytime.</p>
+
+              <div class="tour-buttons-grid">
+                <button type="button" id="settings-btn-tour-general" class="btn btn-secondary">
+                  ✦ Workspace Walkthrough
+                </button>
+                <button type="button" id="settings-btn-tour-map" class="btn btn-secondary">
+                  🗺️ World Map Guide
+                </button>
+                <button type="button" id="settings-btn-tour-timeline" class="btn btn-secondary">
+                  ⏳ Chronology Timeline Guide
+                </button>
+                <button type="button" id="settings-btn-tour-codex" class="btn btn-secondary">
+                  👥 Character Codex Guide
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="settings-export-section">
-          <h4 class="settings-section-subtitle">Workspace Export &amp; Backup</h4>
-          <p class="settings-section-desc">Download a complete .spey bundle to share with other authors or archive your worldbuilding notes and drafts.</p>
-          <div class="settings-action-row">
-            <button id="settings-btn-export-spey" class="btn btn-primary" title="Export complete project as .spey bundle">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export Project (.spey)
-            </button>
-            <button id="settings-btn-export-json" class="btn btn-secondary" title="Export vault as raw JSON">
-              Export Vault (.json)
-            </button>
-            <button id="settings-btn-backup-vault" class="btn btn-ghost" title="Save an in-browser snapshot of your current vault">
-              Snapshot Vault
-            </button>
-          </div>
-        </div>
+      <div class="modal-footer">
+        <button type="button" id="btn-cancel-project-settings" class="btn btn-ghost">Cancel</button>
+        <button type="button" id="btn-save-project-settings" class="btn btn-primary">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Safety Confirmation Dialog for Vault Reset -->
+  <div id="vault-reset-confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title font-cinzel text-danger" id="reset-modal-title">⚠️ Reset Vault?</h3>
+        <button id="btn-close-reset-confirm" class="icon-btn modal-close-btn" title="Cancel (Esc)">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-text" style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+          This operation will permanently delete all chapters, lore, worldbuilding notes, custom map pins, chronology events, and character codices in this browser workspace.
+        </p>
+        <p class="modal-text" style="color: var(--red-400); font-size: 0.82rem; margin-bottom: 0;">
+          <strong>Warning:</strong> This cannot be undone unless you have exported a <code>.spey</code> package backup.
+        </p>
       </div>
       <div class="modal-footer">
-        <button id="btn-save-project-settings" class="btn btn-primary">Save Changes</button>
+        <button type="button" id="btn-cancel-reset-vault" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="btn-confirm-reset-vault" class="btn btn-danger">Confirm Reset (Clear Vault)</button>
       </div>
     </div>
   </div>
