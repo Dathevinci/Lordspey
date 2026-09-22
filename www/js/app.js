@@ -1402,6 +1402,9 @@
   }
 
   function processIncomingSpeyFile(fileOrString, fileName = '') {
+    if (typeof dismissIntroSplash === 'function') {
+      try { dismissIntroSplash(true); } catch (_) {}
+    }
     try {
       if (typeof fileOrString === 'string' || (fileOrString && typeof fileOrString === 'object' && !fileOrString.name && typeof fileOrString.slice !== 'function')) {
         const parsed = Storage.parseSpeyPackage(fileOrString);
@@ -1482,6 +1485,18 @@
   }
 
   function refreshWorkspaceAfterImport() {
+    if (typeof closeMapView === 'function') closeMapView();
+    if (typeof closeTimelineView === 'function') closeTimelineView();
+    if (typeof closeCodexView === 'function') closeCodexView();
+    if (typeof closeGraphView === 'function') closeGraphView();
+    if (typeof closeProjectSettingsModal === 'function') closeProjectSettingsModal();
+    if (typeof closeMetricsModal === 'function') closeMetricsModal();
+    if (typeof closeQuickSwitcher === 'function') closeQuickSwitcher();
+    if (outlineDrawer && !outlineDrawer.classList.contains('hidden')) {
+      if (typeof closeOutlineDrawer === 'function') closeOutlineDrawer();
+      else outlineDrawer.classList.add('hidden');
+    }
+
     renderSidebar();
     renderMainMenuRecent();
     const all = Storage.getAllNotes();
@@ -1579,8 +1594,8 @@
     });
 
     window.addEventListener('dragover', e => {
-      if (e.dataTransfer && e.dataTransfer.types && (e.dataTransfer.types.includes ? e.dataTransfer.types.includes('Files') : true)) {
-        e.preventDefault();
+      e.preventDefault();
+      if (e.dataTransfer) {
         e.dataTransfer.dropEffect = 'copy';
       }
     });

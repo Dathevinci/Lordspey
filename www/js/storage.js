@@ -942,18 +942,19 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
   }
 
   function getWorkspaceStats() {
-    const notes = getAllNotes();
-    const mapPins = getAllMapPins();
-    const timelineEvents = getTimelineEvents();
-    const characters = getCharacters();
-    const relationships = getRelationships();
+    const rawNotes = getAllNotes();
+    const notes = rawNotes.filter(n => n && typeof n === 'object');
+    const mapPins = getAllMapPins().filter(p => p && typeof p === 'object');
+    const timelineEvents = getTimelineEvents().filter(e => e && typeof e === 'object');
+    const characters = getCharacters().filter(c => c && typeof c === 'object');
+    const relationships = getRelationships().filter(r => r && typeof r === 'object');
     const noteCounts = { chapter: 0, lore: 0, world: 0, draft: 0, total: notes.length };
     let wordCount = 0;
     for (const n of notes) {
       if (n.category && noteCounts[n.category] !== undefined) {
         noteCounts[n.category]++;
       }
-      if (n.body && n.body.trim()) {
+      if (typeof n.body === 'string' && n.body.trim()) {
         wordCount += n.body.trim().split(/\s+/).length;
       }
     }
@@ -1014,7 +1015,8 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
 
   function exportSpeyPackage(options = {}) {
     const stats = getWorkspaceStats();
-    const projectTitle = (options.projectTitle && options.projectTitle.trim()) || getProjectTitle();
+    const rawTitle = (options.projectTitle && typeof options.projectTitle === 'string' && options.projectTitle.trim()) || getProjectTitle();
+    const projectTitle = typeof rawTitle === 'string' ? rawTitle.trim() : 'Lord Spey Manuscript';
     const safeBase = projectTitle
       .replace(/[<>:"/\\|?*]/g, '')
       .replace(/\s+/g, '_')
@@ -1109,11 +1111,12 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       throw new Error(val.error);
     }
     const d = val.data;
-    const notes = Array.isArray(d.notes) ? d.notes : [];
-    const mapPins = Array.isArray(d.mapPins) ? d.mapPins : [];
-    const timelineEvents = Array.isArray(d.timelineEvents) ? d.timelineEvents : [];
-    const characters = Array.isArray(d.characters) ? d.characters : [];
-    const relationships = Array.isArray(d.relationships) ? d.relationships : [];
+    const rawNotes = Array.isArray(d.notes) ? d.notes : [];
+    const notes = rawNotes.filter(n => n && typeof n === 'object');
+    const mapPins = Array.isArray(d.mapPins) ? d.mapPins.filter(p => p && typeof p === 'object') : [];
+    const timelineEvents = Array.isArray(d.timelineEvents) ? d.timelineEvents.filter(e => e && typeof e === 'object') : [];
+    const characters = Array.isArray(d.characters) ? d.characters.filter(c => c && typeof c === 'object') : [];
+    const relationships = Array.isArray(d.relationships) ? d.relationships.filter(r => r && typeof r === 'object') : [];
 
     let wordCount = 0;
     if (typeof d.wordCount === 'number') {
@@ -1122,7 +1125,7 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       wordCount = d.stats.wordCount;
     } else {
       for (const n of notes) {
-        if (n && n.body && n.body.trim()) {
+        if (typeof n.body === 'string' && n.body.trim()) {
           wordCount += n.body.trim().split(/\s+/).length;
         }
       }
@@ -1139,7 +1142,13 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       else if (n.category === 'draft') drafts++;
     }
 
-    const title = d.projectName || d.title || (notes.find(n => n.category === 'chapter')?.title) || (notes[0]?.title) || 'Lord Spey Project';
+    const firstChap = notes.find(n => n.category === 'chapter');
+    const firstNote = notes[0];
+    const title = (typeof d.projectName === 'string' && d.projectName.trim()) ||
+      (typeof d.title === 'string' && d.title.trim()) ||
+      (firstChap && typeof firstChap.title === 'string' && firstChap.title.trim()) ||
+      (firstNote && typeof firstNote.title === 'string' && firstNote.title.trim()) ||
+      'Lord Spey Project';
 
     return {
       projectName: title,
@@ -1154,7 +1163,7 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       timelineEventsCount: timelineEvents.length,
       charactersCount: characters.length,
       relationshipsCount: relationships.length,
-      hasCustomMap: !!d.customMapImage,
+      hasCustomMap: typeof d.customMapImage === 'string' && !!d.customMapImage,
       isSpey: !!val.isSpey,
       raw: d
     };
@@ -1175,14 +1184,67 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       _saveCharacters([]);
       _saveRelationships([]);
 
-      const incomingNotes = Array.isArray(d.notes) ? d.notes : [];
-      _saveAll(incomingNotes);
+      const rawNotes = Array.isArray(d.notes) ? d.notes : [];
+      const sanitizedNotes = rawNotes
+        .filter(n => n && typeof n === 'object')
+        .map(n => ({
+          id: n.id || _uid(),
+          title: typeof n.title === 'string' ? n.title : 'Untitled',
+          category: typeof n.category === 'string' ? n.category : 'draft',
+          tags: typeof n.tags === 'string' ? n.tags : '',
+          body: typeof n.body === 'string' ? n.body : '',
+          createdAt: n.createdAt || Date.now(),
+          updatedAt: n.updatedAt || Date.now()
+        }));
+      _saveAll(sanitizedNotes);
 
-      if (Array.isArray(d.mapPins)) _saveMapPins(d.mapPins);
-      if (d.customMapImage) saveCustomMapImage(d.customMapImage);
-      if (Array.isArray(d.timelineEvents)) _saveTimelineEvents(d.timelineEvents);
-      if (Array.isArray(d.characters)) _saveCharacters(d.characters);
-      if (Array.isArray(d.relationships)) _saveRelationships(d.relationships);
+      if (Array.isArray(d.mapPins)) {
+        _saveMapPins(d.mapPins.filter(p => p && typeof p === 'object').map(p => ({
+          id: p.id || _uid(),
+          title: typeof p.title === 'string' ? p.title : 'Pin',
+          category: typeof p.category === 'string' ? p.category : 'world',
+          x: typeof p.x === 'number' ? p.x : 50,
+          y: typeof p.y === 'number' ? p.y : 50,
+          description: typeof p.description === 'string' ? p.description : '',
+          noteId: p.noteId || null
+        })));
+      }
+      if (typeof d.customMapImage === 'string' && d.customMapImage) {
+        saveCustomMapImage(d.customMapImage);
+      }
+      if (Array.isArray(d.timelineEvents)) {
+        _saveTimelineEvents(d.timelineEvents.filter(e => e && typeof e === 'object').map(e => ({
+          id: e.id || _uid(),
+          title: typeof e.title === 'string' ? e.title : 'Milestone',
+          year: typeof e.year === 'string' ? e.year : '',
+          era: typeof e.era === 'string' ? e.era : '',
+          category: typeof e.category === 'string' ? e.category : 'lore',
+          description: typeof e.description === 'string' ? e.description : '',
+          noteId: e.noteId || null
+        })));
+      }
+      if (Array.isArray(d.characters)) {
+        _saveCharacters(d.characters.filter(c => c && typeof c === 'object').map(c => ({
+          id: c.id || _uid(),
+          name: typeof c.name === 'string' ? c.name : 'Unknown',
+          archetype: typeof c.archetype === 'string' ? c.archetype : 'Protagonist',
+          faction: typeof c.faction === 'string' ? c.faction : '',
+          role: typeof c.role === 'string' ? c.role : '',
+          bio: typeof c.bio === 'string' ? c.bio : '',
+          noteId: c.noteId || null
+        })));
+      }
+      if (Array.isArray(d.relationships)) {
+        _saveRelationships(d.relationships.filter(r => r && typeof r === 'object').map(r => ({
+          id: r.id || _uid(),
+          sourceId: r.sourceId || null,
+          sourceName: r.sourceName || '',
+          targetId: r.targetId || null,
+          targetName: r.targetName || '',
+          type: r.type || 'Allied with',
+          description: typeof r.description === 'string' ? r.description : ''
+        })));
+      }
       if (d.settings && typeof d.settings === 'object') {
         const currentSettings = getSettings();
         localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...currentSettings, ...d.settings }));
@@ -1190,24 +1252,38 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       return {
         success: true,
         mode: 'replace',
-        notesCount: incomingNotes.length,
+        notesCount: sanitizedNotes.length,
         summary: parsed
       };
     } else {
       // mode === 'merge'
-      const existingNotes = getAllNotes();
+      const existingNotes = getAllNotes().filter(n => n && typeof n === 'object');
       const existingIds = new Set(existingNotes.map(n => n.id));
+      const noteIdMap = {};
       let addedNotes = 0;
-      const incomingNotes = Array.isArray(d.notes) ? d.notes : [];
+      const rawNotes = Array.isArray(d.notes) ? d.notes : [];
+      const incomingNotes = rawNotes.filter(n => n && typeof n === 'object');
 
       for (const note of incomingNotes) {
-        if (!existingIds.has(note.id)) {
-          existingNotes.push(note);
-          existingIds.add(note.id);
+        const safeNote = {
+          id: note.id || _uid(),
+          title: typeof note.title === 'string' ? note.title : 'Untitled',
+          category: typeof note.category === 'string' ? note.category : 'draft',
+          tags: typeof note.tags === 'string' ? note.tags : '',
+          body: typeof note.body === 'string' ? note.body : '',
+          createdAt: note.createdAt || Date.now(),
+          updatedAt: note.updatedAt || Date.now()
+        };
+
+        if (!existingIds.has(safeNote.id)) {
+          existingNotes.push(safeNote);
+          existingIds.add(safeNote.id);
           addedNotes++;
         } else {
-          // Collision: generate new ID
-          const clone = { ...note, id: _uid() };
+          // Collision: generate new ID and track mapping
+          const newId = _uid();
+          if (note.id) noteIdMap[note.id] = newId;
+          const clone = { ...safeNote, id: newId };
           existingNotes.push(clone);
           existingIds.add(clone.id);
           addedNotes++;
@@ -1215,60 +1291,131 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       }
       _saveAll(existingNotes);
 
-      // Merge map pins
-      const existingPins = getAllMapPins();
+      // Merge map pins with collision remapping & noteId link repair
+      const existingPins = getAllMapPins().filter(p => p && typeof p === 'object');
       const pinIds = new Set(existingPins.map(p => p.id));
       if (Array.isArray(d.mapPins)) {
         for (const p of d.mapPins) {
-          if (!pinIds.has(p.id)) {
-            existingPins.push(p);
-            pinIds.add(p.id);
+          if (!p || typeof p !== 'object') continue;
+          let pinClone = {
+            id: p.id || _uid(),
+            title: typeof p.title === 'string' ? p.title : 'Pin',
+            category: typeof p.category === 'string' ? p.category : 'world',
+            x: typeof p.x === 'number' ? p.x : 50,
+            y: typeof p.y === 'number' ? p.y : 50,
+            description: typeof p.description === 'string' ? p.description : '',
+            noteId: p.noteId || null
+          };
+          if (pinIds.has(pinClone.id)) {
+            pinClone.id = _uid();
           }
+          pinIds.add(pinClone.id);
+          if (pinClone.noteId && noteIdMap[pinClone.noteId]) {
+            pinClone.noteId = noteIdMap[pinClone.noteId];
+          }
+          existingPins.push(pinClone);
         }
         _saveMapPins(existingPins);
       }
 
       // Merge custom map image if current doesn't have one
-      if (!getCustomMapImage() && d.customMapImage) {
+      if (!getCustomMapImage() && typeof d.customMapImage === 'string' && d.customMapImage) {
         saveCustomMapImage(d.customMapImage);
       }
 
-      // Merge timeline events
-      const existingEvents = getTimelineEvents();
+      // Merge timeline events with collision remapping & noteId link repair
+      const existingEvents = getTimelineEvents().filter(e => e && typeof e === 'object');
       const eventIds = new Set(existingEvents.map(e => e.id));
       if (Array.isArray(d.timelineEvents)) {
         for (const ev of d.timelineEvents) {
-          if (!eventIds.has(ev.id)) {
-            existingEvents.push(ev);
-            eventIds.add(ev.id);
+          if (!ev || typeof ev !== 'object') continue;
+          let evClone = {
+            id: ev.id || _uid(),
+            title: typeof ev.title === 'string' ? ev.title : 'Milestone',
+            year: typeof ev.year === 'string' ? ev.year : '',
+            era: typeof ev.era === 'string' ? ev.era : '',
+            category: typeof ev.category === 'string' ? ev.category : 'lore',
+            description: typeof ev.description === 'string' ? ev.description : '',
+            noteId: ev.noteId || null
+          };
+          if (eventIds.has(evClone.id)) {
+            evClone.id = _uid();
           }
+          eventIds.add(evClone.id);
+          if (evClone.noteId && noteIdMap[evClone.noteId]) {
+            evClone.noteId = noteIdMap[evClone.noteId];
+          }
+          existingEvents.push(evClone);
         }
         _saveTimelineEvents(existingEvents);
       }
 
-      // Merge characters
-      const existingChars = getCharacters();
+      // Merge characters with collision remapping & noteId link repair
+      const existingChars = getCharacters().filter(c => c && typeof c === 'object');
       const charIds = new Set(existingChars.map(c => c.id));
-      const charNames = new Set(existingChars.map(c => (c.name || '').trim().toLowerCase()));
+      const charIdMap = {};
       if (Array.isArray(d.characters)) {
         for (const ch of d.characters) {
-          if (!charIds.has(ch.id) && !charNames.has((ch.name || '').trim().toLowerCase())) {
-            existingChars.push(ch);
-            charIds.add(ch.id);
+          if (!ch || typeof ch !== 'object') continue;
+          let chClone = {
+            id: ch.id || _uid(),
+            name: typeof ch.name === 'string' ? ch.name : 'Unknown',
+            archetype: typeof ch.archetype === 'string' ? ch.archetype : 'Protagonist',
+            faction: typeof ch.faction === 'string' ? ch.faction : '',
+            role: typeof ch.role === 'string' ? ch.role : '',
+            bio: typeof ch.bio === 'string' ? ch.bio : '',
+            noteId: ch.noteId || null
+          };
+          const trimmedName = chClone.name.trim().toLowerCase();
+          const existingCharMatch = existingChars.find(c => (c.name || '').trim().toLowerCase() === trimmedName);
+          if (existingCharMatch) {
+            if (ch.id) charIdMap[ch.id] = existingCharMatch.id;
+          } else {
+            if (charIds.has(chClone.id)) {
+              const newId = _uid();
+              if (ch.id) charIdMap[ch.id] = newId;
+              chClone.id = newId;
+            }
+            charIds.add(chClone.id);
+            if (chClone.noteId && noteIdMap[chClone.noteId]) {
+              chClone.noteId = noteIdMap[chClone.noteId];
+            }
+            existingChars.push(chClone);
           }
         }
         _saveCharacters(existingChars);
       }
 
-      // Merge relationships
-      const existingRels = getRelationships();
+      // Merge relationships with remapped character IDs
+      const existingRels = getRelationships().filter(r => r && typeof r === 'object');
       const relKeys = new Set(existingRels.map(r => `${r.sourceId || r.sourceName}->${r.targetId || r.targetName}`));
+      const relIds = new Set(existingRels.map(r => r.id));
       if (Array.isArray(d.relationships)) {
         for (const r of d.relationships) {
-          const k = `${r.sourceId || r.sourceName}->${r.targetId || r.targetName}`;
+          if (!r || typeof r !== 'object') continue;
+          let relClone = {
+            id: r.id || _uid(),
+            sourceId: r.sourceId || null,
+            sourceName: r.sourceName || '',
+            targetId: r.targetId || null,
+            targetName: r.targetName || '',
+            type: r.type || 'Allied with',
+            description: typeof r.description === 'string' ? r.description : ''
+          };
+          if (relClone.sourceId && charIdMap[relClone.sourceId]) {
+            relClone.sourceId = charIdMap[relClone.sourceId];
+          }
+          if (relClone.targetId && charIdMap[relClone.targetId]) {
+            relClone.targetId = charIdMap[relClone.targetId];
+          }
+          const k = `${relClone.sourceId || relClone.sourceName}->${relClone.targetId || relClone.targetName}`;
           if (!relKeys.has(k)) {
-            existingRels.push(r);
+            if (relIds.has(relClone.id)) {
+              relClone.id = _uid();
+            }
+            relIds.add(relClone.id);
             relKeys.add(k);
+            existingRels.push(relClone);
           }
         }
         _saveRelationships(existingRels);

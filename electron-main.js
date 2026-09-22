@@ -7,17 +7,31 @@ let pendingOpenFilePath = null;
 
 function findSpeyArg(args) {
   if (!Array.isArray(args)) return null;
-  return args.find(arg => typeof arg === 'string' && !arg.startsWith('--') && (arg.toLowerCase().endsWith('.spey') || arg.toLowerCase().endsWith('.json')));
+  for (const rawArg of args) {
+    if (typeof rawArg !== 'string') continue;
+    const arg = rawArg.trim().replace(/^["']|["']$/g, '');
+    if (!arg) continue;
+    if (arg.startsWith('--') || arg.startsWith('-') || arg.startsWith('/')) continue;
+    const lower = arg.toLowerCase();
+    if (lower.endsWith('.spey') || lower.endsWith('.json')) {
+      return arg;
+    }
+  }
+  return null;
 }
 
 function sendSpeyFileToWindow(win, filePath) {
   if (!win || !filePath) return;
   try {
-    const fullPath = path.resolve(filePath);
+    const rawPath = typeof filePath === 'string' ? filePath.trim().replace(/^["']|["']$/g, '') : '';
+    if (!rawPath) return;
+    const fullPath = path.resolve(rawPath);
     if (fs.existsSync(fullPath)) {
       const content = fs.readFileSync(fullPath, 'utf8');
       const fileName = path.basename(fullPath);
-      const payload = JSON.stringify({ fileName, content });
+      const payload = JSON.stringify({ fileName, content })
+        .replace(/\u2028/g, '\\u2028')
+        .replace(/\u2029/g, '\\u2029');
       win.webContents.executeJavaScript(
         `if (window.__handleOpenedSpeyFile) { window.__handleOpenedSpeyFile(${payload}); } else { window.__PENDING_SPEY_PAYLOAD__ = ${payload}; }`
       );
@@ -74,11 +88,15 @@ if (!gotSingleInstanceLock) {
     win.loadFile('index.html');
 
     // Handle startup file argument (.spey or .json)
+    let startupFileProcessed = false;
     win.webContents.on('did-finish-load', () => {
-      const startupFile = pendingOpenFilePath || findSpeyArg(process.argv.slice(1));
-      pendingOpenFilePath = null;
-      if (startupFile) {
-        sendSpeyFileToWindow(win, startupFile);
+      if (!startupFileProcessed) {
+        startupFileProcessed = true;
+        const startupFile = pendingOpenFilePath || findSpeyArg(process.argv.slice(1));
+        pendingOpenFilePath = null;
+        if (startupFile) {
+          sendSpeyFileToWindow(win, startupFile);
+        }
       }
     });
 

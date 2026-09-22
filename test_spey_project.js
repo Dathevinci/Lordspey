@@ -132,6 +132,21 @@ const validCheck = Storage.validateSpeyPackage(richPkg);
 assert.strictEqual(validCheck.valid, true);
 assert.strictEqual(validCheck.isSpey, true);
 
+// Resilience with null/empty items in notes and worldbuilding arrays
+const malformedPkg = {
+  format: 'lord-spey-package',
+  version: 1,
+  notes: [null, undefined, { id: 'safe-note', title: 'Safe Note', category: 'chapter', body: 123 }],
+  mapPins: [null],
+  timelineEvents: [null],
+  characters: [null],
+  relationships: [null]
+};
+assert.strictEqual(Storage.validateSpeyPackage(malformedPkg).valid, true);
+const parsedMalformed = Storage.parseSpeyPackage(malformedPkg);
+assert.strictEqual(parsedMalformed.totalNotes, 1, 'Only non-null notes should be counted');
+assert.strictEqual(parsedMalformed.title, 'Safe Note');
+
 // Legacy JSON vault validation
 const legacyCheck = Storage.validateSpeyPackage({ notes: [c1, l1] });
 assert.strictEqual(legacyCheck.valid, true);
@@ -228,6 +243,14 @@ const incomingPkg = {
   ],
   mapPins: [
     {
+      id: pin.id, // collision with existing pin ID
+      title: 'Citadel Gate Colliding Copy',
+      category: 'world',
+      x: 45,
+      y: 80,
+      noteId: c1.id // referencing colliding note
+    },
+    {
       id: 'new-pin',
       title: 'Frozen Pass',
       category: 'world',
@@ -236,9 +259,30 @@ const incomingPkg = {
       description: 'Mountain pass'
     }
   ],
-  timelineEvents: [],
-  characters: [],
-  relationships: []
+  timelineEvents: [
+    {
+      id: evt.id, // collision with existing event ID
+      title: 'The Great Convergence (Variant)',
+      year: 'Year 451',
+      noteId: c1.id // referencing colliding note
+    }
+  ],
+  characters: [
+    {
+      id: char.id, // collision with existing char ID but distinct name
+      name: 'Alden of the High Watch',
+      archetype: 'Ally',
+      noteId: c1.id // referencing colliding note
+    }
+  ],
+  relationships: [
+    {
+      id: 'rel-collab-1',
+      sourceId: char.id, // will be remapped to Alden's new ID
+      targetName: 'Corvus',
+      type: 'Protector of'
+    }
+  ]
 };
 
 const mergeResult = Storage.importSpeyPackage(incomingPkg, 'merge');
@@ -250,9 +294,39 @@ assert.strictEqual(mergeResult.addedNotes, 2);
 const allMerged = Storage.getAllNotes();
 assert.strictEqual(allMerged.length, 6);
 assert(allMerged.some(n => n.title === 'Chapter I: The Basalt Citadel'), 'Original note preserved');
-assert(allMerged.some(n => n.title === 'Chapter I (Collaborator Polish)'), 'Colliding note cloned with new ID');
-assert(allMerged.some(n => n.title === 'Chapter II: The Frozen Pass'), 'New note added');
-assert.strictEqual(Storage.getAllMapPins().length, 2, 'New pin merged with existing pin');
+const clonedNote = allMerged.find(n => n.title === 'Chapter I (Collaborator Polish)');
+assert(clonedNote, 'Colliding note cloned with new ID');
+assert.notStrictEqual(clonedNote.id, c1.id, 'Cloned note must have distinct new ID');
+
+// Verify colliding pin is preserved and its noteId updated to cloned note's new ID
+const allPins = Storage.getAllMapPins();
+assert.strictEqual(allPins.length, 3, 'Both new pin and colliding pin must be merged (none dropped)');
+const collidingPin = allPins.find(p => p.title === 'Citadel Gate Colliding Copy');
+assert(collidingPin, 'Colliding pin must be preserved');
+assert.notStrictEqual(collidingPin.id, pin.id, 'Colliding pin must receive new ID');
+assert.strictEqual(collidingPin.noteId, clonedNote.id, 'Map pin noteId must point to remapped cloned note ID');
+
+// Verify colliding timeline event is preserved and noteId updated
+const allEvents = Storage.getTimelineEvents();
+assert.strictEqual(allEvents.length, 2, 'Colliding timeline event must be preserved');
+const collidingEvt = allEvents.find(e => e.title === 'The Great Convergence (Variant)');
+assert(collidingEvt, 'Colliding timeline event preserved');
+assert.notStrictEqual(collidingEvt.id, evt.id, 'Colliding event receives new ID');
+assert.strictEqual(collidingEvt.noteId, clonedNote.id, 'Timeline event noteId must point to remapped cloned note ID');
+
+// Verify colliding character is preserved and relationships remapped
+const allChars = Storage.getCharacters();
+assert.strictEqual(allChars.length, 2, 'Distinct named character must be merged');
+const remappedChar = allChars.find(c => c.name === 'Alden of the High Watch');
+assert(remappedChar, 'Distinct named character preserved');
+assert.notStrictEqual(remappedChar.id, char.id, 'Colliding character receives new ID');
+assert.strictEqual(remappedChar.noteId, clonedNote.id, 'Character noteId must point to remapped cloned note ID');
+
+const allRels = Storage.getRelationships();
+assert.strictEqual(allRels.length, 2, 'New relationship merged');
+const collabRel = allRels.find(r => r.type === 'Protector of');
+assert(collabRel, 'Relationship preserved');
+assert.strictEqual(collabRel.sourceId, remappedChar.id, 'Relationship sourceId must be remapped to character new ID');
 
 console.log('✓ Merge mode with non-destructive collision resolution verified');
 
@@ -460,6 +534,14 @@ assert(electronMain.includes('requestSingleInstanceLock'), 'electron-main must r
 assert(electronMain.includes('findSpeyArg'), 'electron-main must parse spey arguments');
 assert(electronMain.includes('sendSpeyFileToWindow'), 'electron-main must send spey payload to window');
 assert(electronMain.includes('open-file'), 'electron-main must handle macOS open-file event');
+
+// Evaluate findSpeyArg unit test directly
+const fnSnippet = electronMain.slice(electronMain.indexOf('function findSpeyArg'), electronMain.indexOf('function sendSpeyFileToWindow'));
+const findSpeyArgFn = eval(`(function() { ${fnSnippet}; return findSpeyArg; })()`);
+
+assert.strictEqual(findSpeyArgFn(['--enable-logging', '/prefetch:1', '"C:\\Users\\Author\\LordSpey.spey"']), 'C:\\Users\\Author\\LordSpey.spey', 'findSpeyArg must strip quotes and ignore flags');
+assert.strictEqual(findSpeyArgFn(['-v', 'test.json']), 'test.json', 'findSpeyArg must accept json');
+assert.strictEqual(findSpeyArgFn(['--flag', 'unrelated.txt']), null, 'findSpeyArg must ignore non-spey files');
 
 // AndroidManifest.xml intent filters
 const manifest = fs.readFileSync(path.join(__dirname, 'android/app/src/main/AndroidManifest.xml'), 'utf8');
