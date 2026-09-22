@@ -88,6 +88,46 @@
   const btnImport       = $('#btn-import');
   const importFile      = $('#import-file');
 
+  // .spey Project Package & Settings DOM refs
+  const btnExportSpeySidebar = $('#btn-export-spey');
+  const btnOpenSpeySidebar   = $('#btn-open-spey');
+  const btnProjectSettingsSidebar = $('#btn-project-settings');
+
+  const dashboardBtnExportSpey = $('#dashboard-btn-export-spey');
+  const dashboardBtnOpenSpey   = $('#dashboard-btn-open-spey');
+  const menuBtnExportSpey      = $('#menu-btn-export-spey');
+  const menuBtnOpenSpey        = $('#menu-btn-open-spey');
+  const menuBtnProjectSettings = $('#menu-btn-project-settings');
+
+  const speyImportModal        = $('#spey-import-modal');
+  const btnImportModalClose    = $('#btn-import-modal-close');
+  const speyImportProjName     = $('#spey-import-proj-name');
+  const speyImportFormatTag    = $('#spey-import-format-tag');
+  const speyStatChapters       = $('#spey-stat-chapters');
+  const speyStatWords          = $('#spey-stat-words');
+  const speyStatLore           = $('#spey-stat-lore');
+  const speyStatPins           = $('#spey-stat-pins');
+  const speyBreakdownDetails   = $('#spey-breakdown-details');
+  const btnImportCancel        = $('#btn-import-cancel');
+  const btnImportMerge         = $('#btn-import-merge');
+  const btnImportReplace       = $('#btn-import-replace');
+
+  const projectSettingsModal   = $('#project-settings-modal');
+  const btnCloseProjectSettings = $('#btn-close-project-settings');
+  const settingProjectTitle    = $('#setting-project-title');
+  const settingProjectAuthor   = $('#setting-project-author');
+  const settingsStatsGrid      = $('#settings-stats-grid');
+  const settingsBtnExportSpey  = $('#settings-btn-export-spey');
+  const settingsBtnExportJson  = $('#settings-btn-export-json');
+  const settingsBtnBackupVault = $('#settings-btn-backup-vault');
+  const btnSaveProjectSettings = $('#btn-save-project-settings');
+
+  const speyDropzone           = $('#spey-dropzone');
+
+  if (speyImportModal && speyImportModal.classList) speyImportModal.classList.add('hidden');
+  if (projectSettingsModal && projectSettingsModal.classList) projectSettingsModal.classList.add('hidden');
+  if (speyDropzone && speyDropzone.classList) speyDropzone.classList.add('hidden');
+
   // Find & Replace
   const btnFindToggle   = $('#btn-find-toggle');
   const findReplaceBar  = $('#find-replace-bar');
@@ -725,26 +765,91 @@
       toast('Exported note as Markdown (.md)', 'success');
     });
 
-    // Vault JSON Export / Import
-    btnExport.addEventListener('click', () => {
-      Storage.exportJSON();
-      toast('Vault exported successfully', 'success');
-    });
-    btnImport.addEventListener('click', () => importFile.click());
-    importFile.addEventListener('change', async () => {
-      if (!importFile.files.length) return;
-      try {
-        const added = await Storage.importJSON(importFile.files[0]);
-        toast(`Imported ${added} note(s)`, 'success');
-        renderSidebar();
-        renderMainMenuRecent();
-        const all = Storage.getAllNotes();
-        if (all.length > 0) openNote(all[0].id);
-      } catch {
-        toast('Import failed — invalid JSON format', 'error');
+    // Vault Export & Import
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
+        Storage.exportJSON();
+        toast('Vault exported successfully', 'success');
+      });
+    }
+    if (btnImport) {
+      btnImport.addEventListener('click', handleOpenSpeyFilePicker);
+    }
+
+    // .spey Project Actions
+    if (btnExportSpeySidebar) btnExportSpeySidebar.addEventListener('click', handleExportSpey);
+    if (btnOpenSpeySidebar) btnOpenSpeySidebar.addEventListener('click', handleOpenSpeyFilePicker);
+    if (btnProjectSettingsSidebar) btnProjectSettingsSidebar.addEventListener('click', openProjectSettingsModal);
+
+    if (dashboardBtnExportSpey) dashboardBtnExportSpey.addEventListener('click', handleExportSpey);
+    if (dashboardBtnOpenSpey) dashboardBtnOpenSpey.addEventListener('click', handleOpenSpeyFilePicker);
+    if (menuBtnExportSpey) menuBtnExportSpey.addEventListener('click', handleExportSpey);
+    if (menuBtnOpenSpey) menuBtnOpenSpey.addEventListener('click', handleOpenSpeyFilePicker);
+    if (menuBtnProjectSettings) menuBtnProjectSettings.addEventListener('click', openProjectSettingsModal);
+
+    // Spey Import Confirmation Modal
+    if (btnImportModalClose) btnImportModalClose.addEventListener('click', closeSpeyImportModal);
+    if (btnImportCancel) btnImportCancel.addEventListener('click', closeSpeyImportModal);
+    if (btnImportReplace) btnImportReplace.addEventListener('click', executeImportReplace);
+    if (btnImportMerge) btnImportMerge.addEventListener('click', executeImportMerge);
+    if (speyImportModal) {
+      speyImportModal.addEventListener('click', e => {
+        if (e.target === speyImportModal) closeSpeyImportModal();
+      });
+    }
+
+    // Project Settings Modal
+    if (btnCloseProjectSettings) btnCloseProjectSettings.addEventListener('click', closeProjectSettingsModal);
+    if (btnSaveProjectSettings) btnSaveProjectSettings.addEventListener('click', saveProjectSettings);
+    if (settingsBtnExportSpey) settingsBtnExportSpey.addEventListener('click', handleExportSpey);
+    if (settingsBtnExportJson) {
+      settingsBtnExportJson.addEventListener('click', () => {
+        Storage.exportJSON();
+        toast('Vault exported as JSON', 'success');
+      });
+    }
+    if (settingsBtnBackupVault) {
+      settingsBtnBackupVault.addEventListener('click', () => {
+        Storage.createBackup();
+        toast('Vault snapshot archived in storage', 'success');
+      });
+    }
+    if (projectSettingsModal) {
+      projectSettingsModal.addEventListener('click', e => {
+        if (e.target === projectSettingsModal) closeProjectSettingsModal();
+      });
+    }
+
+    // File Input Handler (Processes .spey & .json with confirmation modal)
+    if (importFile) {
+      importFile.addEventListener('change', () => {
+        if (!importFile.files || !importFile.files.length) return;
+        const file = importFile.files[0];
+        processIncomingSpeyFile(file, file.name);
+        importFile.value = '';
+      });
+    }
+
+    // Drag-and-drop setup
+    setupDragAndDrop();
+
+    // Desktop IPC / process file handler
+    if (typeof window !== 'undefined') {
+      window.__handleOpenedSpeyFile = function(payload) {
+        if (!payload || !payload.content) return;
+        try {
+          processIncomingSpeyFile(payload.content, payload.fileName || 'bundle.spey');
+        } catch (e) {
+          console.error('Error opening spey payload:', e);
+        }
+      };
+
+      if (window.__PENDING_SPEY_PAYLOAD__) {
+        const p = window.__PENDING_SPEY_PAYLOAD__;
+        window.__PENDING_SPEY_PAYLOAD__ = null;
+        window.__handleOpenedSpeyFile(p);
       }
-      importFile.value = '';
-    });
+    }
 
     // Editor inputs → auto-save & metrics & outline
     noteTitle.addEventListener('input', scheduleSave);
@@ -1274,6 +1379,253 @@
     if (metricsModal && !metricsModal.classList.contains('hidden')) {
       renderDetailedMetrics();
     }
+  }
+
+  // ═══════════════════════════════════════════════
+  // .spey Native Project Bundle & Settings Controller
+  // ═══════════════════════════════════════════════
+
+  let pendingSpeyData = null;
+  let isSpeyImportModalOpen = false;
+  let isProjectSettingsModalOpen = false;
+
+  function handleExportSpey() {
+    const pkg = Storage.exportSpeyPackage();
+    const title = pkg.projectName || 'Project';
+    toast(`Exported "${title}.spey" successfully`, 'success');
+  }
+
+  function handleOpenSpeyFilePicker() {
+    if (importFile) {
+      importFile.click();
+    }
+  }
+
+  function processIncomingSpeyFile(fileOrString, fileName = '') {
+    try {
+      if (typeof fileOrString === 'string' || (fileOrString && typeof fileOrString === 'object' && !fileOrString.name && typeof fileOrString.slice !== 'function')) {
+        const parsed = Storage.parseSpeyPackage(fileOrString);
+        pendingSpeyData = parsed;
+        openSpeyImportModal(parsed);
+      } else if (fileOrString && (fileOrString instanceof Blob || typeof fileOrString.slice === 'function')) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = Storage.parseSpeyPackage(reader.result);
+            pendingSpeyData = parsed;
+            openSpeyImportModal(parsed);
+          } catch (err) {
+            toast('Failed to parse file: ' + (err.message || 'invalid format'), 'error');
+          }
+        };
+        reader.onerror = () => toast('Failed to read file', 'error');
+        reader.readAsText(fileOrString);
+      }
+    } catch (err) {
+      toast('Invalid project bundle: ' + (err.message || 'unrecognized package'), 'error');
+    }
+  }
+
+  function openSpeyImportModal(summary) {
+    if (!speyImportModal) return;
+    isSpeyImportModalOpen = true;
+    if (speyImportProjName) speyImportProjName.textContent = summary.projectName || 'Lord Spey Manuscript';
+    if (speyImportFormatTag) speyImportFormatTag.textContent = summary.isSpey ? 'Native .spey Bundle · Version 1' : 'Vault JSON Backup';
+    if (speyStatChapters) speyStatChapters.textContent = String(summary.chapters || 0);
+    if (speyStatWords) speyStatWords.textContent = (summary.wordCount || 0).toLocaleString();
+    if (speyStatLore) speyStatLore.textContent = String(summary.lore || 0);
+    if (speyStatPins) speyStatPins.textContent = String(summary.mapPinsCount || 0);
+
+    if (speyBreakdownDetails) {
+      speyBreakdownDetails.innerHTML = `
+        <div class="spey-breakdown-item"><strong>${summary.totalNotes || 0}</strong> total documents</div>
+        <div class="spey-breakdown-item"><strong>${summary.world || 0}</strong> world realms</div>
+        <div class="spey-breakdown-item"><strong>${summary.drafts || 0}</strong> drafts/outlines</div>
+        <div class="spey-breakdown-item"><strong>${summary.timelineEventsCount || 0}</strong> chronology events</div>
+        <div class="spey-breakdown-item"><strong>${summary.charactersCount || 0}</strong> character dossiers</div>
+        <div class="spey-breakdown-item"><strong>${summary.relationshipsCount || 0}</strong> relationship bonds</div>
+        ${summary.hasCustomMap ? '<div class="spey-breakdown-item">✦ <strong>Custom Cartography Map</strong> included</div>' : ''}
+      `;
+    }
+
+    speyImportModal.classList.remove('hidden');
+  }
+
+  function closeSpeyImportModal() {
+    isSpeyImportModalOpen = false;
+    if (speyImportModal) speyImportModal.classList.add('hidden');
+    pendingSpeyData = null;
+  }
+
+  function executeImportReplace() {
+    if (!pendingSpeyData) return;
+    try {
+      const res = Storage.importSpeyPackage(pendingSpeyData.raw, 'replace', true);
+      toast(`Project "${pendingSpeyData.projectName}" loaded (vault safely archived)`, 'success');
+      closeSpeyImportModal();
+      refreshWorkspaceAfterImport();
+    } catch (err) {
+      toast('Import failed: ' + (err.message || 'unable to load package'), 'error');
+    }
+  }
+
+  function executeImportMerge() {
+    if (!pendingSpeyData) return;
+    try {
+      const res = Storage.importSpeyPackage(pendingSpeyData.raw, 'merge', false);
+      toast(`Merged ${res.addedNotes} item(s) into existing workspace`, 'success');
+      closeSpeyImportModal();
+      refreshWorkspaceAfterImport();
+    } catch (err) {
+      toast('Merge failed: ' + (err.message || 'unable to merge package'), 'error');
+    }
+  }
+
+  function refreshWorkspaceAfterImport() {
+    renderSidebar();
+    renderMainMenuRecent();
+    const all = Storage.getAllNotes();
+    if (all.length > 0) {
+      const firstChap = all.find(n => n.category === 'chapter') || all[0];
+      openNote(firstChap.id);
+    } else {
+      showMainMenu();
+    }
+  }
+
+  function openProjectSettingsModal() {
+    if (!projectSettingsModal) return;
+    isProjectSettingsModalOpen = true;
+    const settings = Storage.getSettings();
+    if (settingProjectTitle) {
+      settingProjectTitle.value = settings.projectTitle || Storage.getProjectTitle();
+    }
+    if (settingProjectAuthor) {
+      settingProjectAuthor.value = settings.projectAuthor || 'Lord Spey';
+    }
+    renderProjectSettingsStats();
+    projectSettingsModal.classList.remove('hidden');
+  }
+
+  function renderProjectSettingsStats() {
+    if (!settingsStatsGrid) return;
+    const stats = Storage.getWorkspaceStats();
+    settingsStatsGrid.innerHTML = `
+      <div class="settings-stat-box">
+        <div class="settings-stat-val">${stats.chapters}</div>
+        <div class="settings-stat-lbl">Chapters</div>
+      </div>
+      <div class="settings-stat-box">
+        <div class="settings-stat-val">${stats.wordCount.toLocaleString()}</div>
+        <div class="settings-stat-lbl">Words</div>
+      </div>
+      <div class="settings-stat-box">
+        <div class="settings-stat-val">${stats.lore}</div>
+        <div class="settings-stat-lbl">Lore Notes</div>
+      </div>
+      <div class="settings-stat-box">
+        <div class="settings-stat-val">${stats.world}</div>
+        <div class="settings-stat-lbl">World Notes</div>
+      </div>
+      <div class="settings-stat-box">
+        <div class="settings-stat-val">${stats.drafts}</div>
+        <div class="settings-stat-lbl">Drafts</div>
+      </div>
+      <div class="settings-stat-box">
+        <div class="settings-stat-val">${stats.mapPins}</div>
+        <div class="settings-stat-lbl">Map Pins</div>
+      </div>
+      <div class="settings-stat-box">
+        <div class="settings-stat-val">${stats.timelineEvents}</div>
+        <div class="settings-stat-lbl">Chronology</div>
+      </div>
+      <div class="settings-stat-box">
+        <div class="settings-stat-val">${stats.characters}</div>
+        <div class="settings-stat-lbl">Characters</div>
+      </div>
+    `;
+  }
+
+  function saveProjectSettings() {
+    if (settingProjectTitle) {
+      Storage.saveSetting('projectTitle', settingProjectTitle.value.trim());
+    }
+    if (settingProjectAuthor) {
+      Storage.saveSetting('projectAuthor', settingProjectAuthor.value.trim());
+    }
+    toast('Project settings saved', 'success');
+    closeProjectSettingsModal();
+  }
+
+  function closeProjectSettingsModal() {
+    isProjectSettingsModalOpen = false;
+    if (projectSettingsModal) projectSettingsModal.classList.add('hidden');
+  }
+
+  function setupDragAndDrop() {
+    if (typeof window === 'undefined') return;
+
+    let dragCounter = 0;
+
+    window.addEventListener('dragenter', e => {
+      if (e.dataTransfer && e.dataTransfer.types && (e.dataTransfer.types.includes ? e.dataTransfer.types.includes('Files') : true)) {
+        e.preventDefault();
+        dragCounter++;
+        if (speyDropzone) {
+          speyDropzone.classList.remove('hidden');
+          speyDropzone.classList.add('active');
+        }
+      }
+    });
+
+    window.addEventListener('dragover', e => {
+      if (e.dataTransfer && e.dataTransfer.types && (e.dataTransfer.types.includes ? e.dataTransfer.types.includes('Files') : true)) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      }
+    });
+
+    window.addEventListener('dragleave', e => {
+      dragCounter--;
+      if (dragCounter <= 0) {
+        dragCounter = 0;
+        if (speyDropzone) {
+          speyDropzone.classList.remove('active');
+          speyDropzone.classList.add('hidden');
+        }
+      }
+    });
+
+    window.addEventListener('drop', e => {
+      e.preventDefault();
+      dragCounter = 0;
+      if (speyDropzone) {
+        speyDropzone.classList.remove('active');
+        speyDropzone.classList.add('hidden');
+      }
+
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        const lowerName = (file.name || '').toLowerCase();
+        if (lowerName.endsWith('.spey') || lowerName.endsWith('.json')) {
+          processIncomingSpeyFile(file, file.name);
+        } else {
+          toast('Please drop a .spey project bundle or .json file', 'info');
+        }
+      }
+    });
+  }
+
+  // Expose methods for testing and integration
+  if (typeof window !== 'undefined') {
+    window.processIncomingSpeyFile = processIncomingSpeyFile;
+    window.openProjectSettingsModal = openProjectSettingsModal;
+    window.closeProjectSettingsModal = closeProjectSettingsModal;
+    window.openSpeyImportModal = openSpeyImportModal;
+    window.closeSpeyImportModal = closeSpeyImportModal;
+    window.handleExportSpey = handleExportSpey;
+    window.executeImportReplace = executeImportReplace;
+    window.executeImportMerge = executeImportMerge;
   }
 
   // ═══════════════════════════════════════════════
@@ -1816,6 +2168,14 @@
     }
     if (tutorialOverlay && !tutorialOverlay.classList.contains('hidden')) {
       closeTutorial();
+      return true;
+    }
+    if (isSpeyImportModalOpen && speyImportModal && !speyImportModal.classList.contains('hidden')) {
+      closeSpeyImportModal();
+      return true;
+    }
+    if (isProjectSettingsModalOpen && projectSettingsModal && !projectSettingsModal.classList.contains('hidden')) {
+      closeProjectSettingsModal();
       return true;
     }
     if (findReplaceBar && !findReplaceBar.classList.contains('hidden')) {

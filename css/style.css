@@ -5003,4 +5003,345 @@ img.map-custom-img[src=""] {
   border-color: #ef4444;
 }
 
+/* ═════════════════════════════════════════════════
+   .spey Project Bundle & Workspace Package Styles
+   ═════════════════════════════════════════════════ */
+
+/* Sidebar Footer Row */
+.sidebar-footer-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+/* Dashboard .spey Banner */
+.menu-spey-banner {
+  margin: 18px 0 24px 0;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(18, 19, 27, 0.85) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+.menu-spey-banner:hover {
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 16px rgba(239, 68, 68, 0.12);
+}
+.menu-spey-banner-left {
+  flex: 1;
+}
+.menu-spey-badge {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--red-400);
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.menu-spey-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  letter-spacing: 0.03em;
+}
+.menu-spey-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+.menu-spey-banner-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.menu-spey-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  padding: 8px 16px;
+  font-weight: 600;
+}
+.menu-sec-highlight {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  color: #fca5a5 !important;
+}
+.menu-sec-highlight:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+/* Import Confirmation Modal */
+.spey-import-card {
+  max-width: 620px;
+  width: 100%;
+}
+.spey-badge {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--red-400);
+  font-weight: 700;
+  display: block;
+  margin-bottom: 2px;
+}
+.spey-project-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 18px;
+}
+.spey-project-emblem {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--red-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.spey-project-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 3px 0;
+}
+.spey-project-tag {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.spey-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.spey-stat-card {
+  background: rgba(16, 17, 24, 0.7);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.spey-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.spey-stat-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.spey-breakdown-details {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+}
+.spey-breakdown-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.spey-breakdown-item strong {
+  color: var(--text-primary);
+}
+.spey-choice-banner {
+  background: rgba(239, 68, 68, 0.08);
+  border-left: 3px solid var(--red-500);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+}
+.spey-choice-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+.spey-choice-desc strong {
+  color: var(--text-primary);
+}
+.spey-import-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Project Settings Modal */
+.project-settings-card {
+  max-width: 580px;
+  width: 100%;
+}
+.settings-modal-badge {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--red-400);
+  font-weight: 700;
+  display: block;
+  margin-bottom: 2px;
+}
+.settings-stats-panel {
+  background: rgba(16, 17, 24, 0.6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin: 18px 0;
+}
+.settings-stats-header {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.settings-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.settings-stat-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  text-align: center;
+}
+.settings-stat-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.settings-stat-lbl {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.settings-export-section {
+  padding: 14px;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-md);
+  margin-top: 14px;
+}
+.settings-section-subtitle {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+.settings-section-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+.settings-action-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Full-Screen Drag and Drop Overlay */
+.spey-dropzone {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(8, 8, 12, 0.88);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: fadeIn 150ms ease;
+}
+.spey-dropzone.active {
+  pointer-events: auto;
+}
+.spey-dropzone-inner {
+  border: 2px dashed rgba(239, 68, 68, 0.6);
+  background: rgba(18, 19, 27, 0.75);
+  border-radius: var(--radius-lg);
+  padding: 48px 64px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(239, 68, 68, 0.2);
+  transform: scale(1);
+  transition: transform 200ms ease, border-color 200ms ease;
+}
+.spey-dropzone-star {
+  font-size: 2.4rem;
+  color: var(--red-400);
+  animation: pulseGlow 1.8s infinite alternate ease-in-out;
+}
+.spey-dropzone-inner h3 {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+.spey-dropzone-inner p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+  .menu-spey-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 14px;
+  }
+  .menu-spey-banner-actions {
+    flex-direction: column;
+  }
+  .spey-stats-grid,
+  .settings-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .spey-import-actions {
+    flex-direction: column-reverse;
+  }
+  .spey-import-actions .btn {
+    width: 100%;
+  }
+}
+
+
 

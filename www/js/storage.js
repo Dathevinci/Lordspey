@@ -923,7 +923,365 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
     return Array.from(map.values());
   }
 
+  // ── Project Metadata & Statistics ──
+
+  function getProjectTitle() {
+    const s = getSettings();
+    if (s && s.projectTitle && s.projectTitle.trim()) {
+      return s.projectTitle.trim();
+    }
+    const notes = getAllNotes();
+    const chapter = notes.find(n => n.category === 'chapter');
+    if (chapter && chapter.title && chapter.title.trim()) {
+      return chapter.title.trim();
+    }
+    if (notes.length > 0 && notes[0].title && notes[0].title.trim()) {
+      return notes[0].title.trim();
+    }
+    return 'Lord Spey Manuscript';
+  }
+
+  function getWorkspaceStats() {
+    const notes = getAllNotes();
+    const mapPins = getAllMapPins();
+    const timelineEvents = getTimelineEvents();
+    const characters = getCharacters();
+    const relationships = getRelationships();
+    const noteCounts = { chapter: 0, lore: 0, world: 0, draft: 0, total: notes.length };
+    let wordCount = 0;
+    for (const n of notes) {
+      if (n.category && noteCounts[n.category] !== undefined) {
+        noteCounts[n.category]++;
+      }
+      if (n.body && n.body.trim()) {
+        wordCount += n.body.trim().split(/\s+/).length;
+      }
+    }
+    return {
+      totalNotes: notes.length,
+      chapters: noteCounts.chapter,
+      lore: noteCounts.lore,
+      world: noteCounts.world,
+      drafts: noteCounts.draft,
+      wordCount,
+      noteCounts,
+      mapPins: mapPins.length,
+      timelineEvents: timelineEvents.length,
+      characters: characters.length,
+      relationships: relationships.length,
+      hasCustomMap: !!getCustomMapImage()
+    };
+  }
+
+  // ── Backup Protection ──
+  const BACKUP_KEY = 'lordspey_vault_backup';
+
+  function createBackup() {
+    const snapshot = {
+      timestamp: new Date().toISOString(),
+      notes: getAllNotes(),
+      mapPins: getAllMapPins(),
+      customMapImage: getCustomMapImage(),
+      timelineEvents: getTimelineEvents(),
+      characters: getCharacters(),
+      relationships: getRelationships(),
+      settings: getSettings()
+    };
+    try {
+      localStorage.setItem(BACKUP_KEY, JSON.stringify(snapshot));
+    } catch (e) {
+      console.warn('Unable to persist backup snapshot to localStorage:', e);
+    }
+    return snapshot;
+  }
+
+  function getVaultBackup() {
+    try {
+      const raw = localStorage.getItem(BACKUP_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function restoreVaultBackup() {
+    const b = getVaultBackup();
+    if (!b) return false;
+    return importSpeyPackage(b, 'replace', false);
+  }
+
   // ── Export / Import ──
+
+  function exportSpeyPackage(options = {}) {
+    const stats = getWorkspaceStats();
+    const projectTitle = (options.projectTitle && options.projectTitle.trim()) || getProjectTitle();
+    const safeBase = projectTitle
+      .replace(/[<>:"/\\|?*]/g, '')
+      .replace(/\s+/g, '_')
+      .trim();
+    const fileName = (safeBase || 'lord-spey-manuscript') + '.spey';
+
+    const pkg = {
+      format: 'lord-spey-package',
+      version: 1,
+      appName: 'Lord Spey',
+      exportedAt: new Date().toISOString(),
+      projectName: projectTitle,
+      title: projectTitle,
+      stats: {
+        totalNotes: stats.totalNotes,
+        chapters: stats.chapters,
+        lore: stats.lore,
+        world: stats.world,
+        drafts: stats.drafts,
+        wordCount: stats.wordCount,
+        mapPins: stats.mapPins,
+        timelineEvents: stats.timelineEvents,
+        characters: stats.characters,
+        relationships: stats.relationships
+      },
+      noteCounts: stats.noteCounts,
+      wordCount: stats.wordCount,
+      notes: getAllNotes(),
+      mapPins: getAllMapPins(),
+      customMapImage: getCustomMapImage(),
+      timelineEvents: getTimelineEvents(),
+      characters: getCharacters(),
+      relationships: getRelationships(),
+      settings: getSettings()
+    };
+
+    const jsonStr = JSON.stringify(pkg, null, 2);
+
+    if (typeof document !== 'undefined' && typeof Blob !== 'undefined' && typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
+      const mimeType = options.mimeType || 'application/x-lord-spey';
+      const blob = new Blob([jsonStr], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    }
+
+    return pkg;
+  }
+
+  function validateSpeyPackage(data) {
+    if (!data || typeof data !== 'object') {
+      return { valid: false, error: 'Data is not an object' };
+    }
+    if (data.format === 'lord-spey-package') {
+      if (!data.version || typeof data.version !== 'number') {
+        return { valid: false, error: 'Invalid or missing package version' };
+      }
+      if (!Array.isArray(data.notes)) {
+        return { valid: false, error: 'Package notes must be an array' };
+      }
+      return { valid: true, isSpey: true, data };
+    }
+    // Backward compatibility with generic vault JSON
+    if (Array.isArray(data.notes)) {
+      return { valid: true, isSpey: false, data };
+    }
+    if (Array.isArray(data)) {
+      return { valid: true, isSpey: false, data: { notes: data } };
+    }
+    return { valid: false, error: 'Unrecognized format: Expected Lord Spey package (.spey) or vault JSON' };
+  }
+
+  function parseSpeyPackage(raw) {
+    let data;
+    if (typeof raw === 'string') {
+      try {
+        data = JSON.parse(raw);
+      } catch (e) {
+        throw new Error('Invalid JSON format: unable to parse project package');
+      }
+    } else if (raw && typeof raw === 'object') {
+      data = raw;
+    } else {
+      throw new Error('Invalid input: expected JSON string or project package object');
+    }
+
+    const val = validateSpeyPackage(data);
+    if (!val.valid) {
+      throw new Error(val.error);
+    }
+    const d = val.data;
+    const notes = Array.isArray(d.notes) ? d.notes : [];
+    const mapPins = Array.isArray(d.mapPins) ? d.mapPins : [];
+    const timelineEvents = Array.isArray(d.timelineEvents) ? d.timelineEvents : [];
+    const characters = Array.isArray(d.characters) ? d.characters : [];
+    const relationships = Array.isArray(d.relationships) ? d.relationships : [];
+
+    let wordCount = 0;
+    if (typeof d.wordCount === 'number') {
+      wordCount = d.wordCount;
+    } else if (d.stats && typeof d.stats.wordCount === 'number') {
+      wordCount = d.stats.wordCount;
+    } else {
+      for (const n of notes) {
+        if (n && n.body && n.body.trim()) {
+          wordCount += n.body.trim().split(/\s+/).length;
+        }
+      }
+    }
+
+    let chapters = 0;
+    let lore = 0;
+    let world = 0;
+    let drafts = 0;
+    for (const n of notes) {
+      if (n.category === 'chapter') chapters++;
+      else if (n.category === 'lore') lore++;
+      else if (n.category === 'world') world++;
+      else if (n.category === 'draft') drafts++;
+    }
+
+    const title = d.projectName || d.title || (notes.find(n => n.category === 'chapter')?.title) || (notes[0]?.title) || 'Lord Spey Project';
+
+    return {
+      projectName: title,
+      title,
+      totalNotes: notes.length,
+      chapters,
+      lore,
+      world,
+      drafts,
+      wordCount,
+      mapPinsCount: mapPins.length,
+      timelineEventsCount: timelineEvents.length,
+      charactersCount: characters.length,
+      relationshipsCount: relationships.length,
+      hasCustomMap: !!d.customMapImage,
+      isSpey: !!val.isSpey,
+      raw: d
+    };
+  }
+
+  function importSpeyPackage(packageInput, mode = 'replace', performBackup = true) {
+    const parsed = parseSpeyPackage(packageInput);
+    const d = parsed.raw;
+
+    if (mode === 'replace') {
+      if (performBackup) {
+        createBackup();
+      }
+      clearAllNotes();
+      _saveMapPins([]);
+      clearCustomMapImage();
+      _saveTimelineEvents([]);
+      _saveCharacters([]);
+      _saveRelationships([]);
+
+      const incomingNotes = Array.isArray(d.notes) ? d.notes : [];
+      _saveAll(incomingNotes);
+
+      if (Array.isArray(d.mapPins)) _saveMapPins(d.mapPins);
+      if (d.customMapImage) saveCustomMapImage(d.customMapImage);
+      if (Array.isArray(d.timelineEvents)) _saveTimelineEvents(d.timelineEvents);
+      if (Array.isArray(d.characters)) _saveCharacters(d.characters);
+      if (Array.isArray(d.relationships)) _saveRelationships(d.relationships);
+      if (d.settings && typeof d.settings === 'object') {
+        const currentSettings = getSettings();
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...currentSettings, ...d.settings }));
+      }
+      return {
+        success: true,
+        mode: 'replace',
+        notesCount: incomingNotes.length,
+        summary: parsed
+      };
+    } else {
+      // mode === 'merge'
+      const existingNotes = getAllNotes();
+      const existingIds = new Set(existingNotes.map(n => n.id));
+      let addedNotes = 0;
+      const incomingNotes = Array.isArray(d.notes) ? d.notes : [];
+
+      for (const note of incomingNotes) {
+        if (!existingIds.has(note.id)) {
+          existingNotes.push(note);
+          existingIds.add(note.id);
+          addedNotes++;
+        } else {
+          // Collision: generate new ID
+          const clone = { ...note, id: _uid() };
+          existingNotes.push(clone);
+          existingIds.add(clone.id);
+          addedNotes++;
+        }
+      }
+      _saveAll(existingNotes);
+
+      // Merge map pins
+      const existingPins = getAllMapPins();
+      const pinIds = new Set(existingPins.map(p => p.id));
+      if (Array.isArray(d.mapPins)) {
+        for (const p of d.mapPins) {
+          if (!pinIds.has(p.id)) {
+            existingPins.push(p);
+            pinIds.add(p.id);
+          }
+        }
+        _saveMapPins(existingPins);
+      }
+
+      // Merge custom map image if current doesn't have one
+      if (!getCustomMapImage() && d.customMapImage) {
+        saveCustomMapImage(d.customMapImage);
+      }
+
+      // Merge timeline events
+      const existingEvents = getTimelineEvents();
+      const eventIds = new Set(existingEvents.map(e => e.id));
+      if (Array.isArray(d.timelineEvents)) {
+        for (const ev of d.timelineEvents) {
+          if (!eventIds.has(ev.id)) {
+            existingEvents.push(ev);
+            eventIds.add(ev.id);
+          }
+        }
+        _saveTimelineEvents(existingEvents);
+      }
+
+      // Merge characters
+      const existingChars = getCharacters();
+      const charIds = new Set(existingChars.map(c => c.id));
+      const charNames = new Set(existingChars.map(c => (c.name || '').trim().toLowerCase()));
+      if (Array.isArray(d.characters)) {
+        for (const ch of d.characters) {
+          if (!charIds.has(ch.id) && !charNames.has((ch.name || '').trim().toLowerCase())) {
+            existingChars.push(ch);
+            charIds.add(ch.id);
+          }
+        }
+        _saveCharacters(existingChars);
+      }
+
+      // Merge relationships
+      const existingRels = getRelationships();
+      const relKeys = new Set(existingRels.map(r => `${r.sourceId || r.sourceName}->${r.targetId || r.targetName}`));
+      if (Array.isArray(d.relationships)) {
+        for (const r of d.relationships) {
+          const k = `${r.sourceId || r.sourceName}->${r.targetId || r.targetName}`;
+          if (!relKeys.has(k)) {
+            existingRels.push(r);
+            relKeys.add(k);
+          }
+        }
+        _saveRelationships(existingRels);
+      }
+
+      return {
+        success: true,
+        mode: 'merge',
+        addedNotes,
+        summary: parsed
+      };
+    }
+  }
 
   function exportJSON() {
     const data = {
@@ -978,36 +1336,11 @@ ${note.body || ''}`;
   function importJSON(file) {
     if (typeof file === 'string' || (file && typeof file === 'object' && typeof file.slice !== 'function' && !file.name)) {
       try {
-        const data = typeof file === 'string' ? JSON.parse(file) : file;
-        const incoming = data.notes || data;
-        if (!Array.isArray(incoming)) throw new Error('Invalid format');
-        const existing = getAllNotes();
-        const existingIds = new Set(existing.map(n => n.id));
-        let added = 0;
-        for (const note of incoming) {
-          if (!existingIds.has(note.id)) {
-            existing.push(note);
-            added++;
-          }
-        }
-        _saveAll(existing);
-
-        if (data.mapPins && Array.isArray(data.mapPins)) {
-          _saveMapPins(data.mapPins);
-        }
-        if (data.timelineEvents && Array.isArray(data.timelineEvents)) {
-          _saveTimelineEvents(data.timelineEvents);
-        }
-        if (data.characters && Array.isArray(data.characters)) {
-          _saveCharacters(data.characters);
-        }
-        if (data.relationships && Array.isArray(data.relationships)) {
-          _saveRelationships(data.relationships);
-        }
-
-        const p = Promise.resolve({ success: true, added });
+        const parsed = parseSpeyPackage(file);
+        const res = importSpeyPackage(parsed.raw, 'merge', false);
+        const p = Promise.resolve({ success: true, added: res.addedNotes !== undefined ? res.addedNotes : res.notesCount });
         p.success = true;
-        p.added = added;
+        p.added = res.addedNotes !== undefined ? res.addedNotes : res.notesCount;
         return p;
       } catch (err) {
         const p = Promise.reject(err);
@@ -1019,34 +1352,9 @@ ${note.body || ''}`;
       const reader = new FileReader();
       reader.onload = () => {
         try {
-          const data = JSON.parse(reader.result);
-          const incoming = data.notes || data;
-          if (!Array.isArray(incoming)) throw new Error('Invalid format');
-          const existing = getAllNotes();
-          const existingIds = new Set(existing.map(n => n.id));
-          let added = 0;
-          for (const note of incoming) {
-            if (!existingIds.has(note.id)) {
-              existing.push(note);
-              added++;
-            }
-          }
-          _saveAll(existing);
-
-          if (data.mapPins && Array.isArray(data.mapPins)) {
-            _saveMapPins(data.mapPins);
-          }
-          if (data.timelineEvents && Array.isArray(data.timelineEvents)) {
-            _saveTimelineEvents(data.timelineEvents);
-          }
-          if (data.characters && Array.isArray(data.characters)) {
-            _saveCharacters(data.characters);
-          }
-          if (data.relationships && Array.isArray(data.relationships)) {
-            _saveRelationships(data.relationships);
-          }
-
-          resolve(added);
+          const parsed = parseSpeyPackage(reader.result);
+          const res = importSpeyPackage(parsed.raw, 'merge', false);
+          resolve(res.addedNotes !== undefined ? res.addedNotes : res.notesCount);
         } catch (err) {
           reject(err);
         }
@@ -1083,9 +1391,21 @@ ${note.body || ''}`;
     getBacklinks,
     getSettings,
     saveSetting,
+    getProjectTitle,
+    getWorkspaceStats,
     exportJSON,
     exportMarkdown,
     importJSON,
+    // .spey Package Architecture & Backup
+    exportSpeyPackage,
+    exportSpey: exportSpeyPackage,
+    validateSpeyPackage,
+    parseSpeyPackage,
+    importSpeyPackage,
+    importSpey: importSpeyPackage,
+    createBackup,
+    getVaultBackup,
+    restoreVaultBackup,
     // Map Pins
     getAllMapPins,
     getMapPins: getAllMapPins,

@@ -105,17 +105,28 @@
     </nav>
 
     <div class="sidebar-footer">
-      <button id="btn-new-note" class="btn btn-primary btn-new" title="Create a new document">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New Note
-      </button>
-      <button id="btn-export" class="icon-btn" title="Export vault as JSON">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      </button>
-      <button id="btn-import" class="icon-btn" title="Import vault from JSON">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      </button>
-      <input type="file" id="import-file" accept=".json" hidden />
+      <div class="sidebar-footer-row">
+        <button id="btn-new-note" class="btn btn-primary btn-new" title="Create a new document">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Note
+        </button>
+        <button id="btn-export-spey" class="icon-btn" title="Export Project (.spey)" aria-label="Export Project (.spey)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        <button id="btn-open-spey" class="icon-btn" title="Open .spey Project" aria-label="Open .spey Project">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </button>
+        <button id="btn-project-settings" class="icon-btn" title="Project Settings &amp; Bundle" aria-label="Project Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button id="btn-export" class="icon-btn visually-hidden" title="Export vault as JSON" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        <button id="btn-import" class="icon-btn visually-hidden" title="Import vault from JSON" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </button>
+      </div>
+      <input type="file" id="import-file" accept=".spey,.json" hidden />
     </div>
   </aside>
 
@@ -171,6 +182,25 @@
           <span class="menu-recent-hint">Resume your latest drafts</span>
         </div>
         <div id="menu-recent-grid" class="menu-recent-grid"></div>
+      </div>
+
+      <!-- Native .spey Project Package Banner -->
+      <div class="menu-spey-banner">
+        <div class="menu-spey-banner-left">
+          <div class="menu-spey-badge font-cinzel">✦ PROJECT PACKAGE (.SPEY)</div>
+          <h4 class="menu-spey-title font-cinzel">Author Workspace Bundle</h4>
+          <p class="menu-spey-desc">Download chapters, lore notes, worldbuilding maps, chronology, and character codex as a single shareable .spey file.</p>
+        </div>
+        <div class="menu-spey-banner-actions">
+          <button id="dashboard-btn-export-spey" class="btn btn-primary menu-spey-action-btn" title="Export complete project as .spey bundle">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Project (.spey)
+          </button>
+          <button id="dashboard-btn-open-spey" class="btn btn-secondary menu-spey-action-btn" title="Open or import a .spey project bundle">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Open .spey Project
+          </button>
+        </div>
       </div>
 
       <!-- Progressive Worldbuilding & Lore Systems Suite -->
@@ -238,6 +268,18 @@
 
       <!-- Minimalist Utility Bar -->
       <div class="menu-secondary-actions">
+        <button class="menu-sec-btn menu-sec-highlight" id="menu-btn-export-spey" title="Export Project (.spey)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export (.spey)
+        </button>
+        <button class="menu-sec-btn" id="menu-btn-open-spey" title="Open .spey Project">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Open (.spey)
+        </button>
+        <button class="menu-sec-btn" id="menu-btn-project-settings" title="Project Title, Details &amp; Settings">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
         <button class="menu-sec-btn" id="menu-btn-switcher" title="Quick Switcher (Ctrl+K)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           Quick Switcher <kbd>Ctrl+K</kbd>
@@ -1308,6 +1350,120 @@
       <div class="modal-actions">
         <button id="btn-dismiss-codex-tutorial" class="btn btn-primary">Got it, Explore Codex</button>
       </div>
+    </div>
+  <!-- Author-Friendly .spey Project Import Confirmation Modal -->
+  <div id="spey-import-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="spey-import-title">
+    <div class="modal-card spey-import-card">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="spey-badge font-cinzel">✦ PROJECT BUNDLE DETECTED</span>
+          <h3 class="modal-title font-cinzel" id="spey-import-title">Open Lord Spey Project</h3>
+        </div>
+        <button id="btn-import-modal-close" class="icon-btn modal-close-btn" title="Cancel &amp; Close (Esc)">✕</button>
+      </div>
+      <div class="modal-body spey-import-body">
+        <div class="spey-project-hero">
+          <div class="spey-project-emblem">✦</div>
+          <div class="spey-project-meta">
+            <h4 class="spey-project-name" id="spey-import-proj-name">Lord Spey Manuscript</h4>
+            <span class="spey-project-tag" id="spey-import-format-tag">Native .spey Bundle · Version 1</span>
+          </div>
+        </div>
+
+        <div class="spey-stats-grid">
+          <div class="spey-stat-card">
+            <span class="spey-stat-value" id="spey-stat-chapters">0</span>
+            <span class="spey-stat-label">Chapters</span>
+          </div>
+          <div class="spey-stat-card">
+            <span class="spey-stat-value" id="spey-stat-words">0</span>
+            <span class="spey-stat-label">Total Words</span>
+          </div>
+          <div class="spey-stat-card">
+            <span class="spey-stat-value" id="spey-stat-lore">0</span>
+            <span class="spey-stat-label">Lore Entries</span>
+          </div>
+          <div class="spey-stat-card">
+            <span class="spey-stat-value" id="spey-stat-pins">0</span>
+            <span class="spey-stat-label">Map Pins</span>
+          </div>
+        </div>
+
+        <div class="spey-breakdown-details" id="spey-breakdown-details">
+          <!-- Populated dynamically with timeline events, characters, custom maps -->
+        </div>
+
+        <div class="spey-choice-banner">
+          <p class="spey-choice-desc">
+            Choose how to open this package. <strong>Open Project (Replace Current Vault)</strong> archives your current vault first so zero work is lost. <strong>Merge with Existing Project</strong> keeps your current documents and appends incoming entries.
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer spey-import-actions">
+        <button id="btn-import-cancel" class="btn btn-ghost">Cancel</button>
+        <button id="btn-import-merge" class="btn btn-secondary">Merge with Existing Project</button>
+        <button id="btn-import-replace" class="btn btn-danger">Open Project (Replace Current Vault)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Settings & Export Modal -->
+  <div id="project-settings-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+    <div class="modal-card project-settings-card">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="settings-modal-badge font-cinzel">✦ PROJECT CONFIGURATION</span>
+          <h3 class="modal-title font-cinzel" id="settings-modal-title">Project Settings &amp; Bundle</h3>
+        </div>
+        <button id="btn-close-project-settings" class="icon-btn modal-close-btn" title="Close (Esc)">✕</button>
+      </div>
+      <div class="modal-body settings-modal-body">
+        <div class="form-group">
+          <label class="form-label" for="setting-project-title">Project Title</label>
+          <input type="text" id="setting-project-title" class="form-input" placeholder="e.g. The Obsidian Gate, Chronicles of Spey" autocomplete="off" />
+          <span class="form-hint">Used for .spey package exports and workspace metadata.</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="setting-project-author">Author / Byline</label>
+          <input type="text" id="setting-project-author" class="form-input" placeholder="e.g. Lord Spey" autocomplete="off" />
+        </div>
+
+        <div class="settings-stats-panel">
+          <div class="settings-stats-header">Current Workspace Overview</div>
+          <div class="settings-stats-grid" id="settings-stats-grid">
+            <!-- Dynamically populated stats -->
+          </div>
+        </div>
+
+        <div class="settings-export-section">
+          <h4 class="settings-section-subtitle">Workspace Export &amp; Backup</h4>
+          <p class="settings-section-desc">Download a complete .spey bundle to share with other authors or archive your worldbuilding notes and drafts.</p>
+          <div class="settings-action-row">
+            <button id="settings-btn-export-spey" class="btn btn-primary" title="Export complete project as .spey bundle">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export Project (.spey)
+            </button>
+            <button id="settings-btn-export-json" class="btn btn-secondary" title="Export vault as raw JSON">
+              Export Vault (.json)
+            </button>
+            <button id="settings-btn-backup-vault" class="btn btn-ghost" title="Save an in-browser snapshot of your current vault">
+              Snapshot Vault
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-save-project-settings" class="btn btn-primary">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drag-and-drop .spey File Overlay -->
+  <div id="spey-dropzone" class="spey-dropzone hidden" aria-hidden="true">
+    <div class="spey-dropzone-inner">
+      <div class="spey-dropzone-star">✦</div>
+      <h3 class="font-cinzel">Drop .spey Project Here</h3>
+      <p>Release to inspect and open author workspace bundle</p>
     </div>
   </div>
 
