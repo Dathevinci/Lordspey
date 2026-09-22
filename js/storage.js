@@ -21,74 +21,320 @@ const Storage = (() => {
   // Optional starter data for inspiration (only loaded if user explicitly requests it)
   const STARTER_NOTES = [
     {
+      id: 'demo-chap-prologue',
+      title: 'Prologue: The Veil of Embers',
+      category: 'chapter',
+      tags: 'act-1, prologue, manuscript, convergence',
+      body: `# Prologue: The Veil of Embers
+
+The obsidian bell in the celestial spire tolled midnight, shivering across the frozen crags of [[The Ashen Vale]] like a dying pulse.
+
+Vespera pulled her wool mantle tight against the piercing alpine wind. Far below, in the shadows of [[The Obsidian Gate]], torches flickered as the sentinels prepared for the convergence.
+
+— Keep your gaze upon the third star, Vespera, — muttered [[Lord Commander Corvus]], his hand resting lightly upon the pommel of his veilblade. — The sky does not forgive hesitation.
+
+— The seals have held for five centuries, Commander, — she replied softly, her fingers tracing the brass casing of [[The Star Astrolabe]]. — Why would tonight be any different?
+
+— Because tonight, ==the third star bleeds crimson across the snow==.
+
+* * *
+
+> [!NOTE]
+> The convergence occurs once every half-millennium, when the twin celestial moons align directly over the zenith of [[The Obsidian Spire & Gate]].
+
+Corvus unrolled a weathered parchment upon the stone balustrade, pointing with a gloved finger toward the planetary alignments[^1]:
+
+| Celestial Sphere | Orbital Alignment | Ascendant Influence |
+| :--- | :---: | ---: |
+| The Obsidian Moon | 45° Zenith | Wards of [[The Obsidian Gate]] |
+| The Blood Comet | 12° Nadir | Seismo-arcana in [[The Ashen Vale]] |
+| The Primordial Star | Absolute Apex | Catalyst of the Veil Seal |
+
+— We thought ~~the ancient treaties will protect us~~ from external greed, — Corvus spat into the howling wind. — But [[High Inquisitor Malakor]] does not honor treaties written by scholars. His vanguard left [[The Sunken Bastion]] before dusk.
+
+Vespera turned the central dial of the astrolabe. A sharp click resonated through the metal—the first ward had begun to dissolve.
+
+* * *
+
+> [!QUOTE]
+> *"When the veil thins to silk, those who hunger for fire shall feast upon the ashes of our citadel."*
+> — Chrono-Archive Codex, Year 120
+
+Tonight's vigil demanded three non-negotiable objectives:
+- [x] Ascend to the High Observatory of [[The Obsidian Spire & Gate]]
+- [x] Calibrate [[The Star Astrolabe]] against the midnight alignment
+- [ ] Safeguard the archive ciphers before the Iron Tribunal arrives
+
+[^1]: Recorded in the astronomical scrolls deciphered by [[Scholar Lyra]] during the Year 340 celestial survey.`,
+      createdAt: Date.now() - 86400000 * 4,
+      updatedAt: Date.now() - 86400000 * 4,
+    },
+    {
       id: 'demo-chap-1',
       title: 'Chapter I: The Obsidian Gate',
       category: 'chapter',
-      tags: 'act-1, prose, prologue',
+      tags: 'act-1, chapter-1, manuscript, infiltration',
       body: `# Chapter I: The Obsidian Gate
 
-The bell in the high spire tolled midnight, shivering across the valley like a dying pulse.
+The iron-reinforced portcullis shivered as a concussive shockwave rippled through the subterranean tunnels of [[The Ashen Vale]].
 
-Vespera tightened her cloak against the cold wind rising from [[The Ashen Vale]]. Far below, torches flickered where the acolytes prepared for the convergence.
+— Bar the secondary gates! — shouted [[Lord Commander Corvus]], his voice cutting through the panic echoing down the arched stone corridors. — [[The Order of Lore]] will not yield this sanctuary while breath remains in our lungs!
 
-> *"When the third star bleeds into the veil, that which was sealed shall awaken."*
+Vespera sprinted past the scriptorium, clutching [[The Star Astrolabe]] close against her ribs. The brass rings were burning hot, humming with harmonic resonance as the celestial seal began its unraveling.
 
-Tonight's vigil demanded three steps:
-- [x] Secure the high observatory
-- [x] Decrypt the ancient seal
-- [ ] Retrieve the star astrolabe before the inquisitors arrive
+> [!WARNING]
+> High Inquisitor Malakor's siege engines have breached the outer perimeter wall of [[The Obsidian Spire & Gate]]. Inquisitorial skirmishers are within the lower ramparts.
 
-Corvus approached from the shadow of the archway, his blade drawn. "[[The Order of Lore]] is no longer alone in these mountains."`,
+She reached the threshold of the Grand Vault. [[Scholar Lyra]] was frantically gathering illuminated parchment folios into leather travel cases.
+
+— Lyra! Have you decoded the final quadrant? — Vespera gasped, leaning against the cold stone lintel.
+
+— Almost, — Lyra answered without looking up, her quill scratching fiercely across the vellum[^1]. — The cipher requires three separate harmonics. Corvus holds the iron key, but the astrological vector points straight toward [[The Sunken Bastion]]!
+
+* * *
+
+| Garrison Defense Sector | Commander | Defensive Status |
+| :--- | :--- | :--- |
+| Upper Celestial Apex | [[Scholar Lyra]] | Intact (Archive evacuation underway) |
+| Obsidian Gate Arch | [[Lord Commander Corvus]] | Engaged with [[High Inquisitor Malakor]] |
+| Lower Subterranean Sluice | Sentinel Cohort IV | Compromised (Hostiles advancing) |
+
+* * *
+
+From the parapet above, the horn of the Iron Tribunal blared—a low, mournful drone that rattled the stained glass windows.
+
+— Go, Vespera! — Lyra pleaded, shoving the cipher scroll into Vespera's satchel. — If [[High Inquisitor Malakor]] claims the astrolabe, the entire valley will burn in celestial fire. You must take the mountain trail toward [[The Ashen Vale]]!
+
+Vespera hesitated for a fraction of a heartbeat, then gripped her cloak and turned toward the shadowed escape tunnel.
+
+[^1]: The decipherment uses the dual-alphabet transcription established in [[Story Beats & Master Arc]].`,
       createdAt: Date.now() - 86400000 * 3,
       updatedAt: Date.now() - 86400000 * 3,
     },
     {
-      id: 'demo-lore-1',
+      id: 'demo-lore-order',
       title: 'The Order of Lore',
       category: 'lore',
-      tags: 'factions, magic, lore',
+      tags: 'faction, monastics, archives, veil-keepers',
       body: `# The Order of Lore
 
-An ancient monastic fellowship dedicated to preserving forbidden manuscripts and cosmic history.
+An ancient monastic fellowship established in Year 120, dedicated to safeguarding forbidden celestial knowledge, astro-arcana, and cosmic chronicles.
+
+> [!NOTE]
+> Headquartered at [[The Obsidian Spire & Gate]] high above [[The Ashen Vale]], the Order operates as neutral custodians of cosmic history.
 
 ---
 
-### Core Tenets
-1. **The Inviolable Word** — Truth must be transcribed regardless of the empire it unseats.
-2. **The Silent Vigil** — Watch from the heights of [[The Ashen Vale]]; intervene only when the cosmic seals weaken.
+### Sacred Hierarchy & Offices
 
-### Key Figures
-- **Vespera** — Protagonist of [[Chapter I: The Obsidian Gate]].
-- **Lord Commander Corvus** — Master of the Veilblades.`,
+| Title / Rank | Bearer | Primary Responsibility |
+| :--- | :--- | :--- |
+| Lord Commander | [[Lord Commander Corvus]] | Guardian of the Citadel & Master of Veilblades |
+| Chief Astromancer | [[Scholar Lyra]] | Stellar cartography, ciphers & seal prognostication |
+| Acolyte of the Veil | [[Vespera]] | Field recovery & custodian of [[The Star Astrolabe]] |
+
+### Core Tenets
+
+1. **The Inviolable Word** — Truth must be transcribed and preserved, regardless of the empire it threatens or unseats.
+2. **The Vigil of the Veil** — Monitor celestial anomalies from the heights; intervene only when the cosmic seals weaken.
+3. **The Silent Custody** — No celestial relic, specifically [[The Star Astrolabe]], may ever be wielded as an offensive weapon of conquest.
+
+### Historical Conflicts
+- **The Iron Schism (Year 312)** — Former brother [[High Inquisitor Malakor]] fractured the fellowship, departing to establish the militaristic Iron Tribunal at [[The Sunken Bastion]].
+- **The Midnight Convergence (Year 342)** — Chronicled in [[Prologue: The Veil of Embers]] and [[Chapter I: The Obsidian Gate]].`,
       createdAt: Date.now() - 86400000 * 2,
       updatedAt: Date.now() - 86400000 * 2,
     },
     {
-      id: 'demo-world-1',
+      id: 'demo-lore-astrolabe',
+      title: 'The Star Astrolabe',
+      category: 'lore',
+      tags: 'artifact, relic, celestial, magic',
+      body: `# The Star Astrolabe
+
+A masterwork brass and obsidian instrument forged during the First Age of Foundations, capable of reading and manipulating the celestial wards that bind the Veil.
+
+> [!QUOTE]
+> *"To hold the astrolabe is to feel the heartbeat of stars long dead."*
+> — [[Scholar Lyra]], *Treatise on Astro-Resonance*
+
+---
+
+### Mechanical & Arcane Properties
+
+- **Nested Concentric Rings**: Seven rings of blackened bronze, engraved with astronomical runes that align with stellar coordinates.
+- **Resonance Core**: Contains a sliver of meteorite harvested from the impact crater in [[The Ashen Vale]].
+- **Cipher Decryption**: Automatically aligns with [[The Obsidian Spire & Gate]] to project real-time celestial coordinates.
+
+### Current Custody & Conflict
+
+| Attribute | Detail |
+| :--- | :--- |
+| **Current Bearer** | [[Vespera]] (Acolyte of [[The Order of Lore]]) |
+| **Primary Threat** | [[High Inquisitor Malakor]], seeking to weaponize its celestial harmonics |
+| **Key Narrative Role** | Featured prominently in [[Prologue: The Veil of Embers]] and [[Chapter I: The Obsidian Gate]] |
+
+* * *
+
+> [!WARNING]
+> If all seven rings align without the counterbalance key held by [[Lord Commander Corvus]], the resulting harmonic wave could shatter the geological foundations of the entire valley.`,
+      createdAt: Date.now() - 86400000 * 2,
+      updatedAt: Date.now() - 86400000 * 2,
+    },
+    {
+      id: 'demo-world-vale',
       title: 'The Ashen Vale',
       category: 'world',
-      tags: 'geography, worldbuilding, map',
+      tags: 'geography, region, highlands, basin',
       body: `# The Ashen Vale
 
-A highland territory situated at the convergence of the Three Moons, shrouded in perpetual twilight.
+A rugged highland basin situated at the convergence of three mountain ranges, shrouded in perpetual twilight and geothermal mist.
 
-## Key Landmarks
-- **The Obsidian Spire**: Houses the highest observatory of [[The Order of Lore]].
-- **The Bleeding Chasm**: A geothermal fissure glowing with ruby radiance at midnight.`,
+---
+
+### Regional Geography & Topography
+
+The Vale sits at an altitude of 3,200 paces, surrounded by jagged basalt cliffs. Volcanic vents release mineral-rich vapors that produce a constant silvery haze across the tundra.
+
+\`\`\`
+       [The Obsidian Spire & Gate] (North Peak)
+                     |
+            (The Alpine Switchbacks)
+                     |
+              [The Ashen Vale Basin]
+             /                      \\
+            /                        \\
+[The Sunken Bastion] (West)    [The Bleeding Chasm] (East)
+\`\`\`
+
+### Key Landmarks & Outposts
+
+| Landmark | Coordinates / Sector | Primary Occupants |
+| :--- | :--- | :--- |
+| [[The Obsidian Spire & Gate]] | Northern Crags | [[The Order of Lore]], [[Lord Commander Corvus]] |
+| [[The Sunken Bastion]] | Western Gorge | Iron Tribunal, [[High Inquisitor Malakor]] |
+| **The Bleeding Chasm** | Eastern Fissures | Wild geomantic spirits & mineral prospectors |
+
+### Narrative Significance
+The Vale serves as the central theater of operations across [[Prologue: The Veil of Embers]], [[Chapter I: The Obsidian Gate]], and future journeys planned in [[Story Beats & Master Arc]].`,
       createdAt: Date.now() - 86400000 * 1,
       updatedAt: Date.now() - 86400000 * 1,
     },
     {
-      id: 'demo-draft-1',
-      title: 'Story Beats & Scene Outlines',
-      category: 'draft',
-      tags: 'outline, planning, draft',
-      body: `# Story Beats & Scene Outlines
+      id: 'demo-world-spire',
+      title: 'The Obsidian Spire & Gate',
+      category: 'world',
+      tags: 'fortress, architecture, observatory, landmark',
+      body: `# The Obsidian Spire & Gate
 
-### Milestone Checklist
-- [x] Establish the opening atmosphere in [[Chapter I: The Obsidian Gate]]
-- [ ] Outline the conflict with the Inquisition
-- [ ] Describe the descent into [[The Ashen Vale]]`,
+A towering mountain fortress carved directly from a single monolith of volcanic glass, serving as the high seat of [[The Order of Lore]].
+
+---
+
+### Bastion Architecture
+
+The structure spans nine tiers divided across three vertical defensive zones:
+
+| Level | Sector | Function & Personnel |
+| :--- | :--- | :--- |
+| **Apex (Tier 7–9)** | High Celestial Observatory | Astrolabe chamber, stellar telescopes, [[Scholar Lyra]] |
+| **Mid-Barrows (Tier 4–6)** | The Grand Scriptorium & Scriptorium Vaults | Ancient manuscripts, archive monks, [[Vespera]] |
+| **Ramparts (Tier 1–3)** | [[The Obsidian Gate]] & Outer Barbican | Defensive portcullis, curtain walls, [[Lord Commander Corvus]] |
+
+* * *
+
+> [!NOTE]
+> The outer gate is reinforced with anti-arcane iron bands that can withstand direct seismic shocks from the geothermal fissures of [[The Ashen Vale]].
+
+### Recent Events
+Under active siege by [[High Inquisitor Malakor]] during the events of [[Chapter I: The Obsidian Gate]].`,
+      createdAt: Date.now() - 86400000 * 1,
+      updatedAt: Date.now() - 86400000 * 1,
+    },
+    {
+      id: 'demo-world-bastion',
+      title: 'The Sunken Bastion',
+      category: 'world',
+      tags: 'ruins, subterranean, inquisition, outpost',
+      body: `# The Sunken Bastion
+
+An ancient subterranean stronghold carved into the western gorge of [[The Ashen Vale]], currently occupied by the Iron Inquisition.
+
+---
+
+### Strategic Importance
+
+Constructed centuries before the founding of [[The Order of Lore]], this sunken fortress is buried beneath three strata of solid granite, making it invulnerable to aerial bombardment and astronomical divinations.
+
+> [!DANGER]
+> The Bastion houses Malakor's siege engines, alchemical laboratories, and interrogation cells.
+
+### Key Figures & Operations
+
+- **Commanding Officer**: [[High Inquisitor Malakor]]
+- **Mission Directive**: Locate and seize [[The Star Astrolabe]] from [[Vespera]]
+- **Vanguard Status**: Deployed troops toward [[The Obsidian Spire & Gate]] as depicted in [[Prologue: The Veil of Embers]]
+
+* * *
+
+### Secret Passages
+Historical notes in [[World Secrets & Codex Notes]] suggest a forgotten aqueduct connects the lower dungeons directly to the subterranean sluice of [[The Obsidian Gate]].`,
+      createdAt: Date.now() - 86400000 * 1,
+      updatedAt: Date.now() - 86400000 * 1,
+    },
+    {
+      id: 'demo-draft-master',
+      title: 'Story Beats & Master Arc',
+      category: 'draft',
+      tags: 'outline, story-structure, pacing, checklist',
+      body: `# Story Beats & Master Arc
+
+Working outline and structural roadmap for the manuscript.
+
+---
+
+### Act I: The Convergence Broken
+- [x] **Scene 1 (Prologue)**: Introduce [[Vespera]] and [[Lord Commander Corvus]] atop the spire. Establish the midnight omen in [[Prologue: The Veil of Embers]].
+- [x] **Scene 2 (Chapter 1)**: Siege begins. Inquisitorial breach at [[The Obsidian Gate]]. Vespera flees with [[The Star Astrolabe]] in [[Chapter I: The Obsidian Gate]].
+- [ ] **Scene 3 (Chapter 2)**: The perilous descent into the misty tundra of [[The Ashen Vale]].
+- [ ] **Scene 4 (Chapter 3)**: Ambush at the mountain switchbacks by Inquisitor skirmishers.
+
+### Act II: The Shattered Citadel
+- [ ] **Midpoint Turn**: Vespera discovers that [[High Inquisitor Malakor]] and Corvus share a blood covenant.
+- [ ] Infiltration of [[The Sunken Bastion]] to rescue captured scholars from [[The Order of Lore]].
+- [ ] Astrological breakthrough deciphered by [[Scholar Lyra]].
+
+* * *
+
+> [!TIP]
+> **Pacing Goal:** Maintain tense, claustrophobic atmosphere during subterranean chapters before opening out onto the sweeping frozen vistas of the Vale.`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    },
+    {
+      id: 'demo-draft-secrets',
+      title: 'World Secrets & Codex Notes',
+      category: 'draft',
+      tags: 'brainstorm, secrets, spoilers, lore-notes',
+      body: `# World Secrets & Codex Notes
+
+Confidential author reference sheet for character backstories, plot twists, and hidden lore connections.
+
+---
+
+### The Malakor–Corvus Schism
+- [[High Inquisitor Malakor]] and [[Lord Commander Corvus]] were inducted into [[The Order of Lore]] on the exact same winter solstice in Year 290.
+- Malakor did not abandon the Order out of malice; he believed that passive monastic observation would allow the celestial seals to burn away the mortal realm.
+- Corvus continues to wear an iron ring that mirrors Malakor's insignia.
+
+### The Astrolabe's True Nature
+- [[The Star Astrolabe]] is not merely a tracking compass; it is the physical ignition key for the celestial wards sealing the primordial chasm beneath [[The Ashen Vale]].
+- If [[Vespera]] aligns the final ring, the veil does not close—it releases the stored celestial energy into whoever holds the brass cylinder.
+
+* * *
+
+> [!NOTE]
+> Review [[Story Beats & Master Arc]] to ensure these reveals are seeded with subtle foreshadowing in early dialogues.`,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     }
@@ -113,11 +359,21 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       createdAt: Date.now() - 86400000 * 3
     },
     {
+      id: 'pin-spire',
+      x: 52.0,
+      y: 24.8,
+      noteId: 'demo-world-spire',
+      title: 'The Obsidian Spire & Observatory',
+      category: 'world',
+      description: 'Nine-tiered volcanic monolith housing the celestial astrolabe chambers.',
+      createdAt: Date.now() - 86400000 * 3
+    },
+    {
       id: 'pin-order',
       x: 64.2,
       y: 53.6,
-      noteId: 'demo-lore-1',
-      title: 'The Order of Lore',
+      noteId: 'demo-lore-order',
+      title: 'The Order of Lore Citadel',
       category: 'lore',
       description: 'Ancient monastic citadel safeguarding forbidden manuscripts and cosmic history.',
       createdAt: Date.now() - 86400000 * 2
@@ -126,10 +382,30 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       id: 'pin-vale',
       x: 37.8,
       y: 67.4,
-      noteId: 'demo-world-1',
-      title: 'The Ashen Vale',
+      noteId: 'demo-world-vale',
+      title: 'The Ashen Vale Basin',
       category: 'world',
-      description: 'Twilight highland territory shrouded in perpetual mist at the Three Moons convergence.',
+      description: 'Twilight highland territory shrouded in perpetual geothermal mist.',
+      createdAt: Date.now() - 86400000 * 1
+    },
+    {
+      id: 'pin-bastion',
+      x: 24.5,
+      y: 41.0,
+      noteId: 'demo-world-bastion',
+      title: 'The Sunken Bastion',
+      category: 'world',
+      description: 'Subterranean fortress occupied by High Inquisitor Malakor and the Iron Tribunal.',
+      createdAt: Date.now() - 86400000 * 1
+    },
+    {
+      id: 'pin-chasm',
+      x: 78.2,
+      y: 72.5,
+      noteId: 'demo-world-vale',
+      title: 'The Bleeding Chasm',
+      category: 'world',
+      description: 'Geothermal fissure glowing with ruby celestial radiance at midnight.',
       createdAt: Date.now() - 86400000 * 1
     }
   ];
@@ -141,29 +417,49 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       era: 'Age of Foundations',
       title: 'The Sealing of the Veil',
       description: 'Monastic scholars establish celestial wards across the mountain peaks.',
-      noteId: 'demo-lore-1',
+      noteId: 'demo-lore-order',
       category: 'lore',
-      createdAt: Date.now() - 86400000 * 3
+      createdAt: Date.now() - 86400000 * 4
     },
     {
       id: 'evt-2',
       year: 'Year 240',
       era: 'Era of the Moons',
-      title: 'Construction of High Spire',
+      title: 'Construction of the High Spire',
       description: 'The Order completes the celestial observatory overlooking The Ashen Vale.',
-      noteId: 'demo-world-1',
+      noteId: 'demo-world-spire',
+      category: 'world',
+      createdAt: Date.now() - 86400000 * 3
+    },
+    {
+      id: 'evt-3',
+      year: 'Year 312',
+      era: 'The Iron Schism',
+      title: 'Fracture of the Iron Tribunal',
+      description: 'High Inquisitor Malakor breaks from the Order and fortifies The Sunken Bastion.',
+      noteId: 'demo-world-bastion',
       category: 'world',
       createdAt: Date.now() - 86400000 * 2
     },
     {
-      id: 'evt-3',
+      id: 'evt-4',
       year: 'Year 342',
       era: 'The Convergence',
-      title: 'The Fall of the Gate',
-      description: 'The third star bleeds into the veil; inquisitors approach the mountain pass.',
-      noteId: 'demo-chap-1',
+      title: 'The Bleeding Sky Omen',
+      description: 'The third star bleeds into the veil; the midnight vigil begins atop the spire.',
+      noteId: 'demo-chap-prologue',
       category: 'chapter',
       createdAt: Date.now() - 86400000 * 1
+    },
+    {
+      id: 'evt-5',
+      year: 'Year 342 (Winter)',
+      era: 'The Convergence',
+      title: 'Breach of the Obsidian Gate',
+      description: 'Inquisitorial vanguard attacks the lower ramparts; Vespera escapes with the astrolabe.',
+      noteId: 'demo-chap-1',
+      category: 'chapter',
+      createdAt: Date.now()
     }
   ];
 
@@ -175,9 +471,9 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       faction: 'The Order of Lore',
       role: 'Acolyte of the Veil',
       status: 'Active',
-      noteId: 'demo-chap-1',
-      bio: 'Bearer of the nocturnal astrolabe, bound to decrypt the ancient seal during convergence.',
-      createdAt: Date.now() - 86400000 * 3
+      noteId: 'demo-chap-prologue',
+      bio: 'Bearer of the nocturnal astrolabe, bound to decrypt the celestial seals before the Inquisition breaches the sanctuary.',
+      createdAt: Date.now() - 86400000 * 4
     },
     {
       id: 'char-corvus',
@@ -186,9 +482,31 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       faction: 'The Order of Lore',
       role: 'Master of the Veilblades',
       status: 'Active',
-      noteId: 'demo-lore-1',
-      bio: 'Veteran defender protecting the archives against inquisitorial incursions.',
+      noteId: 'demo-lore-order',
+      bio: 'Veteran defender protecting the archives; swore a blood vow to protect Vespera and the astrolabe.',
+      createdAt: Date.now() - 86400000 * 3
+    },
+    {
+      id: 'char-malakor',
+      name: 'High Inquisitor Malakor',
+      archetype: 'Antagonist',
+      faction: 'The Iron Inquisition',
+      role: 'Grand Inquisitor of the Sunken Bastion',
+      status: 'Hostile',
+      noteId: 'demo-world-bastion',
+      bio: 'Ruthless commander seeking to unbind the primordial seals to harness celestial fire.',
       createdAt: Date.now() - 86400000 * 2
+    },
+    {
+      id: 'char-lyra',
+      name: 'Scholar Lyra',
+      archetype: 'Ally',
+      faction: 'The Order of Lore',
+      role: 'Chief Astromancer',
+      status: 'Active',
+      noteId: 'demo-lore-astrolabe',
+      bio: 'Brilliant celestial cartographer who decoded the astrolabe cipher quadrants.',
+      createdAt: Date.now() - 86400000 * 1
     }
   ];
 
@@ -199,7 +517,31 @@ A highland territory situated at the convergence of the Three Moons, shrouded in
       targetId: 'char-corvus',
       type: 'Mentor to',
       description: 'Corvus trained Vespera in defensive arts and safeguarding the astrolabe.',
+      createdAt: Date.now() - 86400000 * 3
+    },
+    {
+      id: 'rel-2',
+      sourceId: 'char-corvus',
+      targetId: 'char-malakor',
+      type: 'Nemesis of',
+      description: 'Former comrades separated during the Iron Schism over custody of cosmic relics.',
       createdAt: Date.now() - 86400000 * 2
+    },
+    {
+      id: 'rel-3',
+      sourceId: 'char-lyra',
+      targetId: 'char-vespera',
+      type: 'Allied with',
+      description: 'Lyra decodes stellar glyphs and provides navigational ciphers for Vespera.',
+      createdAt: Date.now() - 86400000 * 1
+    },
+    {
+      id: 'rel-4',
+      sourceId: 'char-malakor',
+      targetId: 'char-vespera',
+      type: 'Pursues',
+      description: 'Commands inquisitorial vanguard to capture Vespera and seize the astrolabe.',
+      createdAt: Date.now()
     }
   ];
 

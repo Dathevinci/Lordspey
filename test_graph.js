@@ -202,19 +202,19 @@ console.log('✓ Test 1 Passed: 0 notes empty state handled correctly');
 // Test 2: Load starter vault and build galaxy data
 Storage.loadStarterVault();
 const allNotes = Storage.getAllNotes();
-assert.strictEqual(allNotes.length, 4, 'Starter vault should contain 4 notes');
+assert.strictEqual(allNotes.length, 9, 'Starter vault should contain 9 notes');
 
 // Trigger loading demo in graph
 const galaxyBtnLoadDemo = elementsMap['galaxy-btn-load-demo'];
 galaxyBtnLoadDemo.dispatchEvent('click');
 
 assert(emptyPrompt.classList.contains('hidden'), 'Empty prompt should hide when notes exist');
-assert(nodeCountEl.textContent.includes('4 note'), `Node count should say 4 notes, got: ${nodeCountEl.textContent}`);
+assert(nodeCountEl.textContent.includes('9 note'), `Node count should say 9 notes, got: ${nodeCountEl.textContent}`);
 
 const edgeCountEl = elementsMap['graph-edge-count'];
 assert(edgeCountEl.textContent.includes('sub-branch'), `Edge count should mention sub-branches, got: ${edgeCountEl.textContent}`);
 assert(edgeCountEl.textContent.includes('wiki link'), `Edge count should mention wiki links, got: ${edgeCountEl.textContent}`);
-console.log(`✓ Test 2 Passed: 4 notes populated graph with hubs and sub-branches (${edgeCountEl.textContent})`);
+console.log(`✓ Test 2 Passed: 9 notes populated graph with hubs and sub-branches (${edgeCountEl.textContent})`);
 
 // Test 3: Close graph view
 const btnCloseGraph = elementsMap['btn-close-graph'];
@@ -284,13 +284,13 @@ const chapterPill = filterPills.find(p => p.dataset.filter === 'chapter');
 assert(chapterPill, 'Chapter filter pill found');
 
 chapterPill.dispatchEvent('click');
-assert(nodeCountEl.textContent.includes('1 note'), `Filtered chapter count should be 1 note, got: ${nodeCountEl.textContent}`);
-console.log('✓ Test 6 Passed: Category isolation filter works (1 chapter displayed)');
+assert(nodeCountEl.textContent.includes('2 note'), `Filtered chapter count should be 2 notes, got: ${nodeCountEl.textContent}`);
+console.log('✓ Test 6 Passed: Category isolation filter works (2 chapters displayed)');
 
 // Reset filter to all
 const allPill = filterPills.find(p => p.dataset.filter === 'all');
 allPill.dispatchEvent('click');
-assert(nodeCountEl.textContent.includes('4 note'), 'All filter displays all 4 notes');
+assert(nodeCountEl.textContent.includes('9 note'), 'All filter displays all 9 notes');
 console.log('✓ Test 7 Passed: Filter reset to all displays all categories');
 
 // Test 8: Clicking directly on chapter title text navigates to editor

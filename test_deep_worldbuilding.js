@@ -210,7 +210,7 @@ console.log('✓ Character Codex & Relationship CRUD & Note Tag Scanner passed')
 
 // Test 1.6: Starter Vault Populates Worldbuilding Data
 Storage.loadStarterVault();
-assert.strictEqual(Storage.getAllNotes().length, 4, 'Starter vault must still have exactly 4 starter notes');
+assert.strictEqual(Storage.getAllNotes().length, 9, 'Starter vault must have exactly 9 starter notes');
 assert(Storage.getAllMapPins().length > 0, 'Starter vault should populate starter pins');
 assert(Storage.getTimelineEvents().length > 0, 'Starter vault should populate starter timeline events');
 assert(Storage.getCharacters().length > 0, 'Starter vault should populate starter characters');
@@ -218,7 +218,7 @@ assert(Storage.getRelationships().length > 0, 'Starter vault should populate sta
 
 const starterChars = Storage.getAllCharacters();
 assert(!starterChars.some(c => c.name === 'The Order of Lore'), 'The Order of Lore must not be treated as a character');
-assert.strictEqual(starterChars.length, 2, 'Starter vault should have exactly 2 characters (Vespera and Corvus)');
+assert.strictEqual(starterChars.length, 4, 'Starter vault should have exactly 4 characters (Vespera, Corvus, Malakor, and Lyra)');
 console.log('✓ Starter Vault cleanly initializes rich worldbuilding datasets without phantom character extraction');
 
 // Test 1.7: Export & Import JSON preserves Worldbuilding Data
@@ -236,7 +236,7 @@ assert.strictEqual(Storage.getAllMapPins().length, 0);
 // Restore from export
 const importResult = Storage.importJSON(exported);
 assert.strictEqual(importResult.success, true);
-assert.strictEqual(Storage.getAllNotes().length, 4);
+assert.strictEqual(Storage.getAllNotes().length, 9);
 assert(Storage.getAllMapPins().length > 0);
 assert(Storage.getTimelineEvents().length > 0);
 assert(Storage.getCharacters().length > 0);

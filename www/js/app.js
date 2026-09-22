@@ -142,9 +142,18 @@
   const settingBtnPreviewIntro = $('#setting-btn-preview-intro');
 
   const settingsBtnTourGeneral  = $('#settings-btn-tour-general');
+  const settingsBtnTourEditor   = $('#settings-btn-tour-editor');
+  const settingsBtnTourGraph    = $('#settings-btn-tour-graph');
   const settingsBtnTourMap      = $('#settings-btn-tour-map');
   const settingsBtnTourTimeline = $('#settings-btn-tour-timeline');
   const settingsBtnTourCodex    = $('#settings-btn-tour-codex');
+  const settingsBtnTourSpey     = $('#settings-btn-tour-spey');
+  const settingsBtnLoadSample   = $('#settings-btn-load-sample');
+  const btnSettingsTutorial     = $('#btn-settings-tutorial');
+  const btnGraphTutorial        = $('#btn-graph-tutorial');
+  const btnEditorTutorial       = $('#btn-editor-tutorial');
+  const btnTimelineEmptySample  = $('#btn-timeline-empty-sample');
+  const btnCodexEmptySample     = $('#btn-codex-empty-sample');
 
   const vaultResetConfirmModal  = $('#vault-reset-confirm-modal');
   const btnCloseResetConfirm    = $('#btn-close-reset-confirm');
@@ -1119,11 +1128,23 @@
       });
     }
 
-    // Guided Tutorials from Settings
+    // Guided Tutorials from Settings & Views
     if (settingsBtnTourGeneral) {
       settingsBtnTourGeneral.addEventListener('click', () => {
         closeProjectSettingsModal();
         openTutorial(0);
+      });
+    }
+    if (settingsBtnTourEditor) {
+      settingsBtnTourEditor.addEventListener('click', () => {
+        closeProjectSettingsModal();
+        openTutorial(1);
+      });
+    }
+    if (settingsBtnTourGraph) {
+      settingsBtnTourGraph.addEventListener('click', () => {
+        closeProjectSettingsModal();
+        openTutorial(3);
       });
     }
     if (settingsBtnTourMap) {
@@ -1142,6 +1163,53 @@
       settingsBtnTourCodex.addEventListener('click', () => {
         closeProjectSettingsModal();
         openWorldbuildingTutorial('codex');
+      });
+    }
+    if (settingsBtnTourSpey) {
+      settingsBtnTourSpey.addEventListener('click', () => {
+        closeProjectSettingsModal();
+        openTutorial(7);
+      });
+    }
+    if (settingsBtnLoadSample) {
+      settingsBtnLoadSample.addEventListener('click', () => {
+        Storage.loadStarterVault();
+        renderSidebar();
+        renderMainMenuRecent();
+        if (typeof updateSettingsStats === 'function') updateSettingsStats();
+        toast('Loaded rich sample vault template', 'success');
+      });
+    }
+    if (btnSettingsTutorial) {
+      btnSettingsTutorial.addEventListener('click', () => {
+        closeProjectSettingsModal();
+        openTutorial(7);
+      });
+    }
+    if (btnGraphTutorial) {
+      btnGraphTutorial.addEventListener('click', () => {
+        openTutorial(3);
+      });
+    }
+    if (btnEditorTutorial) {
+      btnEditorTutorial.addEventListener('click', () => {
+        openTutorial(1);
+      });
+    }
+    if (btnTimelineEmptySample) {
+      btnTimelineEmptySample.addEventListener('click', () => {
+        Storage.loadStarterVault();
+        renderSidebar();
+        renderTimelineEvents();
+        toast('Loaded sample vault', 'success');
+      });
+    }
+    if (btnCodexEmptySample) {
+      btnCodexEmptySample.addEventListener('click', () => {
+        Storage.loadStarterVault();
+        renderSidebar();
+        renderCodexUI();
+        toast('Loaded sample vault', 'success');
       });
     }
 
@@ -2271,85 +2339,116 @@
   // ═══════════════════════════════════════════════
   const TUTORIAL_STEPS = [
     {
-      step: '1 of 6',
-      category: 'Overview',
+      step: '1 of 8',
+      category: 'Workspace Overview',
       icon: '✦',
       title: 'Welcome to Lord Spey',
-      desc: 'Lord Spey is your minimal, local-first workspace designed specifically for authors, novelists, and worldbuilders. Inspired by Obsidian, it lets you draft chapters, organize manuscript lore, and interconnect your story universe.',
+      desc: 'Lord Spey is your minimal, local-first author workspace crafted for novelists and worldbuilders. Inspired by Obsidian, it lets you draft chapters, organize manuscript lore, and interconnect your universe without distractions.',
       features: [
-        { icon: '✦', text: '<strong>Clean Black & Red Aesthetic:</strong> Crafted to maximize focus and eliminate eye strain during long writing sessions.' },
-        { icon: '✦', text: '<strong>100% Private & Local:</strong> Your notes and worldbuilding lore stay safely stored in your browser with zero sign-up required.' },
-        { icon: '✦', text: '<strong>Instant Navigation:</strong> Click any category in the sidebar, or return to the main dashboard anytime by clicking the logo.' }
+        { icon: '🗂', text: '<strong>Four Dedicated Shelves:</strong> Chapters (prose & scenes), Lore (factions & relics), World (geography & realms), and Drafts (outlines & beat sheets).' },
+        { icon: '✦', text: '<strong>100% Private & Offline:</strong> Stored locally in your browser storage with zero latency, zero cloud tracking, and zero sign-up required.' },
+        { icon: '⚡', text: '<strong>Quick Switcher (<kbd>Ctrl+K</kbd> / <kbd>Ctrl+O</kbd>):</strong> Search and jump to any document, lore entry, or outline instantly.' }
       ],
-      tip: 'You can replay this walkthrough at any time by clicking the guide icon (?) in the sidebar or the button on the dashboard.'
+      tip: 'Click any category card on the dashboard or "+ New Note" in the sidebar to jump straight into drafting.'
     },
     {
-      step: '2 of 6',
-      category: 'Vault Structure',
-      icon: '🗂',
-      title: 'Four Dedicated Categories',
-      desc: 'Organize your entire writing universe across four purpose-built categories in the sidebar and dashboard:',
+      step: '2 of 8',
+      category: 'Editor & Formatting',
+      icon: '✍️',
+      title: 'Author Drafting & Formatting',
+      desc: 'A distraction-free writing environment equipped with professional author formatting controls and live split preview:',
       features: [
-        { icon: '📖', text: '<strong>Chapters:</strong> Draft full manuscript scenes, dialogue, and story prose.' },
-        { icon: '📜', text: '<strong>Lore:</strong> Define characters, factions, magic systems, relics, and historical lore.' },
-        { icon: '🗺️', text: '<strong>World Building:</strong> Outline continents, realms, citadels, geographies, and cultures.' },
-        { icon: '📝', text: '<strong>Drafts:</strong> Quick notes, brainstorms, scene beat sheets, and raw story ideas.' }
+        { icon: '—', text: '<strong>Dialogue & Smart Typography:</strong> Type <code>--</code> to auto-expand to em-dash (—), or use curly quotes (“ ”), single quotes (‘ ’), and ellipsis (…).' },
+        { icon: '✦', text: '<strong>Extended Markdown:</strong> Scene breaks (<code>* * *</code>), task checklists (<code>- [ ]</code>), strikethrough (<code>~~text~~</code>), and highlighters (<code>==text==</code>).' },
+        { icon: '[!]', text: '<strong>Callouts & Tables:</strong> One-click inserts for Obsidian callouts (<code>> [!NOTE]</code>, <code>> [!QUOTE]</code>) and markdown tables.' },
+        { icon: '↕', text: '<strong>Typography & Line Height:</strong> Choose between Lora, Inter, JetBrains Mono, or Playfair, adjust font size, and cycle line spacing (1.5, 1.8, 2.1).' },
+        { icon: '✦', text: '<strong>Typewriter Mode & Metrics:</strong> Keep the active line vertically centered while drafting, and click the word meter for detailed readability metrics.' }
       ],
-      tip: 'Click any category card on the dashboard or "+ New Note" in the sidebar to create an entry.'
+      tip: 'Press <kbd>Ctrl+\\</kbd> for live split view, <kbd>Alt+O</kbd> for document outline, or <kbd>Ctrl+F</kbd> for in-editor find and replace.'
     },
     {
-      step: '3 of 6',
-      category: 'Obsidian Wiki-Links',
+      step: '3 of 8',
+      category: 'Wiki-Links',
       icon: '🔗',
-      title: 'Obsidian-Style Wiki-Links',
-      desc: 'Cross-reference people, places, and story events seamlessly inside your prose using double square brackets:',
+      title: 'Obsidian Wiki-Links & Mentions',
+      desc: 'Cross-reference people, places, factions, and relics seamlessly inside your prose using double square brackets:',
       features: [
-        { icon: '[[ ]]', text: '<strong>Standard Link:</strong> Type <code>[[The High Citadel]]</code> to link directly to that note.' },
-        { icon: '[[ | ]]', text: '<strong>Custom Alias:</strong> Type <code>[[The High Citadel|The Fortress]]</code> to display custom label text.' },
-        { icon: '✦', text: '<strong>Auto-Create on Click:</strong> Clicking a link to a note that does not exist yet prompts you to create it immediately.' },
-        { icon: '✦', text: '<strong>Linked Mentions:</strong> The panel at the bottom of every note automatically reveals all backlinks pointing to it.' }
+        { icon: '[[ ]]', text: '<strong>Standard Link:</strong> Type <code>[[The Obsidian Gate]]</code> to link directly to that note.' },
+        { icon: '[[ | ]]', text: '<strong>Custom Display Alias:</strong> Type <code>[[The Obsidian Gate|The High Portal]]</code> to display custom anchor text.' },
+        { icon: '✦', text: '<strong>Auto-Create on Click:</strong> Clicking a link to an unwritten entry automatically prompts you to create it immediately.' },
+        { icon: '✦', text: '<strong>Linked Mentions Panel:</strong> The panel at the bottom of every note reveals all backlinks and references pointing to it.' }
       ],
-      tip: 'Use the [[ ]] button in the editor formatting bar to quickly insert a wiki-link at your cursor position.'
+      tip: 'Use the <kbd>[[ ]]</kbd> button in the formatting bar to quickly wrap any selected text in wiki brackets.'
     },
     {
-      step: '4 of 6',
-      category: 'Visual Cosmos',
+      step: '4 of 8',
+      category: 'Galaxy Graph',
       icon: '🌌',
       title: 'Interactive Galaxy Graph',
-      desc: 'Visualize your stories, lore entries, and chapters as an interconnected galaxy of stars:',
+      desc: 'Visualize your stories, lore entries, and chapters as an interconnected galaxy of stars and category hubs:',
       features: [
-        { icon: '✦', text: '<strong>Star Nodes:</strong> Every document shines as a star color-coded by category (red for chapters, orange for lore, purple for world, slate for drafts).' },
-        { icon: '✦', text: '<strong>Luminous Links:</strong> Wiki-links between your notes form glowing constellation connections.' },
-        { icon: '✦', text: '<strong>Interactive Controls:</strong> Drag nodes to rearrange, scroll to zoom in/out, and click any star to jump into editing.' }
+        { icon: '✦', text: '<strong>Category Sun Hubs:</strong> Four glowing core suns anchor Chapters (crimson), Lore (amber), World (amethyst), and Drafts (slate).' },
+        { icon: '✦', text: '<strong>Sub-Branch Constellations:</strong> Notes cluster organically around their category hub, grouped by story arcs and tags.' },
+        { icon: '✦', text: '<strong>Luminous Links:</strong> Bidirectional wiki-links illuminate glowing constellation beams connecting your manuscript.' },
+        { icon: '✦', text: '<strong>Interactive Controls:</strong> Drag background to pan, scroll to zoom, click category hubs to focus sub-branches, and click any star to jump into editing.' }
       ],
-      tip: 'Open the Galaxy Graph at any time by pressing <kbd>Ctrl+G</kbd> or clicking the graph icon in the sidebar.'
+      tip: 'Press <kbd>Ctrl+G</kbd> anytime to open the Galaxy Graph, or use the category filter pills at the top to isolate specific shelves.'
     },
     {
-      step: '5 of 6',
-      category: 'Author Toolkit',
-      icon: '✍️',
-      title: 'Focused Author Writing Tools',
-      desc: 'Powerful drafting tools designed to keep you in a state of creative flow without leaving your keyboard:',
+      step: '5 of 8',
+      category: 'World Map',
+      icon: '🗺️',
+      title: 'Interactive World Map & Cartography',
+      desc: 'Anchor your worldbuilding in physical geography with procedural terrain, custom map art, and coordinate pins:',
       features: [
-        { icon: '✦', text: '<strong>Live Split View (<kbd>Ctrl+\\</kbd>):</strong> Edit Markdown on the left and see real-time rendered typography on the right.' },
-        { icon: '✦', text: '<strong>Document Outline (<kbd>Alt+O</kbd>):</strong> Live scene outline drawer generated from your markdown headings (# H1, ## H2, ### H3).' },
-        { icon: '✦', text: '<strong>Word Target & Sprint:</strong> Set session word goals (e.g. 500w) and trigger timed 20-minute sprints with live progress tracking.' },
-        { icon: '✦', text: '<strong>Zen Mode (<kbd>Ctrl+Shift+F</kbd>):</strong> Collapses all sidebars and chrome for an immersive, distraction-free writing environment.' }
+        { icon: '✦', text: '<strong>Procedural & Custom Maps:</strong> Explore procedural fantasy terrain or upload your own high-resolution world map image.' },
+        { icon: '📍', text: '<strong>Drop Coordinate Pins:</strong> Click "Place Pin" and tap anywhere on the canvas (or double-click) to drop pins with precise (X, Y) coordinates.' },
+        { icon: '✦', text: '<strong>Attach to Lore Notes:</strong> Link pins directly to worldbuilding entries; clicking a pin displays an interactive preview card and direct jump.' },
+        { icon: '✦', text: '<strong>Smooth Zoom & Pan:</strong> Drag to pan the map, scroll wheel to zoom, or use multi-touch pinch gestures on mobile devices.' }
       ],
-      tip: 'Click the word count meter in the editor toolbar to adjust your session goal or launch a sprint.'
+      tip: 'Press <kbd>Ctrl+M</kbd> to launch the World Map, or tag notes with coordinates to associate them automatically.'
     },
     {
-      step: '6 of 6',
-      category: 'Shortcuts & Backups',
-      icon: '⚡',
-      title: 'Speed, Search & Vault Backups',
-      desc: 'Quickly find what you need and safeguard your writing across devices:',
+      step: '6 of 8',
+      category: 'Chronology Timeline',
+      icon: '⏳',
+      title: 'Chronology & Event Timeline',
+      desc: 'Track narrative pacing, historic epochs, battle dates, and chapter milestones across time:',
       features: [
-        { icon: '✦', text: '<strong>Quick Switcher (<kbd>Ctrl+K</kbd> or <kbd>Ctrl+O</kbd>):</strong> Search and open any note instantly by title or category.' },
-        { icon: '✦', text: '<strong>Export Markdown (<kbd>.md</kbd>):</strong> Export your current note as a clean Markdown file with one click.' },
-        { icon: '✦', text: '<strong>Vault Backup & Restore:</strong> Export your entire library as a single JSON file or import existing vaults using the sidebar footer icons.' }
+        { icon: '✦', text: '<strong>Dual View Modes:</strong> Toggle between a visual Rail Timeline with epoch milestone nodes and a narrative Event Stream.' },
+        { icon: '✦', text: '<strong>Era & Epoch Organization:</strong> Group milestones by epochs (e.g. "Age of Foundations", "The Convergence") with filterable eras.' },
+        { icon: '✦', text: '<strong>Automatic Note Tag Scanning:</strong> Spey automatically indexes events tagged with <code>@timeline(Year, Era)</code> or <code>@event</code> in note text.' },
+        { icon: '✦', text: '<strong>Chapter Milestone Linking:</strong> Click any milestone card to jump directly to its associated chapter or lore entry in the editor.' }
       ],
-      tip: 'You are all set! Click "Get Started" below to begin writing in your workspace.'
+      tip: 'Press <kbd>Ctrl+T</kbd> to open the Chronology Timeline and inspect story pacing across your saga.'
+    },
+    {
+      step: '7 of 8',
+      category: 'Character Codex',
+      icon: '👥',
+      title: 'Character Codex & Relationship Webs',
+      desc: 'Develop your cast, psychological archetypes, factions, and relationship dynamics:',
+      features: [
+        { icon: '✦', text: '<strong>Character Dossiers:</strong> Record character archetypes (Protagonist, Antagonist, Mentor, Ally), factions, roles, and status.' },
+        { icon: '✦', text: '<strong>Interactive Web Canvas:</strong> Switch to the "Relationship Web" view to see force-directed relationship lines connecting your cast.' },
+        { icon: '✦', text: '<strong>Dynamic Connections:</strong> Map relationships ("Mentor to", "Nemesis of", "Allied with", "Pursues") with custom descriptions.' },
+        { icon: '✦', text: '<strong>Auto-Scanning Character Tags:</strong> Tag notes with <code>@character: Name | Archetype | Faction</code> to populate dossiers automatically.' }
+      ],
+      tip: 'Press <kbd>Ctrl+U</kbd> to open the Character Codex, or switch between Card Dossier and Relationship Web views.'
+    },
+    {
+      step: '8 of 8',
+      category: 'Settings & .spey',
+      icon: '📦',
+      title: 'Settings, Themes & .spey Vault Bundles',
+      desc: 'Safeguard your creative work and customize your workspace aesthetics:',
+      features: [
+        { icon: '📦', text: '<strong>Portable .spey Project Bundles:</strong> Export your entire novel library—notes, map pins, timeline, characters, and settings—into a single file.' },
+        { icon: '✦', text: '<strong>Merge & Replace Import:</strong> Import existing .spey bundles with automatic safety backups and non-destructive merge collision handling.' },
+        { icon: '🎨', text: '<strong>Accent Themes:</strong> Switch between Crimson, Ruby, Amber/Gold, Amethyst, and Emerald accent palettes.' },
+        { icon: '⚡', text: '<strong>Sample Vault Template:</strong> Instantly reload the complete sample vault anytime via Settings Tab 1 or empty state buttons.' }
+      ],
+      tip: 'Press <kbd>Ctrl+,</kbd> to open Project Settings, or drag and drop any <code>.spey</code> file directly into the application.'
     }
   ];
 
@@ -4537,7 +4636,7 @@
     const zoom = camera.zoom || 1;
     const extraTol = Math.max(0, (14 / zoom) - 10);
 
-    // 1. Check note nodes first so they have click priority over hubs
+    // 1. Check direct circular hits on note stars
     for (let i = graphNodes.length - 1; i >= 0; i--) {
       const n = graphNodes[i];
       if (n.isHub) continue;
@@ -4546,12 +4645,31 @@
       const dy = worldY - n.y;
       const hitR = n.radius + 14 + extraTol;
 
-      // Circle hit test
       if (dx * dx + dy * dy <= hitR * hitR) {
         return n;
       }
+    }
 
-      // Title & Sub-branch Badge hit-box directly beneath note center
+    // 2. Check direct circular hits on category hubs (taking precedence over nearby floating labels)
+    for (let i = graphNodes.length - 1; i >= 0; i--) {
+      const n = graphNodes[i];
+      if (!n.isHub) continue;
+
+      const dx = worldX - n.x;
+      const dy = worldY - n.y;
+      const hitR = n.radius + 16 + extraTol;
+
+      if (dx * dx + dy * dy <= hitR * hitR) {
+        return n;
+      }
+    }
+
+    // 3. Check Title & Sub-branch Badge hit-box directly beneath note center
+    for (let i = graphNodes.length - 1; i >= 0; i--) {
+      const n = graphNodes[i];
+      if (n.isHub) continue;
+
+      const dx = worldX - n.x;
       const labelW = Math.max(90, (n.hitWidth || 100));
       const halfW = labelW / 2 + 12 + extraTol;
       const topY = n.y;
@@ -4561,21 +4679,12 @@
       }
     }
 
-    // 2. Check category hub nodes
+    // 4. Check Hub Category Badge hit-box below hub
     for (let i = graphNodes.length - 1; i >= 0; i--) {
       const n = graphNodes[i];
       if (!n.isHub) continue;
 
       const dx = worldX - n.x;
-      const dy = worldY - n.y;
-      const hitR = n.radius + 16 + extraTol;
-
-      // Circle hit test
-      if (dx * dx + dy * dy <= hitR * hitR) {
-        return n;
-      }
-
-      // Hub Category Badge hit-box below hub
       const badgeW = Math.max(110, (n.hitWidth || 120));
       const halfW = badgeW / 2 + 14 + extraTol;
       const topY = n.y;
