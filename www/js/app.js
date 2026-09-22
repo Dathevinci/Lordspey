@@ -91,12 +91,14 @@
   const btnExportSpeySidebar = $('#btn-export-spey');
   const btnOpenSpeySidebar   = $('#btn-open-spey');
   const btnProjectSettingsSidebar = $('#btn-project-settings');
+  const btnSettingsSidebar        = $('#btn-settings');
 
   const dashboardBtnExportSpey = $('#dashboard-btn-export-spey');
   const dashboardBtnOpenSpey   = $('#dashboard-btn-open-spey');
   const menuBtnExportSpey      = $('#menu-btn-export-spey');
   const menuBtnOpenSpey        = $('#menu-btn-open-spey');
   const menuBtnProjectSettings = $('#menu-btn-project-settings');
+  const menuBtnSettings        = $('#menu-btn-settings');
 
   const speyImportModal        = $('#spey-import-modal');
   const btnImportModalClose    = $('#btn-import-modal-close');
@@ -111,9 +113,12 @@
   const btnImportMerge         = $('#btn-import-merge');
   const btnImportReplace       = $('#btn-import-replace');
 
-  const projectSettingsModal   = $('#project-settings-modal');
-  const btnCloseProjectSettings = $('#btn-close-project-settings');
-  const btnCancelProjectSettings = $('#btn-cancel-project-settings');
+  const projectSettingsModal   = $('#project-settings-modal') || $('#settings-modal');
+  const settingsModal          = $('#settings-modal') || $('#project-settings-modal');
+  const btnCloseProjectSettings = $('#btn-close-project-settings') || $('#btn-close-settings');
+  const btnCloseSettings       = $('#btn-close-settings') || $('#btn-close-project-settings');
+  const btnCancelProjectSettings = $('#btn-cancel-project-settings') || $('#btn-cancel-settings');
+  const btnCancelSettings      = $('#btn-cancel-settings') || $('#btn-cancel-project-settings');
   const settingProjectTitle    = $('#setting-project-title');
   const settingProjectAuthor   = $('#setting-project-author');
   const settingsStatsGrid      = $('#settings-stats-grid');
@@ -963,16 +968,23 @@
       btnImport.addEventListener('click', handleOpenSpeyFilePicker);
     }
 
-    // .spey Project Actions
+    // .spey Project Actions & Settings Triggers
     if (btnExportSpeySidebar) btnExportSpeySidebar.addEventListener('click', handleExportSpey);
     if (btnOpenSpeySidebar) btnOpenSpeySidebar.addEventListener('click', handleOpenSpeyFilePicker);
     if (btnProjectSettingsSidebar) btnProjectSettingsSidebar.addEventListener('click', openProjectSettingsModal);
+    if (btnSettingsSidebar) btnSettingsSidebar.addEventListener('click', openProjectSettingsModal);
 
     if (dashboardBtnExportSpey) dashboardBtnExportSpey.addEventListener('click', handleExportSpey);
     if (dashboardBtnOpenSpey) dashboardBtnOpenSpey.addEventListener('click', handleOpenSpeyFilePicker);
     if (menuBtnExportSpey) menuBtnExportSpey.addEventListener('click', handleExportSpey);
     if (menuBtnOpenSpey) menuBtnOpenSpey.addEventListener('click', handleOpenSpeyFilePicker);
     if (menuBtnProjectSettings) menuBtnProjectSettings.addEventListener('click', openProjectSettingsModal);
+    if (menuBtnSettings) menuBtnSettings.addEventListener('click', openProjectSettingsModal);
+
+    // Also bind any element with .btn-settings-gear or data-action="settings"
+    $$('.btn-settings-gear, [data-action="settings"], [data-action="open-settings"]').forEach(btn => {
+      btn.addEventListener('click', openProjectSettingsModal);
+    });
 
     // Spey Import Confirmation Modal
     if (btnImportModalClose) btnImportModalClose.addEventListener('click', closeSpeyImportModal);
@@ -985,9 +997,11 @@
       });
     }
 
-    // Project Settings Modal
+    // Settings Modal close and cancel triggers
     if (btnCloseProjectSettings) btnCloseProjectSettings.addEventListener('click', closeProjectSettingsModal);
+    if (btnCloseSettings && btnCloseSettings !== btnCloseProjectSettings) btnCloseSettings.addEventListener('click', closeProjectSettingsModal);
     if (btnCancelProjectSettings) btnCancelProjectSettings.addEventListener('click', closeProjectSettingsModal);
+    if (btnCancelSettings && btnCancelSettings !== btnCancelProjectSettings) btnCancelSettings.addEventListener('click', closeProjectSettingsModal);
     if (btnSaveProjectSettings) btnSaveProjectSettings.addEventListener('click', saveProjectSettings);
 
     // Settings Navigation Tabs
@@ -1117,6 +1131,11 @@
     if (projectSettingsModal) {
       projectSettingsModal.addEventListener('click', e => {
         if (e.target === projectSettingsModal) closeProjectSettingsModal();
+      });
+    }
+    if (settingsModal && settingsModal !== projectSettingsModal) {
+      settingsModal.addEventListener('click', e => {
+        if (e.target === settingsModal) closeProjectSettingsModal();
       });
     }
     if (vaultResetConfirmModal) {
@@ -1335,6 +1354,18 @@
           callout.setAttribute('data-folded', String(!isFolded));
           return;
         }
+      }
+      const settingsTrigger = e.target.closest('#btn-project-settings, #btn-settings, #menu-btn-settings, #menu-btn-project-settings, .btn-settings-gear, [data-action="settings"], [data-action="open-settings"]');
+      if (settingsTrigger) {
+        e.preventDefault();
+        openProjectSettingsModal();
+        return;
+      }
+      const settingsCloseTrigger = e.target.closest('#btn-close-project-settings, #btn-close-settings, #btn-cancel-project-settings, #btn-cancel-settings');
+      if (settingsCloseTrigger) {
+        e.preventDefault();
+        closeProjectSettingsModal();
+        return;
       }
     });
   }
@@ -1887,90 +1918,115 @@
 
   function openProjectSettingsModal(initialTab = 'vault') {
     if (typeof initialTab !== 'string') initialTab = 'vault';
-    if (!projectSettingsModal) return;
+    const targetModal = projectSettingsModal || settingsModal || $('#project-settings-modal') || $('#settings-modal');
+    if (!targetModal) return;
     isProjectSettingsModalOpen = true;
-    const settings = Storage.getSettings();
 
-    // 1. Project Identity
-    if (settingProjectTitle) {
-      settingProjectTitle.value = settings.projectTitle || Storage.getProjectTitle();
-    }
-    if (settingProjectAuthor) {
-      settingProjectAuthor.value = settings.projectAuthor || 'Lord Spey';
-    }
-    renderProjectSettingsStats();
+    try {
+      const settings = (typeof Storage !== 'undefined' && typeof Storage.getSettings === 'function')
+        ? Storage.getSettings()
+        : {};
 
-    // 2. Editor & Writing Preferences
-    if (settingFontFamily) {
-      settingFontFamily.value = currentEditorFont;
-    }
-    if (settingFontSize) {
-      settingFontSize.value = String(currentFontSize);
-    }
-    if (settingLineHeight) {
-      settingLineHeight.value = String(currentLineHeight);
-    }
-    if (settingTypewriterToggle) {
-      settingTypewriterToggle.checked = typewriterMode;
-    }
-    if (settingAutoEmdash) {
-      settingAutoEmdash.checked = autoEmDash;
-    }
-    if (settingSmartQuotes) {
-      settingSmartQuotes.checked = smartQuotes;
+      // 1. Project Identity
+      if (settingProjectTitle) {
+        settingProjectTitle.value = settings.projectTitle || (typeof Storage !== 'undefined' && typeof Storage.getProjectTitle === 'function' ? Storage.getProjectTitle() : 'Lord Spey Manuscript');
+      }
+      if (settingProjectAuthor) {
+        settingProjectAuthor.value = settings.projectAuthor || 'Lord Spey';
+      }
+      renderProjectSettingsStats();
+
+      // 2. Editor & Writing Preferences
+      if (settingFontFamily) {
+        settingFontFamily.value = currentEditorFont;
+      }
+      if (settingFontSize) {
+        settingFontSize.value = String(currentFontSize);
+      }
+      if (settingLineHeight) {
+        settingLineHeight.value = String(currentLineHeight);
+      }
+      if (settingTypewriterToggle) {
+        settingTypewriterToggle.checked = typewriterMode;
+      }
+      if (settingAutoEmdash) {
+        settingAutoEmdash.checked = autoEmDash;
+      }
+      if (settingSmartQuotes) {
+        settingSmartQuotes.checked = smartQuotes;
+      }
+
+      // 3. Appearance & Accent Theme
+      const isSkipIntro = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_skip_intro') === 'true') ||
+                          (settings && settings.skipIntro === true);
+      if (settingIntroStarToggle) {
+        settingIntroStarToggle.checked = !isSkipIntro;
+      }
+      applyAccentTheme(currentAccentTheme);
+
+      // Switch tab
+      switchSettingsTab(initialTab);
+    } catch (err) {
+      console.error('Error populating settings modal:', err);
     }
 
-    // 3. Appearance & Accent Theme
-    const isSkipIntro = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_skip_intro') === 'true') ||
-                        (settings && settings.skipIntro === true);
-    if (settingIntroStarToggle) {
-      settingIntroStarToggle.checked = !isSkipIntro;
+    if (projectSettingsModal) {
+      projectSettingsModal.classList.remove('hidden');
+      projectSettingsModal.style.display = 'flex';
+      projectSettingsModal.style.zIndex = '260';
     }
-    applyAccentTheme(currentAccentTheme);
-
-    // Switch tab
-    switchSettingsTab(initialTab);
-
-    projectSettingsModal.classList.remove('hidden');
+    if (settingsModal && settingsModal !== projectSettingsModal) {
+      settingsModal.classList.remove('hidden');
+      settingsModal.style.display = 'flex';
+      settingsModal.style.zIndex = '260';
+    }
   }
+  const openSettingsModal = openProjectSettingsModal;
 
   function renderProjectSettingsStats() {
     if (!settingsStatsGrid) return;
-    const stats = Storage.getWorkspaceStats();
-    settingsStatsGrid.innerHTML = `
-      <div class="settings-stat-box">
-        <div class="settings-stat-val">${stats.chapters}</div>
-        <div class="settings-stat-lbl">Chapters</div>
-      </div>
-      <div class="settings-stat-box">
-        <div class="settings-stat-val">${stats.wordCount.toLocaleString()}</div>
-        <div class="settings-stat-lbl">Words</div>
-      </div>
-      <div class="settings-stat-box">
-        <div class="settings-stat-val">${stats.lore}</div>
-        <div class="settings-stat-lbl">Lore Notes</div>
-      </div>
-      <div class="settings-stat-box">
-        <div class="settings-stat-val">${stats.world}</div>
-        <div class="settings-stat-lbl">World Notes</div>
-      </div>
-      <div class="settings-stat-box">
-        <div class="settings-stat-val">${stats.drafts}</div>
-        <div class="settings-stat-lbl">Drafts</div>
-      </div>
-      <div class="settings-stat-box">
-        <div class="settings-stat-val">${stats.mapPins}</div>
-        <div class="settings-stat-lbl">Map Pins</div>
-      </div>
-      <div class="settings-stat-box">
-        <div class="settings-stat-val">${stats.timelineEvents}</div>
-        <div class="settings-stat-lbl">Chronology</div>
-      </div>
-      <div class="settings-stat-box">
-        <div class="settings-stat-val">${stats.characters}</div>
-        <div class="settings-stat-lbl">Characters</div>
-      </div>
-    `;
+    try {
+      const stats = (typeof Storage !== 'undefined' && typeof Storage.getWorkspaceStats === 'function')
+        ? Storage.getWorkspaceStats()
+        : { chapters: 0, wordCount: 0, lore: 0, world: 0, drafts: 0, mapPins: 0, timelineEvents: 0, characters: 0 };
+      const words = (stats && typeof stats.wordCount === 'number') ? stats.wordCount.toLocaleString() : '0';
+      settingsStatsGrid.innerHTML = `
+        <div class="settings-stat-box">
+          <div class="settings-stat-val">${(stats && stats.chapters) || 0}</div>
+          <div class="settings-stat-lbl">Chapters</div>
+        </div>
+        <div class="settings-stat-box">
+          <div class="settings-stat-val">${words}</div>
+          <div class="settings-stat-lbl">Words</div>
+        </div>
+        <div class="settings-stat-box">
+          <div class="settings-stat-val">${(stats && stats.lore) || 0}</div>
+          <div class="settings-stat-lbl">Lore Notes</div>
+        </div>
+        <div class="settings-stat-box">
+          <div class="settings-stat-val">${(stats && stats.world) || 0}</div>
+          <div class="settings-stat-lbl">World Notes</div>
+        </div>
+        <div class="settings-stat-box">
+          <div class="settings-stat-val">${(stats && stats.drafts) || 0}</div>
+          <div class="settings-stat-lbl">Drafts</div>
+        </div>
+        <div class="settings-stat-box">
+          <div class="settings-stat-val">${(stats && stats.mapPins) || 0}</div>
+          <div class="settings-stat-lbl">Map Pins</div>
+        </div>
+        <div class="settings-stat-box">
+          <div class="settings-stat-val">${(stats && stats.timelineEvents) || 0}</div>
+          <div class="settings-stat-lbl">Chronology</div>
+        </div>
+        <div class="settings-stat-box">
+          <div class="settings-stat-val">${(stats && stats.characters) || 0}</div>
+          <div class="settings-stat-lbl">Characters</div>
+        </div>
+      `;
+    } catch (e) {
+      console.error('Error rendering settings stats:', e);
+    }
   }
 
   function saveProjectSettings() {
@@ -2042,8 +2098,16 @@
 
   function closeProjectSettingsModal() {
     isProjectSettingsModalOpen = false;
-    if (projectSettingsModal) projectSettingsModal.classList.add('hidden');
+    if (projectSettingsModal) {
+      projectSettingsModal.classList.add('hidden');
+      projectSettingsModal.style.display = 'none';
+    }
+    if (settingsModal && settingsModal !== projectSettingsModal) {
+      settingsModal.classList.add('hidden');
+      settingsModal.style.display = 'none';
+    }
   }
+  const closeSettingsModal = closeProjectSettingsModal;
 
   function setupDragAndDrop() {
     if (typeof window === 'undefined') return;
@@ -2104,6 +2168,10 @@
     window.processIncomingSpeyFile = processIncomingSpeyFile;
     window.openProjectSettingsModal = openProjectSettingsModal;
     window.closeProjectSettingsModal = closeProjectSettingsModal;
+    window.openSettingsModal = openSettingsModal;
+    window.closeSettingsModal = closeSettingsModal;
+    window.isProjectSettingsModalOpen = () => isProjectSettingsModalOpen;
+    window.isSettingsModalOpen = () => isProjectSettingsModalOpen;
     window.openSpeyImportModal = openSpeyImportModal;
     window.closeSpeyImportModal = closeSpeyImportModal;
     window.handleExportSpey = handleExportSpey;
@@ -2516,9 +2584,9 @@
 
   // ── Keyboard shortcuts ──
   function handleGlobalShortcuts(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+    if ((e.ctrlKey || e.metaKey) && (e.key === ',' || e.code === 'Comma')) {
       e.preventDefault();
-      if (isProjectSettingsModalOpen) {
+      if (isProjectSettingsModalOpen || (projectSettingsModal && !projectSettingsModal.classList.contains('hidden'))) {
         closeProjectSettingsModal();
       } else {
         openProjectSettingsModal('vault');
@@ -2671,7 +2739,7 @@
       closeSpeyImportModal();
       return true;
     }
-    if (isProjectSettingsModalOpen && projectSettingsModal && !projectSettingsModal.classList.contains('hidden')) {
+    if (isProjectSettingsModalOpen && ((projectSettingsModal && !projectSettingsModal.classList.contains('hidden')) || (settingsModal && !settingsModal.classList.contains('hidden')))) {
       closeProjectSettingsModal();
       return true;
     }

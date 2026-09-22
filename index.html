@@ -116,6 +116,7 @@
       </div>
       <!-- Hidden compatibility triggers for test harnesses & file pickers -->
       <div class="hidden" aria-hidden="true" style="display: none;">
+        <button id="btn-settings" aria-hidden="true" tabindex="-1"></button>
         <button id="btn-export-spey" aria-hidden="true" tabindex="-1"></button>
         <button id="btn-open-spey" aria-hidden="true" tabindex="-1"></button>
         <button id="btn-export" aria-hidden="true" tabindex="-1"></button>
@@ -271,7 +272,7 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           Open (.spey)
         </button>
-        <button class="menu-sec-btn" id="menu-btn-project-settings" title="Project Title, Details &amp; Settings">
+        <button class="menu-sec-btn" id="menu-btn-settings" data-id="menu-btn-project-settings" title="Project Title, Details &amp; Settings">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           Settings
         </button>
@@ -289,6 +290,7 @@
         </button>
         <!-- Accessible fallback triggers for backward compatibility -->
         <span class="visually-hidden" aria-hidden="true" style="display: none;">
+          <button id="menu-btn-project-settings" aria-label="Open Project Settings"></button>
           <button id="menu-btn-map" aria-label="Open World Map"></button>
           <button id="menu-btn-timeline" aria-label="Open Timeline"></button>
           <button id="menu-btn-codex" aria-label="Open Character Codex"></button>

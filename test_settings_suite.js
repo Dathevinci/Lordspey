@@ -155,9 +155,9 @@ const mockIds = [
   'menu-recent-grid', 'dashboard-btn-export-spey', 'dashboard-btn-open-spey',
   'editor-area', 'editor-body-wrap', 'btn-back-menu', 'note-title',
   'note-tags', 'note-category', 'note-body', 'note-preview', 'word-count',
-  'btn-project-settings', 'btn-new-note', 'btn-export-spey', 'btn-open-spey',
-  'btn-export', 'btn-import', 'import-file',
-  'project-settings-modal', 'btn-close-project-settings', 'btn-cancel-project-settings',
+  'btn-project-settings', 'btn-settings', 'btn-new-note', 'btn-export-spey', 'btn-open-spey',
+  'btn-export', 'btn-import', 'import-file', 'menu-btn-settings', 'menu-btn-project-settings',
+  'project-settings-modal', 'settings-modal', 'btn-close-project-settings', 'btn-close-settings', 'btn-cancel-project-settings', 'btn-cancel-settings',
   'btn-save-project-settings', 'setting-project-title', 'setting-project-author',
   'settings-stats-grid', 'settings-btn-export-spey', 'settings-btn-open-spey',
   'settings-btn-export-json', 'settings-btn-import-json', 'settings-import-json-file',
@@ -314,14 +314,56 @@ const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
 eval(`(function() {\n${appCode}\n})()`);
 console.log('✓ app.js successfully evaluated with full Settings integration');
 
-// Test 1: Open Settings Modal via gear button
+// Test 1: Open Settings Modal via gear button and verify all triggers and closing behaviors
 const btnSettings = elementsMap['btn-project-settings'];
 const settingsModal = elementsMap['project-settings-modal'];
 assert(settingsModal.classList.contains('hidden'), 'Modal starts hidden');
 
+// 1a: Sidebar gear button click
 btnSettings.click();
 assert(!settingsModal.classList.contains('hidden'), 'Modal should be open after gear click');
-console.log('✓ Test 1 Passed: Settings Modal opens on gear button click');
+assert.strictEqual(settingsModal.style.display, 'flex', 'Modal must have display: flex');
+assert.strictEqual(settingsModal.style.zIndex, '260', 'Modal must have z-index: 260');
+
+// 1b: Close button click
+const btnClose = elementsMap['btn-close-project-settings'];
+btnClose.click();
+assert(settingsModal.classList.contains('hidden'), 'Modal should be closed after close button click');
+assert.strictEqual(settingsModal.style.display, 'none', 'Modal must have display: none');
+
+// 1c: Dashboard settings button click (#menu-btn-settings)
+const menuBtn = elementsMap['menu-btn-settings'];
+menuBtn.click();
+assert(!settingsModal.classList.contains('hidden'), 'Modal should open after dashboard menu-btn-settings click');
+
+// 1d: Click outside overlay/backdrop
+settingsModal.click();
+assert(settingsModal.classList.contains('hidden'), 'Modal should close on outside backdrop click');
+
+// 1e: Dashboard fallback (#menu-btn-project-settings)
+const menuBtnProject = elementsMap['menu-btn-project-settings'];
+menuBtnProject.click();
+assert(!settingsModal.classList.contains('hidden'), 'Modal should open after dashboard menu-btn-project-settings click');
+
+// 1f: Close button alias (#btn-close-settings)
+const btnCloseAlt = elementsMap['btn-close-settings'];
+btnCloseAlt.click();
+assert(settingsModal.classList.contains('hidden'), 'Modal should close after btn-close-settings click');
+
+// 1g: Sidebar alias (#btn-settings)
+const btnSettingsAlt = elementsMap['btn-settings'];
+btnSettingsAlt.click();
+assert(!settingsModal.classList.contains('hidden'), 'Modal should open after btn-settings click');
+
+// 1h: Global openSettingsModal and closeSettingsModal
+assert(typeof global.window.openSettingsModal === 'function', 'openSettingsModal must be exposed on window');
+assert(typeof global.window.closeSettingsModal === 'function', 'closeSettingsModal must be exposed on window');
+global.window.closeSettingsModal();
+assert(settingsModal.classList.contains('hidden'), 'Modal should close after closeSettingsModal()');
+global.window.openSettingsModal();
+assert(!settingsModal.classList.contains('hidden'), 'Modal should open after openSettingsModal()');
+
+console.log('✓ Test 1 Passed: Settings Modal opens & closes across all triggers, gear buttons, overlays, and aliases');
 
 // Test 2: Tab Switching
 const tabEditor = mockTabBtns.find(b => b.dataset.tab === 'editor');

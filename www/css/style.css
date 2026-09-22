@@ -2489,7 +2489,7 @@ body.zen-mode .format-bar:hover {
   animation: fadeIn 150ms ease;
 }
 .modal-overlay.hidden {
-  display: none;
+  display: none !important;
 }
 
 @keyframes fadeIn {
@@ -5299,6 +5299,38 @@ img.map-custom-img[src=""] {
 /* ═════════════════════════════════════════════════
    Comprehensive Obsidian-Grade Settings Modal
    ═════════════════════════════════════════════════ */
+#project-settings-modal,
+#settings-modal,
+.project-settings-modal {
+  z-index: 260 !important;
+}
+
+#project-settings-modal:not(.hidden),
+#settings-modal:not(.hidden) {
+  display: flex !important;
+}
+
+#project-settings-modal.hidden,
+#settings-modal.hidden {
+  display: none !important;
+}
+
+#vault-reset-confirm-modal {
+  z-index: 300 !important;
+}
+
+.btn-settings-gear svg,
+.btn-settings-gear path,
+.btn-settings-gear circle,
+#menu-btn-settings svg,
+#menu-btn-settings path,
+#menu-btn-settings circle,
+#menu-btn-project-settings svg,
+#menu-btn-project-settings path,
+#menu-btn-project-settings circle {
+  pointer-events: none;
+}
+
 .project-settings-card {
   max-width: 840px;
   width: 92%;
