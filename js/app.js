@@ -143,6 +143,7 @@
 
   const settingsBtnTourGeneral  = $('#settings-btn-tour-general');
   const settingsBtnTourEditor   = $('#settings-btn-tour-editor');
+  const settingsBtnTourWiki     = $('#settings-btn-tour-wiki');
   const settingsBtnTourGraph    = $('#settings-btn-tour-graph');
   const settingsBtnTourMap      = $('#settings-btn-tour-map');
   const settingsBtnTourTimeline = $('#settings-btn-tour-timeline');
@@ -154,6 +155,11 @@
   const btnEditorTutorial       = $('#btn-editor-tutorial');
   const btnTimelineEmptySample  = $('#btn-timeline-empty-sample');
   const btnCodexEmptySample     = $('#btn-codex-empty-sample');
+  const dashboardBtnTutorial    = $('#dashboard-btn-tutorial');
+  const menuEmptyBtnSample      = $('#menu-empty-btn-sample');
+  const menuEmptyBtnGuide       = $('#menu-empty-btn-guide');
+  const mapBtnEmptyDrop         = $('#map-btn-empty-drop');
+  const mapBtnEmptySample       = $('#map-btn-empty-sample');
 
   const vaultResetConfirmModal  = $('#vault-reset-confirm-modal');
   const btnCloseResetConfirm    = $('#btn-close-reset-confirm');
@@ -733,13 +739,16 @@
 
   function renderMainMenuRecent() {
     const all = Storage.getAllNotes();
+    const menuEmptySection = $('#menu-empty-section');
     if (all.length === 0) {
-      menuRecentSection.classList.add('hidden');
-      menuRecentGrid.innerHTML = '';
+      if (menuRecentSection) menuRecentSection.classList.add('hidden');
+      if (menuRecentGrid) menuRecentGrid.innerHTML = '';
+      if (menuEmptySection) menuEmptySection.classList.remove('hidden');
       return;
     }
 
-    menuRecentSection.classList.remove('hidden');
+    if (menuEmptySection) menuEmptySection.classList.add('hidden');
+    if (menuRecentSection) menuRecentSection.classList.remove('hidden');
     const sorted = [...all].sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0)).slice(0, 6);
 
     menuRecentGrid.innerHTML = sorted.map(n => `
@@ -1141,6 +1150,12 @@
         openTutorial(1);
       });
     }
+    if (settingsBtnTourWiki) {
+      settingsBtnTourWiki.addEventListener('click', () => {
+        closeProjectSettingsModal();
+        openTutorial(2);
+      });
+    }
     if (settingsBtnTourGraph) {
       settingsBtnTourGraph.addEventListener('click', () => {
         closeProjectSettingsModal();
@@ -1200,6 +1215,7 @@
       btnTimelineEmptySample.addEventListener('click', () => {
         Storage.loadStarterVault();
         renderSidebar();
+        renderMainMenuRecent();
         renderTimelineEvents();
         toast('Loaded sample vault', 'success');
       });
@@ -1208,8 +1224,44 @@
       btnCodexEmptySample.addEventListener('click', () => {
         Storage.loadStarterVault();
         renderSidebar();
+        renderMainMenuRecent();
         renderCodexUI();
         toast('Loaded sample vault', 'success');
+      });
+    }
+
+    if (menuEmptyBtnSample) {
+      menuEmptyBtnSample.addEventListener('click', () => {
+        Storage.loadStarterVault();
+        renderSidebar();
+        renderMainMenuRecent();
+        if (typeof updateSettingsStats === 'function') updateSettingsStats();
+        toast('Loaded rich sample vault template', 'success');
+      });
+    }
+    if (menuEmptyBtnGuide) {
+      menuEmptyBtnGuide.addEventListener('click', () => {
+        openTutorial(0);
+      });
+    }
+    if (dashboardBtnTutorial) {
+      dashboardBtnTutorial.addEventListener('click', () => {
+        openTutorial(0);
+      });
+    }
+
+    if (mapBtnEmptyDrop) {
+      mapBtnEmptyDrop.addEventListener('click', () => {
+        if (btnMapDropPin) btnMapDropPin.click();
+      });
+    }
+    if (mapBtnEmptySample) {
+      mapBtnEmptySample.addEventListener('click', () => {
+        Storage.loadStarterVault();
+        renderSidebar();
+        renderMainMenuRecent();
+        renderMapPins();
+        toast('Loaded sample map pins', 'success');
       });
     }
 
@@ -1479,6 +1531,7 @@
     galaxyBtnLoadDemo.addEventListener('click', () => {
       Storage.loadStarterVault();
       renderSidebar();
+      renderMainMenuRecent();
       buildGalaxyData();
       toast('Loaded sample vault', 'success');
     });
@@ -1508,17 +1561,26 @@
     // Worldbuilding Feature Tutorial Triggers
     if (btnMapTutorial) btnMapTutorial.addEventListener('click', () => openWorldbuildingTutorial('map'));
     if (btnCloseMapTutorial) btnCloseMapTutorial.addEventListener('click', () => closeWorldbuildingTutorial('map'));
-    if (btnDismissMapTutorial) btnDismissMapTutorial.addEventListener('click', () => closeWorldbuildingTutorial('map'));
+    if (btnDismissMapTutorial) btnDismissMapTutorial.addEventListener('click', () => {
+      closeWorldbuildingTutorial('map');
+      openMapView();
+    });
     if (mapTutorialModal) mapTutorialModal.addEventListener('click', e => { if (e.target === mapTutorialModal) closeWorldbuildingTutorial('map'); });
 
     if (btnTimelineTutorial) btnTimelineTutorial.addEventListener('click', () => openWorldbuildingTutorial('timeline'));
     if (btnCloseTimelineTutorial) btnCloseTimelineTutorial.addEventListener('click', () => closeWorldbuildingTutorial('timeline'));
-    if (btnDismissTimelineTutorial) btnDismissTimelineTutorial.addEventListener('click', () => closeWorldbuildingTutorial('timeline'));
+    if (btnDismissTimelineTutorial) btnDismissTimelineTutorial.addEventListener('click', () => {
+      closeWorldbuildingTutorial('timeline');
+      openTimelineView();
+    });
     if (timelineTutorialModal) timelineTutorialModal.addEventListener('click', e => { if (e.target === timelineTutorialModal) closeWorldbuildingTutorial('timeline'); });
 
     if (btnCodexTutorial) btnCodexTutorial.addEventListener('click', () => openWorldbuildingTutorial('codex'));
     if (btnCloseCodexTutorial) btnCloseCodexTutorial.addEventListener('click', () => closeWorldbuildingTutorial('codex'));
-    if (btnDismissCodexTutorial) btnDismissCodexTutorial.addEventListener('click', () => closeWorldbuildingTutorial('codex'));
+    if (btnDismissCodexTutorial) btnDismissCodexTutorial.addEventListener('click', () => {
+      closeWorldbuildingTutorial('codex');
+      openCodexView();
+    });
     if (codexTutorialModal) codexTutorialModal.addEventListener('click', e => { if (e.target === codexTutorialModal) closeWorldbuildingTutorial('codex'); });
 
     // Copyable syntax cheat sheet code snippets
@@ -2453,7 +2515,9 @@
   ];
 
   function openTutorial(step = 0) {
-    if (isProjectSettingsModalOpen) return;
+    if (isProjectSettingsModalOpen) {
+      closeProjectSettingsModal();
+    }
     currentTutorialStep = Math.max(0, Math.min(step, TUTORIAL_STEPS.length - 1));
     renderTutorialStep(currentTutorialStep);
     tutorialOverlay.classList.remove('hidden');
@@ -3930,6 +3994,34 @@
       });
     }
 
+    // Also map subtitle after colon (e.g. "Chapter I: The Obsidian Gate" -> "The Obsidian Gate")
+    for (const n of noteNodes) {
+      const full = (n.title || '').trim().toLowerCase();
+      const colonIdx = full.indexOf(':');
+      if (colonIdx !== -1) {
+        const sub = full.substring(colonIdx + 1).trim();
+        if (sub && !titleToNode.has(sub)) {
+          titleToNode.set(sub, n);
+        }
+      }
+    }
+
+    // Also map characters linked to notes so character wiki-links illuminate constellation edges
+    try {
+      const chars = Storage.getAllCharacters ? Storage.getAllCharacters() : [];
+      chars.forEach(c => {
+        if (c.name && c.noteId) {
+          const targetNode = noteNodes.find(nn => nn.id === c.noteId);
+          const cName = c.name.trim().toLowerCase();
+          if (targetNode && !titleToNode.has(cName)) {
+            titleToNode.set(cName, targetNode);
+          }
+        }
+      });
+    } catch {
+      // Ignore
+    }
+
     graphNodes = [...hubNodes, ...noteNodes];
 
     // 3. Create Edges: Category Sub-branch Hierarchy + Wiki Cross-links
@@ -5100,6 +5192,9 @@
   }
 
   function openWorldbuildingTutorial(type) {
+    if (isProjectSettingsModalOpen) {
+      closeProjectSettingsModal();
+    }
     if (type === 'map' && mapTutorialModal) {
       mapTutorialModal.classList.remove('hidden');
     } else if (type === 'timeline' && timelineTutorialModal) {
@@ -5443,6 +5538,15 @@
     const allPins = Storage.getAllMapPins();
     const query = mapPinSearch ? mapPinSearch.value.trim().toLowerCase() : '';
 
+    const mapEmptyPrompt = $('#map-empty-prompt');
+    if (mapEmptyPrompt) {
+      if (allPins.length === 0) {
+        mapEmptyPrompt.classList.remove('hidden');
+      } else {
+        mapEmptyPrompt.classList.add('hidden');
+      }
+    }
+
     const filtered = allPins.filter(pin => {
       if (mapFilter !== 'all' && pin.category !== mapFilter) return false;
       if (query && !(pin.title || '').toLowerCase().includes(query) && !(pin.description || '').toLowerCase().includes(query)) return false;
@@ -5517,6 +5621,9 @@
     }
 
     let summaryText = pin.description || '';
+    if (pin.terrain) {
+      summaryText = `[Terrain: ${pin.terrain}]\n\n${summaryText}`;
+    }
     let linkedNote = pin.noteId ? Storage.getNote(pin.noteId) : null;
     if (!linkedNote && pin.title) {
       linkedNote = Storage.findNoteByTitle(pin.title);
@@ -6484,6 +6591,7 @@
           <div class="codex-avatar">${initial}</div>
           <div class="codex-card-meta">
             <h4 class="codex-card-name">${escText(c.name)}</h4>
+            ${c.aliases ? `<div class="codex-card-alias text-xs text-muted" style="font-style: italic; margin-bottom: 2px;">"${escText(c.aliases)}"</div>` : ''}
             <div class="codex-badges">
               <span class="badge-archetype" data-type="${escText(c.archetype || 'Ally')}">${escText(c.archetype || 'Ally')}</span>
               <span class="codex-card-faction">${escText(c.faction || 'Independent')}</span>

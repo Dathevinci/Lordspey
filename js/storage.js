@@ -91,6 +91,10 @@ She reached the threshold of the Grand Vault. [[Scholar Lyra]] was frantically g
 
 — Almost, — Lyra answered without looking up, her quill scratching fiercely across the vellum[^1]. — The cipher requires three separate harmonics. Corvus holds the iron key, but the astrological vector points straight toward [[The Sunken Bastion]]!
 
+— We can ~~surrender the celestial archives~~ to spare the initiates, — whispered a frightened novice, cowering beneath the stone shelves.
+
+— We surrender nothing, — Lyra snapped fiercely. — ==Our sacred oath to the stars is non-negotiable==!
+
 * * *
 
 | Garrison Defense Sector | Commander | Defensive Status |
@@ -318,18 +322,30 @@ Working outline and structural roadmap for the manuscript.
       tags: 'brainstorm, secrets, spoilers, lore-notes',
       body: `# World Secrets & Codex Notes
 
-Confidential author reference sheet for character backstories, plot twists, and hidden lore connections.
+Confidential author reference sheet for character backstories, plot twists, psychological profiles, and hidden lore connections.
 
 ---
 
 ### The Malakor–Corvus Schism
-- [[High Inquisitor Malakor]] and [[Lord Commander Corvus]] were inducted into [[The Order of Lore]] on the exact same winter solstice in Year 290.
+- [[High Inquisitor Malakor]] (Alias: *The Cleansing Flame*) and [[Lord Commander Corvus]] (Alias: *The Iron Shield of Lore*) were inducted into [[The Order of Lore]] on the exact same winter solstice in Year 290.
 - Malakor did not abandon the Order out of malice; he believed that passive monastic observation would allow the celestial seals to burn away the mortal realm.
 - Corvus continues to wear an iron ring that mirrors Malakor's insignia.
 
 ### The Astrolabe's True Nature
 - [[The Star Astrolabe]] is not merely a tracking compass; it is the physical ignition key for the celestial wards sealing the primordial chasm beneath [[The Ashen Vale]].
-- If [[Vespera]] aligns the final ring, the veil does not close—it releases the stored celestial energy into whoever holds the brass cylinder.
+- If [[Vespera]] (Alias: *The Starbound Acolyte*) aligns the final ring, the veil does not close—it releases the stored celestial energy into whoever holds the brass cylinder.
+- [[Scholar Lyra]] (Alias: *The Star Weaver*) knows this secret, but conceals it from Vespera to prevent panic during the convergence.
+
+---
+
+### Cast Dossiers & Psychological Profiles
+
+| Character | Alias | Archetype & Faction | Core Psychological Drive |
+| :--- | :--- | :--- | :--- |
+| [[Vespera]] | The Starbound Acolyte | Protagonist · [[The Order of Lore]] | Hyper-vigilant, intellectually driven; burdened by monastic duty yet determined to prevent apocalypse. |
+| [[Lord Commander Corvus]] | The Iron Shield of Lore | Mentor · [[The Order of Lore]] | Stoic defender haunted by the Iron Schism; bound by a blood vow to protect Vespera and the citadel. |
+| [[High Inquisitor Malakor]] | The Cleansing Flame | Antagonist · The Iron Inquisition | Fanatically pragmatic utilitarian; believes unbinding primordial wards will cleanse mortal corruption. |
+| [[Scholar Lyra]] | The Star Weaver | Ally · [[The Order of Lore]] | Inquisitive, remarkably serene under siege; decodes astronomical ciphers with meticulous precision. |
 
 * * *
 
@@ -355,6 +371,7 @@ Confidential author reference sheet for character backstories, plot twists, and 
       noteId: 'demo-chap-1',
       title: 'The Obsidian Gate',
       category: 'chapter',
+      terrain: 'Alpine Mountain Pass',
       description: 'Mountain pass fortress where the Convergence occurs under the midnight vigil.',
       createdAt: Date.now() - 86400000 * 3
     },
@@ -365,6 +382,7 @@ Confidential author reference sheet for character backstories, plot twists, and 
       noteId: 'demo-world-spire',
       title: 'The Obsidian Spire & Observatory',
       category: 'world',
+      terrain: 'Volcanic Monolith & Spire',
       description: 'Nine-tiered volcanic monolith housing the celestial astrolabe chambers.',
       createdAt: Date.now() - 86400000 * 3
     },
@@ -375,6 +393,7 @@ Confidential author reference sheet for character backstories, plot twists, and 
       noteId: 'demo-lore-order',
       title: 'The Order of Lore Citadel',
       category: 'lore',
+      terrain: 'Monastic Basalt Crags',
       description: 'Ancient monastic citadel safeguarding forbidden manuscripts and cosmic history.',
       createdAt: Date.now() - 86400000 * 2
     },
@@ -385,6 +404,7 @@ Confidential author reference sheet for character backstories, plot twists, and 
       noteId: 'demo-world-vale',
       title: 'The Ashen Vale Basin',
       category: 'world',
+      terrain: 'Geothermal Highland Basin',
       description: 'Twilight highland territory shrouded in perpetual geothermal mist.',
       createdAt: Date.now() - 86400000 * 1
     },
@@ -395,6 +415,7 @@ Confidential author reference sheet for character backstories, plot twists, and 
       noteId: 'demo-world-bastion',
       title: 'The Sunken Bastion',
       category: 'world',
+      terrain: 'Subterranean Gorge',
       description: 'Subterranean fortress occupied by High Inquisitor Malakor and the Iron Tribunal.',
       createdAt: Date.now() - 86400000 * 1
     },
@@ -405,6 +426,7 @@ Confidential author reference sheet for character backstories, plot twists, and 
       noteId: 'demo-world-vale',
       title: 'The Bleeding Chasm',
       category: 'world',
+      terrain: 'Volcanic Radiant Fissure',
       description: 'Geothermal fissure glowing with ruby celestial radiance at midnight.',
       createdAt: Date.now() - 86400000 * 1
     }
@@ -467,45 +489,53 @@ Confidential author reference sheet for character backstories, plot twists, and 
     {
       id: 'char-vespera',
       name: 'Vespera',
+      aliases: 'The Starbound Acolyte',
       archetype: 'Protagonist',
       faction: 'The Order of Lore',
       role: 'Acolyte of the Veil',
       status: 'Active',
       noteId: 'demo-chap-prologue',
-      bio: 'Bearer of the nocturnal astrolabe, bound to decrypt the celestial seals before the Inquisition breaches the sanctuary.',
+      psychProfile: 'Hyper-vigilant, intellectually driven, burdened by inherited monastic duty yet resilient.',
+      bio: 'Alias: "The Starbound Acolyte". Bearer of the nocturnal astrolabe. Psychological Profile: Hyper-vigilant, intellectually driven; burdened by sacred monastic duty yet determined to prevent celestial catastrophe.',
       createdAt: Date.now() - 86400000 * 4
     },
     {
       id: 'char-corvus',
       name: 'Lord Commander Corvus',
+      aliases: 'The Iron Shield of Lore',
       archetype: 'Mentor',
       faction: 'The Order of Lore',
       role: 'Master of the Veilblades',
       status: 'Active',
       noteId: 'demo-lore-order',
-      bio: 'Veteran defender protecting the archives; swore a blood vow to protect Vespera and the astrolabe.',
+      psychProfile: 'Stoic, fiercely protective, haunted by the Iron Schism and defection of his former comrade.',
+      bio: 'Alias: "The Iron Shield of Lore". Master of Veilblades. Psychological Profile: Stoic defender haunted by the Iron Schism; bound by a blood vow to protect Vespera and the archives.',
       createdAt: Date.now() - 86400000 * 3
     },
     {
       id: 'char-malakor',
       name: 'High Inquisitor Malakor',
+      aliases: 'The Cleansing Flame',
       archetype: 'Antagonist',
       faction: 'The Iron Inquisition',
       role: 'Grand Inquisitor of the Sunken Bastion',
       status: 'Hostile',
       noteId: 'demo-world-bastion',
-      bio: 'Ruthless commander seeking to unbind the primordial seals to harness celestial fire.',
+      psychProfile: 'Fanatically utilitarian extremist; convinced that cosmic destruction is necessary purification.',
+      bio: 'Alias: "The Cleansing Flame". Grand Inquisitor. Psychological Profile: Fanatical utilitarian who broke from the Order; believes celestial unbinding is necessary to purge mortal corruption.',
       createdAt: Date.now() - 86400000 * 2
     },
     {
       id: 'char-lyra',
       name: 'Scholar Lyra',
+      aliases: 'The Star Weaver',
       archetype: 'Ally',
       faction: 'The Order of Lore',
       role: 'Chief Astromancer',
       status: 'Active',
       noteId: 'demo-lore-astrolabe',
-      bio: 'Brilliant celestial cartographer who decoded the astrolabe cipher quadrants.',
+      psychProfile: 'Methodical, deeply curious, composed under extreme pressure and siege conditions.',
+      bio: 'Alias: "The Star Weaver". Chief Astromancer. Psychological Profile: Methodical, curious, and remarkably calm under siege; decodes ancient glyphs and astrolabe harmonics under extreme pressure.',
       createdAt: Date.now() - 86400000 * 1
     }
   ];
@@ -542,6 +572,14 @@ Confidential author reference sheet for character backstories, plot twists, and 
       type: 'Pursues',
       description: 'Commands inquisitorial vanguard to capture Vespera and seize the astrolabe.',
       createdAt: Date.now()
+    },
+    {
+      id: 'rel-5',
+      sourceId: 'char-corvus',
+      targetId: 'char-lyra',
+      type: 'Advises',
+      description: 'Coordinates citadel garrison defenses in concert with stellar astrological forecasts.',
+      createdAt: Date.now() - 86400000 * 2
     }
   ];
 
@@ -567,7 +605,32 @@ Confidential author reference sheet for character backstories, plot twists, and 
   function findNoteByTitle(title) {
     if (!title) return null;
     const clean = title.trim().toLowerCase();
-    return getAllNotes().find(n => (n.title || '').trim().toLowerCase() === clean) || null;
+    const notes = getAllNotes();
+
+    // 1. Exact title match
+    const exact = notes.find(n => (n.title || '').trim().toLowerCase() === clean);
+    if (exact) return exact;
+
+    // 2. Subtitle / prefix match after colon (e.g. "Chapter I: The Obsidian Gate" matches "The Obsidian Gate")
+    const afterColon = notes.find(n => {
+      const parts = (n.title || '').split(':').map(p => p.trim().toLowerCase());
+      return parts.length > 1 && parts.some(p => p === clean);
+    });
+    if (afterColon) return afterColon;
+
+    // 3. Match character in Codex linked to an existing note
+    try {
+      const chars = getAllCharacters();
+      const char = chars.find(c => (c.name || '').trim().toLowerCase() === clean);
+      if (char && char.noteId) {
+        const charNote = notes.find(n => n.id === char.noteId);
+        if (charNote) return charNote;
+      }
+    } catch {
+      // Ignore
+    }
+
+    return null;
   }
 
   function createNote({ title, category, body = '', tags = '' }) {
@@ -661,9 +724,27 @@ Confidential author reference sheet for character backstories, plot twists, and 
   function getBacklinks(targetTitle) {
     if (!targetTitle) return [];
     const cleanTarget = targetTitle.trim().toLowerCase();
+    const colonIdx = cleanTarget.indexOf(':');
+    const cleanSubtitle = colonIdx !== -1 ? cleanTarget.substring(colonIdx + 1).trim() : null;
+
+    // Also match characters associated with this note
+    const associatedCharNames = [];
+    try {
+      const currentNote = findNoteByTitle(targetTitle);
+      if (currentNote) {
+        const chars = getAllCharacters();
+        chars.forEach(c => {
+          if (c.noteId === currentNote.id && c.name) {
+            associatedCharNames.push(c.name.trim().toLowerCase());
+          }
+        });
+      }
+    } catch {
+      // Ignore
+    }
+
     const notes = getAllNotes();
     const backlinks = [];
-
     const wikiRegex = /\[\[([^|\]\n]+)(?:\|[^\]\n]+)?\]\]/g;
 
     for (const note of notes) {
@@ -673,7 +754,8 @@ Confidential author reference sheet for character backstories, plot twists, and 
       let matched = false;
       wikiRegex.lastIndex = 0;
       while ((match = wikiRegex.exec(body)) !== null) {
-        if (match[1].trim().toLowerCase() === cleanTarget) {
+        const link = match[1].trim().toLowerCase();
+        if (link === cleanTarget || (cleanSubtitle && link === cleanSubtitle) || associatedCharNames.includes(link)) {
           matched = true;
           break;
         }

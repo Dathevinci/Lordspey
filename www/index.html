@@ -180,6 +180,25 @@
         <div id="menu-recent-grid" class="menu-recent-grid"></div>
       </div>
 
+      <!-- Empty Vault Starter Section (shown when 0 notes exist) -->
+      <div id="menu-empty-section" class="menu-empty-section hidden">
+        <div class="menu-empty-card">
+          <div class="menu-empty-left">
+            <div class="menu-empty-badge font-cinzel">✦ EMPTY VAULT STARTER</div>
+            <h4 class="menu-empty-title font-cinzel">Begin Your Novel or Explore the Sample Universe</h4>
+            <p class="menu-empty-desc">Your author workspace is pristine and ready. Craft your opening scene, or load the complete sample fantasy vault showcasing chapters, interconnected wiki-link constellations, world map pins, timeline epochs, and character codices.</p>
+          </div>
+          <div class="menu-empty-actions">
+            <button id="menu-empty-btn-sample" class="btn btn-primary menu-spey-action-btn">
+              ⚡ Load Sample Vault
+            </button>
+            <button id="menu-empty-btn-guide" class="btn btn-secondary menu-spey-action-btn">
+              ✦ Guided Walkthrough
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Native .spey Project Package Banner -->
       <div class="menu-spey-banner">
         <div class="menu-spey-banner-left">
@@ -206,6 +225,7 @@
             <span class="menu-wb-badge">✦ WORLDBUILDING & LORE SYSTEMS</span>
             <span class="menu-wb-hint">Spatial cartography, chronology, character dossiers & cosmos graph</span>
           </div>
+          <button type="button" id="dashboard-btn-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Lord Spey Guided Walkthrough">✦ Guided Walkthrough</button>
         </div>
         <div class="menu-wb-grid">
           <button class="menu-wb-card" id="dashboard-btn-map" title="Interactive World Map & Pin Placement (Ctrl+M)">
@@ -673,6 +693,21 @@
         <div class="map-stage" id="map-stage">
           <canvas id="map-canvas" width="1600" height="1000"></canvas>
           <div id="map-pins-container" class="map-pins-container"></div>
+        </div>
+
+        <!-- Map Empty Prompt (when 0 pins exist) -->
+        <div id="map-empty-prompt" class="galaxy-empty-prompt hidden">
+          <div class="galaxy-emblem">🗺️</div>
+          <h3 class="font-cinzel">World Map Cartography</h3>
+          <p>No landmark pins placed on the map yet.<br/>Drop coordinate pins to anchor citadels, passes, and regions to your lore notes.</p>
+          <div class="galaxy-prompt-actions">
+            <button class="btn btn-primary" id="map-btn-empty-drop">
+              + Drop First Pin
+            </button>
+            <button class="btn btn-ghost" id="map-btn-empty-sample">
+              ⚡ Load Sample Pins
+            </button>
+          </div>
         </div>
 
         <!-- Pin Hover / Click Preview Card -->
@@ -1185,7 +1220,7 @@
     <div class="tutorial-card">
       <div class="tutorial-card-header">
         <div class="tutorial-step-indicator">
-          <span class="tutorial-step-badge" id="tutorial-step-badge">Step 1 of 6</span>
+          <span class="tutorial-step-badge" id="tutorial-step-badge">Step 1 of 8</span>
           <span class="tutorial-category-tag" id="tutorial-category-tag">Welcome</span>
         </div>
         <button id="btn-skip-tutorial-top" class="tutorial-skip-btn" title="Skip Tutorial (Esc)">
@@ -1763,6 +1798,9 @@
                 </button>
                 <button type="button" id="settings-btn-tour-editor" class="btn btn-secondary">
                   ✍️ Editor &amp; Formatting Guide
+                </button>
+                <button type="button" id="settings-btn-tour-wiki" class="btn btn-secondary">
+                  🔗 Wiki-Links &amp; Mentions Guide
                 </button>
                 <button type="button" id="settings-btn-tour-graph" class="btn btn-secondary">
                   🌌 Galaxy Graph Guide

@@ -5113,6 +5113,60 @@ img.map-custom-img[src=""] {
   width: 100%;
 }
 
+/* Dashboard Empty Vault Starter Banner */
+.menu-empty-section {
+  margin: 18px 0 24px 0;
+  animation: fadeIn 200ms ease;
+}
+.menu-empty-section.hidden {
+  display: none !important;
+}
+.menu-empty-card {
+  padding: 22px 26px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(18, 19, 27, 0.92) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 18px rgba(239, 68, 68, 0.12);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+.menu-empty-card:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.55), 0 0 22px rgba(239, 68, 68, 0.16);
+}
+.menu-empty-left {
+  flex: 1;
+}
+.menu-empty-badge {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--red-400);
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.menu-empty-title {
+  font-size: 1.12rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+  letter-spacing: 0.03em;
+}
+.menu-empty-desc {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.48;
+  margin: 0;
+  max-width: 640px;
+}
+.menu-empty-actions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
 /* Dashboard .spey Banner */
 .menu-spey-banner {
   margin: 18px 0 24px 0;
