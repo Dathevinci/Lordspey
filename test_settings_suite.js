@@ -341,6 +341,8 @@ const cardEmerald = mockThemeCards.find(c => c.dataset.theme === 'emerald');
 cardEmerald.click();
 assert(cardEmerald.classList.contains('active'), 'Emerald card should become active');
 assert.strictEqual(localStorage.getItem('lordspey_accent_theme'), 'emerald');
+assert.strictEqual(rootElement.style.getPropertyValue('--accent'), '#10b981', 'Emerald accent must be #10b981');
+assert.strictEqual(rootElement.style.getPropertyValue('--red-glow'), 'rgba(16, 185, 129, 0.15)', 'Emerald glow must be rgba(16, 185, 129, 0.15), not purple amethyst');
 
 const cardRuby = mockThemeCards.find(c => c.dataset.theme === 'ruby');
 cardRuby.click();
@@ -402,5 +404,31 @@ assert(!settingsModal.classList.contains('hidden'));
 global.document.dispatchEvent({ type: 'keydown', key: 'Escape', preventDefault: () => {} });
 assert(settingsModal.classList.contains('hidden'), 'Escape should dismiss Settings modal');
 console.log('✓ Test 6 Passed: Escape key closes Settings modal');
+
+// Test 7: Ctrl+, Global Shortcut opens & toggles Settings modal
+global.document.dispatchEvent({ type: 'keydown', key: ',', ctrlKey: true, preventDefault: () => {} });
+assert(!settingsModal.classList.contains('hidden'), 'Ctrl+, should open Settings modal');
+global.document.dispatchEvent({ type: 'keydown', key: ',', ctrlKey: true, preventDefault: () => {} });
+assert(settingsModal.classList.contains('hidden'), 'Ctrl+, should close Settings modal');
+console.log('✓ Test 7 Passed: Ctrl+, toggles Settings modal open and closed');
+
+// Test 8: Smart Typography: Auto Em-dash & Markdown Scene Break
+const noteBody = elementsMap['note-body'];
+noteBody.value = '-';
+noteBody.selectionStart = noteBody.selectionEnd = 1;
+noteBody.dispatchEvent('keydown', { key: '-', ctrlKey: false, metaKey: false, altKey: false, preventDefault: () => {} });
+assert.strictEqual(noteBody.value, '—', 'Double hyphen -- must convert to em-dash —');
+
+// Third hyphen expands — + - to --- (Markdown scene break / hr)
+noteBody.selectionStart = noteBody.selectionEnd = 1;
+noteBody.dispatchEvent('keydown', { key: '-', ctrlKey: false, metaKey: false, altKey: false, preventDefault: () => {} });
+assert.strictEqual(noteBody.value, '---', 'Typing hyphen after em-dash must expand to ---');
+console.log('✓ Test 8 Passed: Smart typography converts -- to — and allows expansion to ---');
+
+// Test 9: HTML Option synchronization
+assert(htmlContent.includes(`value="'Inter', -apple-system, sans-serif"`), 'setting-font-family must match editor-font-select');
+assert(htmlContent.includes(`value="2.1"`), 'setting-line-height must contain 2.1 option');
+assert(htmlContent.includes('Ctrl</kbd> + <kbd>,'), 'Shortcuts cheat sheet must include Ctrl+,');
+console.log('✓ Test 9 Passed: HTML font family, line height 2.1, and shortcuts table synchronized');
 
 console.log('\n=== ALL SETTINGS & UI SUITE TESTS PASSED (100%) ===\n');

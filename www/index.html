@@ -1517,7 +1517,7 @@
                 <label class="form-label" for="setting-font-family">Default Font Family</label>
                 <select id="setting-font-family" class="form-input">
                   <option value="'Lora', Georgia, serif">Lora (Book Serif)</option>
-                  <option value="'Inter', -apple-system, BlinkMacSystemFont, sans-serif">Inter (Clean Sans)</option>
+                  <option value="'Inter', -apple-system, sans-serif">Inter (Clean Sans)</option>
                   <option value="'JetBrains Mono', monospace">JetBrains Mono (Monospace)</option>
                   <option value="'Playfair Display', Georgia, serif">Playfair Display (Editorial Display)</option>
                 </select>
@@ -1529,13 +1529,18 @@
                   <div class="settings-row-hint">Base reading font size for markdown editor and live preview.</div>
                 </div>
                 <select id="setting-font-size" class="form-input form-input-sm" style="width: 110px;">
+                  <option value="12">12 px</option>
                   <option value="13">13 px</option>
                   <option value="14">14 px</option>
                   <option value="15" selected>15 px</option>
                   <option value="16">16 px</option>
+                  <option value="17">17 px</option>
                   <option value="18">18 px</option>
+                  <option value="19">19 px</option>
                   <option value="20">20 px</option>
+                  <option value="22">22 px</option>
                   <option value="24">24 px</option>
+                  <option value="28">28 px</option>
                 </select>
               </div>
 
@@ -1549,7 +1554,8 @@
                   <option value="1.5">1.5 (Standard)</option>
                   <option value="1.8" selected>1.8 (Serene)</option>
                   <option value="2.0">2.0 (Spacious)</option>
-                  <option value="2.2">2.2 (Airy)</option>
+                  <option value="2.1">2.1 (Airy)</option>
+                  <option value="2.2">2.2 (Expanded)</option>
                 </select>
               </div>
             </div>
@@ -1705,6 +1711,11 @@
                     <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
                     <td>Instant Save Active Note</td>
                     <td>Editor</td>
+                  </tr>
+                  <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>,</kbd></td>
+                    <td>Lord Spey Settings Modal</td>
+                    <td>Global</td>
                   </tr>
                   <tr>
                     <td><kbd>Esc</kbd></td>

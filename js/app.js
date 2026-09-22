@@ -389,14 +389,61 @@
   // Tutorial state
   let currentTutorialStep = 0;
 
+  let CATEGORY_META = null;
+  let codexMode = 'cards';
+  let lastCodexChars = [];
+  let lastCodexRels = [];
+
   // Author Typography & Writing Mode State
-  let currentEditorFont   = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_editor_font')) || "'Lora', Georgia, serif";
-  let currentFontSize     = (typeof localStorage !== 'undefined' && parseInt(localStorage.getItem('lordspey_editor_font_size'), 10)) || 15;
-  let currentLineHeight   = (typeof localStorage !== 'undefined' && parseFloat(localStorage.getItem('lordspey_editor_line_spacing'))) || 1.8;
-  let typewriterMode      = typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_typewriter_mode') === 'true';
-  let autoEmDash          = typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_auto_emdash') !== 'false';
-  let smartQuotes         = typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_smart_quotes') === 'true';
-  let currentAccentTheme  = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_accent_theme')) || 'crimson';
+  let currentEditorFont   = "'Lora', Georgia, serif";
+  let currentFontSize     = 15;
+  let currentLineHeight   = 1.8;
+  let typewriterMode      = false;
+  let autoEmDash          = true;
+  let smartQuotes         = false;
+  let currentAccentTheme  = 'crimson';
+
+  function loadUserPreferences() {
+    const s = (typeof Storage !== 'undefined' && typeof Storage.getSettings === 'function') ? Storage.getSettings() : {};
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_accent_theme')) {
+      currentAccentTheme = localStorage.getItem('lordspey_accent_theme');
+    } else if (s.accentTheme) {
+      currentAccentTheme = s.accentTheme;
+    }
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_editor_font')) {
+      currentEditorFont = localStorage.getItem('lordspey_editor_font');
+    } else if (s.defaultFontFamily) {
+      currentEditorFont = s.defaultFontFamily;
+    }
+    if (currentEditorFont && currentEditorFont.includes('Inter')) {
+      currentEditorFont = "'Inter', -apple-system, sans-serif";
+    }
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_editor_font_size')) {
+      currentFontSize = parseInt(localStorage.getItem('lordspey_editor_font_size'), 10) || 15;
+    } else if (s.defaultFontSize) {
+      currentFontSize = parseInt(s.defaultFontSize, 10) || 15;
+    }
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_editor_line_spacing')) {
+      currentLineHeight = parseFloat(localStorage.getItem('lordspey_editor_line_spacing')) || 1.8;
+    } else if (s.defaultLineHeight) {
+      currentLineHeight = parseFloat(s.defaultLineHeight) || 1.8;
+    }
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_typewriter_mode') !== null) {
+      typewriterMode = localStorage.getItem('lordspey_typewriter_mode') === 'true';
+    } else if (typeof s.typewriterMode === 'boolean') {
+      typewriterMode = s.typewriterMode;
+    }
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_auto_emdash') !== null) {
+      autoEmDash = localStorage.getItem('lordspey_auto_emdash') !== 'false';
+    } else if (typeof s.autoEmDash === 'boolean') {
+      autoEmDash = s.autoEmDash;
+    }
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_smart_quotes') !== null) {
+      smartQuotes = localStorage.getItem('lordspey_smart_quotes') === 'true';
+    } else if (typeof s.smartQuotes === 'boolean') {
+      smartQuotes = s.smartQuotes;
+    }
+  }
 
   // Find & Replace State
   let findMatches         = [];
@@ -456,7 +503,7 @@
       red400: '#34d399',
       red500: '#10b981',
       red600: '#059669',
-      redGlow: 'rgba(168, 85, 247, 0.15)',
+      redGlow: 'rgba(16, 185, 129, 0.15)',
       redGlowStrong: 'rgba(16, 185, 129, 0.3)'
     }
   };
@@ -490,12 +537,30 @@
         }
       });
     }
+
+    // Refresh canvas renders if active
+    if (CATEGORY_META && CATEGORY_META.chapter) {
+      CATEGORY_META.chapter.color = theme.accent;
+      CATEGORY_META.chapter.halo = theme.accent;
+      CATEGORY_META.chapter.glow = theme.redGlowStrong;
+    }
+    if (codexMode === 'web' && codexModal && !codexModal.classList.contains('hidden')) {
+      if (typeof renderCodexWeb === 'function') {
+        renderCodexWeb(lastCodexChars, lastCodexRels);
+      }
+    }
+    if (mapModal && !mapModal.classList.contains('hidden') && typeof Storage !== 'undefined' && typeof Storage.getCustomMapImage === 'function' && !Storage.getCustomMapImage()) {
+      if (typeof renderProceduralWorldMap === 'function') {
+        renderProceduralWorldMap();
+      }
+    }
   }
 
   // ── Init ──
   init();
 
   function init() {
+    loadUserPreferences();
     renderSidebar();
     applyAccentTheme(currentAccentTheme);
     applyTypographySettings();
@@ -968,9 +1033,11 @@
           return;
         }
         if (confirm('Restore workspace from latest in-browser snapshot? Current unsaved modifications will be replaced.')) {
+          clearTimeout(saveTimer);
+          activeNoteId = null;
           const success = Storage.restoreVaultBackup();
           if (success) {
-            renderSidebar();
+            refreshWorkspaceAfterImport();
             renderProjectSettingsStats();
             toast('Vault restored from snapshot', 'success');
           } else {
@@ -1367,22 +1434,34 @@
         return;
       }
 
-      // Smart Typography: Auto Em-Dash (--)
-      if (autoEmDash && e.key === '-' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const isInsideCode = noteBody.value.substring(0, noteBody.selectionStart).split('```').length % 2 === 0;
+
+      // Smart Typography: Auto Em-Dash (--) & Triple Hyphen Scene Break (---)
+      if (autoEmDash && !isInsideCode && e.key === '-' && !e.ctrlKey && !e.metaKey && !e.altKey) {
         const start = noteBody.selectionStart;
         const end = noteBody.selectionEnd;
         const val = noteBody.value;
-        if (start === end && start > 0 && val[start - 1] === '-') {
-          e.preventDefault();
-          noteBody.value = val.substring(0, start - 1) + '—' + val.substring(start);
-          noteBody.selectionStart = noteBody.selectionEnd = start;
-          noteBody.dispatchEvent(new Event('input'));
-          return;
+        if (start === end && start > 0) {
+          // If previous character is already an em-dash, typing another hyphen expands into markdown triple hyphen (---)
+          if (val[start - 1] === '—') {
+            e.preventDefault();
+            noteBody.value = val.substring(0, start - 1) + '---' + val.substring(start);
+            noteBody.selectionStart = noteBody.selectionEnd = start + 2;
+            noteBody.dispatchEvent(new Event('input'));
+            return;
+          }
+          if (val[start - 1] === '-') {
+            e.preventDefault();
+            noteBody.value = val.substring(0, start - 1) + '—' + val.substring(start);
+            noteBody.selectionStart = noteBody.selectionEnd = start;
+            noteBody.dispatchEvent(new Event('input'));
+            return;
+          }
         }
       }
 
       // Smart Typography: Smart Curly Quotes
-      if (smartQuotes && (e.key === '"' || e.key === "'") && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (smartQuotes && !isInsideCode && (e.key === '"' || e.key === "'") && !e.ctrlKey && !e.metaKey && !e.altKey) {
         e.preventDefault();
         const start = noteBody.selectionStart;
         const end = noteBody.selectionEnd;
@@ -1744,6 +1823,8 @@
   function executeImportReplace() {
     if (!pendingSpeyData) return;
     try {
+      clearTimeout(saveTimer);
+      activeNoteId = null;
       const res = Storage.importSpeyPackage(pendingSpeyData.raw, 'replace', true);
       toast(`Project "${pendingSpeyData.projectName}" loaded (vault safely archived)`, 'success');
       closeSpeyImportModal();
@@ -1756,6 +1837,7 @@
   function executeImportMerge() {
     if (!pendingSpeyData) return;
     try {
+      clearTimeout(saveTimer);
       const res = Storage.importSpeyPackage(pendingSpeyData.raw, 'merge', false);
       toast(`Merged ${res.addedNotes} item(s) into existing workspace`, 'success');
       closeSpeyImportModal();
@@ -1777,6 +1859,11 @@
       if (typeof closeOutlineDrawer === 'function') closeOutlineDrawer();
       else outlineDrawer.classList.add('hidden');
     }
+
+    loadUserPreferences();
+    applyAccentTheme(currentAccentTheme);
+    applyTypographySettings();
+    applyTypewriterState();
 
     renderSidebar();
     renderMainMenuRecent();
@@ -1942,6 +2029,8 @@
   }
 
   function executeVaultReset() {
+    clearTimeout(saveTimer);
+    activeNoteId = null;
     Storage.clearVault();
     if (vaultResetConfirmModal) vaultResetConfirmModal.classList.add('hidden');
     renderSidebar();
@@ -2427,6 +2516,16 @@
 
   // ── Keyboard shortcuts ──
   function handleGlobalShortcuts(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+      e.preventDefault();
+      if (isProjectSettingsModalOpen) {
+        closeProjectSettingsModal();
+      } else {
+        openProjectSettingsModal('vault');
+      }
+      return;
+    }
+
     if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'k' || e.key.toLowerCase() === 'o')) {
       e.preventDefault();
       openQuickSwitcher();
@@ -3174,6 +3273,15 @@
   };
 
   function getCategoryRgba(cat, alpha) {
+    if (cat === 'chapter' && CATEGORY_META && CATEGORY_META.chapter) {
+      const hex = CATEGORY_META.chapter.color;
+      if (hex && hex.startsWith('#') && hex.length === 7) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      }
+    }
     const map = {
       chapter: `rgba(239, 68, 68, ${alpha})`,
       lore: `rgba(249, 115, 22, ${alpha})`,
@@ -3183,13 +3291,13 @@
     return map[cat] || `rgba(239, 68, 68, ${alpha})`;
   }
 
-  const CATEGORY_META = {
+  CATEGORY_META = {
     chapter: {
       key: 'chapter',
       name: 'Chapters',
-      color: '#ef4444',
-      halo: '#ef4444',
-      glow: 'rgba(239, 68, 68, 0.45)',
+      color: (ACCENT_THEMES[currentAccentTheme] && ACCENT_THEMES[currentAccentTheme].accent) || '#ef4444',
+      halo: (ACCENT_THEMES[currentAccentTheme] && ACCENT_THEMES[currentAccentTheme].accent) || '#ef4444',
+      glow: (ACCENT_THEMES[currentAccentTheme] && ACCENT_THEMES[currentAccentTheme].redGlowStrong) || 'rgba(239, 68, 68, 0.45)',
       core: '#ffffff',
       icon: '✦',
       angle: -3 * Math.PI / 4,
@@ -4527,7 +4635,7 @@
   let timelineTouchStartStep = 320;
   let timelineDidPan = false;
 
-  let codexMode = 'cards'; // 'cards' or 'web'
+  codexMode = 'cards'; // 'cards' or 'web'
   let codexFilter = 'all';
   let hoveredCharId = null;
   let codexWebCamera = { x: 0, y: 0, zoom: 1 };
@@ -4865,8 +4973,12 @@
     }
     ctx.fillRect(0, 0, w, h);
 
+    const mapTheme = ACCENT_THEMES[currentAccentTheme] || ACCENT_THEMES['crimson'];
+    const mapAccentColor = mapTheme.accent;
+    const mapGlowColor = mapTheme.redGlowStrong || 'rgba(239, 68, 68, 0.5)';
+
     // Coordinate grid lines
-    ctx.strokeStyle = 'rgba(239, 68, 68, 0.07)';
+    ctx.strokeStyle = mapTheme.redGlow || 'rgba(239, 68, 68, 0.07)';
     ctx.lineWidth = 1;
     if (ctx.setLineDash) ctx.setLineDash([4, 6]);
 
@@ -4885,7 +4997,7 @@
     if (ctx.setLineDash) ctx.setLineDash([]);
 
     // Outer border
-    ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
+    ctx.strokeStyle = mapGlowColor;
     ctx.lineWidth = 2;
     if (ctx.strokeRect) ctx.strokeRect(20, 20, w - 40, h - 40);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
@@ -4893,7 +5005,7 @@
 
     // Decorative corner diamond runes
     const corners = [[20, 20], [w - 20, 20], [20, h - 20], [w - 20, h - 20]];
-    ctx.fillStyle = '#ef4444';
+    ctx.fillStyle = mapAccentColor;
     corners.forEach(([cx, cy]) => {
       ctx.beginPath();
       ctx.arc(cx, cy, 4, 0, Math.PI * 2);
@@ -4903,7 +5015,7 @@
     // Western Continent: The Ashen Highlands
     if (ctx.save) ctx.save();
     ctx.fillStyle = '#12141e';
-    ctx.strokeStyle = '#ef4444';
+    ctx.strokeStyle = mapAccentColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(140, 320);
@@ -4927,7 +5039,7 @@
     // Eastern Continent: The Starfall Expanse
     if (ctx.save) ctx.save();
     ctx.fillStyle = '#11131c';
-    ctx.strokeStyle = '#ef4444';
+    ctx.strokeStyle = mapAccentColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(960, 240);
@@ -4965,9 +5077,9 @@
     });
     ctx.stroke();
 
-    // The Bleeding Chasm (crimson rift)
+    // The Bleeding Chasm (rift)
     if (ctx.save) ctx.save();
-    ctx.strokeStyle = '#ef4444';
+    ctx.strokeStyle = mapAccentColor;
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(600, 510);
@@ -4983,7 +5095,7 @@
       [720, 820, 28], [790, 860, 22], [850, 840, 18], [680, 890, 14]
     ];
     ctx.fillStyle = '#141724';
-    ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+    ctx.strokeStyle = mapGlowColor;
     ctx.lineWidth = 1.5;
     islands.forEach(([ix, iy, r]) => {
       ctx.beginPath();
@@ -4996,7 +5108,7 @@
     const astrolabeX = 1440;
     const astrolabeY = 850;
     if (ctx.save) ctx.save();
-    ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
+    ctx.strokeStyle = mapGlowColor;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(astrolabeX, astrolabeY, 54, 0, Math.PI * 2);
@@ -5008,7 +5120,7 @@
     for (let a = 0; a < 8; a++) {
       const angle = (a * Math.PI) / 4;
       const len = a % 2 === 0 ? 50 : 32;
-      ctx.fillStyle = a % 2 === 0 ? '#ef4444' : 'rgba(255, 255, 255, 0.4)';
+      ctx.fillStyle = a % 2 === 0 ? mapAccentColor : 'rgba(255, 255, 255, 0.4)';
       ctx.beginPath();
       ctx.moveTo(astrolabeX, astrolabeY);
       ctx.lineTo(astrolabeX + Math.cos(angle - 0.15) * 14, astrolabeY + Math.sin(angle - 0.15) * 14);
@@ -5745,8 +5857,8 @@
   // ── 3. Character Codex & Relationship Web ──
 
   let activeCodexNodes = [];
-  let lastCodexChars = [];
-  let lastCodexRels = [];
+  lastCodexChars = [];
+  lastCodexRels = [];
 
   function getCodexWorldCoords(clientX, clientY) {
     const rect = codexWebCanvas && codexWebCanvas.getBoundingClientRect ? codexWebCanvas.getBoundingClientRect() : { left: 0, top: 0, width: 1200, height: 800 };
@@ -6239,7 +6351,11 @@
       if (ctx.save) ctx.save();
       if (isDimmed) ctx.globalAlpha = 0.3;
 
-      ctx.shadowColor = '#ef4444';
+      const codexTheme = ACCENT_THEMES[currentAccentTheme] || ACCENT_THEMES['crimson'];
+      const codexAccentColor = codexTheme.accent;
+      const codexGlowColor = codexTheme.redGlowStrong || 'rgba(239, 68, 68, 0.5)';
+
+      ctx.shadowColor = codexAccentColor;
       ctx.shadowBlur = isHovered ? 20 : 8;
 
       ctx.fillStyle = '#0f111a';
@@ -6247,7 +6363,7 @@
       ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.strokeStyle = isHovered ? '#ef4444' : 'rgba(239, 68, 68, 0.5)';
+      ctx.strokeStyle = isHovered ? codexAccentColor : codexGlowColor;
       ctx.lineWidth = isHovered ? 3 : 2;
       ctx.stroke();
 
