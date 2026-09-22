@@ -1451,7 +1451,16 @@
     });
 
     // Global keyboard shortcuts
-    document.addEventListener('keydown', handleGlobalShortcuts);
+    let lastHandledKeyEvent = null;
+    const shortcutHandler = (e) => {
+      if (e === lastHandledKeyEvent) return;
+      lastHandledKeyEvent = e;
+      handleGlobalShortcuts(e);
+    };
+    document.addEventListener('keydown', shortcutHandler);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', shortcutHandler);
+    }
 
     // Tab key & Smart Typography inside textarea
     noteBody.addEventListener('keydown', e => {
@@ -1916,86 +1925,98 @@
     });
   }
 
+  function loadSettingsValues() {
+    const settings = (typeof Storage !== 'undefined' && typeof Storage.getSettings === 'function')
+      ? Storage.getSettings()
+      : {};
+
+    // 1. Project Identity
+    if (settingProjectTitle) {
+      settingProjectTitle.value = settings.projectTitle || (typeof Storage !== 'undefined' && typeof Storage.getProjectTitle === 'function' ? Storage.getProjectTitle() : 'Lord Spey Manuscript');
+    }
+    if (settingProjectAuthor) {
+      settingProjectAuthor.value = settings.projectAuthor || 'Lord Spey';
+    }
+    renderProjectSettingsStats();
+
+    // 2. Editor & Writing Preferences
+    if (settingFontFamily) {
+      settingFontFamily.value = currentEditorFont;
+    }
+    if (settingFontSize) {
+      settingFontSize.value = String(currentFontSize);
+    }
+    if (settingLineHeight) {
+      settingLineHeight.value = String(currentLineHeight);
+    }
+    if (settingTypewriterToggle) {
+      settingTypewriterToggle.checked = typewriterMode;
+    }
+    if (settingAutoEmdash) {
+      settingAutoEmdash.checked = autoEmDash;
+    }
+    if (settingSmartQuotes) {
+      settingSmartQuotes.checked = smartQuotes;
+    }
+
+    // 3. Appearance & Accent Theme
+    const isSkipIntro = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_skip_intro') === 'true') ||
+                        (settings && settings.skipIntro === true);
+    if (settingIntroStarToggle) {
+      settingIntroStarToggle.checked = !isSkipIntro;
+    }
+    applyAccentTheme(currentAccentTheme);
+  }
+
   function openProjectSettingsModal(initialTab = 'vault') {
     if (typeof initialTab !== 'string') initialTab = 'vault';
     const targetModal = projectSettingsModal || settingsModal || $('#project-settings-modal') || $('#settings-modal');
     if (!targetModal) return;
     isProjectSettingsModalOpen = true;
 
-    if (introSplash && !introSplash.classList.contains('hidden')) {
-      if (introTimer) {
-        clearTimeout(introTimer);
-        introTimer = null;
-      }
-      if (dismissTimer) {
-        clearTimeout(dismissTimer);
-        dismissTimer = null;
-      }
+    // Clear any pending intro animation or auto-tutorial timers
+    if (introTimer) {
+      clearTimeout(introTimer);
+      introTimer = null;
+    }
+    if (dismissTimer) {
+      clearTimeout(dismissTimer);
+      dismissTimer = null;
+    }
+    isInitialTutorialHandled = true;
+
+    if (introSplash) {
       introSplash.classList.remove('intro-animating', 'intro-fade-out');
       introSplash.classList.add('hidden');
+      if (introSplash.style) introSplash.style.display = 'none';
       if (typeof introSplash.setAttribute === 'function') {
         introSplash.setAttribute('aria-hidden', 'true');
       }
       isIntroActive = false;
     }
 
+    if (tutorialOverlay && !tutorialOverlay.classList.contains('hidden')) {
+      tutorialOverlay.classList.add('hidden');
+    }
+
     try {
-      const settings = (typeof Storage !== 'undefined' && typeof Storage.getSettings === 'function')
-        ? Storage.getSettings()
-        : {};
-
-      // 1. Project Identity
-      if (settingProjectTitle) {
-        settingProjectTitle.value = settings.projectTitle || (typeof Storage !== 'undefined' && typeof Storage.getProjectTitle === 'function' ? Storage.getProjectTitle() : 'Lord Spey Manuscript');
-      }
-      if (settingProjectAuthor) {
-        settingProjectAuthor.value = settings.projectAuthor || 'Lord Spey';
-      }
-      renderProjectSettingsStats();
-
-      // 2. Editor & Writing Preferences
-      if (settingFontFamily) {
-        settingFontFamily.value = currentEditorFont;
-      }
-      if (settingFontSize) {
-        settingFontSize.value = String(currentFontSize);
-      }
-      if (settingLineHeight) {
-        settingLineHeight.value = String(currentLineHeight);
-      }
-      if (settingTypewriterToggle) {
-        settingTypewriterToggle.checked = typewriterMode;
-      }
-      if (settingAutoEmdash) {
-        settingAutoEmdash.checked = autoEmDash;
-      }
-      if (settingSmartQuotes) {
-        settingSmartQuotes.checked = smartQuotes;
-      }
-
-      // 3. Appearance & Accent Theme
-      const isSkipIntro = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_skip_intro') === 'true') ||
-                          (settings && settings.skipIntro === true);
-      if (settingIntroStarToggle) {
-        settingIntroStarToggle.checked = !isSkipIntro;
-      }
-      applyAccentTheme(currentAccentTheme);
-
-      // Switch tab
+      loadSettingsValues();
       switchSettingsTab(initialTab);
     } catch (err) {
       console.error('Error populating settings modal:', err);
     }
 
-    if (projectSettingsModal) {
-      projectSettingsModal.classList.remove('hidden');
-      projectSettingsModal.style.display = 'flex';
-      projectSettingsModal.style.zIndex = '260';
-    }
-    if (settingsModal && settingsModal !== projectSettingsModal) {
-      settingsModal.classList.remove('hidden');
-      settingsModal.style.display = 'flex';
-      settingsModal.style.zIndex = '260';
+    const modalsToActivate = [targetModal, projectSettingsModal, settingsModal, $('#project-settings-modal'), $('#settings-modal')].filter(Boolean);
+    const seenModals = new Set();
+    for (const m of modalsToActivate) {
+      if (seenModals.has(m)) continue;
+      seenModals.add(m);
+      m.classList.remove('hidden');
+      m.style.display = 'flex';
+      m.style.zIndex = '260';
+      m.style.opacity = '1';
+      m.style.visibility = 'visible';
+      m.style.pointerEvents = 'auto';
     }
   }
   const openSettingsModal = openProjectSettingsModal;
@@ -2115,13 +2136,16 @@
 
   function closeProjectSettingsModal() {
     isProjectSettingsModalOpen = false;
-    if (projectSettingsModal) {
-      projectSettingsModal.classList.add('hidden');
-      projectSettingsModal.style.display = 'none';
-    }
-    if (settingsModal && settingsModal !== projectSettingsModal) {
-      settingsModal.classList.add('hidden');
-      settingsModal.style.display = 'none';
+    const targetModal = projectSettingsModal || settingsModal || $('#project-settings-modal') || $('#settings-modal');
+    const modalsToClose = [targetModal, projectSettingsModal, settingsModal, $('#project-settings-modal'), $('#settings-modal')].filter(Boolean);
+    const seenModals = new Set();
+    for (const m of modalsToClose) {
+      if (seenModals.has(m)) continue;
+      seenModals.add(m);
+      m.classList.add('hidden');
+      m.style.display = 'none';
+      m.style.visibility = 'hidden';
+      m.style.pointerEvents = 'none';
     }
   }
   const closeSettingsModal = closeProjectSettingsModal;
@@ -2187,6 +2211,7 @@
     window.closeProjectSettingsModal = closeProjectSettingsModal;
     window.openSettingsModal = openSettingsModal;
     window.closeSettingsModal = closeSettingsModal;
+    window.loadSettingsValues = loadSettingsValues;
     window.isProjectSettingsModalOpen = () => isProjectSettingsModalOpen;
     window.isSettingsModalOpen = () => isProjectSettingsModalOpen;
     window.openSpeyImportModal = openSpeyImportModal;
@@ -2627,7 +2652,9 @@
   function handleGlobalShortcuts(e) {
     if ((e.ctrlKey || e.metaKey) && (e.key === ',' || e.code === 'Comma')) {
       e.preventDefault();
-      if (isProjectSettingsModalOpen) {
+      const targetModal = projectSettingsModal || settingsModal || $('#project-settings-modal') || $('#settings-modal');
+      const isVisible = isProjectSettingsModalOpen || (targetModal && !targetModal.classList.contains('hidden') && targetModal.style.display !== 'none');
+      if (isVisible) {
         closeProjectSettingsModal();
       } else {
         openProjectSettingsModal('vault');

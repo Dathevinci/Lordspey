@@ -5306,13 +5306,20 @@ img.map-custom-img[src=""] {
 }
 
 #project-settings-modal:not(.hidden),
-#settings-modal:not(.hidden) {
+#settings-modal:not(.hidden),
+.project-settings-modal:not(.hidden) {
   display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 #project-settings-modal.hidden,
-#settings-modal.hidden {
+#settings-modal.hidden,
+.project-settings-modal.hidden {
   display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 #vault-reset-confirm-modal {
@@ -5434,11 +5441,13 @@ img.map-custom-img[src=""] {
 
 .settings-pane {
   display: none;
-  animation: fadeIn 150ms ease;
+  opacity: 1;
 }
 
 .settings-pane.active {
   display: block;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .settings-group {
