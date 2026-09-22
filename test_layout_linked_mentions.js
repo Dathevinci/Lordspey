@@ -59,7 +59,10 @@ assert(cssContent.includes('border-top: 1px solid var(--border-subtle)'), 'Linke
 assert(cssContent.includes('#linked-mentions.collapsed') || cssContent.includes('.backlinks-panel.collapsed'),
   'CSS must support collapsed state for linked mentions');
 
-console.log('✓ CSS layout isolation rules verified: flex: 1 0 auto, field-sizing: content, and subtle border-top');
+// Verify nested reset rule prevents double borders and duplicate padding
+assert(cssContent.includes('.linked-mentions-wrapper .backlinks-panel'), 'CSS must include nested reset rule for .backlinks-panel');
+
+console.log('✓ CSS layout isolation rules verified: flex: 1 0 auto, field-sizing: content, subtle border-top, and nested panel reset');
 
 // 3. Mock DOM & Geometry Collision Engine
 console.log('\n--- 3. Running DOM Layout Geometry & Collision Verification ---');
@@ -129,6 +132,13 @@ function checkCollision(r1, r2) {
     r1.right <= r2.left
   );
 }
+
+// Regression Test: Verify detector accurately flags the original bug state
+const oldBugPreviewRect = { top: 218, bottom: 1827, left: 290, right: 1260 };
+const oldBugBacklinksRect = { top: 680, bottom: 1062, left: 290, right: 1260 };
+assert.strictEqual(checkCollision(oldBugPreviewRect, oldBugBacklinksRect), true,
+  'checkCollision MUST accurately detect the original bug collision condition');
+console.log('✓ Regression detector verified: Original bug geometry is accurately flagged as collision');
 
 const previewCollision = checkCollision(notePreviewRect, linkedMentionsRect);
 assert.strictEqual(previewCollision, false, 'Linked Mentions MUST NOT overlap with #note-preview in reading mode');

@@ -1910,6 +1910,19 @@ mark.md-highlight {
   transition: background var(--transition), border-color var(--transition);
 }
 
+/* Reset nested backlinks-panel inside linked-mentions-wrapper to prevent double border, double padding, and double background */
+.linked-mentions-wrapper .backlinks-panel,
+.linked-mentions-wrapper #backlinks-panel {
+  border: none;
+  border-top: none;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 .backlinks-header {
   display: flex;
   align-items: center;
@@ -1943,6 +1956,10 @@ mark.md-highlight {
 
 .backlinks-header .chevron {
   transition: transform 200ms ease;
+}
+#linked-mentions.collapsed,
+.backlinks-panel.collapsed {
+  padding-bottom: 20px;
 }
 #linked-mentions.collapsed .chevron,
 .backlinks-panel.collapsed .chevron {
@@ -3223,6 +3240,11 @@ body.zen-mode .format-bar:hover {
   .backlinks-panel {
     padding: 16px 20px 32px;
     margin-top: 24px;
+  }
+  .linked-mentions-wrapper .backlinks-panel,
+  .linked-mentions-wrapper #backlinks-panel {
+    padding: 0;
+    margin: 0;
   }
 
   .graph-dialog {

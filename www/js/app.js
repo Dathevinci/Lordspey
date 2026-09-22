@@ -230,7 +230,13 @@
   }
 
   function adjustNoteBodyHeight() {
-    if (!noteBody || previewMode || splitMode) return;
+    if (!noteBody) return;
+    if (previewMode || splitMode) {
+      if (noteBody.style && noteBody.style.height) {
+        noteBody.style.height = '';
+      }
+      return;
+    }
     if (typeof window !== 'undefined' && window.CSS && CSS.supports && CSS.supports('field-sizing', 'content')) {
       return;
     }
@@ -1792,11 +1798,13 @@
       notePreview.classList.remove('hidden');
       notePreview.innerHTML = Markdown.render(noteBody.value);
       btnSplit.classList.add('active');
+      adjustNoteBodyHeight();
       toast('Live Split-View enabled', 'info');
     } else {
       editorBodyWrap.classList.remove('split-mode');
       notePreview.classList.add('hidden');
       btnSplit.classList.remove('active');
+      adjustNoteBodyHeight();
       toast('Split-View closed', 'info');
     }
   }
@@ -1814,10 +1822,12 @@
       noteBody.classList.add('hidden');
       notePreview.classList.remove('hidden');
       btnPreview.classList.add('active');
+      adjustNoteBodyHeight();
     } else {
       noteBody.classList.remove('hidden');
       notePreview.classList.add('hidden');
       btnPreview.classList.remove('active');
+      adjustNoteBodyHeight();
     }
   }
 
