@@ -1470,26 +1470,33 @@ body {
 
 /* Scroll Container */
 .editor-scroll-container {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  position: relative;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Editor body */
 .editor-body {
-  flex: 1;
-  min-height: 400px;
+  flex: 1 0 auto;
+  min-height: min-content;
   position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .editor-textarea {
   width: 100%;
-  min-height: 400px;
-  flex: 1;
-  padding: 20px 32px 40px;
+  min-height: calc(100vh - 280px);
+  flex: 1 0 auto;
+  padding: 20px 32px 80px;
   font-family: var(--editor-font, 'Lora', Georgia, serif);
   font-size: var(--editor-font-size, 15px);
   line-height: var(--editor-line-height, 1.8);
@@ -1501,6 +1508,8 @@ body {
   tab-size: 2;
   overflow-y: auto;
   transition: font-size 120ms ease, line-height 120ms ease;
+  box-sizing: border-box;
+  field-sizing: content;
 }
 .editor-textarea.typewriter-mode {
   padding-bottom: 55vh !important;
@@ -1515,14 +1524,17 @@ body {
 /* Reading Mode / Preview */
 .editor-preview {
   width: 100%;
-  min-height: 400px;
-  flex: 1;
-  padding: 24px 36px 60px;
+  min-height: calc(100vh - 280px);
+  flex: 1 0 auto;
+  height: auto;
+  padding: 24px 36px 80px;
   font-family: var(--editor-font, 'Lora', Georgia, serif);
   font-size: calc(var(--editor-font-size, 15px) * 1.05);
   line-height: var(--editor-line-height, 1.8);
   color: #e4e4e7;
   transition: font-size 120ms ease, line-height 120ms ease;
+  box-sizing: border-box;
+  overflow: visible;
 }
 .editor-preview.hidden {
   display: none;
@@ -1873,11 +1885,29 @@ mark.md-highlight {
 /* ═══════════════════════════
    BACKLINKS / LINKED MENTIONS
    ═══════════════════════════ */
+#linked-mentions,
+.linked-mentions-wrapper {
+  width: 100%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: block;
+}
+
+#linked-mentions,
+#backlinks-panel,
 .backlinks-panel {
   border-top: 1px solid var(--border-subtle);
-  background: rgba(14, 14, 18, 0.6);
-  padding: 16px 32px 32px;
-  margin-top: 20px;
+  background: rgba(14, 14, 18, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 24px 32px 48px;
+  margin-top: 32px;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  transition: background var(--transition), border-color var(--transition);
 }
 
 .backlinks-header {
@@ -1886,7 +1916,7 @@ mark.md-highlight {
   justify-content: space-between;
   cursor: pointer;
   user-select: none;
-  padding-bottom: 12px;
+  padding-bottom: 14px;
 }
 
 .backlinks-title {
@@ -1914,9 +1944,11 @@ mark.md-highlight {
 .backlinks-header .chevron {
   transition: transform 200ms ease;
 }
+#linked-mentions.collapsed .chevron,
 .backlinks-panel.collapsed .chevron {
   transform: rotate(-90deg);
 }
+#linked-mentions.collapsed .backlinks-content,
 .backlinks-panel.collapsed .backlinks-content {
   display: none;
 }
@@ -2013,6 +2045,8 @@ body.zen-mode .sidebar-expand-btn {
 }
 body.zen-mode .editor-header,
 body.zen-mode .editor-body,
+body.zen-mode #linked-mentions,
+body.zen-mode .linked-mentions-wrapper,
 body.zen-mode .backlinks-panel {
   max-width: 780px;
   margin-left: auto;
@@ -2745,16 +2779,20 @@ body.zen-mode .format-bar:hover {
 #editor-body-wrap.split-mode {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: 450px;
+  min-height: calc(100vh - 280px);
+  height: auto;
 }
 #editor-body-wrap.split-mode .editor-textarea {
   display: block !important;
   border-right: 1px solid var(--border-subtle);
   overflow-y: auto;
+  max-height: calc(100vh - 240px);
+  field-sizing: fixed;
 }
 #editor-body-wrap.split-mode .editor-preview {
   display: block !important;
   overflow-y: auto;
+  max-height: calc(100vh - 240px);
 }
 
 /* ═══════════════════════════
@@ -3174,10 +3212,17 @@ body.zen-mode .format-bar:hover {
   #editor-body-wrap.split-mode .editor-textarea {
     border-right: none;
     border-bottom: 1px solid var(--border-subtle);
+    max-height: 45vh;
+  }
+  #editor-body-wrap.split-mode .editor-preview {
+    max-height: 45vh;
   }
 
+  #linked-mentions,
+  #backlinks-panel,
   .backlinks-panel {
-    padding: 16px 20px 24px;
+    padding: 16px 20px 32px;
+    margin-top: 24px;
   }
 
   .graph-dialog {

@@ -214,11 +214,32 @@
   const statSelWords       = $('#stat-sel-words');
   const statSelChars       = $('#stat-sel-chars');
 
-  // Backlinks
+  // Backlinks & Linked Mentions
   const backlinksPanel   = $('#backlinks-panel');
+  const linkedMentions   = $('#linked-mentions') || backlinksPanel;
   const backlinksHeader  = $('#backlinks-toggle-header');
   const backlinksCount   = $('#backlinks-count');
   const backlinksList    = $('#backlinks-list');
+  const btnToggleBacklinks = $('#btn-toggle-backlinks');
+
+  function toggleLinkedMentions() {
+    if (backlinksPanel) backlinksPanel.classList.toggle('collapsed');
+    if (linkedMentions && linkedMentions !== backlinksPanel) {
+      linkedMentions.classList.toggle('collapsed');
+    }
+  }
+
+  function adjustNoteBodyHeight() {
+    if (!noteBody || previewMode || splitMode) return;
+    if (typeof window !== 'undefined' && window.CSS && CSS.supports && CSS.supports('field-sizing', 'content')) {
+      return;
+    }
+    if (noteBody.style) {
+      noteBody.style.height = 'auto';
+      const minH = (typeof window !== 'undefined' && window.innerHeight) ? Math.max(450, window.innerHeight - 280) : 450;
+      noteBody.style.height = Math.max(minH, noteBody.scrollHeight || 0) + 'px';
+    }
+  }
 
   // Modals
   const modalOverlay     = $('#modal-overlay');
@@ -1315,6 +1336,7 @@
     // Editor inputs → auto-save & metrics & outline
     noteTitle.addEventListener('input', scheduleSave);
     noteBody.addEventListener('input', () => {
+      adjustNoteBodyHeight();
       updateMetrics();
       scheduleSave();
       if (splitMode) {
@@ -1463,10 +1485,16 @@
       if (typewriterMode) keepTypewriterCentered();
     });
 
-    // Backlinks toggle
-    backlinksHeader.addEventListener('click', () => {
-      backlinksPanel.classList.toggle('collapsed');
-    });
+    // Backlinks & Linked Mentions toggle
+    if (backlinksHeader) {
+      backlinksHeader.addEventListener('click', toggleLinkedMentions);
+    }
+    if (btnToggleBacklinks) {
+      btnToggleBacklinks.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleLinkedMentions();
+      });
+    }
 
     // Wiki-link clicks inside preview & backlinks panel
     if (document && document.addEventListener) {
@@ -1689,6 +1717,7 @@
     noteBody.value = note.body;
 
     updateMetrics();
+    adjustNoteBodyHeight();
     showEditor();
     renderSidebar(searchInput.value.trim());
     updateBacklinks();
@@ -2370,9 +2399,13 @@
     window.handleExportSpey = handleExportSpey;
     window.executeImportReplace = executeImportReplace;
     window.executeImportMerge = executeImportMerge;
+    window.linkedMentions = linkedMentions;
+    window.backlinksPanel = backlinksPanel;
+    window.toggleLinkedMentions = toggleLinkedMentions;
+    window.adjustNoteBodyHeight = adjustNoteBodyHeight;
   }
 
-  // Support transparent alias resolution for #settings-modal and settings triggers
+  // Support transparent alias resolution for #settings-modal, #linked-mentions, and settings triggers
   if (typeof document !== 'undefined') {
     if (typeof document.getElementById === 'function') {
       const origGetById = document.getElementById.bind(document);
@@ -2381,6 +2414,8 @@
         if (id === 'btn-settings') return origGetById('btn-project-settings') || origGetById(id);
         if (id === 'btn-close-settings') return origGetById('btn-close-project-settings') || origGetById(id);
         if (id === 'btn-cancel-settings') return origGetById('btn-cancel-project-settings') || origGetById(id);
+        if (id === 'linked-mentions') return origGetById('linked-mentions') || origGetById('backlinks-panel') || origGetById(id);
+        if (id === 'backlinks-panel') return origGetById('backlinks-panel') || origGetById('linked-mentions') || origGetById(id);
         return origGetById(id);
       };
     }
@@ -2391,6 +2426,8 @@
         if (sel === '#btn-settings') return origQuery('#btn-project-settings') || origQuery(sel);
         if (sel === '#btn-close-settings') return origQuery('#btn-close-project-settings') || origQuery(sel);
         if (sel === '#btn-cancel-settings') return origQuery('#btn-cancel-project-settings') || origQuery(sel);
+        if (sel === '#linked-mentions') return origQuery('#linked-mentions') || origQuery('#backlinks-panel') || origQuery(sel);
+        if (sel === '#backlinks-panel') return origQuery('#backlinks-panel') || origQuery('#linked-mentions') || origQuery(sel);
         return origQuery(sel);
       };
     }

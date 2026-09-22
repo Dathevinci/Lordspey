@@ -540,21 +540,23 @@
         </div>
 
         <!-- Backlinks / Linked Mentions Panel -->
-        <section id="backlinks-panel" class="backlinks-panel">
-          <div class="backlinks-header" id="backlinks-toggle-header">
-            <div class="backlinks-title">
-              <span class="backlinks-icon">✦</span>
-              <span>Linked Mentions</span>
-              <span id="backlinks-count" class="backlinks-count">0</span>
+        <div id="linked-mentions" class="linked-mentions-wrapper" data-testid="linked-mentions">
+          <section id="backlinks-panel" class="backlinks-panel">
+            <div class="backlinks-header" id="backlinks-toggle-header">
+              <div class="backlinks-title">
+                <span class="backlinks-icon">✦</span>
+                <span>Linked Mentions</span>
+                <span id="backlinks-count" class="backlinks-count">0</span>
+              </div>
+              <button id="btn-toggle-backlinks" class="icon-btn btn-xs" title="Toggle Mentions">
+                <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
             </div>
-            <button id="btn-toggle-backlinks" class="icon-btn btn-xs" title="Toggle Mentions">
-              <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-            </button>
-          </div>
-          <div id="backlinks-content" class="backlinks-content">
-            <div id="backlinks-list" class="backlinks-list"></div>
-          </div>
-        </section>
+            <div id="backlinks-content" class="backlinks-content">
+              <div id="backlinks-list" class="backlinks-list"></div>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   </main>

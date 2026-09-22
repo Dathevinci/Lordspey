@@ -8,7 +8,7 @@
     "build:exe": "electron-builder --win --publish never",
     "build:web": "node scripts/build-web.js",
     "cap:sync": "node scripts/build-web.js && npx cap sync android",
-    "test": "node scripts/build-web.js && node verify_all.js && node test_suite.js && node test_graph.js && node test_author_features.js && node test_extended_markdown.js && node test_android.js && node test_intro_animation.js && node test_deep_worldbuilding.js && node test_spey_project.js && node test_settings_suite.js && node test_settings_dom.js && node test_sample_vault_tutorials.js"
+    "test": "node scripts/build-web.js && node verify_all.js && node test_suite.js && node test_graph.js && node test_author_features.js && node test_extended_markdown.js && node test_android.js && node test_intro_animation.js && node test_deep_worldbuilding.js && node test_spey_project.js && node test_settings_suite.js && node test_settings_dom.js && node test_sample_vault_tutorials.js && node test_layout_linked_mentions.js"
   },
   "keywords": [
     "author",
