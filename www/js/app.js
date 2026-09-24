@@ -8639,30 +8639,116 @@
     return 0;
   }
 
-  function showUpdateModal(releaseData) {
+  const WHATS_NEW_V110_FEATURES = [
+    {
+      icon: '🦅',
+      title: 'Official Raven Brand Logo',
+      desc: 'Celestial raven emblem in the header, dashboard, and desktop icon.'
+    },
+    {
+      icon: '🎨',
+      title: 'App Themes',
+      desc: 'Dark, Light (Ivory), Sepia (Parchment), and Custom Accent Color Picker.'
+    },
+    {
+      icon: '✍️',
+      title: 'Writing Focus Mode',
+      desc: 'Auto-hiding formatting toolbar while typing.'
+    },
+    {
+      icon: '🗺️',
+      title: 'World Map Shapes & Region Drawing',
+      desc: '16:9 Landscape, 1:1 Square, 9:16 Realm, and Oval maps with interactive territory polygon drawing.'
+    },
+    {
+      icon: '📁',
+      title: 'Multi-Section Folders & Note Dropdown',
+      desc: 'Multi-act/volume chapters and document-type selector.'
+    },
+    {
+      icon: '🌌',
+      title: 'Expanded Galaxy Graph',
+      desc: '0-collision physics, wide spacing, and manual entity creation (Themes, Plot Arcs, Factions).'
+    },
+    {
+      icon: '👤',
+      title: 'Character Codex Portraits',
+      desc: 'Image upload for concept art & avatars.'
+    },
+    {
+      icon: '📦',
+      title: 'Standalone Modules',
+      desc: 'In-module detail popups without forced note redirects.'
+    },
+    {
+      icon: '🔄',
+      title: 'In-App Auto-Updater',
+      desc: 'Background check and one-click in-place updates.'
+    }
+  ];
+
+  function renderWhatsNewHtml(features = WHATS_NEW_V110_FEATURES) {
+    return `
+      <div class="whats-new-intro" style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
+        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This release delivers major upgrades to the authorial writing experience, cartography tools, codex dossiers, and visual aesthetics:
+      </div>
+      <div class="whats-new-grid">
+        ${features.map(f => `
+          <div class="whats-new-card">
+            <span class="whats-new-card-icon">${f.icon}</span>
+            <div class="whats-new-card-content">
+              <div class="whats-new-card-title">${f.title}</div>
+              <div class="whats-new-card-desc">${f.desc}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  let cachedLatestReleaseData = null;
+
+  function showUpdateModal(releaseData, isDemo = false) {
+    cachedLatestReleaseData = releaseData;
     const modal = $('#modal-update');
     if (!modal) return;
+    const badgeEl = $('#update-modal-badge');
     const titleEl = $('#update-modal-title');
     const newVerChip = $('#update-new-version-chip');
     const curVerChip = $('#update-current-version-chip');
+    const arrowEl = $('#update-version-arrow');
+    const notesHeadingEl = $('#update-notes-heading');
     const notesEl = $('#update-release-notes');
     const downloadBtn = $('#btn-download-update');
     const downloadText = $('#btn-download-update-text');
     const githubLink = $('#btn-view-release-github');
 
     const tag = releaseData.tag_name || ('v' + (releaseData.latestVersion || '1.1.0'));
-    if (titleEl) titleEl.textContent = releaseData.name || `Lord Spey ${tag}`;
-    if (newVerChip) newVerChip.textContent = `New: ${tag}`;
+    if (badgeEl) badgeEl.textContent = isDemo ? '✦ UPDATE PREVIEW (DEMO)' : '✦ UPDATE AVAILABLE';
+    if (titleEl) titleEl.textContent = releaseData.name || `Lord Spey ${tag}${isDemo ? ' (Preview)' : ''}`;
+    if (arrowEl) arrowEl.textContent = '→';
+    if (newVerChip) {
+      newVerChip.textContent = isDemo ? `New: ${tag} (Demo)` : `New: ${tag}`;
+      newVerChip.className = 'update-version-chip update-chip-new';
+    }
     if (curVerChip) curVerChip.textContent = `Installed: v${APP_VERSION}`;
-    if (githubLink && releaseData.html_url) githubLink.href = releaseData.html_url;
+    if (notesHeadingEl) notesHeadingEl.textContent = isDemo ? 'Preview Highlights & Safety' : 'Release Highlights';
+    if (githubLink && releaseData.html_url) {
+      githubLink.href = releaseData.html_url;
+      githubLink.textContent = 'Release Notes ↗';
+    }
 
     // Render formatted release notes
     if (notesEl) {
-      const rawNotes = releaseData.body || releaseData.releaseNotes || '### New Release Highlights\n- Enhanced visual performance and responsiveness\n- Lord Spey raven brand & emblem integration\n- In-app update mechanism with full vault safety guarantee\n- Improved workflow stability';
-      if (typeof Markdown !== 'undefined' && typeof Markdown.render === 'function') {
-        notesEl.innerHTML = Markdown.render(rawNotes);
+      const rawNotes = releaseData.body || releaseData.releaseNotes;
+      if (rawNotes) {
+        if (typeof Markdown !== 'undefined' && typeof Markdown.render === 'function') {
+          notesEl.innerHTML = Markdown.render(rawNotes);
+        } else {
+          notesEl.textContent = rawNotes;
+        }
       } else {
-        notesEl.textContent = rawNotes;
+        notesEl.innerHTML = renderWhatsNewHtml();
       }
     }
 
@@ -8692,7 +8778,10 @@
       }
 
       downloadBtn.href = downloadUrl;
-      downloadBtn.onclick = () => {
+      downloadBtn.onclick = (e) => {
+        if (isDemo) {
+          e.preventDefault();
+        }
         // Vault Safety Guarantee: Automated snapshot backup before update download
         try {
           if (typeof Storage !== 'undefined' && typeof Storage.createBackup === 'function') {
@@ -8704,7 +8793,7 @@
         closeUpdateModal();
         const banner = $('#update-banner');
         if (banner) banner.classList.add('hidden');
-        toast('Starting update download. Your vault notes & lore are 100% safeguarded!', 'success');
+        toast(isDemo ? 'Update preview tested! Vault safety backup created successfully.' : 'Starting update download. Your vault notes & lore are 100% safeguarded!', 'success');
       };
     }
 
@@ -8715,9 +8804,62 @@
     const banner = $('#update-banner');
     const bannerVer = $('#update-banner-version');
     if (banner && bannerVer) {
-      bannerVer.textContent = tag;
+      bannerVer.textContent = isDemo ? `${tag} (Demo)` : tag;
       banner.classList.remove('hidden');
     }
+  }
+
+  function openWhatsNewModal() {
+    const modal = $('#modal-update');
+    if (!modal) return;
+    const badgeEl = $('#update-modal-badge');
+    const titleEl = $('#update-modal-title');
+    const newVerChip = $('#update-new-version-chip');
+    const curVerChip = $('#update-current-version-chip');
+    const arrowEl = $('#update-version-arrow');
+    const notesHeadingEl = $('#update-notes-heading');
+    const notesEl = $('#update-release-notes');
+    const downloadBtn = $('#btn-download-update');
+    const downloadText = $('#btn-download-update-text');
+    const githubLink = $('#btn-view-release-github');
+
+    if (badgeEl) badgeEl.textContent = `✦ WHAT'S NEW IN v${APP_VERSION}`;
+    if (titleEl) titleEl.textContent = `Lord Spey v${APP_VERSION} — New Features`;
+    if (curVerChip) curVerChip.textContent = `Installed: v${APP_VERSION}`;
+    if (arrowEl) arrowEl.textContent = '✦';
+    if (newVerChip) {
+      newVerChip.textContent = `Latest Edition ✓`;
+      newVerChip.className = 'update-version-chip update-chip-installed';
+    }
+    if (notesHeadingEl) notesHeadingEl.textContent = `What's New in Lord Spey v${APP_VERSION}`;
+    if (notesEl) {
+      notesEl.innerHTML = renderWhatsNewHtml();
+    }
+    if (githubLink) {
+      githubLink.href = 'https://github.com/Dathevinci/Lordspey/releases';
+      githubLink.textContent = 'Release Notes ↗';
+    }
+    if (downloadBtn) {
+      downloadBtn.href = '#';
+      if (downloadText) downloadText.textContent = 'Explore Features';
+      downloadBtn.onclick = (e) => {
+        e.preventDefault();
+        closeUpdateModal();
+      };
+    }
+
+    modal.classList.remove('hidden');
+    isUpdateModalOpen = true;
+  }
+
+  function triggerTestUpdateNotification() {
+    const banner = $('#update-banner');
+    const bannerVer = $('#update-banner-version');
+    if (banner && bannerVer) {
+      bannerVer.textContent = 'v1.2.0 (Preview)';
+      banner.classList.remove('hidden');
+    }
+    toast('Update notification preview banner triggered! Click "Update Now" to preview the update modal.', 'info');
   }
 
   function closeUpdateModal() {
@@ -8739,9 +8881,23 @@
 
     const statusVault = $('#settings-vault-update-status');
     const statusGuides = $('#settings-guides-update-status');
-    const setStatus = (text, className) => {
-      if (statusVault) { statusVault.textContent = text; statusVault.className = 'update-status-msg ' + className; }
-      if (statusGuides) { statusGuides.textContent = text; statusGuides.className = 'update-status-msg ' + className; }
+    const setStatus = (text, className, viewLink = false) => {
+      [statusVault, statusGuides].forEach(el => {
+        if (!el) return;
+        el.className = 'update-status-msg ' + className;
+        if (viewLink) {
+          el.innerHTML = `${text} <button type="button" class="btn-link-whats-new font-inter">View What's New</button>`;
+          const btn = el.querySelector('.btn-link-whats-new');
+          if (btn) {
+            btn.addEventListener('click', (e) => {
+              e.preventDefault();
+              openWhatsNewModal();
+            });
+          }
+        } else {
+          el.textContent = text;
+        }
+      });
     };
 
     if (userInitiated) {
@@ -8762,6 +8918,7 @@
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        cachedLatestReleaseData = data;
         const latestTag = data.tag_name || '';
         const latestVer = latestTag.replace(/^v/i, '');
         const hasUpdate = compareSemver(latestVer, APP_VERSION) > 0;
@@ -8772,9 +8929,9 @@
           return { hasUpdate: true, latestTag, data };
         } else {
           const upToDateMsg = `✓ Lord Spey is up to date (${latestTag || 'v' + APP_VERSION})`;
-          setStatus(upToDateMsg, 'success');
+          setStatus(upToDateMsg, 'success', true);
           if (userInitiated) {
-            toast(upToDateMsg, 'success');
+            toast(upToDateMsg + ' — Click "What\'s New in v1.1.0" to see all new features!', 'success');
           }
           return { hasUpdate: false, latestTag, data };
         }
@@ -8821,6 +8978,36 @@
       });
     }
 
+    // What's New buttons in Settings
+    const btnWhatsNewVault = $('#settings-btn-whats-new-vault');
+    if (btnWhatsNewVault) {
+      btnWhatsNewVault.addEventListener('click', () => {
+        openWhatsNewModal();
+      });
+    }
+
+    const btnWhatsNewGuides = $('#settings-btn-whats-new-guides');
+    if (btnWhatsNewGuides) {
+      btnWhatsNewGuides.addEventListener('click', () => {
+        openWhatsNewModal();
+      });
+    }
+
+    // Test notification buttons in Settings
+    const btnTestVault = $('#settings-btn-test-update-vault');
+    if (btnTestVault) {
+      btnTestVault.addEventListener('click', () => {
+        triggerTestUpdateNotification();
+      });
+    }
+
+    const btnTestGuides = $('#settings-btn-test-update-guides');
+    if (btnTestGuides) {
+      btnTestGuides.addEventListener('click', () => {
+        triggerTestUpdateNotification();
+      });
+    }
+
     // Modal close & dismissal
     const btnCloseModal = $('#btn-close-update-modal');
     const btnDismiss = $('#btn-dismiss-update');
@@ -8847,6 +9034,16 @@
           modal.classList.remove('hidden');
           isUpdateModalOpen = true;
         }
+        if (cachedLatestReleaseData && cachedLatestReleaseData.latestVersion && compareSemver(cachedLatestReleaseData.latestVersion, APP_VERSION) > 0) {
+          showUpdateModal(cachedLatestReleaseData);
+        } else {
+          showUpdateModal({
+            tag_name: 'v1.2.0',
+            name: 'Lord Spey v1.2.0 (Demo)',
+            body: '### Update Preview\n- Preview of future updates and notifications\n- Seamless one-click background updates\n- Automated pre-update snapshot backup\n- Full vault safety guarantee',
+            html_url: 'https://github.com/Dathevinci/Lordspey/releases'
+          }, true);
+        }
       });
     }
     if (btnBannerDismiss) {
@@ -8862,9 +9059,23 @@
 
         const statusVault = $('#settings-vault-update-status');
         const statusGuides = $('#settings-guides-update-status');
-        const setStatus = (text, className) => {
-          if (statusVault) { statusVault.textContent = text; statusVault.className = 'update-status-msg ' + className; }
-          if (statusGuides) { statusGuides.textContent = text; statusGuides.className = 'update-status-msg ' + className; }
+        const setStatus = (text, className, viewLink = false) => {
+          [statusVault, statusGuides].forEach(el => {
+            if (!el) return;
+            el.className = 'update-status-msg ' + className;
+            if (viewLink) {
+              el.innerHTML = `${text} <button type="button" class="btn-link-whats-new font-inter">View What's New</button>`;
+              const btn = el.querySelector('.btn-link-whats-new');
+              if (btn) {
+                btn.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  openWhatsNewModal();
+                });
+              }
+            } else {
+              el.textContent = text;
+            }
+          });
         };
 
         if (payload.error) {
@@ -8892,13 +9103,15 @@
         } else if (payload.userInitiated) {
           const currentTag = payload.latestVersion || ('v' + APP_VERSION);
           const upToDateMsg = `✓ Lord Spey is up to date (${currentTag})`;
-          setStatus(upToDateMsg, 'success');
-          toast(`Lord Spey is up to date (${currentTag})`, 'success');
+          setStatus(upToDateMsg, 'success', true);
+          toast(`Lord Spey is up to date (${currentTag}) — Click "What\'s New in v1.1.0" to see all new features!`, 'success');
         }
       };
       window.checkLordSpeyUpdates = checkAppUpdates;
       window.showLordSpeyUpdateModal = showUpdateModal;
       window.closeLordSpeyUpdateModal = closeUpdateModal;
+      window.openLordSpeyWhatsNewModal = openWhatsNewModal;
+      window.triggerTestUpdateNotification = triggerTestUpdateNotification;
       window.LORD_SPEY_VERSION = APP_VERSION;
       window.compareSemver = compareSemver;
       window.openGraphView = openGraphView;

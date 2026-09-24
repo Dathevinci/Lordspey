@@ -6636,8 +6636,8 @@ img.map-custom-img[src=""] {
   z-index: 500;
 }
 .update-modal-card {
-  max-width: 580px;
-  width: 92%;
+  max-width: 640px;
+  width: 94%;
   border-color: rgba(239, 68, 68, 0.4);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 32px rgba(239, 68, 68, 0.25);
 }
@@ -6662,6 +6662,7 @@ img.map-custom-img[src=""] {
   align-items: center;
   gap: 10px;
   margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 .update-version-chip {
   padding: 3px 10px;
@@ -6683,6 +6684,11 @@ img.map-custom-img[src=""] {
   background: rgba(239, 68, 68, 0.2);
   color: #ff8080;
   border: 1px solid rgba(239, 68, 68, 0.45);
+}
+.update-chip-installed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
 }
 .update-guarantee {
   display: flex;
@@ -6708,7 +6714,7 @@ img.map-custom-img[src=""] {
   margin-bottom: 6px;
 }
 .update-release-notes {
-  max-height: 220px;
+  max-height: 320px;
   overflow-y: auto;
   background: var(--bg-tertiary);
   border: 1px solid var(--border);
@@ -6717,6 +6723,65 @@ img.map-custom-img[src=""] {
   font-size: 0.88rem;
   line-height: 1.55;
   color: var(--text-secondary);
+}
+/* What's New Visual Cards */
+.whats-new-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+  margin-top: 6px;
+}
+.whats-new-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  transition: all 180ms ease;
+}
+.whats-new-card:hover {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.whats-new-card-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.whats-new-card-content {
+  flex: 1;
+  min-width: 0;
+}
+.whats-new-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.whats-new-card-desc {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+.btn-link-whats-new {
+  font-size: inherit;
+  font-family: inherit;
+  color: var(--red-400);
+  background: none;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 6px;
+  display: inline;
+}
+.btn-link-whats-new:hover {
+  color: #ff8080;
 }
 .update-modal-footer {
   display: flex;

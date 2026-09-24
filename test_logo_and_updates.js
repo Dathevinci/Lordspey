@@ -68,7 +68,9 @@ const vaultPaneMatch = htmlContent.match(/<div class="settings-pane[^"]*" id="se
 assert(vaultPaneMatch, 'settings-pane-vault must exist');
 const vaultPaneHtml = vaultPaneMatch[1];
 assert(vaultPaneHtml.includes('id="settings-vault-version-display"'), 'Missing settings-vault-version-display in vault pane');
+assert(vaultPaneHtml.includes('id="settings-btn-whats-new-vault"'), 'Missing settings-btn-whats-new-vault in vault pane');
 assert(vaultPaneHtml.includes('id="settings-btn-check-update-vault"'), 'Missing settings-btn-check-update-vault in vault pane');
+assert(vaultPaneHtml.includes('id="settings-btn-test-update-vault"'), 'Missing settings-btn-test-update-vault in vault pane');
 assert(vaultPaneHtml.includes('id="settings-vault-update-status"'), 'Missing settings-vault-update-status in vault pane');
 assert(vaultPaneHtml.includes('v1.1.0'), 'Current version v1.1.0 must be rendered in vault pane');
 
@@ -77,11 +79,13 @@ const guidesPaneMatch = htmlContent.match(/<div class="settings-pane[^"]*" id="s
 assert(guidesPaneMatch, 'settings-pane-keybindings must exist');
 const guidesPaneHtml = guidesPaneMatch[1];
 assert(guidesPaneHtml.includes('id="settings-guides-version-display"'), 'Missing settings-guides-version-display in guides pane');
+assert(guidesPaneHtml.includes('id="settings-btn-whats-new-guides"'), 'Missing settings-btn-whats-new-guides in guides pane');
 assert(guidesPaneHtml.includes('id="settings-btn-check-update-guides"'), 'Missing settings-btn-check-update-guides in guides pane');
+assert(guidesPaneHtml.includes('id="settings-btn-test-update-guides"'), 'Missing settings-btn-test-update-guides in guides pane');
 assert(guidesPaneHtml.includes('id="settings-guides-update-status"'), 'Missing settings-guides-update-status in guides pane');
 assert(guidesPaneHtml.includes('v1.1.0'), 'Current version v1.1.0 must be rendered in guides pane');
 
-console.log('✓ Settings tabs update controls verified: v1.1.0 displays and Check for Updates buttons');
+console.log('✓ Settings tabs update controls verified: v1.1.0 displays, What\'s New, Test Notification, and Check for Updates buttons');
 
 // 5. Update Modal & Banner Markup Verification
 console.log('--- 5. Update Modal & Banner Markup Verification ---');
@@ -216,5 +220,36 @@ assert(appCode.includes('btnBannerView.addEventListener'), 'Missing banner view 
 const bannerListenerSnippet = appCode.slice(appCode.indexOf('btnBannerView.addEventListener'), appCode.indexOf('btnBannerView.addEventListener') + 250);
 assert(bannerListenerSnippet.includes('isUpdateModalOpen = true'), 'Clicking Update Now from banner must set isUpdateModalOpen = true for Escape key');
 console.log('✓ Update modal Escape hierarchy flag synchronized between banner and modal views');
+
+// 11. What's New in v1.1.0 & Test Update Notification Feature Verification
+console.log('--- 11. What\'s New in v1.1.0 & Test Notification Verification ---');
+assert(appCode.includes('WHATS_NEW_V110_FEATURES'), 'Missing WHATS_NEW_V110_FEATURES in app.js');
+assert(appCode.includes('openWhatsNewModal'), 'Missing openWhatsNewModal in app.js');
+assert(appCode.includes('triggerTestUpdateNotification'), 'Missing triggerTestUpdateNotification in app.js');
+assert(appCode.includes('window.openLordSpeyWhatsNewModal'), 'Missing window.openLordSpeyWhatsNewModal export in app.js');
+assert(appCode.includes('window.triggerTestUpdateNotification'), 'Missing window.triggerTestUpdateNotification export in app.js');
+
+const requiredFeatureTitles = [
+  'Official Raven Brand Logo',
+  'App Themes',
+  'Writing Focus Mode',
+  'World Map Shapes & Region Drawing',
+  'Multi-Section Folders & Note Dropdown',
+  'Expanded Galaxy Graph',
+  'Character Codex Portraits',
+  'Standalone Modules',
+  'In-App Auto-Updater'
+];
+
+requiredFeatureTitles.forEach(title => {
+  assert(appCode.includes(title), `Missing required What's New feature: ${title}`);
+});
+console.log(`✓ All 9 What's New v1.1.0 visual features verified: ${requiredFeatureTitles.join(', ')}`);
+
+assert(cssContent.includes('.whats-new-grid'), 'Missing .whats-new-grid in css/style.css');
+assert(cssContent.includes('.whats-new-card'), 'Missing .whats-new-card in css/style.css');
+assert(cssContent.includes('.btn-link-whats-new'), 'Missing .btn-link-whats-new in css/style.css');
+assert(cssContent.includes('.update-chip-installed'), 'Missing .update-chip-installed in css/style.css');
+console.log('✓ CSS stylesheet verified for .whats-new-grid, .whats-new-card, and installed chips');
 
 console.log('\n=== ALL LOGO & AUTO-UPDATE TESTS PASSED (100%) ===\n');
