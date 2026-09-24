@@ -1079,8 +1079,27 @@
           });
 
           if (sectionMap.size > 1 || (sectionMap.size === 1 && !sectionMap.has(''))) {
+            const savedSections = Storage.getAllSections ? Storage.getAllSections() : [];
+            const secOrderMap = new Map();
+            savedSections.forEach((s, idx) => {
+              if (s && s.name) {
+                secOrderMap.set(s.name.trim().toLowerCase(), typeof s.order === 'number' ? s.order : idx);
+              }
+            });
+
+            const sortedEntries = Array.from(sectionMap.entries()).sort((a, b) => {
+              const nameA = a[0];
+              const nameB = b[0];
+              if (!nameA) return 1;
+              if (!nameB) return -1;
+              const ordA = secOrderMap.has(nameA.toLowerCase()) ? secOrderMap.get(nameA.toLowerCase()) : 9999;
+              const ordB = secOrderMap.has(nameB.toLowerCase()) ? secOrderMap.get(nameB.toLowerCase()) : 9999;
+              if (ordA !== ordB) return ordA - ordB;
+              return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
+            });
+
             let sectionHtml = '';
-            sectionMap.forEach((secNotes, secName) => {
+            sortedEntries.forEach(([secName, secNotes]) => {
               if (secName) {
                 sectionHtml += `<li class="nav-subsection-header font-cinzel"><span>✦ ${escText(secName)}</span></li>`;
               }
@@ -1246,6 +1265,14 @@
     modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeNewNoteModal(); });
     modalCreate.addEventListener('click', createNoteFromModal);
     modalTitle.addEventListener('keydown', e => { if (e.key === 'Enter') createNoteFromModal(); });
+    if (modalCategory) {
+      modalCategory.addEventListener('change', () => {
+        const sectionField = $('#modal-field-section');
+        if (sectionField) {
+          sectionField.style.display = (modalCategory.value === 'chapter') ? 'block' : 'none';
+        }
+      });
+    }
 
     // Delete note
     btnDelete.addEventListener('click', () => deleteOverlay.classList.remove('hidden'));
@@ -2045,11 +2072,12 @@
     const title = modalTitle.value.trim() || 'Untitled';
     const category = modalCategory.value;
     const section = (modalNoteSection && category === 'chapter') ? modalNoteSection.value.trim() : '';
+    const tags = (modalOverlay && modalOverlay.dataset && modalOverlay.dataset.tags) ? modalOverlay.dataset.tags : '';
     let body = (modalOverlay && modalOverlay.dataset && modalOverlay.dataset.template) ? modalOverlay.dataset.template : `# ${title}\n\n`;
     if (!modalOverlay.dataset.template && category === 'chapter' && section) {
       body = `# ${title}\n\n**Section:** ${section}\n\n`;
     }
-    const note = Storage.createNote({ title, category, section, body });
+    const note = Storage.createNote({ title, category, section, body, tags });
     if (section && Storage.saveSection) {
       Storage.saveSection({ name: section });
     }
@@ -3406,75 +3434,89 @@
       closeGraphView();
       return true;
     }
-    if (mapPinPreview && !mapPinPreview.classList.contains('hidden')) {
-      mapPinPreview.classList.add('hidden');
-      mapPinPreview.style.display = 'none';
-      return true;
-    }
-    if (codexCharPreview && !codexCharPreview.classList.contains('hidden')) {
-      codexCharPreview.classList.add('hidden');
-      codexCharPreview.style.display = 'none';
-      return true;
-    }
-    if (isMapPlacementMode) {
-      isMapPlacementMode = false;
-      updateMapPlacementUI();
-      return true;
-    }
-    if (mapTutorialModal && !mapTutorialModal.classList.contains('hidden')) {
-      mapTutorialModal.classList.add('hidden');
-      return true;
-    }
-    if (timelineTutorialModal && !timelineTutorialModal.classList.contains('hidden')) {
-      timelineTutorialModal.classList.add('hidden');
-      return true;
-    }
-    if (codexTutorialModal && !codexTutorialModal.classList.contains('hidden')) {
-      codexTutorialModal.classList.add('hidden');
-      return true;
-    }
-    if (mapRegionDetailModal && !mapRegionDetailModal.classList.contains('hidden')) {
-      mapRegionDetailModal.classList.add('hidden');
-      return true;
-    }
-    if (mapRegionModal && !mapRegionModal.classList.contains('hidden')) {
-      mapRegionModal.classList.add('hidden');
-      return true;
-    }
-    if (mapPinModal && !mapPinModal.classList.contains('hidden')) {
-      mapPinModal.classList.add('hidden');
-      return true;
-    }
-    if (timelineEventDetailModal && !timelineEventDetailModal.classList.contains('hidden')) {
-      timelineEventDetailModal.classList.add('hidden');
-      return true;
-    }
-    if (timelineEventModal && !timelineEventModal.classList.contains('hidden')) {
-      timelineEventModal.classList.add('hidden');
-      return true;
-    }
-    if (codexDetailModal && !codexDetailModal.classList.contains('hidden')) {
-      codexDetailModal.classList.add('hidden');
-      return true;
-    }
-    if (codexCharModal && !codexCharModal.classList.contains('hidden')) {
-      codexCharModal.classList.add('hidden');
-      return true;
-    }
-    if (codexRelModal && !codexRelModal.classList.contains('hidden')) {
-      codexRelModal.classList.add('hidden');
-      return true;
-    }
     if (mapModal && !mapModal.classList.contains('hidden')) {
+      if (isMapRegionDrawingMode) {
+        isMapRegionDrawingMode = false;
+        currentMapRegionPoints = [];
+        if (btnMapDrawRegion) {
+          btnMapDrawRegion.classList.remove('active', 'btn-primary');
+          btnMapDrawRegion.classList.add('btn-ghost');
+          btnMapDrawRegion.textContent = 'Draw Region';
+        }
+        return true;
+      }
+      if (mapPinPreview && !mapPinPreview.classList.contains('hidden')) {
+        mapPinPreview.classList.add('hidden');
+        mapPinPreview.style.display = 'none';
+        return true;
+      }
+      if (isMapPlacementMode) {
+        isMapPlacementMode = false;
+        updateMapPlacementUI();
+        return true;
+      }
+      if (mapTutorialModal && !mapTutorialModal.classList.contains('hidden')) {
+        mapTutorialModal.classList.add('hidden');
+        return true;
+      }
+      if (mapRegionDetailModal && !mapRegionDetailModal.classList.contains('hidden')) {
+        mapRegionDetailModal.classList.add('hidden');
+        return true;
+      }
+      if (mapRegionModal && !mapRegionModal.classList.contains('hidden')) {
+        mapRegionModal.classList.add('hidden');
+        return true;
+      }
+      if (mapPinModal && !mapPinModal.classList.contains('hidden')) {
+        mapPinModal.classList.add('hidden');
+        return true;
+      }
       closeMapView();
       return true;
     }
     if (timelineModal && !timelineModal.classList.contains('hidden')) {
+      if (timelineTutorialModal && !timelineTutorialModal.classList.contains('hidden')) {
+        timelineTutorialModal.classList.add('hidden');
+        return true;
+      }
+      if (timelineEventDetailModal && !timelineEventDetailModal.classList.contains('hidden')) {
+        timelineEventDetailModal.classList.add('hidden');
+        return true;
+      }
+      if (timelineEventModal && !timelineEventModal.classList.contains('hidden')) {
+        timelineEventModal.classList.add('hidden');
+        return true;
+      }
       closeTimelineView();
       return true;
     }
     if (codexModal && !codexModal.classList.contains('hidden')) {
+      if (codexCharPreview && !codexCharPreview.classList.contains('hidden')) {
+        codexCharPreview.classList.add('hidden');
+        codexCharPreview.style.display = 'none';
+        return true;
+      }
+      if (codexTutorialModal && !codexTutorialModal.classList.contains('hidden')) {
+        codexTutorialModal.classList.add('hidden');
+        return true;
+      }
+      if (codexDetailModal && !codexDetailModal.classList.contains('hidden')) {
+        codexDetailModal.classList.add('hidden');
+        return true;
+      }
+      if (codexCharModal && !codexCharModal.classList.contains('hidden')) {
+        codexCharModal.classList.add('hidden');
+        return true;
+      }
+      if (codexRelModal && !codexRelModal.classList.contains('hidden')) {
+        codexRelModal.classList.add('hidden');
+        return true;
+      }
       closeCodexView();
+      return true;
+    }
+    if (newNoteDropdown && !newNoteDropdown.classList.contains('hidden')) {
+      newNoteDropdown.classList.add('hidden');
       return true;
     }
     if (goalModal && !goalModal.classList.contains('hidden')) {
@@ -3508,19 +3550,21 @@
     return false;
   }
 
-  function openNewNoteModal(cat = 'draft', defaultTitle = '', template = '') {
+  function openNewNoteModal(cat = 'draft', defaultTitle = '', template = '', tags = '') {
     if (newNoteDropdown) newNoteDropdown.classList.add('hidden');
     if (modalTitle) modalTitle.value = defaultTitle || '';
-    if (modalCategory) modalCategory.value = cat || 'draft';
+    const safeCat = ['chapter', 'lore', 'world', 'draft'].includes(cat) ? cat : (cat === 'character' ? 'lore' : 'draft');
+    if (modalCategory) modalCategory.value = safeCat;
     if (modalNoteSection) {
       modalNoteSection.value = '';
       const sectionField = $('#modal-field-section');
       if (sectionField) {
-        sectionField.style.display = (cat === 'chapter') ? 'block' : 'none';
+        sectionField.style.display = (safeCat === 'chapter') ? 'block' : 'none';
       }
     }
     if (modalOverlay) {
       modalOverlay.dataset.template = template || '';
+      modalOverlay.dataset.tags = tags || (cat === 'character' ? 'character' : '');
       modalOverlay.classList.remove('hidden');
     }
     setTimeout(() => { if (modalTitle) modalTitle.focus(); }, 100);
@@ -4276,16 +4320,22 @@
       ? allNotes
       : allNotes.filter(n => n.category === graphFilter);
 
-    if (filtered.length === 0) {
-      galaxyEmptyPrompt.classList.remove('hidden');
+    const allManualEntities = (Storage.getGraphNodes ? Storage.getGraphNodes() : []);
+    const matchingEntities = allManualEntities.filter(mn => {
+      if (graphFilter === 'all') return true;
+      return mn.type === graphFilter || mn.category === graphFilter;
+    });
+
+    if (filtered.length === 0 && matchingEntities.length === 0) {
+      if (galaxyEmptyPrompt) galaxyEmptyPrompt.classList.remove('hidden');
       graphNodes = [];
       graphEdges = [];
-      graphNodeCount.textContent = '0 notes';
-      graphEdgeCount.textContent = '0 links';
+      if (graphNodeCount) graphNodeCount.textContent = '0 notes';
+      if (graphEdgeCount) graphEdgeCount.textContent = '0 links';
       if (graphLocationHud) graphLocationHud.classList.add('hidden');
       return;
     } else {
-      galaxyEmptyPrompt.classList.add('hidden');
+      if (galaxyEmptyPrompt) galaxyEmptyPrompt.classList.add('hidden');
     }
 
     const dpr = window.devicePixelRatio || 1;
@@ -4298,12 +4348,14 @@
     const hubMap = new Map();
 
     // Determine active categories to render hubs for
-    let catsToCreate;
-    if (graphFilter === 'all') {
-      const active = categories.filter(c => allNotes.some(n => n.category === c));
-      catsToCreate = active.length > 0 ? active : categories;
-    } else {
-      catsToCreate = [graphFilter];
+    let catsToCreate = [];
+    if (filtered.length > 0) {
+      if (graphFilter === 'all') {
+        const active = categories.filter(c => allNotes.some(n => n.category === c));
+        catsToCreate = active.length > 0 ? active : categories;
+      } else {
+        catsToCreate = [graphFilter];
+      }
     }
 
     const hubDist = Math.max(160, Math.min(w, h) * 0.28);
@@ -4430,13 +4482,15 @@
     }
 
     // Manual Non-Note Entities (Theme, Plot Arc, Faction, Concept)
-    const manualNodes = (Storage.getGraphNodes ? Storage.getGraphNodes() : []).map((mn, idx) => {
+    const manualNodes = matchingEntities.map((mn, idx) => {
       let mx = mn.x;
       let my = mn.y;
       if (mx === undefined || my === undefined) {
-        const angle = (idx / 4) * Math.PI * 2;
-        mx = centerX + Math.cos(angle) * (hubDist * 1.4);
-        my = centerY + Math.sin(angle) * (hubDist * 1.4);
+        const count = Math.max(1, matchingEntities.length);
+        const angle = (idx / count) * Math.PI * 2;
+        const dist = filtered.length > 0 ? (hubDist * 1.4) : (Math.min(w, h) * 0.32);
+        mx = centerX + Math.cos(angle) * dist;
+        my = centerY + Math.sin(angle) * dist;
       }
       return {
         id: mn.id,
@@ -4471,8 +4525,10 @@
     const idToNode = new Map();
     graphNodes.forEach(n => idToNode.set(n.id, n));
     manualLinks.forEach(ml => {
-      const s = idToNode.get(ml.source) || titleToNode.get((ml.source || '').toLowerCase());
-      const t = idToNode.get(ml.target) || titleToNode.get((ml.target || '').toLowerCase());
+      const srcKey = ml.source || ml.sourceId || '';
+      const tgtKey = ml.target || ml.targetId || '';
+      const s = idToNode.get(srcKey) || titleToNode.get(String(srcKey).toLowerCase());
+      const t = idToNode.get(tgtKey) || titleToNode.get(String(tgtKey).toLowerCase());
       if (s && t && s !== t) {
         graphEdges.push({
           source: s,
@@ -4484,8 +4540,8 @@
           color: ml.color || '#818cf8',
           flowProgress: Math.random()
         });
-        s.connections++;
-        t.connections++;
+        s.connections = (s.connections || 0) + 1;
+        t.connections = (t.connections || 0) + 1;
       }
     });
 
@@ -4542,8 +4598,23 @@
 
     const wikiCount = graphEdges.filter(e => e.isWiki).length;
     const branchCount = graphEdges.filter(e => e.isHierarchy).length;
-    graphNodeCount.textContent = `${noteNodes.length} note${noteNodes.length === 1 ? '' : 's'}`;
-    graphEdgeCount.textContent = `${branchCount} sub-branch${branchCount === 1 ? '' : 'es'} · ${wikiCount} wiki link${wikiCount === 1 ? '' : 's'}`;
+    const manualLinkCount = graphEdges.filter(e => e.isManualLink).length;
+    if (graphNodeCount) {
+      if (noteNodes.length > 0 && manualNodes.length > 0) {
+        graphNodeCount.textContent = `${noteNodes.length} notes · ${manualNodes.length} entities`;
+      } else if (manualNodes.length > 0) {
+        graphNodeCount.textContent = `${manualNodes.length} entity${manualNodes.length === 1 ? '' : 'ies'}`;
+      } else {
+        graphNodeCount.textContent = `${noteNodes.length} note${noteNodes.length === 1 ? '' : 's'}`;
+      }
+    }
+    if (graphEdgeCount) {
+      if (branchCount === 0 && wikiCount === 0 && manualLinkCount > 0) {
+        graphEdgeCount.textContent = `${manualLinkCount} custom connection${manualLinkCount === 1 ? '' : 's'}`;
+      } else {
+        graphEdgeCount.textContent = `${branchCount} sub-branch${branchCount === 1 ? '' : 'es'} · ${wikiCount} wiki link${wikiCount === 1 ? '' : 's'}${manualLinkCount > 0 ? ` · ${manualLinkCount} custom` : ''}`;
+      }
+    }
   }
 
   function startGalaxySimulation() {
@@ -5668,12 +5739,16 @@
     if (mapViewport) {
       mapViewport.addEventListener('mousedown', onMapMouseDown);
       mapViewport.addEventListener('click', (e) => {
-        if (isMapPlacementMode) {
+        if (isMapPlacementMode || isMapRegionDrawingMode) {
           handleMapDropClick(e);
         }
       });
       mapViewport.addEventListener('dblclick', (e) => {
-        handleMapDropClick(e);
+        if (isMapRegionDrawingMode && currentMapRegionPoints.length >= 1) {
+          finishMapRegionDrawing();
+        } else {
+          handleMapDropClick(e);
+        }
       });
       window.addEventListener('mousemove', onMapMouseMove);
       window.addEventListener('mouseup', onMapMouseUp);
@@ -6053,8 +6128,9 @@
     const query = (mapPinSearch && typeof mapPinSearch.value === 'string') ? mapPinSearch.value.trim().toLowerCase() : '';
 
     const mapEmptyPrompt = $('#map-empty-prompt');
+    const allRegions = Storage.getAllMapRegions ? Storage.getAllMapRegions() : [];
     if (mapEmptyPrompt) {
-      if (allPins.length === 0) {
+      if (allPins.length === 0 && allRegions.length === 0) {
         mapEmptyPrompt.classList.remove('hidden');
       } else {
         mapEmptyPrompt.classList.add('hidden');
@@ -6092,6 +6168,7 @@
       `;
 
       pinEl.addEventListener('click', (e) => {
+        if (isMapRegionDrawingMode) return;
         e.stopPropagation();
         if (mapDragDidMove) return;
         showPinPreview(pin);
@@ -6295,17 +6372,10 @@
 
     if (isMapRegionDrawingMode) {
       currentMapRegionPoints.push({ x: pctX, y: pctY });
-      if (currentMapRegionPoints.length >= 3) {
-        openEditMapRegionModal({
-          name: 'New Territory',
-          shape: 'polygon',
-          color: '#ef4444',
-          description: '',
-          points: currentMapRegionPoints
-        });
-      } else {
-        toast(`Point ${currentMapRegionPoints.length} placed (click 3+ points for territory)`, 'info');
+      if (btnMapDrawRegion) {
+        btnMapDrawRegion.textContent = `Finish (${currentMapRegionPoints.length} pts)`;
       }
+      toast(`Point ${currentMapRegionPoints.length} placed (click Finish or double-click to complete)`, 'info');
       return;
     }
 
@@ -6314,6 +6384,27 @@
     isMapPlacementMode = false;
     updateMapPlacementUI();
     openPinModalWithCoords(pctX, pctY);
+  }
+
+  function finishMapRegionDrawing() {
+    if (!isMapRegionDrawingMode) return;
+    if (currentMapRegionPoints.length === 0) {
+      isMapRegionDrawingMode = false;
+      if (btnMapDrawRegion) {
+        btnMapDrawRegion.classList.remove('active', 'btn-primary');
+        btnMapDrawRegion.classList.add('btn-ghost');
+        btnMapDrawRegion.textContent = 'Draw Region';
+      }
+      return;
+    }
+    const shape = currentMapRegionPoints.length >= 3 ? 'polygon' : 'circle';
+    openEditMapRegionModal({
+      name: 'New Territory',
+      shape,
+      color: '#ef4444',
+      description: '',
+      points: [...currentMapRegionPoints]
+    });
   }
 
   function openPinModalWithCoords(pctX, pctY) {
@@ -6370,7 +6461,7 @@
 
   function onMapTouchStart(e) {
     if (e.touches && e.touches.length === 1) {
-      if (isMapPlacementMode) {
+      if (isMapPlacementMode || isMapRegionDrawingMode) {
         if (typeof e.preventDefault === 'function') e.preventDefault();
         handleMapDropClick(e.touches[0]);
         return;
@@ -6725,8 +6816,12 @@
 
       item.addEventListener('click', (e) => {
         if (e.target.closest('.btn-del-timeline-evt')) return;
-        closeTimelineView();
-        navigateToEventNote(evt);
+        if (e.target.closest('.timeline-card-link')) {
+          closeTimelineView();
+          navigateToEventNote(evt);
+          return;
+        }
+        openTimelineEventDetailModal(evt);
       });
 
       timelineStreamContainer.appendChild(item);
@@ -7390,6 +7485,25 @@
       });
     }
 
+    const avatarWrap = $('#inspector-avatar-wrap');
+    const avatarImg = $('#inspector-avatar-img');
+    if (avatarWrap && avatarImg) {
+      if (char.image) {
+        avatarImg.src = char.image;
+        avatarWrap.classList.remove('hidden');
+      } else {
+        avatarImg.src = '';
+        avatarWrap.classList.add('hidden');
+      }
+    }
+
+    const btnInspectorDossier = $('#btn-inspector-dossier');
+    if (btnInspectorDossier) {
+      btnInspectorDossier.onclick = () => {
+        openCodexDetailModal(char);
+      };
+    }
+
     if (btnInspectorOpenNote) {
       btnInspectorOpenNote.onclick = () => {
         closeCodexView();
@@ -7433,15 +7547,27 @@
 
   function openAddCharacterModal() {
     if (!codexCharModal) return;
+    activeEditingChar = null;
+    currentCharImageData = null;
+    if (codexImagePreview) {
+      codexImagePreview.src = '';
+      codexImagePreview.classList.add('hidden');
+    }
+    if (codexImagePlaceholder) {
+      codexImagePlaceholder.classList.remove('hidden');
+    }
+    if (codexInputImage) codexInputImage.value = '';
     codexCharModal.classList.remove('hidden');
 
     if (codexInputNote) {
       const notes = Storage.getAllNotes();
-      codexInputNote.innerHTML = `<option value="">-- Auto-create new Lore Dossier Note --</option>` +
+      codexInputNote.innerHTML = `<option value="">-- Standalone Character (No linked note) --</option>` +
+        `<option value="__autocreate__">+ Auto-create new Lore Dossier Note</option>` +
         notes.map(n => `<option value="${n.id}">${escText(n.title)} (${n.category})</option>`).join('');
     }
 
     if (codexInputName) codexInputName.value = '';
+    if (codexInputArchetype) codexInputArchetype.value = 'Protagonist';
     if (codexInputFaction) codexInputFaction.value = '';
     if (codexInputRole) codexInputRole.value = '';
     if (codexInputBio) codexInputBio.value = '';
@@ -7454,9 +7580,10 @@
     const faction = (codexInputFaction && codexInputFaction.value.trim()) || 'Independent';
     const role = (codexInputRole && codexInputRole.value.trim()) || '';
     const bio = (codexInputBio && codexInputBio.value.trim()) || '';
-    let noteId = (codexInputNote && codexInputNote.value) || null;
+    const rawNoteVal = (codexInputNote && codexInputNote.value) || '';
+    let noteId = null;
 
-    if (!noteId && !activeEditingChar) {
+    if (rawNoteVal === '__autocreate__') {
       const created = Storage.createNote({
         title: name,
         category: 'lore',
@@ -7465,6 +7592,10 @@
       });
       noteId = created.id;
       renderSidebar();
+    } else if (rawNoteVal) {
+      noteId = rawNoteVal;
+    } else if (activeEditingChar && activeEditingChar.noteId) {
+      noteId = activeEditingChar.noteId;
     }
 
     Storage.saveCharacter({
@@ -7474,11 +7605,12 @@
       faction,
       role,
       bio,
-      image: currentCharImageData,
-      noteId: noteId || (activeEditingChar ? activeEditingChar.noteId : null)
+      image: currentCharImageData || (activeEditingChar ? activeEditingChar.image : null),
+      noteId
     });
 
     activeEditingChar = null;
+    currentCharImageData = null;
     if (codexCharModal) codexCharModal.classList.add('hidden');
     renderCodex();
     toast(`Character "${name}" saved to codex`, 'success');
@@ -7776,6 +7908,7 @@
           setAttr(circle, 'data-id', reg.id);
           if (typeof circle.addEventListener === 'function') {
             circle.addEventListener('click', (e) => {
+              if (isMapRegionDrawingMode || isMapPlacementMode) return;
               if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
               openMapRegionDetailModal(reg);
             });
@@ -7808,6 +7941,7 @@
           setAttr(poly, 'data-id', reg.id);
           if (typeof poly.addEventListener === 'function') {
             poly.addEventListener('click', (e) => {
+              if (isMapRegionDrawingMode || isMapPlacementMode) return;
               if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
               openMapRegionDetailModal(reg);
             });
@@ -8295,7 +8429,13 @@
     if (codexInputFaction) codexInputFaction.value = char.faction || '';
     if (codexInputRole) codexInputRole.value = char.role || '';
     if (codexInputBio) codexInputBio.value = char.bio || '';
-    if (codexInputNote) codexInputNote.value = char.noteId || '';
+    if (codexInputNote) {
+      const notes = Storage.getAllNotes();
+      codexInputNote.innerHTML = `<option value="">-- Standalone Character (No linked note) --</option>` +
+        `<option value="__autocreate__">+ Auto-create new Lore Dossier Note</option>` +
+        notes.map(n => `<option value="${n.id}">${escText(n.title)} (${n.category})</option>`).join('');
+      codexInputNote.value = char.noteId || '';
+    }
     currentCharImageData = char.image || null;
     if (currentCharImageData) {
       if (codexImagePreview) {

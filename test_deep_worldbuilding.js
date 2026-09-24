@@ -412,7 +412,10 @@ const allMockIds = [
   'btn-map-tutorial', 'btn-timeline-tutorial', 'btn-codex-tutorial',
   'map-tutorial-modal', 'timeline-tutorial-modal', 'codex-tutorial-modal',
   'btn-close-map-tutorial', 'btn-close-timeline-tutorial', 'btn-close-codex-tutorial',
-  'codex-char-preview', 'btn-inspector-delete-char'
+  'codex-char-preview', 'btn-inspector-delete-char',
+  'new-note-dropdown', 'map-region-modal', 'map-region-detail-modal',
+  'timeline-event-detail-modal', 'codex-detail-modal', 'graph-node-detail-modal',
+  'graph-entity-modal', 'graph-link-modal', 'btn-map-draw-region'
 ];
 
 allMockIds.forEach(id => {
@@ -420,7 +423,7 @@ allMockIds.forEach(id => {
 });
 
 // Set hidden initial states
-['tutorial-overlay', 'graph-modal', 'map-modal', 'timeline-modal', 'codex-modal', 'map-pin-modal', 'timeline-event-modal', 'codex-char-modal', 'codex-rel-modal', 'editor-area', 'intro-splash', 'metrics-modal', 'switcher-modal', 'goal-modal', 'outline-drawer', 'wikicreate-modal', 'find-replace-bar', 'modal-overlay', 'delete-overlay', 'map-tutorial-modal', 'timeline-tutorial-modal', 'codex-tutorial-modal', 'map-pin-preview', 'codex-char-preview', 'codex-web-inspector'].forEach(id => {
+['tutorial-overlay', 'graph-modal', 'map-modal', 'timeline-modal', 'codex-modal', 'map-pin-modal', 'timeline-event-modal', 'codex-char-modal', 'codex-rel-modal', 'editor-area', 'intro-splash', 'metrics-modal', 'switcher-modal', 'goal-modal', 'outline-drawer', 'wikicreate-modal', 'find-replace-bar', 'modal-overlay', 'delete-overlay', 'map-tutorial-modal', 'timeline-tutorial-modal', 'codex-tutorial-modal', 'map-pin-preview', 'codex-char-preview', 'codex-web-inspector', 'new-note-dropdown', 'map-region-modal', 'map-region-detail-modal', 'timeline-event-detail-modal', 'codex-detail-modal', 'graph-node-detail-modal', 'graph-entity-modal', 'graph-link-modal'].forEach(id => {
   if (elementsMap[id]) elementsMap[id].classList.add('hidden');
 });
 elementsMap['main-menu'].classList.remove('hidden');

@@ -1008,12 +1008,16 @@
                 <span id="inspector-archetype-badge" class="badge badge-archetype">Protagonist</span>
                 <button id="btn-inspector-close" class="icon-btn btn-xs">✕</button>
               </div>
+              <div id="inspector-avatar-wrap" class="inspector-avatar-wrap hidden" style="text-align: center; margin: 8px 0;">
+                <img id="inspector-avatar-img" class="inspector-avatar-img" src="" alt="Portrait" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent, #e53e3e); display: inline-block;" />
+              </div>
               <h4 id="inspector-name" class="font-cinzel">Character Name</h4>
               <div id="inspector-faction" class="inspector-faction">Faction: Independent</div>
               <p id="inspector-bio" class="inspector-bio">Character bio snippet…</p>
               <div class="inspector-rels-title">Relationships:</div>
               <div id="inspector-rels-list" class="inspector-rels-list"></div>
               <div class="inspector-actions">
+                <button id="btn-inspector-dossier" class="btn btn-sm btn-ghost">Dossier Details</button>
                 <button id="btn-inspector-open-note" class="btn btn-sm btn-primary">Open Dossier Note ↗</button>
                 <button id="btn-inspector-delete-char" class="btn btn-sm btn-danger">Delete Character</button>
               </div>
@@ -1073,7 +1077,8 @@
       <div class="modal-field">
         <label for="codex-input-note">Link to Existing Note (Optional)</label>
         <select id="codex-input-note">
-          <option value="">-- Auto-create new Lore Dossier Note --</option>
+          <option value="">-- Standalone Character (No linked note) --</option>
+          <option value="__autocreate__">+ Auto-create new Lore Dossier Note</option>
         </select>
       </div>
       <div class="modal-field">

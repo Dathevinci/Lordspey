@@ -282,4 +282,64 @@ assert(Storage.getAllSections().some(s => s.name === 'Part III'), 'Imported sect
 
 console.log('✓ .spey package export/import preserves all feedback additions flawlessly');
 
+// ── 8. Graph Node Link Cascading Cleanup & Normalization ──
+console.log('\n--- 8. Graph Node Link Cascading Cleanup & Normalization ---');
+
+const nodeA = Storage.saveGraphNode({ title: 'Theme Alpha', type: 'theme' });
+const nodeB = Storage.saveGraphNode({ title: 'Arc Beta', type: 'arc' });
+const link1 = Storage.saveGraphLink({ source: nodeA.id, target: nodeB.id, label: 'influences' });
+
+assert.strictEqual(link1.source, nodeA.id);
+assert.strictEqual(link1.sourceId, nodeA.id);
+assert.strictEqual(link1.target, nodeB.id);
+assert.strictEqual(link1.targetId, nodeB.id);
+
+// Deleting nodeA should cleanly delete link1
+Storage.deleteGraphNode(nodeA.id);
+assert.strictEqual(Storage.getGraphLinks().some(l => l.id === link1.id), false, 'Cascading delete must remove link');
+console.log('✓ Graph node cascading deletion cleanly purges associated links');
+
+// ── 9. Spey Package Graph Links Round-trip (Replace and Merge) ──
+console.log('\n--- 9. Spey Package Graph Links Round-trip ---');
+
+const nodeC = Storage.saveGraphNode({ title: 'Concept Gamma', type: 'concept' });
+const link2 = Storage.saveGraphLink({ source: nodeB.id, target: nodeC.id, label: 'embodies' });
+const exported = Storage.exportSpeyPackage();
+
+assert(exported.graphLinks.some(l => l.id === link2.id));
+assert.strictEqual(exported.graphLinks.find(l => l.id === link2.id).source, nodeB.id);
+assert.strictEqual(exported.graphLinks.find(l => l.id === link2.id).target, nodeC.id);
+
+// Test replace mode
+global.localStorage.clear();
+const replaceResult = Storage.importSpeyPackage(exported, 'replace');
+assert(replaceResult.success, 'Replace import must succeed');
+const importedLinks = Storage.getGraphLinks();
+assert(importedLinks.some(l => l.source === nodeB.id && l.target === nodeC.id), 'Graph link source/target preserved in replace');
+
+// Test merge mode
+const mergeResult = Storage.importSpeyPackage(exported, 'merge');
+assert(mergeResult.success, 'Merge import must succeed');
+const mergedLinks = Storage.getGraphLinks();
+assert(mergedLinks.length >= 1, 'Graph links preserved in merge');
+console.log('✓ .spey package graph links round-trip preserves custom connections in replace and merge');
+
+// ── 10. Codex Character Standalone Mode ──
+console.log('\n--- 10. Codex Character Standalone Mode ---');
+
+const notesCountBefore = Storage.getAllNotes().length;
+const standaloneChar = Storage.saveCharacter({
+  name: 'Sir Galahad the Independent',
+  archetype: 'Protagonist',
+  faction: 'Round Table',
+  role: 'Knight',
+  noteId: null
+});
+
+assert.strictEqual(standaloneChar.noteId, null, 'Standalone character must have noteId: null');
+assert.strictEqual(Storage.getAllNotes().length, notesCountBefore, 'No note should be auto-created for standalone character');
+const fetchedChar = Storage.getCharacters().find(c => c.id === standaloneChar.id);
+assert.strictEqual(fetchedChar.noteId, null, 'Stored standalone character preserves noteId: null');
+console.log('✓ Standalone character created with noteId: null without forcing note creation');
+
 console.log('\n=== ALL FEEDBACK ENHANCEMENTS TESTS PASSED (100%) ===\n');

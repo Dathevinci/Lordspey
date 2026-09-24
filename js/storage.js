@@ -1369,7 +1369,10 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     const nodes = getGraphNodes().filter(n => n.id !== id);
     _saveGraphNodes(nodes);
     // Remove links connected to this node
-    const links = getGraphLinks().filter(l => l.sourceId !== id && l.targetId !== id);
+    const links = getGraphLinks().filter(l =>
+      l.sourceId !== id && l.targetId !== id &&
+      l.source !== id && l.target !== id
+    );
     _saveGraphLinks(links);
   }
 
@@ -1388,21 +1391,30 @@ Confidential author reference sheet for character backstories, plot twists, psyc
 
   function saveGraphLink(link) {
     const links = getGraphLinks();
-    if (!link.id) {
-      link.id = 'glink-' + _uid();
-      link.createdAt = Date.now();
-      links.push(link);
+    const sourceVal = link.source || link.sourceId || '';
+    const targetVal = link.target || link.targetId || '';
+    const normalizedLink = {
+      ...link,
+      source: sourceVal,
+      target: targetVal,
+      sourceId: sourceVal,
+      targetId: targetVal
+    };
+    if (!normalizedLink.id) {
+      normalizedLink.id = 'glink-' + _uid();
+      normalizedLink.createdAt = Date.now();
+      links.push(normalizedLink);
     } else {
-      const idx = links.findIndex(l => l.id === link.id);
+      const idx = links.findIndex(l => l.id === normalizedLink.id);
       if (idx !== -1) {
-        links[idx] = Object.assign({}, links[idx], link, { updatedAt: Date.now() });
+        links[idx] = Object.assign({}, links[idx], normalizedLink, { updatedAt: Date.now() });
       } else {
-        link.createdAt = link.createdAt || Date.now();
-        links.push(link);
+        normalizedLink.createdAt = normalizedLink.createdAt || Date.now();
+        links.push(normalizedLink);
       }
     }
     _saveGraphLinks(links);
-    return link;
+    return normalizedLink;
   }
 
   function deleteGraphLink(id) {
@@ -2027,15 +2039,21 @@ Confidential author reference sheet for character backstories, plot twists, psyc
         })));
       }
       if (Array.isArray(d.graphLinks)) {
-        _saveGraphLinks(d.graphLinks.filter(l => l && typeof l === 'object').map(l => ({
-          id: l.id || _uid(),
-          sourceId: l.sourceId,
-          targetId: l.targetId,
-          label: typeof l.label === 'string' ? l.label : '',
-          relationshipType: l.relationshipType || '',
-          color: l.color || '#ef4444',
-          createdAt: l.createdAt || Date.now()
-        })));
+        _saveGraphLinks(d.graphLinks.filter(l => l && typeof l === 'object').map(l => {
+          const sVal = l.source || l.sourceId || '';
+          const tVal = l.target || l.targetId || '';
+          return {
+            id: l.id || _uid(),
+            source: sVal,
+            target: tVal,
+            sourceId: sVal,
+            targetId: tVal,
+            label: typeof l.label === 'string' ? l.label : '',
+            relationshipType: l.relationshipType || '',
+            color: l.color || '#ef4444',
+            createdAt: l.createdAt || Date.now()
+          };
+        }));
       }
       if (Array.isArray(d.sections)) {
         _saveSections(d.sections.filter(s => s && typeof s === 'object').map(s => ({
@@ -2301,8 +2319,14 @@ Confidential author reference sheet for character backstories, plot twists, psyc
         for (const gl of d.graphLinks) {
           if (!gl || typeof gl !== 'object') continue;
           let glClone = { ...gl };
-          if (glClone.sourceId && gnodeMap[glClone.sourceId]) glClone.sourceId = gnodeMap[glClone.sourceId];
-          if (glClone.targetId && gnodeMap[glClone.targetId]) glClone.targetId = gnodeMap[glClone.targetId];
+          const s = glClone.source || glClone.sourceId || '';
+          const t = glClone.target || glClone.targetId || '';
+          const newS = (s && gnodeMap[s]) ? gnodeMap[s] : s;
+          const newT = (t && gnodeMap[t]) ? gnodeMap[t] : t;
+          glClone.source = newS;
+          glClone.target = newT;
+          glClone.sourceId = newS;
+          glClone.targetId = newT;
           if (!glClone.id || glinkIds.has(glClone.id)) glClone.id = 'glink-' + _uid();
           glinkIds.add(glClone.id);
           existingGLinks.push(glClone);
