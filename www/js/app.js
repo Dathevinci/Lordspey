@@ -4276,11 +4276,17 @@
 
   function openGraphView() {
     graphModal.classList.remove('hidden');
-    camera = { x: 0, y: 0, zoom: 1 };
-    targetCamera = { x: 0, y: 0, zoom: 1 };
+    resizeCanvas();
+    const rect = graphCanvas.parentElement.getBoundingClientRect();
+    const fitZoom = Math.min(1.0, Math.max(0.85, (rect.width || 1200) / 1350));
+    camera = {
+      x: ((rect.width || 1200) / 2) * (1 - fitZoom),
+      y: ((rect.height || 800) / 2) * (1 - fitZoom),
+      zoom: fitZoom
+    };
+    targetCamera = { ...camera };
     panInertia = { x: 0, y: 0 };
     panLast = { x: 0, y: 0 };
-    resizeCanvas();
     buildGalaxyData();
     startGalaxySimulation();
     if (graphLocationHud) graphLocationHud.classList.add('hidden');
@@ -4405,7 +4411,7 @@
       }
     }
 
-    const hubDist = Math.max(260, Math.min(w, h) * 0.38);
+    const hubDist = Math.max(280, Math.min(w * 0.36, h * 0.40));
 
     // 1. Create Category Hub Nodes
     const hubNodes = catsToCreate.map(cat => {
@@ -4464,13 +4470,13 @@
           const startAngle = meta.angle - fanSpread / 2;
           const angle = totalInCat === 1 ? meta.angle : startAngle + i * angleStep;
           const shell = Math.floor(i / 6);
-          const dist = 145 + (i % 3) * 50 + shell * 38;
+          const dist = 180 + (i % 3) * 55 + shell * 45;
           nx = hub.x + Math.cos(angle) * dist;
           ny = hub.y + Math.sin(angle) * dist;
         } else {
           const angle = totalInCat > 0 ? (i / totalInCat) * Math.PI * 2 : 0;
           const shell = Math.floor(i / 8);
-          const dist = 185 + (i % 3) * 55 + shell * 45;
+          const dist = 210 + (i % 3) * 60 + shell * 50;
           nx = centerX + Math.cos(angle) * dist;
           ny = centerY + Math.sin(angle) * dist;
         }
@@ -4690,23 +4696,31 @@
         const dy = n2.y - n1.y;
         const distSq = dx * dx + dy * dy;
         const dist = Math.sqrt(distSq) || 0.001;
-        const maxRepulse = (n1.isHub || n2.isHub) ? 650 : 380;
+        const maxRepulse = (n1.isHub || n2.isHub) ? 750 : 520;
         if (dist < maxRepulse) {
-          const strength = (n1.isHub && n2.isHub) ? 16000 : (n1.isHub || n2.isHub) ? 9500 : 4800;
-          const force = strength / (distSq + 400);
+          const strength = (n1.isHub && n2.isHub) ? 45000 : (n1.isHub || n2.isHub) ? 30000 : 18000;
+          const force = strength / (distSq + 625);
           const fx = (dx / dist) * force;
           const fy = (dy / dist) * force;
           if (n1 !== draggedNode) { n1.vx -= fx; n1.vy -= fy; }
           if (n2 !== draggedNode) { n2.vx += fx; n2.vy += fy; }
         }
 
-        // Anti-overlap padding between node bounding circles and text labels
-        const minSeparation = (n1.isHub && n2.isHub) ? 150 : (n1.isHub || n2.isHub) ? 120 : 88;
-        if (dist < minSeparation) {
-          const overlap = (minSeparation - dist) / minSeparation;
-          const push = overlap * 0.45;
-          const px = (dx / dist) * push;
-          const py = (dy / dist) * push;
+        // Bounding box anti-overlap & collision padding
+        const n1W = Math.max(95, (n1.hitWidth || 105));
+        const n2W = Math.max(95, (n2.hitWidth || 105));
+        const minSepX = (n1W + n2W) / 2 + 36;
+        const minSepY = (n1.isHub || n2.isHub) ? 85 : 68;
+        const sepX = Math.abs(dx);
+        const sepY = Math.abs(dy);
+        if (sepX < minSepX && sepY < minSepY) {
+          const overlapX = (minSepX - sepX) / minSepX;
+          const overlapY = (minSepY - sepY) / minSepY;
+          const pushFactor = 3.5;
+          const dirX = dx === 0 ? (Math.random() - 0.5) : (dx > 0 ? 1 : -1);
+          const dirY = dy === 0 ? (Math.random() - 0.5) : (dy > 0 ? 1 : -1);
+          const px = dirX * Math.pow(overlapX, 0.75) * pushFactor;
+          const py = dirY * Math.pow(overlapY, 0.75) * pushFactor;
           if (n1 !== draggedNode) { n1.vx -= px; n1.vy -= py; }
           if (n2 !== draggedNode) { n2.vx += px; n2.vy += py; }
         }
@@ -4720,19 +4734,19 @@
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
       let restLength, k;
       if (edge.isHierarchy) {
-        restLength = 190;
-        k = 0.035;
+        restLength = 220;
+        k = 0.022;
         edge.flowProgress = ((edge.flowProgress || 0) + 0.008) % 1;
       } else {
-        restLength = 250;
-        k = 0.024;
+        restLength = 320;
+        k = 0.009;
         edge.photonPulse = ((edge.photonPulse || 0) + 0.010) % 1;
       }
 
       const delta = dist - restLength;
       const relVx = edge.target.vx - edge.source.vx;
       const relVy = edge.target.vy - edge.source.vy;
-      const damping = ((relVx * dx + relVy * dy) / dist) * 0.05;
+      const damping = ((relVx * dx + relVy * dy) / dist) * 0.06;
       const totalForce = delta * k + damping;
 
       const fx = (dx / dist) * totalForce;
@@ -4757,20 +4771,25 @@
         const hubDrift = galaxyTime * 0.6 + (n.pulseOffset || 0);
         n.vx += Math.cos(hubDrift) * 0.012;
         n.vy += Math.sin(hubDrift) * 0.012;
+      } else if (n.hubRef) {
+        // Tether gently to category hub, NOT galactic core
+        const hdx = n.hubRef.x - n.x;
+        const hdy = n.hubRef.y - n.y;
+        n.vx += hdx * 0.0006;
+        n.vy += hdy * 0.0006;
+        n.vx += -hdy * 0.00015;
+        n.vy += hdx * 0.00015;
+
+        // Harmonic floating oscillation
+        const floatAngle = galaxyTime * 0.9 + (n.pulseOffset || 0);
+        n.vx += Math.cos(floatAngle) * 0.02;
+        n.vy += Math.sin(floatAngle) * 0.02;
       } else {
-        // Gentle inward pull toward galactic core
+        // Manual entities float in central constellation
         const cdx = centerX - n.x;
         const cdy = centerY - n.y;
-        n.vx += cdx * 0.0009;
-        n.vy += cdy * 0.0009;
-
-        // Gentle orbital swirl around category hub
-        if (n.hubRef) {
-          const bdx = n.hubRef.x - n.x;
-          const bdy = n.hubRef.y - n.y;
-          n.vx += -bdy * 0.00028;
-          n.vy += bdx * 0.00028;
-        }
+        n.vx += cdx * 0.0003;
+        n.vy += cdy * 0.0003;
 
         // Harmonic floating oscillation
         const floatAngle = galaxyTime * 0.9 + (n.pulseOffset || 0);
@@ -8884,6 +8903,10 @@
       window.compareSemver = compareSemver;
       window.openGraphView = openGraphView;
       window.closeGraphView = closeGraphView;
+      window.simulateGalaxyPhysics = simulateGalaxyPhysics;
+      window.drawLivingGalaxy = drawLivingGalaxy;
+      window.getGraphNodes = () => graphNodes;
+      window.getGraphEdges = () => graphEdges;
       window.openMapView = openMapView;
       window.closeMapView = closeMapView;
       window.openTimelineView = openTimelineView;
