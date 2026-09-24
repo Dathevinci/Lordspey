@@ -8,11 +8,29 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '1.1.0';
+  const APP_VERSION = '1.1.1';
   const UPDATE_API_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
 
-  const $ = (s, ctx = document) => (ctx && typeof ctx.querySelector === 'function' ? ctx.querySelector(s) : null);
-  const $$ = (s, ctx = document) => (ctx && typeof ctx.querySelectorAll === 'function' ? [...(ctx.querySelectorAll(s) || [])] : []);
+  const ALIAS_SELECTORS = {
+    '#editor-toolbar-wrap': '#editor-toolbar-wrap, .editor-toolbar',
+    '#editor-header': '#editor-header, .editor-header',
+    '#editor-title': '#editor-title, #note-title',
+    '#editor-body': '#editor-body, #editor-body-wrap, .editor-body',
+    '#preview-pane': '#preview-pane, #note-preview, .preview-pane',
+    '.split-view': '.split-view, .split-mode',
+    '.focus-mode': '.focus-mode, .zen-mode',
+  };
+
+  const $ = (s, ctx = document) => {
+    if (!ctx || typeof ctx.querySelector !== 'function') return null;
+    const resolved = ALIAS_SELECTORS[s] || s;
+    return ctx.querySelector(resolved);
+  };
+  const $$ = (s, ctx = document) => {
+    if (!ctx || typeof ctx.querySelectorAll !== 'function') return [];
+    const resolved = ALIAS_SELECTORS[s] || s;
+    return [...(ctx.querySelectorAll(resolved) || [])];
+  };
 
   const sidebar         = $('#sidebar');
   const sidebarToggle   = $('#sidebar-toggle');
@@ -248,6 +266,7 @@
   const settingFontFamily      = $('#setting-font-family');
   const settingFontSize        = $('#setting-font-size');
   const settingLineHeight      = $('#setting-line-height');
+  const settingTabSize         = $('#setting-tab-size');
   const settingTypewriterToggle = $('#setting-typewriter-toggle');
   const settingAutoEmdash      = $('#setting-auto-emdash');
   const settingSmartQuotes     = $('#setting-smart-quotes');
@@ -558,6 +577,7 @@
   let currentEditorFont   = "'Lora', Georgia, serif";
   let currentFontSize     = 15;
   let currentLineHeight   = 1.8;
+  let currentTabSize      = 2;
   let typewriterMode      = false;
   let autoEmDash          = true;
   let smartQuotes         = false;
@@ -633,6 +653,11 @@
       currentLineHeight = parseFloat(localStorage.getItem('lordspey_editor_line_spacing')) || 1.8;
     } else if (s.defaultLineHeight) {
       currentLineHeight = parseFloat(s.defaultLineHeight) || 1.8;
+    }
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_editor_tab_size')) {
+      currentTabSize = parseInt(localStorage.getItem('lordspey_editor_tab_size'), 10) || 2;
+    } else if (s.tabSize) {
+      currentTabSize = parseInt(s.tabSize, 10) || 2;
     }
     if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_typewriter_mode') !== null) {
       typewriterMode = localStorage.getItem('lordspey_typewriter_mode') === 'true';
@@ -1383,6 +1408,12 @@
     if (btnCancelProjectSettings) btnCancelProjectSettings.addEventListener('click', closeProjectSettingsModal);
     if (btnCancelSettings && btnCancelSettings !== btnCancelProjectSettings) btnCancelSettings.addEventListener('click', closeProjectSettingsModal);
     if (btnSaveProjectSettings) btnSaveProjectSettings.addEventListener('click', saveProjectSettings);
+    if (settingTabSize) {
+      settingTabSize.addEventListener('change', () => {
+        currentTabSize = parseInt(settingTabSize.value, 10) || 2;
+        applyTypographySettings();
+      });
+    }
 
     // Settings Navigation Tabs
     $$('.settings-tab-btn').forEach(btn => {
@@ -1991,16 +2022,59 @@
     document.addEventListener('keydown', shortcutHandler);
     if (typeof window !== 'undefined') {
       window.addEventListener('keydown', shortcutHandler);
+      window.addEventListener('resize', () => {
+        adjustNoteBodyHeight();
+      });
     }
 
     // Tab key & Smart Typography inside textarea
     noteBody.addEventListener('keydown', e => {
       if (e.key === 'Tab') {
         e.preventDefault();
+        const tabSpaces = ' '.repeat(currentTabSize || 2);
         const start = noteBody.selectionStart;
         const end = noteBody.selectionEnd;
-        noteBody.value = noteBody.value.substring(0, start) + '  ' + noteBody.value.substring(end);
-        noteBody.selectionStart = noteBody.selectionEnd = start + 2;
+        const val = noteBody.value;
+
+        if (e.shiftKey) {
+          // Unindent: shift lines left by up to currentTabSize spaces or 1 tab
+          const lineStart = val.lastIndexOf('\n', start - 1) + 1;
+          const lineEnd = val.indexOf('\n', end);
+          const blockEnd = lineEnd === -1 ? val.length : lineEnd;
+          const lines = val.substring(lineStart, blockEnd).split('\n');
+          let removedTotal = 0;
+          let firstLineRemoved = 0;
+          const unindentedLines = lines.map((line, idx) => {
+            let toRemove = 0;
+            const spacesCount = (line.match(/^[ ]+/) || [''])[0].length;
+            if (spacesCount > 0) {
+              toRemove = Math.min(spacesCount, currentTabSize || 2);
+            } else if (line.startsWith('\t')) {
+              toRemove = 1;
+            }
+            if (idx === 0) firstLineRemoved = toRemove;
+            removedTotal += toRemove;
+            return line.substring(toRemove);
+          });
+          noteBody.value = val.substring(0, lineStart) + unindentedLines.join('\n') + val.substring(blockEnd);
+          noteBody.selectionStart = Math.max(lineStart, start - firstLineRemoved);
+          noteBody.selectionEnd = Math.max(lineStart, end - removedTotal);
+        } else if (start !== end && val.substring(start, end).includes('\n')) {
+          // Multiline indent
+          const lineStart = val.lastIndexOf('\n', start - 1) + 1;
+          const lineEnd = val.indexOf('\n', end);
+          const blockEnd = lineEnd === -1 ? val.length : lineEnd;
+          const lines = val.substring(lineStart, blockEnd).split('\n');
+          const indentedLines = lines.map(line => tabSpaces + line);
+          noteBody.value = val.substring(0, lineStart) + indentedLines.join('\n') + val.substring(blockEnd);
+          noteBody.selectionStart = start + tabSpaces.length;
+          noteBody.selectionEnd = end + tabSpaces.length * lines.length;
+        } else {
+          // Single cursor or inline selection
+          noteBody.value = val.substring(0, start) + tabSpaces + val.substring(end);
+          noteBody.selectionStart = noteBody.selectionEnd = start + tabSpaces.length;
+        }
+        noteBody.dispatchEvent(new Event('input'));
         scheduleSave();
         return;
       }
@@ -2152,7 +2226,7 @@
     if (splitMode) {
       previewMode = false;
       btnPreview.classList.remove('active');
-      editorBodyWrap.classList.add('split-mode');
+      editorBodyWrap.classList.add('split-mode', 'split-view');
       noteBody.classList.remove('hidden');
       notePreview.classList.remove('hidden');
       notePreview.innerHTML = Markdown.render(noteBody.value);
@@ -2160,7 +2234,7 @@
       adjustNoteBodyHeight();
       toast('Live Split-View enabled', 'info');
     } else {
-      editorBodyWrap.classList.remove('split-mode');
+      editorBodyWrap.classList.remove('split-mode', 'split-view');
       notePreview.classList.add('hidden');
       btnSplit.classList.remove('active');
       adjustNoteBodyHeight();
@@ -2171,7 +2245,7 @@
   // ── Reading Preview Mode ──
   function togglePreview() {
     if (splitMode) {
-      editorBodyWrap.classList.remove('split-mode');
+      editorBodyWrap.classList.remove('split-mode', 'split-view');
       splitMode = false;
       btnSplit.classList.remove('active');
     }
@@ -2500,6 +2574,9 @@
     if (settingLineHeight) {
       settingLineHeight.value = String(currentLineHeight);
     }
+    if (settingTabSize) {
+      settingTabSize.value = String(currentTabSize || 2);
+    }
     if (settingTypewriterToggle) {
       settingTypewriterToggle.checked = typewriterMode;
     }
@@ -2648,6 +2725,11 @@
       currentLineHeight = parseFloat(settingLineHeight.value) || 1.8;
       if (typeof localStorage !== 'undefined') localStorage.setItem('lordspey_editor_line_spacing', String(currentLineHeight));
       Storage.saveSetting('defaultLineHeight', currentLineHeight);
+    }
+    if (settingTabSize) {
+      currentTabSize = parseInt(settingTabSize.value, 10) || 2;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('lordspey_editor_tab_size', String(currentTabSize));
+      Storage.saveSetting('tabSize', currentTabSize);
     }
     if (settingTypewriterToggle) {
       typewriterMode = settingTypewriterToggle.checked;
@@ -3115,6 +3197,7 @@
   function toggleZenMode() {
     zenMode = !zenMode;
     document.body.classList.toggle('zen-mode', zenMode);
+    document.body.classList.toggle('focus-mode', zenMode);
     btnZen.classList.toggle('active', zenMode);
     toast(zenMode ? 'Focus Mode enabled' : 'Focus Mode exited', 'info');
   }
@@ -3628,10 +3711,12 @@
       rootEl.style.setProperty('--editor-font', currentEditorFont);
       rootEl.style.setProperty('--editor-font-size', `${currentFontSize}px`);
       rootEl.style.setProperty('--editor-line-height', String(currentLineHeight));
+      rootEl.style.setProperty('--editor-tab-size', String(currentTabSize || 2));
     }
     if (editorFontSelect) editorFontSelect.value = currentEditorFont;
     if (fontSizeVal) fontSizeVal.textContent = `${currentFontSize}px`;
     if (lineSpacingVal) lineSpacingVal.textContent = `↕ ${currentLineHeight}`;
+    if (settingTabSize) settingTabSize.value = String(currentTabSize || 2);
   }
 
   function applyTypewriterState() {
@@ -8735,7 +8820,15 @@
   function renderWhatsNewHtml(features = WHATS_NEW_V110_FEATURES) {
     return `
       <div class="whats-new-intro" style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
-        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This release delivers major upgrades to the authorial writing experience, cartography tools, codex dossiers, and visual aesthetics:
+        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This bug fix release resolves editor layout overlapping on window resize or tab changes, and adds customizable editor tab indentation:
+      </div>
+      <div class="whats-new-v111-patch" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px;">
+        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">✦ v1.1.1 Maintenance &amp; Bug Fixes</div>
+        <ul style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; padding-left: 18px; line-height: 1.4;">
+          <li>Fixed layout overlapping where header and formatting toolbar collided with editor content upon resizing window or tabs.</li>
+          <li>Added customizable tab size indentation (2, 4, 8 spaces) in Settings and smart tab indentation keys.</li>
+          <li>Enhanced responsive layout flexbox constraints and z-index ordering across all screen dimensions.</li>
+        </ul>
       </div>
       <div class="whats-new-grid">
         ${features.map(f => `

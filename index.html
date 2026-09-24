@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=1.1.0" />
+  <link rel="stylesheet" href="css/style.css?v=1.1.1" />
 </head>
 <body>
   <!-- ───────── Sidebar ───────── -->
@@ -324,9 +324,9 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export (.spey)
         </button>
-        <button class="menu-sec-btn menu-sec-highlight" id="menu-btn-whats-new" title="What's New in v1.1.0">
+        <button class="menu-sec-btn menu-sec-highlight" id="menu-btn-whats-new" title="What's New in v1.1.1">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          What's New (v1.1.0)
+          What's New (v1.1.1)
         </button>
         <button class="menu-sec-btn" id="menu-btn-open-spey" title="Open .spey Project">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -361,7 +361,7 @@
     <!-- Editor area -->
     <div id="editor-area" class="editor-area hidden">
       <!-- Editor toolbar -->
-      <div class="editor-toolbar">
+      <div id="editor-toolbar-wrap" class="editor-toolbar">
         <div class="editor-meta">
           <button id="btn-back-menu" class="icon-btn" title="Back to Main Menu (Esc)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -460,7 +460,7 @@
       </div>
 
       <!-- Title & Tags container -->
-      <div class="editor-header">
+      <div id="editor-header" class="editor-header">
         <input type="text" id="note-title" class="editor-title" placeholder="Untitled Note" autocomplete="off" spellcheck="true" />
         <div class="tags-row">
           <svg class="tags-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
@@ -576,7 +576,7 @@
 
         <div id="editor-body-wrap" class="editor-body">
           <textarea id="note-body" class="editor-textarea" placeholder="Start writing… Type [[ to link notes, or use Markdown formatting." spellcheck="true"></textarea>
-          <div id="note-preview" class="editor-preview hidden"></div>
+          <div id="note-preview" class="editor-preview preview-pane hidden" data-testid="preview-pane"></div>
         </div>
 
         <!-- Backlinks / Linked Mentions Panel -->
@@ -1663,11 +1663,11 @@
               <div class="settings-action-row settings-update-row">
                 <div class="settings-version-tag">
                   <span class="version-label">Current Version:</span>
-                  <span class="version-badge" id="settings-vault-version-display">v1.1.0</span>
+                  <span class="version-badge" id="settings-vault-version-display">v1.1.1</span>
                 </div>
-                <button type="button" id="settings-btn-whats-new-vault" class="btn btn-primary" title="View new UI features and changelog in v1.1.0">
+                <button type="button" id="settings-btn-whats-new-vault" class="btn btn-primary" title="View new UI features and changelog in v1.1.1">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                  What's New in v1.1.0
+                  What's New in v1.1.1
                 </button>
                 <button type="button" id="settings-btn-check-update-vault" class="btn btn-secondary">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
@@ -1739,6 +1739,18 @@
                   <option value="2.0">2.0 (Spacious)</option>
                   <option value="2.1">2.1 (Airy)</option>
                   <option value="2.2">2.2 (Expanded)</option>
+                </select>
+              </div>
+
+              <div class="settings-row">
+                <div class="settings-row-label">
+                  <div class="settings-row-title">Editor Tab Indentation Size</div>
+                  <div class="settings-row-hint">Number of spaces inserted when pressing Tab in the editor.</div>
+                </div>
+                <select id="setting-tab-size" class="form-input form-input-sm" style="width: 110px;">
+                  <option value="2" selected>2 spaces</option>
+                  <option value="4">4 spaces</option>
+                  <option value="8">8 spaces</option>
                 </select>
               </div>
             </div>
@@ -1996,11 +2008,11 @@
               <div class="settings-action-row settings-update-row">
                 <div class="settings-version-tag">
                   <span class="version-label">Current Version:</span>
-                  <span class="version-badge" id="settings-guides-version-display">v1.1.0</span>
+                  <span class="version-badge" id="settings-guides-version-display">v1.1.1</span>
                 </div>
-                <button type="button" id="settings-btn-whats-new-guides" class="btn btn-primary" title="View new UI features and changelog in v1.1.0">
+                <button type="button" id="settings-btn-whats-new-guides" class="btn btn-primary" title="View new UI features and changelog in v1.1.1">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                  What's New in v1.1.0
+                  What's New in v1.1.1
                 </button>
                 <button type="button" id="settings-btn-check-update-guides" class="btn btn-secondary">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
@@ -2322,7 +2334,7 @@
   <div id="update-banner" class="update-banner hidden" role="alert">
     <div class="update-banner-content">
       <img src="assets/icon.png" alt="Raven Logo" class="update-banner-logo" />
-      <span class="update-banner-text"><strong>A new version of Lord Spey (<span id="update-banner-version">v1.1.0</span>) is ready!</strong></span>
+      <span class="update-banner-text"><strong>A new version of Lord Spey (<span id="update-banner-version">v1.1.1</span>) is ready!</strong></span>
       <button type="button" id="btn-banner-view-update" class="btn btn-sm btn-primary">Update Now</button>
       <button type="button" id="btn-banner-dismiss-update" class="icon-btn update-banner-close" title="Dismiss">✕</button>
     </div>
@@ -2345,9 +2357,9 @@
       <div class="modal-body update-modal-body">
         <div class="update-hero-banner" id="update-hero-banner">
           <div class="update-version-row">
-            <span class="update-version-chip update-chip-current" id="update-current-version-chip">Installed: v1.1.0</span>
+            <span class="update-version-chip update-chip-current" id="update-current-version-chip">Installed: v1.1.1</span>
             <span class="update-arrow" id="update-version-arrow">→</span>
-            <span class="update-version-chip update-chip-new" id="update-new-version-chip">New: v1.1.0</span>
+            <span class="update-version-chip update-chip-new" id="update-new-version-chip">New: v1.1.1</span>
           </div>
           <p class="update-guarantee" id="update-guarantee">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -2368,7 +2380,7 @@
             Release Notes ↗
           </a>
           <a id="btn-download-update" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-glow">
-            <svg id="btn-download-update-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <svg id="btn-download-update-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span id="btn-download-update-text">Instant Update &amp; Download</span>
           </a>
         </div>
@@ -2379,8 +2391,8 @@
   <!-- Toast container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <script src="js/storage.js?v=1.1.0"></script>
-  <script src="js/markdown.js?v=1.1.0"></script>
-  <script src="js/app.js?v=1.1.0"></script>
+  <script src="js/storage.js?v=1.1.1"></script>
+  <script src="js/markdown.js?v=1.1.1"></script>
+  <script src="js/app.js?v=1.1.1"></script>
 </body>
 </html>

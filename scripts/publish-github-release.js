@@ -25,44 +25,27 @@ async function main() {
   }
 
   const repo = 'Dathevinci/Lordspey';
-  const tag = 'v1.1.0';
-  const releaseName = 'Lord Spey v1.1.0 — Raven Brand & Feature Expansion';
-  const releaseBody = `## Lord Spey v1.1.0 — Raven Brand & Feature Expansion
+  const tag = 'v1.1.1';
+  const releaseName = 'Lord Spey v1.1.1 — Layout Resize & Tab Indentation Bug Fix';
+  const releaseBody = `## Lord Spey v1.1.1 — Layout Resize & Tab Indentation Bug Fix
 
 Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding.
 
-### ✦ What's New in v1.1.0
-- **🦅 Official Raven Brand Logo**:
-  - Celestial raven emblem with butterfly silhouette accents in top navigation, header, and dashboard watermark.
-  - Native multi-resolution Windows icon (\`.ico\`) configured for installers, taskbar, and desktop launcher shortcuts.
-- **🎨 App Themes & Custom Accent Picker**:
-  - Velvet Dark, Ivory Light, and Parchment Sepia authorial reading themes.
-  - Custom Accent Color Picker with live CSS variable updates and accessible border contrast.
-- **✍️ Writing Focus Mode**:
-  - Auto-hiding formatting toolbar while typing for zero-clutter composition.
-  - Smooth fade-in on mouse hover or pause.
-- **🗺️ World Map Shapes & Region Drawing**:
-  - 16:9 Landscape, 1:1 Square, 9:16 Realm, and Oval cartographic canvas aspect ratios.
-  - Interactive territory polygon drawing with fill colors, opacity controls, and linked lore markers.
-- **📁 Multi-Section Folders & Note Dropdown**:
-  - Multi-act and multi-volume chapter folder hierarchies.
-  - Dedicated \`+ New Note\` dropdown for Chapters, Lore, Characters, and Codex documents.
-- **🌌 Expanded Galaxy Graph**:
-  - 0-collision force simulation physics with spacious distribution and legible typography.
-  - Manual entity creation for Themes, Plot Arcs, and Factions with custom directional relationship links.
-- **👤 Character Codex Portraits**:
-  - Direct portrait image upload and drag-and-drop for concept art & avatars.
-  - Aspect-ratio preserved dossier cards with zoom previews.
-- **📦 Standalone Modules**:
-  - In-module inspection and editing for Characters, Maps, and Timelines without forced note redirects.
-- **🔄 In-App Auto-Updater**:
-  - Automated background release detector connected to GitHub Releases API.
-  - "What's New in v1.1.0" changelog viewer and update notification preview tester in Settings.
-  - Automated safety snapshot backup before updates guaranteeing 100% preservation of drafts, lore, and maps.
+### ✦ What's Fixed in v1.1.1
+- **📐 Layout Overlap & Collision Fix on Window / Tab Resize**:
+  - Resolved responsive flexbox compression where document header (\`#editor-header\`) and formatting toolbar overlapped with editor text and preview pane during viewport resizing, split view changes, or tablet/laptop dimension shifts.
+  - Added \`min-height: 42px\` and fixed \`flex-shrink: 0\` to format bar and headers so toolbar controls never clip or collapse into lower panes.
+  - Reset \`.editor-scroll-container\` flex basis to \`0%\` (\`flex: 1 1 0%\`) to ensure unconstrained, single-scroll vertical flow.
+- **⌨️ Customizable Editor Tab Indentation**:
+  - Added configurable Tab Size setting in **Settings → Editor & Writing Preferences** with 2-space, 4-space, and 8-space presets.
+  - Integrated dynamic CSS variable (\`--editor-tab-size\`) syncing live to the drafting canvas.
+  - Upgraded Tab key handling in the editor: supports single indentation, multiline block indentation, and Shift+Tab unindentation.
+- **🛡️ DOM Selector Compatibility & Class Aliasing**:
+  - Full support for selector aliases (\`#editor-header\`, \`#editor-toolbar-wrap\`, \`#editor-title\`, \`#editor-body\`, \`#preview-pane\`, \`.split-view\`, \`.focus-mode\`).
 
 ### 📦 Windows Downloads
-- **Lord Spey Setup 1.1.0.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
-- **Lord Spey 1.1.0.exe**: Portable standalone executable (no installation required).
+- **Lord Spey Setup 1.1.1.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
+- **Lord Spey 1.1.1.exe**: Portable standalone executable (no installation required).
 `;
 
   const headers = {
@@ -129,8 +112,8 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
   const cleanUploadUrl = uploadUrlTemplate.replace(/\{.*?\}$/, '');
 
   const assetsToUpload = [
-    { file: 'Lord Spey Setup 1.1.0.exe', label: 'Lord Spey Setup 1.1.0.exe', contentType: 'application/x-msdos-program' },
-    { file: 'Lord Spey 1.1.0.exe', label: 'Lord Spey 1.1.0.exe', contentType: 'application/x-msdos-program' }
+    { file: 'Lord Spey Setup 1.1.1.exe', label: 'Lord Spey Setup 1.1.1.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord Spey 1.1.1.exe', label: 'Lord Spey 1.1.1.exe', contentType: 'application/x-msdos-program' }
   ];
 
   const distDir = path.join(__dirname, '..', 'dist');
