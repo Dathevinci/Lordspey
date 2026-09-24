@@ -325,6 +325,8 @@
   const fontSizeVal      = $('#font-size-val');
   const btnLineSpacing   = $('#btn-line-spacing');
   const lineSpacingVal   = $('#line-spacing-val');
+  const btnTabSize       = $('#btn-tab-size');
+  const tabSizeVal       = $('#tab-size-val');
   const btnTypewriter    = $('#btn-typewriter');
 
   // Manuscript Metrics Modal
@@ -1411,6 +1413,12 @@
     if (settingTabSize) {
       settingTabSize.addEventListener('change', () => {
         currentTabSize = parseInt(settingTabSize.value, 10) || 2;
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('lordspey_editor_tab_size', String(currentTabSize));
+        }
+        if (typeof Storage !== 'undefined' && typeof Storage.saveSetting === 'function') {
+          Storage.saveSetting('tabSize', currentTabSize);
+        }
         applyTypographySettings();
       });
     }
@@ -1795,6 +1803,21 @@
         applyTypographySettings();
       });
     }
+    if (btnTabSize) {
+      btnTabSize.addEventListener('click', () => {
+        const TAB_SIZES = [2, 4, 8];
+        const idx = TAB_SIZES.indexOf(currentTabSize);
+        currentTabSize = TAB_SIZES[(idx + 1) % TAB_SIZES.length] || 2;
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('lordspey_editor_tab_size', String(currentTabSize));
+        }
+        if (typeof Storage !== 'undefined' && typeof Storage.saveSetting === 'function') {
+          Storage.saveSetting('tabSize', currentTabSize);
+        }
+        applyTypographySettings();
+        toast(`Editor indentation: ${currentTabSize} spaces`, 'info');
+      });
+    }
     if (btnTypewriter) {
       btnTypewriter.addEventListener('click', toggleTypewriterMode);
     }
@@ -2071,8 +2094,18 @@
           noteBody.selectionEnd = end + tabSpaces.length * lines.length;
         } else {
           // Single cursor or inline selection
-          noteBody.value = val.substring(0, start) + tabSpaces + val.substring(end);
-          noteBody.selectionStart = noteBody.selectionEnd = start + tabSpaces.length;
+          let inserted = false;
+          if (typeof document !== 'undefined' && document.queryCommandSupported && document.queryCommandSupported('insertText')) {
+            try {
+              inserted = document.execCommand('insertText', false, tabSpaces);
+            } catch (_) {
+              inserted = false;
+            }
+          }
+          if (!inserted) {
+            noteBody.value = val.substring(0, start) + tabSpaces + val.substring(end);
+            noteBody.selectionStart = noteBody.selectionEnd = start + tabSpaces.length;
+          }
         }
         noteBody.dispatchEvent(new Event('input'));
         scheduleSave();
@@ -3716,6 +3749,7 @@
     if (editorFontSelect) editorFontSelect.value = currentEditorFont;
     if (fontSizeVal) fontSizeVal.textContent = `${currentFontSize}px`;
     if (lineSpacingVal) lineSpacingVal.textContent = `↕ ${currentLineHeight}`;
+    if (tabSizeVal) tabSizeVal.textContent = `Tab: ${currentTabSize || 2}`;
     if (settingTabSize) settingTabSize.value = String(currentTabSize || 2);
   }
 
@@ -7899,7 +7933,9 @@
         if (!formatBar) return;
         const rect = editorArea.getBoundingClientRect ? editorArea.getBoundingClientRect() : { top: 0 };
         const relativeY = e.clientY - rect.top;
-        if (relativeY < 120 || e.clientY < 140) {
+        const fbRect = formatBar.getBoundingClientRect ? formatBar.getBoundingClientRect() : null;
+        const fbBottom = fbRect ? (fbRect.bottom - rect.top) : 120;
+        if (relativeY <= Math.max(140, fbBottom + 30)) {
           formatBar.classList.remove('focus-autohidden');
         }
       });
@@ -7914,6 +7950,13 @@
     const editorHeader = $('#editor-header');
     if (editorHeader) {
       editorHeader.addEventListener('mouseenter', () => {
+        if (formatBar) formatBar.classList.remove('focus-autohidden');
+      });
+    }
+
+    const editorToolbarWrap = $('#editor-toolbar-wrap');
+    if (editorToolbarWrap) {
+      editorToolbarWrap.addEventListener('mouseenter', () => {
         if (formatBar) formatBar.classList.remove('focus-autohidden');
       });
     }

@@ -1259,22 +1259,32 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 32px;
+  padding: 6px 28px;
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-primary);
   min-height: var(--toolbar-height);
+  max-height: 52px;
   flex-shrink: 0;
   position: relative;
   z-index: 10;
   box-sizing: border-box;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
   transition: all var(--transition);
+}
+.editor-toolbar::-webkit-scrollbar,
+#editor-toolbar-wrap::-webkit-scrollbar {
+  display: none;
 }
 
 .editor-meta {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
 .meta-select {
@@ -1330,6 +1340,7 @@ body {
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  flex-wrap: nowrap;
 }
 .toolbar-cluster {
   display: flex;
@@ -1538,19 +1549,28 @@ body {
   background: var(--bg-secondary);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
   flex-shrink: 0;
   min-height: 42px;
+  max-height: 42px;
   position: relative;
   z-index: 6;
   box-sizing: border-box;
+}
+.format-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .format-group {
   display: flex;
   align-items: center;
   gap: 3px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   flex-shrink: 0;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);
@@ -3078,7 +3098,8 @@ body.focus-mode .format-bar:hover {
 #editor-body.split-view {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: calc(100vh - 280px);
+  flex: 1 1 auto;
+  min-height: min-content;
   height: auto;
   box-sizing: border-box;
 }
@@ -3091,7 +3112,8 @@ body.focus-mode .format-bar:hover {
   display: block !important;
   border-right: 1px solid var(--border-subtle);
   overflow-y: auto;
-  max-height: calc(100vh - 240px);
+  min-height: 250px;
+  max-height: calc(100vh - 160px);
   field-sizing: fixed;
   box-sizing: border-box;
 }
@@ -3103,7 +3125,8 @@ body.focus-mode .format-bar:hover {
 #editor-body.split-view .editor-preview {
   display: block !important;
   overflow-y: auto;
-  max-height: calc(100vh - 240px);
+  min-height: 250px;
+  max-height: calc(100vh - 160px);
   box-sizing: border-box;
 }
 

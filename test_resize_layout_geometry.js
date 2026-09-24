@@ -16,6 +16,8 @@ assert(htmlContent.includes('id="editor-body-wrap"'), 'index.html must contain i
 assert(htmlContent.includes('id="note-preview"'), 'index.html must contain id="note-preview"');
 assert(htmlContent.includes('data-testid="preview-pane"'), 'index.html must contain data-testid="preview-pane"');
 assert(htmlContent.includes('id="setting-tab-size"'), 'index.html must contain id="setting-tab-size"');
+assert(htmlContent.includes('id="btn-tab-size"'), 'index.html must contain id="btn-tab-size" on format toolbar');
+assert(htmlContent.includes('id="tab-size-val"'), 'index.html must contain id="tab-size-val"');
 assert(htmlContent.includes('value="2"'), 'setting-tab-size must have 2 spaces option');
 assert(htmlContent.includes('value="4"'), 'setting-tab-size must have 4 spaces option');
 assert(htmlContent.includes('value="8"'), 'setting-tab-size must have 8 spaces option');
@@ -30,7 +32,9 @@ assert(cssContent.includes('#editor-toolbar-wrap') || cssContent.includes('.edit
 assert(/flex-shrink:\s*0/.test(cssContent), 'CSS must have flex-shrink: 0 on fixed header/toolbar elements');
 assert(cssContent.includes('.format-bar'), 'CSS must style .format-bar');
 assert(cssContent.includes('min-height: 42px'), '.format-bar must specify min-height: 42px to prevent compression/cutoff on resize');
+assert(cssContent.includes('max-height: 42px'), '.format-bar must specify max-height: 42px to prevent vertical explosion on resize');
 assert(cssContent.includes('flex-shrink: 0'), '.format-bar must have flex-shrink: 0 to protect from flex compression');
+assert(cssContent.includes('overflow-x: auto'), 'Format bar must support horizontal scrolling on narrow viewports');
 
 // Scroll container and body unconstrained
 assert(cssContent.includes('.editor-scroll-container'), 'CSS must style .editor-scroll-container');
@@ -133,6 +137,9 @@ const noteBody = getElem('note-body', 'textarea', ['editor-textarea']);
 const notePreview = getElem('note-preview', 'div', ['editor-preview', 'preview-pane', 'hidden']);
 const settingTabSize = getElem('setting-tab-size', 'select');
 settingTabSize.value = '4';
+const btnTabSize = getElem('btn-tab-size', 'button');
+const tabSizeVal = getElem('tab-size-val', 'span');
+tabSizeVal.textContent = 'Tab: 4';
 
 const mockDocument = {
   getElementById: id => getElem(id),
@@ -142,6 +149,8 @@ const mockDocument = {
     if (sel.includes('#editor-title') || sel === '#note-title') return noteTitle;
     if (sel.includes('#editor-body') || sel.includes('#editor-body-wrap') || sel === '.editor-body') return editorBodyWrap;
     if (sel.includes('#preview-pane') || sel.includes('#note-preview') || sel === '.preview-pane') return notePreview;
+    if (sel.includes('#btn-tab-size')) return btnTabSize;
+    if (sel.includes('#tab-size-val')) return tabSizeVal;
     if (sel.startsWith('#')) return getElem(sel.slice(1));
     return createMockElement('', 'div');
   },
@@ -242,10 +251,12 @@ noteBody.dispatchEvent({
 
 assert.strictEqual(noteBody.value, '    First line\n    Second line', 'Multiline selection Tab must indent both lines with 4 spaces');
 
-// Test changing tab size to 8
+// Test changing tab size to 8 via settings select
 settingTabSize.value = '8';
 settingTabSize.dispatchEvent({ type: 'change' });
 assert.strictEqual(rootStyle.getPropertyValue('--editor-tab-size'), '8', '--editor-tab-size must update to 8 on setting change');
+assert.strictEqual(mockStorage['lordspey_editor_tab_size'], '8', 'localStorage must update immediately to 8 on settings change');
+assert.strictEqual(tabSizeVal.textContent, 'Tab: 8', 'tabSizeVal must update to Tab: 8');
 
 // Test Tab key with tab size 8
 noteBody.value = 'Testing eight';
@@ -260,7 +271,22 @@ noteBody.dispatchEvent({
 });
 
 assert.strictEqual(noteBody.value, '        Testing eight', 'Tab key with tabSize=8 must insert 8 spaces');
-console.log('✓ Tab size configuration, --editor-tab-size CSS sync, single-line indent, multiline indent, and Shift+Tab unindent passed');
+
+// Test clicking btnTabSize on formatting toolbar to cycle 8 -> 2
+btnTabSize.dispatchEvent({ type: 'click' });
+assert.strictEqual(rootStyle.getPropertyValue('--editor-tab-size'), '2', 'Clicking btnTabSize must cycle from 8 to 2');
+assert.strictEqual(tabSizeVal.textContent, 'Tab: 2', 'tabSizeVal must update to Tab: 2');
+assert.strictEqual(settingTabSize.value, '2', 'settingTabSize select must synchronize to 2');
+assert.strictEqual(mockStorage['lordspey_editor_tab_size'], '2', 'localStorage must update to 2');
+
+// Test clicking btnTabSize again to cycle 2 -> 4
+btnTabSize.dispatchEvent({ type: 'click' });
+assert.strictEqual(rootStyle.getPropertyValue('--editor-tab-size'), '4', 'Clicking btnTabSize must cycle from 2 to 4');
+assert.strictEqual(tabSizeVal.textContent, 'Tab: 4', 'tabSizeVal must update to Tab: 4');
+assert.strictEqual(settingTabSize.value, '4', 'settingTabSize select must synchronize to 4');
+assert.strictEqual(mockStorage['lordspey_editor_tab_size'], '4', 'localStorage must update to 4');
+
+console.log('✓ Tab size configuration, toolbar cycle button, --editor-tab-size CSS sync, single-line indent, multiline indent, and Shift+Tab unindent passed');
 
 // 5. Test Split-View & Focus Mode Toggles
 console.log('\n--- 5. Testing Split-View & Focus Mode Class Aliases ---');
@@ -289,24 +315,23 @@ console.log('✓ Focus Mode toggle applies and clears both .zen-mode and .focus-
 
 // 6. Non-overlapping Responsive Geometry Verification
 console.log('\n--- 6. Verifying Non-Overlapping Responsive Geometry Across Viewport Sizes ---');
-const viewportWidths = [480, 768, 1024, 1440];
 
-viewportWidths.forEach(width => {
-  // Simulate mock bounding boxes for header, toolbar, format bar, and scroll container
-  const headerHeight = 70; // Title + tags
-  const toolbarHeight = 44; // Top nav actions
-  const formatBarMinHeight = 42; // Formatting actions
+// Validate DOM hierarchy sequence in index.html inside editor-area
+const editorAreaIndex = htmlContent.indexOf('id="editor-area"');
+const toolbarIndex = htmlContent.indexOf('id="editor-toolbar-wrap"', editorAreaIndex);
+const headerIndex = htmlContent.indexOf('id="editor-header"', toolbarIndex);
+const formatBarIndex = htmlContent.indexOf('class="format-bar"', headerIndex);
+const scrollContainerIndex = htmlContent.indexOf('class="editor-scroll-container"', formatBarIndex);
 
-  const headerBox = { top: toolbarHeight, bottom: toolbarHeight + headerHeight };
-  const formatBarBox = { top: headerBox.bottom, bottom: headerBox.bottom + formatBarMinHeight };
-  const scrollContainerBox = { top: formatBarBox.bottom, bottom: 900 };
+assert(toolbarIndex !== -1 && headerIndex !== -1 && formatBarIndex !== -1 && scrollContainerIndex !== -1, 'All 4 editor panels must be found in HTML');
+assert(toolbarIndex < headerIndex, 'Toolbar must strictly precede editor header in DOM');
+assert(headerIndex < formatBarIndex, 'Editor header must strictly precede format bar in DOM');
+assert(formatBarIndex < scrollContainerIndex, 'Format bar must strictly precede editor scroll container in DOM');
 
-  // Assert zero vertical overlap
-  assert(headerBox.top >= toolbarHeight, `At width ${width}px, header must start at or below toolbar`);
-  assert(formatBarBox.top >= headerBox.bottom, `At width ${width}px, format bar must start at or below header bottom`);
-  assert(scrollContainerBox.top >= formatBarBox.bottom, `At width ${width}px, scroll container must start at or below format bar bottom`);
-  assert(formatBarBox.bottom - formatBarBox.top >= 42, `At width ${width}px, format bar height must be >= 42px (never clipped)`);
-});
-console.log('✓ Zero-overlap vertical flow verified across 480px, 768px, 1024px, and 1440px viewport widths');
+// Verify CSS layout rules guarantee non-overlap
+assert(!/(\.editor-header|\.format-bar|\.editor-scroll-container)\s*\{[^}]*margin-top:\s*-[0-9]/i.test(cssContent), 'No negative margin-top allowed on editor components');
+assert(!/(\.editor-header|\.format-bar)\s*\{[^}]*position:\s*absolute/i.test(cssContent), 'Header and format bar must not use position: absolute in base layout');
+
+console.log('✓ Zero-overlap vertical flow verified across DOM hierarchy and CSS isolation constraints');
 
 console.log('\n=== ALL RESIZE LAYOUT GEOMETRY & TAB SIZE TESTS PASSED (100%) ===\n');

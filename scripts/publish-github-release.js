@@ -33,15 +33,18 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
 
 ### ✦ What's Fixed in v1.1.1
 - **📐 Layout Overlap & Collision Fix on Window / Tab Resize**:
-  - Resolved responsive flexbox compression where document header (\`#editor-header\`) and formatting toolbar overlapped with editor text and preview pane during viewport resizing, split view changes, or tablet/laptop dimension shifts.
-  - Added \`min-height: 42px\` and fixed \`flex-shrink: 0\` to format bar and headers so toolbar controls never clip or collapse into lower panes.
-  - Reset \`.editor-scroll-container\` flex basis to \`0%\` (\`flex: 1 1 0%\`) to ensure unconstrained, single-scroll vertical flow.
-- **⌨️ Customizable Editor Tab Indentation**:
-  - Added configurable Tab Size setting in **Settings → Editor & Writing Preferences** with 2-space, 4-space, and 8-space presets.
-  - Integrated dynamic CSS variable (\`--editor-tab-size\`) syncing live to the drafting canvas.
-  - Upgraded Tab key handling in the editor: supports single indentation, multiline block indentation, and Shift+Tab unindentation.
+  - Resolved responsive flexbox compression where document header (`#editor-header`) and formatting toolbar overlapped with editor text and preview pane during viewport resizing, split view changes, or tablet/laptop dimension shifts.
+  - Added `min-height: 42px`, `max-height: 42px`, `flex-wrap: nowrap`, and horizontal scrolling to `.format-bar` and `.editor-toolbar` so toolbars remain sleek and never vertically explode to 250px or crush the writing area.
+  - Reset `.editor-scroll-container` flex basis to `0%` (`flex: 1 1 0%`) to ensure unconstrained, single-scroll vertical flow.
+  - Upgraded split view to dynamic height scaling (`flex: 1 1 auto; height: 100%`) eliminating hardcoded viewport offset collisions.
+  - Enhanced Focus Mode toolbar hover detection to calculate dynamic bounds across all window sizes.
+- **⌨️ Customizable Editor Tab Indentation & 1-Click Toolbar Control**:
+  - Added instant Tab Indentation cycle button (`Tab: 2 / 4 / 8`) directly on the formatting toolbar alongside line spacing.
+  - Added configurable Tab Size setting in **Settings → Editor & Writing Preferences** with 2-space, 4-space, and 8-space presets with immediate persistence.
+  - Integrated dynamic CSS variable (`--editor-tab-size`) syncing live to the drafting canvas.
+  - Upgraded Tab key handling in the editor: supports single indentation with native undo (`Ctrl+Z`), multiline block indentation, and Shift+Tab unindentation.
 - **🛡️ DOM Selector Compatibility & Class Aliasing**:
-  - Full support for selector aliases (\`#editor-header\`, \`#editor-toolbar-wrap\`, \`#editor-title\`, \`#editor-body\`, \`#preview-pane\`, \`.split-view\`, \`.focus-mode\`).
+  - Full support for selector aliases (`#editor-header`, `#editor-toolbar-wrap`, `#editor-title`, `#editor-body`, `#preview-pane`, `.split-view`, `.focus-mode`).
 
 ### 📦 Windows Downloads
 - **Lord Spey Setup 1.1.1.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
