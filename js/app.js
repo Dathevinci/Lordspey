@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '1.1.1';
+  const APP_VERSION = '1.1.2';
   const UPDATE_API_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
 
   const ALIAS_SELECTORS = {
@@ -131,6 +131,7 @@
 
   // 2. New Note Dropdown & Section
   const newNoteDropdown       = $('#new-note-dropdown');
+  const btnNewNoteDropdown    = $('#btn-new-note-dropdown');
   const modalNoteSection      = $('#modal-note-section');
 
   // 3. World Map Canvas Shapes, Regions & Enhanced Tools
@@ -3715,6 +3716,7 @@
 
   function openNewNoteModal(cat = 'draft', defaultTitle = '', template = '', tags = '') {
     if (newNoteDropdown) newNoteDropdown.classList.add('hidden');
+    if (btnNewNoteDropdown) btnNewNoteDropdown.classList.remove('active');
     if (modalTitle) modalTitle.value = defaultTitle || '';
     const safeCat = ['chapter', 'lore', 'world', 'draft'].includes(cat) ? cat : (cat === 'character' ? 'lore' : 'draft');
     if (modalCategory) modalCategory.value = safeCat;
@@ -7964,28 +7966,56 @@
 
   // ── 2. New Note Dropdown (Chapter, Character, World, Draft) ──
   function initNewNoteDropdown() {
-    if (!btnNewNote) return;
-    btnNewNote.addEventListener('click', (e) => {
-      if (!newNoteDropdown) {
-        openNewNoteModal();
-        return;
-      }
-      e.stopPropagation();
-      newNoteDropdown.classList.toggle('hidden');
-    });
+    // Dedicated dropdown button toggles dropdown menu
+    if (btnNewNoteDropdown) {
+      btnNewNoteDropdown.addEventListener('click', (e) => {
+        if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (newNoteDropdown) {
+          const isOpening = newNoteDropdown.classList.contains('hidden');
+          newNoteDropdown.classList.toggle('hidden');
+          btnNewNoteDropdown.classList.toggle('active', isOpening);
+        }
+      });
+    }
 
+    // Ensure main New Note button only triggers modal creation and dismisses dropdown
+    if (btnNewNote) {
+      btnNewNote.addEventListener('click', () => {
+        if (newNoteDropdown) newNoteDropdown.classList.add('hidden');
+        if (btnNewNoteDropdown) btnNewNoteDropdown.classList.remove('active');
+      });
+    }
+
+    // Dismiss dropdown on click outside
     document.addEventListener('click', (e) => {
       if (newNoteDropdown && !newNoteDropdown.classList.contains('hidden')) {
-        if (!e.target.closest('#btn-new-note') && !e.target.closest('#new-note-dropdown')) {
+        const target = e ? e.target : null;
+        if (target && typeof target.closest === 'function') {
+          if (!target.closest('#btn-new-note-dropdown') && !target.closest('#new-note-dropdown')) {
+            newNoteDropdown.classList.add('hidden');
+            if (btnNewNoteDropdown) btnNewNoteDropdown.classList.remove('active');
+          }
+        } else {
           newNoteDropdown.classList.add('hidden');
+          if (btnNewNoteDropdown) btnNewNoteDropdown.classList.remove('active');
         }
+      }
+    });
+
+    // Dismiss dropdown on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e && e.key === 'Escape' && newNoteDropdown && !newNoteDropdown.classList.contains('hidden')) {
+        newNoteDropdown.classList.add('hidden');
+        if (btnNewNoteDropdown) btnNewNoteDropdown.classList.remove('active');
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
       }
     });
 
     $$('.new-dropdown-item').forEach(item => {
       item.addEventListener('click', (e) => {
-        e.stopPropagation();
+        if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
         if (newNoteDropdown) newNoteDropdown.classList.add('hidden');
+        if (btnNewNoteDropdown) btnNewNoteDropdown.classList.remove('active');
         const type = item.dataset.createType || 'draft';
         if (type === 'chapter') {
           openNewNoteModal('chapter', '', '');
@@ -8863,14 +8893,14 @@
   function renderWhatsNewHtml(features = WHATS_NEW_V110_FEATURES) {
     return `
       <div class="whats-new-intro" style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
-        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This bug fix release resolves editor layout overlapping on window resize or tab changes, and adds customizable editor tab indentation:
+        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This update resolves document creation actions, eliminating modal and dropdown conflicts with a clean split-button experience:
       </div>
       <div class="whats-new-v111-patch" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px;">
-        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">✦ v1.1.1 Maintenance &amp; Bug Fixes</div>
+        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">✦ v1.1.2 Maintenance &amp; Bug Fixes</div>
         <ul style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; padding-left: 18px; line-height: 1.4;">
-          <li>Fixed layout overlapping where header and formatting toolbar collided with editor content upon resizing window or tabs.</li>
-          <li>Added customizable tab size indentation (2, 4, 8 spaces) in Settings and smart tab indentation keys.</li>
-          <li>Enhanced responsive layout flexbox constraints and z-index ordering across all screen dimensions.</li>
+          <li>Fixed "+ New Note" action conflict where pressing the button triggered both the modal and dropdown menu simultaneously.</li>
+          <li>Added dedicated dropdown toggle button to seamlessly choose note type (Chapter, Character Note, Worldbuilding, Draft) without modal occlusion.</li>
+          <li>Enhanced sidebar footer button alignment, event isolation, keyboard Escape dismissal, and click-outside handling.</li>
         </ul>
       </div>
       <div class="whats-new-grid">

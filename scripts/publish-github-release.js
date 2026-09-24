@@ -25,30 +25,27 @@ async function main() {
   }
 
   const repo = 'Dathevinci/Lordspey';
-  const tag = 'v1.1.1';
-  const releaseName = 'Lord Spey v1.1.1 — Layout Resize & Tab Indentation Bug Fix';
-  const releaseBody = `## Lord Spey v1.1.1 — Layout Resize & Tab Indentation Bug Fix
+  const tag = 'v1.1.2';
+  const releaseName = 'Lord Spey v1.1.2 — New Note Button & Dropdown Action Fix';
+  const releaseBody = `## Lord Spey v1.1.2 — New Note Button & Dropdown Action Fix
 
 Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding.
 
-### ✦ What's Fixed in v1.1.1
-- **📐 Layout Overlap & Collision Fix on Window / Tab Resize**:
-  - Resolved responsive flexbox compression where document header (\`#editor-header\`) and formatting toolbar overlapped with editor text and preview pane during viewport resizing, split view changes, or tablet/laptop dimension shifts.
-  - Added \`min-height: 42px\`, \`max-height: 42px\`, \`flex-wrap: nowrap\`, and horizontal scrolling to \`.format-bar\` and \`.editor-toolbar\` so toolbars remain sleek and never vertically explode to 250px or crush the writing area.
-  - Reset \`.editor-scroll-container\` flex basis to \`0%\` (\`flex: 1 1 0%\`) to ensure unconstrained, single-scroll vertical flow.
-  - Upgraded split view to dynamic height scaling (\`flex: 1 1 auto; height: 100%\`) eliminating hardcoded viewport offset collisions.
-  - Enhanced Focus Mode toolbar hover detection to calculate dynamic bounds across all window sizes.
-- **⌨️ Customizable Editor Tab Indentation & 1-Click Toolbar Control**:
-  - Added instant Tab Indentation cycle button (\`Tab: 2 / 4 / 8\`) directly on the formatting toolbar alongside line spacing.
-  - Added configurable Tab Size setting in **Settings → Editor & Writing Preferences** with 2-space, 4-space, and 8-space presets with immediate persistence.
-  - Integrated dynamic CSS variable (\`--editor-tab-size\`) syncing live to the drafting canvas.
-  - Upgraded Tab key handling in the editor: supports single indentation with native undo (\`Ctrl+Z\`), multiline block indentation, and Shift+Tab unindentation.
-- **🛡️ DOM Selector Compatibility & Class Aliasing**:
-  - Full support for selector aliases (\`#editor-header\`, \`#editor-toolbar-wrap\`, \`#editor-title\`, \`#editor-body\`, \`#preview-pane\`, \`.split-view\`, \`.focus-mode\`).
+### ✦ What's Fixed in v1.1.2
+- **⚡ Resolved New Note Button & Dropdown Action Conflict**:
+  - Fixed duplicate listener trigger where pressing the "+ New Note" button simultaneously opened both the "Create New Document" modal and the dropdown menu, resulting in the modal backdrop obscuring the dropdown menu beneath it.
+  - Added dedicated dropdown toggle button (\`#btn-new-note-dropdown\`) forming a clean, unified split button (\`[ + New Note | ▾ ]\`) in the sidebar footer.
+  - Clicking "+ New Note" now immediately opens the document creation modal without opening the dropdown menu.
+  - Clicking the dropdown chevron (\`▾\`) toggles the document type menu (Chapter, Character Note, Worldbuilding, Draft) cleanly without opening the modal.
+- **🛡️ Dropdown Occlusion, Dismissal & Keyboard Navigation**:
+  - Implemented proper event isolation (\`e.stopPropagation()\`) preventing double triggers and event bubbling.
+  - Added Escape key dismissal to immediately close the dropdown menu without impacting other views.
+  - Added document click-outside dismissal and cleared active toggle button state.
+  - Enhanced upward slide animation and alignment within the sidebar footer.
 
 ### 📦 Windows Downloads
-- **Lord Spey Setup 1.1.1.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
-- **Lord Spey 1.1.1.exe**: Portable standalone executable (no installation required).
+- **Lord Spey Setup 1.1.2.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
+- **Lord Spey 1.1.2.exe**: Portable standalone executable (no installation required).
 `;
 
   const headers = {
@@ -115,8 +112,8 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
   const cleanUploadUrl = uploadUrlTemplate.replace(/\{.*?\}$/, '');
 
   const assetsToUpload = [
-    { file: 'Lord Spey Setup 1.1.1.exe', label: 'Lord Spey Setup 1.1.1.exe', contentType: 'application/x-msdos-program' },
-    { file: 'Lord Spey 1.1.1.exe', label: 'Lord Spey 1.1.1.exe', contentType: 'application/x-msdos-program' }
+    { file: 'Lord Spey Setup 1.1.2.exe', label: 'Lord Spey Setup 1.1.2.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord Spey 1.1.2.exe', label: 'Lord Spey 1.1.2.exe', contentType: 'application/x-msdos-program' }
   ];
 
   const distDir = path.join(__dirname, '..', 'dist');
