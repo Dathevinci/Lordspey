@@ -744,6 +744,9 @@
     if (rootEl && typeof rootEl.setAttribute === 'function') {
       rootEl.setAttribute('data-accent', key);
     }
+    if (document.body && typeof document.body.setAttribute === 'function') {
+      document.body.setAttribute('data-accent', key);
+    }
     if (settingCustomAccent && theme.accent) {
       settingCustomAccent.value = theme.accent;
       if (settingCustomAccentHex) settingCustomAccentHex.value = theme.accent;
@@ -773,6 +776,8 @@
     if (mapModal && !mapModal.classList.contains('hidden') && typeof Storage !== 'undefined' && typeof Storage.getCustomMapImage === 'function' && !Storage.getCustomMapImage()) {
       if (typeof renderProceduralWorldMap === 'function') {
         renderProceduralWorldMap();
+      } else if (typeof renderDefaultMap === 'function') {
+        renderDefaultMap();
       }
     }
   }
@@ -786,17 +791,28 @@
     const rootEl = document.documentElement || document.body;
     if (rootEl && typeof rootEl.setAttribute === 'function') {
       rootEl.setAttribute('data-theme', valid);
+      rootEl.setAttribute('data-base-theme', valid);
     }
     if (document.body && typeof document.body.setAttribute === 'function') {
       document.body.setAttribute('data-theme', valid);
+      document.body.setAttribute('data-base-theme', valid);
     }
     $$('.base-theme-card').forEach(card => {
       if (!card) return;
-      const isMatch = card.dataset && card.dataset.baseTheme === valid;
+      const isMatch = card.dataset && (card.dataset.baseTheme === valid || card.dataset.theme === valid);
       if (card.classList && typeof card.classList.toggle === 'function') {
         card.classList.toggle('active', isMatch);
       }
     });
+
+    if (typeof renderDefaultMap === 'function' && mapModal && !mapModal.classList.contains('hidden')) {
+      if (typeof Storage !== 'undefined' && typeof Storage.getCustomMapImage === 'function' && !Storage.getCustomMapImage()) {
+        renderDefaultMap();
+      }
+    }
+    if (typeof renderCodexWeb === 'function' && codexModal && !codexModal.classList.contains('hidden') && codexMode === 'web') {
+      renderCodexWeb(lastCodexChars, lastCodexRels);
+    }
   }
 
   function applyCustomAccent(hex) {
@@ -820,6 +836,9 @@
     }
     if (rootEl && typeof rootEl.setAttribute === 'function') {
       rootEl.setAttribute('data-accent', 'custom');
+    }
+    if (document.body && typeof document.body.setAttribute === 'function') {
+      document.body.setAttribute('data-accent', 'custom');
     }
     $$('.accent-theme-card').forEach(card => {
       if (card && card.classList && typeof card.classList.remove === 'function') {
@@ -2772,6 +2791,9 @@
     window.backlinksPanel = backlinksPanel;
     window.toggleLinkedMentions = toggleLinkedMentions;
     window.adjustNoteBodyHeight = adjustNoteBodyHeight;
+    window.applyBaseTheme = applyBaseTheme;
+    window.applyAccentTheme = applyAccentTheme;
+    window.applyCustomAccent = applyCustomAccent;
   }
 
   // Support transparent alias resolution for #settings-modal, #linked-mentions, and settings triggers
@@ -4383,7 +4405,7 @@
       }
     }
 
-    const hubDist = Math.max(160, Math.min(w, h) * 0.28);
+    const hubDist = Math.max(260, Math.min(w, h) * 0.38);
 
     // 1. Create Category Hub Nodes
     const hubNodes = catsToCreate.map(cat => {
@@ -4442,13 +4464,13 @@
           const startAngle = meta.angle - fanSpread / 2;
           const angle = totalInCat === 1 ? meta.angle : startAngle + i * angleStep;
           const shell = Math.floor(i / 6);
-          const dist = 90 + (i % 3) * 35 + shell * 30;
+          const dist = 145 + (i % 3) * 50 + shell * 38;
           nx = hub.x + Math.cos(angle) * dist;
           ny = hub.y + Math.sin(angle) * dist;
         } else {
           const angle = totalInCat > 0 ? (i / totalInCat) * Math.PI * 2 : 0;
           const shell = Math.floor(i / 8);
-          const dist = 120 + (i % 3) * 40 + shell * 35;
+          const dist = 185 + (i % 3) * 55 + shell * 45;
           nx = centerX + Math.cos(angle) * dist;
           ny = centerY + Math.sin(angle) * dist;
         }
@@ -4668,14 +4690,25 @@
         const dy = n2.y - n1.y;
         const distSq = dx * dx + dy * dy;
         const dist = Math.sqrt(distSq) || 0.001;
-        const maxRepulse = (n1.isHub || n2.isHub) ? 360 : 260;
+        const maxRepulse = (n1.isHub || n2.isHub) ? 650 : 380;
         if (dist < maxRepulse) {
-          const strength = (n1.isHub && n2.isHub) ? 5500 : (n1.isHub || n2.isHub) ? 3200 : 1800;
+          const strength = (n1.isHub && n2.isHub) ? 16000 : (n1.isHub || n2.isHub) ? 9500 : 4800;
           const force = strength / (distSq + 400);
           const fx = (dx / dist) * force;
           const fy = (dy / dist) * force;
           if (n1 !== draggedNode) { n1.vx -= fx; n1.vy -= fy; }
           if (n2 !== draggedNode) { n2.vx += fx; n2.vy += fy; }
+        }
+
+        // Anti-overlap padding between node bounding circles and text labels
+        const minSeparation = (n1.isHub && n2.isHub) ? 150 : (n1.isHub || n2.isHub) ? 120 : 88;
+        if (dist < minSeparation) {
+          const overlap = (minSeparation - dist) / minSeparation;
+          const push = overlap * 0.45;
+          const px = (dx / dist) * push;
+          const py = (dy / dist) * push;
+          if (n1 !== draggedNode) { n1.vx -= px; n1.vy -= py; }
+          if (n2 !== draggedNode) { n2.vx += px; n2.vy += py; }
         }
       }
     }
@@ -4687,12 +4720,12 @@
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
       let restLength, k;
       if (edge.isHierarchy) {
-        restLength = 105;
-        k = 0.038;
+        restLength = 190;
+        k = 0.035;
         edge.flowProgress = ((edge.flowProgress || 0) + 0.008) % 1;
       } else {
-        restLength = 135;
-        k = 0.026;
+        restLength = 250;
+        k = 0.024;
         edge.photonPulse = ((edge.photonPulse || 0) + 0.010) % 1;
       }
 
@@ -4725,11 +4758,11 @@
         n.vx += Math.cos(hubDrift) * 0.012;
         n.vy += Math.sin(hubDrift) * 0.012;
       } else {
-        // Inward pull toward galactic core
+        // Gentle inward pull toward galactic core
         const cdx = centerX - n.x;
         const cdy = centerY - n.y;
-        n.vx += cdx * 0.0028;
-        n.vy += cdy * 0.0028;
+        n.vx += cdx * 0.0009;
+        n.vy += cdy * 0.0009;
 
         // Gentle orbital swirl around category hub
         if (n.hubRef) {
@@ -5949,15 +5982,28 @@
     mapCanvas.width = w;
     mapCanvas.height = h;
 
-    // Background cosmic ocean
+    const isLight = currentBaseTheme === 'light';
+    const isSepia = currentBaseTheme === 'sepia';
+
+    // Background cosmic ocean / parchment sea
     if (ctx.createRadialGradient) {
       const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, 900);
-      bgGrad.addColorStop(0, '#0a0d16');
-      bgGrad.addColorStop(0.6, '#06070c');
-      bgGrad.addColorStop(1, '#020306');
+      if (isLight) {
+        bgGrad.addColorStop(0, '#f8fafc');
+        bgGrad.addColorStop(0.6, '#edf2f7');
+        bgGrad.addColorStop(1, '#e2e8f0');
+      } else if (isSepia) {
+        bgGrad.addColorStop(0, '#fbf0d9');
+        bgGrad.addColorStop(0.6, '#f3e5c8');
+        bgGrad.addColorStop(1, '#e8d5b5');
+      } else {
+        bgGrad.addColorStop(0, '#0a0d16');
+        bgGrad.addColorStop(0.6, '#06070c');
+        bgGrad.addColorStop(1, '#020306');
+      }
       ctx.fillStyle = bgGrad;
     } else {
-      ctx.fillStyle = '#06070c';
+      ctx.fillStyle = isLight ? '#edf2f7' : isSepia ? '#f3e5c8' : '#06070c';
     }
     if (typeof ctx.fillRect === 'function') {
       ctx.fillRect(0, 0, w, h);
@@ -5966,9 +6012,12 @@
     const mapTheme = ACCENT_THEMES[currentAccentTheme] || ACCENT_THEMES['crimson'];
     const mapAccentColor = mapTheme.accent;
     const mapGlowColor = mapTheme.redGlowStrong || 'rgba(239, 68, 68, 0.5)';
+    const continentFill = isLight ? '#ffffff' : isSepia ? '#fdf8ee' : '#12141e';
+    const islandFill = isLight ? '#f1f5f9' : isSepia ? '#f5ebd2' : '#141724';
+    const mountainColor = isLight ? 'rgba(71, 85, 105, 0.45)' : isSepia ? 'rgba(92, 70, 50, 0.45)' : 'rgba(255, 255, 255, 0.25)';
 
     // Coordinate grid lines
-    ctx.strokeStyle = mapTheme.redGlow || 'rgba(239, 68, 68, 0.07)';
+    ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.05)' : isSepia ? 'rgba(90, 60, 30, 0.08)' : (mapTheme.redGlow || 'rgba(239, 68, 68, 0.07)');
     ctx.lineWidth = 1;
     if (ctx.setLineDash) ctx.setLineDash([4, 6]);
 
@@ -5990,7 +6039,7 @@
     ctx.strokeStyle = mapGlowColor;
     ctx.lineWidth = 2;
     if (ctx.strokeRect) ctx.strokeRect(20, 20, w - 40, h - 40);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.08)' : isSepia ? 'rgba(90, 60, 30, 0.12)' : 'rgba(255, 255, 255, 0.08)';
     if (ctx.strokeRect) ctx.strokeRect(28, 28, w - 56, h - 56);
 
     // Decorative corner diamond runes
@@ -6004,7 +6053,7 @@
 
     // Western Continent: The Ashen Highlands
     if (ctx.save) ctx.save();
-    ctx.fillStyle = '#12141e';
+    ctx.fillStyle = continentFill;
     ctx.strokeStyle = mapAccentColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -6028,7 +6077,7 @@
 
     // Eastern Continent: The Starfall Expanse
     if (ctx.save) ctx.save();
-    ctx.fillStyle = '#11131c';
+    ctx.fillStyle = continentFill;
     ctx.strokeStyle = mapAccentColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -6049,7 +6098,7 @@
     if (ctx.restore) ctx.restore();
 
     // Central Mountain Divide (The Obsidian Ridge)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+    ctx.strokeStyle = mountainColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
     const ridgePoints = [
@@ -6084,7 +6133,7 @@
     const islands = [
       [720, 820, 28], [790, 860, 22], [850, 840, 18], [680, 890, 14]
     ];
-    ctx.fillStyle = '#141724';
+    ctx.fillStyle = islandFill;
     ctx.strokeStyle = mapGlowColor;
     ctx.lineWidth = 1.5;
     islands.forEach(([ix, iy, r]) => {
@@ -7427,7 +7476,10 @@
       ctx.shadowColor = codexAccentColor;
       ctx.shadowBlur = isHovered ? 20 : 8;
 
-      ctx.fillStyle = '#0f111a';
+      const isLightBase = currentBaseTheme === 'light';
+      const isSepiaBase = currentBaseTheme === 'sepia';
+
+      ctx.fillStyle = isLightBase ? '#ffffff' : isSepiaBase ? '#fbf0d9' : '#0f111a';
       ctx.beginPath();
       ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
       ctx.fill();
@@ -7438,13 +7490,13 @@
 
       if (typeof ctx.fillText === 'function') {
         ctx.font = "bold 16px 'Cinzel', serif";
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = (isLightBase || isSepiaBase) ? codexAccentColor : '#fff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText((n.char.name || 'C').charAt(0), n.x, n.y);
 
         ctx.font = "12px sans-serif";
-        ctx.fillStyle = isHovered ? '#fff' : '#cbd5e1';
+        ctx.fillStyle = isLightBase ? '#111827' : isSepiaBase ? '#2d241e' : (isHovered ? '#fff' : '#cbd5e1');
         ctx.fillText(n.char.name, n.x, n.y + n.r + 16);
       }
 
@@ -8830,6 +8882,16 @@
       window.closeLordSpeyUpdateModal = closeUpdateModal;
       window.LORD_SPEY_VERSION = APP_VERSION;
       window.compareSemver = compareSemver;
+      window.openGraphView = openGraphView;
+      window.closeGraphView = closeGraphView;
+      window.openMapView = openMapView;
+      window.closeMapView = closeMapView;
+      window.openTimelineView = openTimelineView;
+      window.closeTimelineView = closeTimelineView;
+      window.openCodexView = openCodexView;
+      window.closeCodexView = closeCodexView;
+      window.showMainMenu = showMainMenu;
+      window.openNote = openNote;
     }
 
     // Quiet startup check in background after 4s (in browser/Capacitor runtimes, skip in node tests or when Electron handles it)
