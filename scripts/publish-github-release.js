@@ -108,8 +108,12 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
     const norm = n => (n || '').toLowerCase().replace(/[\s.]+/g, '.');
     const existingAsset = (release.assets || []).find(a => norm(a.name) === norm(asset.file));
     if (existingAsset) {
-      console.log(`Asset ${asset.file} already exists (id: ${existingAsset.id}), skipping upload...`);
-      continue;
+      console.log(`Asset ${asset.file} already exists (id: ${existingAsset.id}), deleting old asset to replace...`);
+      await fetch(`https://api.github.com/repos/${repo}/releases/assets/${existingAsset.id}`, {
+        method: 'DELETE',
+        headers
+      });
+      console.log(`Deleted old asset ${existingAsset.id}`);
     }
 
     console.log(`Uploading ${asset.file} (${fs.statSync(filePath).size} bytes)...`);
