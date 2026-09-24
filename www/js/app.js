@@ -9288,6 +9288,11 @@
       // If running inside Electron with electronAPI bridge available, delegate to main HTTPS check
       if (typeof window !== 'undefined' && window.electronAPI && typeof window.electronAPI.checkForUpdates === 'function') {
         window.electronAPI.checkForUpdates(userInitiated);
+        setTimeout(() => {
+          isCheckingUpdates = false;
+          if (btnVault) btnVault.disabled = false;
+          if (btnGuides) btnGuides.disabled = false;
+        }, 12000);
         return;
       }
 
@@ -9355,9 +9360,13 @@
       }
       return { error: err.message };
     } finally {
-      isCheckingUpdates = false;
-      if (btnVault) btnVault.disabled = false;
-      if (btnGuides) btnGuides.disabled = false;
+      // In web environment, re-enable buttons immediately once fetch completes.
+      // In Electron, buttons remain safely disabled until __handleUpdateCheckResult arrives or timeout expires.
+      if (typeof window === 'undefined' || !window.electronAPI) {
+        isCheckingUpdates = false;
+        if (btnVault) btnVault.disabled = false;
+        if (btnGuides) btnGuides.disabled = false;
+      }
     }
   }
 
@@ -9492,6 +9501,12 @@
     // Expose global handler for Electron main process communication
     if (typeof window !== 'undefined') {
       window.__handleUpdateCheckResult = function(payload) {
+        isCheckingUpdates = false;
+        const btnVault = $('#settings-btn-check-update-vault');
+        const btnGuides = $('#settings-btn-check-update-guides');
+        if (btnVault) btnVault.disabled = false;
+        if (btnGuides) btnGuides.disabled = false;
+
         if (!payload) return;
 
         const statusVault = $('#settings-vault-update-status');

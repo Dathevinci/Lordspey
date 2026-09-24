@@ -423,7 +423,9 @@ const path = require('path');
   assert(banner.classList.contains('hidden'), 'Up-to-date payload must hide banner');
   assert(sidebarBadge.classList.contains('hidden'), 'Up-to-date payload must hide sidebar badge');
   assert(dashboardBadge.classList.contains('hidden'), 'Up-to-date payload must hide dashboard badge');
-  console.log('✓ Electron IPC bridge correctly controls banner and badge lifecycle');
+  const btnCheckVaultEl = getOrCreateElement('settings-btn-check-update-vault');
+  assert.strictEqual(btnCheckVaultEl.disabled, false, 'settings-btn-check-update-vault must be re-enabled after IPC result');
+  console.log('✓ Electron IPC bridge correctly controls banner and badge lifecycle and re-enables buttons');
 
   // 12. Testing Settings Update Action, Version Fallbacks, and Demo State Preservation
   console.log('--- 12. Testing Settings Update Action, Fallbacks, and Demo State Preservation ---');

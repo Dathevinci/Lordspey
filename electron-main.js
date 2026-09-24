@@ -92,15 +92,20 @@ function compareVersions(v1, v2) {
 }
 
 let lastMainUpdateCheckTime = 0;
+let isCheckingInMain = false;
 const MAIN_CHECK_COOLDOWN_MS = 15 * 60 * 1000;
 
 function checkForUpdatesInMain(win, userInitiated = false) {
-  if (!win || win.isDestroyed()) return;
+  if (!win || win.isDestroyed() || isCheckingInMain) return;
   const now = Date.now();
   if (!userInitiated && (now - lastMainUpdateCheckTime < MAIN_CHECK_COOLDOWN_MS)) {
     return;
   }
   lastMainUpdateCheckTime = now;
+  isCheckingInMain = true;
+
+  const resetChecking = () => { isCheckingInMain = false; };
+
   try {
     const req = https.get(UPDATE_CHECK_URL, {
       headers: {
@@ -112,6 +117,7 @@ function checkForUpdatesInMain(win, userInitiated = false) {
       let raw = '';
       res.on('data', chunk => { raw += chunk; });
       res.on('end', () => {
+        resetChecking();
         try {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             const data = JSON.parse(raw);
@@ -138,12 +144,12 @@ function checkForUpdatesInMain(win, userInitiated = false) {
             if (!win.isDestroyed()) {
               win.webContents.executeJavaScript(
                 `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult(${payload}); }`
-              );
+              ).catch(e => console.warn('Could not deliver update payload to renderer:', e.message));
             }
           } else if (!win.isDestroyed()) {
             win.webContents.executeJavaScript(
               `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult({ error: 'HTTP ' + ${res.statusCode}, userInitiated: ${userInitiated ? 'true' : 'false'} }); }`
-            );
+            ).catch(e => console.warn('Could not deliver update error to renderer:', e.message));
           }
         } catch (parseErr) {
           console.error('Failed to parse update info:', parseErr);
@@ -152,18 +158,21 @@ function checkForUpdatesInMain(win, userInitiated = false) {
     });
 
     req.on('error', (err) => {
+      resetChecking();
       console.warn('Update check network error in main:', err.message);
       if (!win.isDestroyed()) {
         win.webContents.executeJavaScript(
           `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult({ error: ${JSON.stringify(err.message)}, userInitiated: ${userInitiated ? 'true' : 'false'} }); }`
-        );
+        ).catch(e => console.warn('Could not deliver network error to renderer:', e.message));
       }
     });
 
     req.on('timeout', () => {
+      resetChecking();
       req.destroy();
     });
   } catch (err) {
+    resetChecking();
     console.error('Update check exception in main:', err);
   }
 }

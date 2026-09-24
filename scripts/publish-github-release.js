@@ -125,9 +125,12 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
   for (const apkName of apkFiles) {
     const localApkPath = path.join(distDir, apkName);
     if (!fs.existsSync(localApkPath)) {
-      console.log(`Downloading ${apkName} from previous release for release bundle...`);
+      console.log(`Downloading ${apkName} from release bundle...`);
       try {
-        const apkRes = await fetch(`https://github.com/${repo}/releases/download/v1.1.2/${apkName}`, { headers, redirect: 'follow' });
+        let apkRes = await fetch(`https://github.com/${repo}/releases/download/${tag}/${apkName}`, { headers, redirect: 'follow' });
+        if (!apkRes.ok) {
+          apkRes = await fetch(`https://github.com/${repo}/releases/download/v1.1.2/${apkName}`, { headers, redirect: 'follow' });
+        }
         if (apkRes.ok) {
           const arrayBuf = await apkRes.arrayBuffer();
           fs.writeFileSync(localApkPath, Buffer.from(arrayBuf));

@@ -83,7 +83,7 @@ assert(guidesPaneHtml.includes('id="settings-btn-test-update-guides"'), 'Missing
 assert(guidesPaneHtml.includes('id="settings-guides-update-status"'), 'Missing settings-guides-update-status in guides pane');
 assert(guidesPaneHtml.includes('v1.1.0') || guidesPaneHtml.includes('v1.1.1') || guidesPaneHtml.includes('v1.1.2') || guidesPaneHtml.includes('v1.1.3'), 'Current version v1.1.0, v1.1.1, v1.1.2, or v1.1.3 must be rendered in guides pane');
 
-console.log('✓ Settings tabs update controls verified: v1.1.0 displays, What\'s New, Test Notification, and Check for Updates buttons');
+console.log('✓ Settings tabs update controls verified: v1.1.3 displays, What\'s New, Test Notification, and Check for Updates buttons');
 
 // 5. Update Modal & Banner Markup Verification
 console.log('--- 5. Update Modal & Banner Markup Verification ---');
