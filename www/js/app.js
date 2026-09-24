@@ -8925,6 +8925,7 @@
   let cachedLatestReleaseData = null;
 
   function showUpdateModal(releaseData, isDemo = false) {
+    const isActuallyDemo = isDemo || !!(releaseData && releaseData.isDemo);
     cachedLatestReleaseData = releaseData;
     const modal = $('#modal-update');
     if (!modal) return;
@@ -8942,30 +8943,30 @@
     const downloadIcon = $('#btn-download-update-icon');
     const githubLink = $('#btn-view-release-github');
 
-    const tag = releaseData.tag_name || ('v' + (releaseData.latestVersion || '1.1.0'));
-    if (badgeEl) badgeEl.textContent = isDemo ? '✦ UPDATE PREVIEW (DEMO)' : '✦ UPDATE AVAILABLE';
-    if (titleEl) titleEl.textContent = releaseData.name || `Lord Spey ${tag}${isDemo ? ' (Preview)' : ''}`;
+    const tag = (releaseData && (releaseData.tag_name || (releaseData.latestVersion ? ('v' + String(releaseData.latestVersion).replace(/^v/i, '')) : null))) || ('v' + APP_VERSION);
+    if (badgeEl) badgeEl.textContent = isActuallyDemo ? '✦ UPDATE PREVIEW (DEMO)' : '✦ UPDATE AVAILABLE';
+    if (titleEl) titleEl.textContent = (releaseData && releaseData.name) || `Lord Spey ${tag}${isActuallyDemo ? ' (Preview)' : ''}`;
     if (arrowEl) arrowEl.textContent = '→';
     if (newVerChip) {
-      newVerChip.textContent = isDemo ? `New: ${tag} (Demo)` : `New: ${tag}`;
+      newVerChip.textContent = isActuallyDemo ? `New: ${tag} (Demo)` : `New: ${tag}`;
       newVerChip.className = 'update-version-chip update-chip-new';
     }
     if (curVerChip) curVerChip.textContent = `Installed: v${APP_VERSION}`;
-    if (notesHeadingEl) notesHeadingEl.textContent = isDemo ? 'Preview Highlights & Safety' : 'Release Highlights';
+    if (notesHeadingEl) notesHeadingEl.textContent = isActuallyDemo ? 'Preview Highlights & Safety' : 'Release Highlights';
     if (guaranteeEl) {
       guaranteeEl.innerHTML = '<strong>Safe Update Guarantee:</strong> All manuscript drafts, vault lore, world maps, characters, and settings are 100% preserved. An automated safety backup is created upon update.';
     }
     if (dismissBtn) {
-      dismissBtn.textContent = isDemo ? 'Dismiss' : 'Remind Me Later';
+      dismissBtn.textContent = isActuallyDemo ? 'Dismiss' : 'Remind Me Later';
     }
-    if (githubLink && releaseData.html_url) {
+    if (githubLink && releaseData && releaseData.html_url) {
       githubLink.href = releaseData.html_url;
       githubLink.textContent = 'Release Notes ↗';
     }
 
     // Render formatted release notes
     if (notesEl) {
-      const rawNotes = releaseData.body || releaseData.releaseNotes;
+      const rawNotes = releaseData ? (releaseData.body || releaseData.releaseNotes) : '';
       if (rawNotes) {
         if (typeof Markdown !== 'undefined' && typeof Markdown.render === 'function') {
           notesEl.innerHTML = Markdown.render(rawNotes);
@@ -8979,14 +8980,14 @@
 
     // Determine platform-specific direct binary download
     if (downloadBtn) {
-      let downloadUrl = releaseData.html_url || 'https://github.com/Dathevinci/Lordspey/releases';
-      const assets = releaseData.assets || [];
+      let downloadUrl = (releaseData && releaseData.html_url) || 'https://github.com/Dathevinci/Lordspey/releases';
+      const assets = (releaseData && releaseData.assets) || [];
       const isWin = typeof navigator !== 'undefined' && (/win/i.test(navigator.platform || '') || /windows/i.test(navigator.userAgent || ''));
       const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent || '');
 
       // Reset action button text and icon back to update mode
       if (downloadText) {
-        downloadText.textContent = isDemo ? 'Test Safe Backup & Close' : 'Download & Install Update';
+        downloadText.textContent = isActuallyDemo ? 'Test Safe Backup & Close' : 'Download & Install Update';
       }
       if (downloadIcon) {
         downloadIcon.innerHTML = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>';
@@ -9012,7 +9013,7 @@
 
       downloadBtn.href = downloadUrl;
       downloadBtn.onclick = (e) => {
-        if (isDemo) {
+        if (isActuallyDemo) {
           e.preventDefault();
         }
         // Vault Safety Guarantee: Automated snapshot backup before update download
@@ -9027,7 +9028,7 @@
         const banner = $('#update-banner');
         if (banner) banner.classList.add('hidden');
         if (typeof clearUpdateNotificationUI === 'function') clearUpdateNotificationUI();
-        toast(isDemo ? 'Update preview tested! Vault safety backup created successfully.' : 'Starting update download. Your vault notes & lore are 100% safeguarded!', 'success');
+        toast(isActuallyDemo ? 'Update preview tested! Vault safety backup created successfully.' : 'Starting update download. Your vault notes & lore are 100% safeguarded!', 'success');
       };
     }
 
@@ -9140,7 +9141,14 @@
     [statusVault, statusGuides].forEach(el => {
       if (!el) return;
       el.className = 'update-status-msg success';
-      el.textContent = `New update ${tag} available!`;
+      el.innerHTML = `New update ${tag} available! <button type="button" class="btn-link-update-now font-inter">Update Now</button>`;
+      const btn = el.querySelector ? el.querySelector('.btn-link-update-now') : null;
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          showUpdateModal(releaseData);
+        });
+      }
     });
   }
 
@@ -9162,19 +9170,32 @@
 
     const menuSettingsBtn = $('#menu-btn-settings');
     if (menuSettingsBtn) menuSettingsBtn.classList.remove('has-update-indicator');
+
+    const statusVault = $('#settings-vault-update-status');
+    const statusGuides = $('#settings-guides-update-status');
+    [statusVault, statusGuides].forEach(el => {
+      if (!el) return;
+      if (el.textContent && el.textContent.includes('New update')) {
+        el.textContent = '';
+        el.className = 'update-status-msg';
+      }
+    });
   }
 
   function triggerTestUpdateNotification() {
-    showUpdateNotification({
+    const demoPayload = {
       tag_name: 'v1.2.0 (Preview)',
       latestVersion: '1.2.0',
+      name: 'Lord Spey v1.2.0 (Demo)',
+      body: '### Update Preview\n- Preview of future updates and notifications\n- Seamless one-click background updates\n- Automated pre-update snapshot backup\n- Full vault safety guarantee',
+      html_url: 'https://github.com/Dathevinci/Lordspey/releases',
       isDemo: true
-    });
+    };
+    showUpdateNotification(demoPayload);
     const bannerVer = $('#update-banner-version');
     if (bannerVer) {
       bannerVer.textContent = 'v1.2.0 (Preview)';
     }
-    cachedLatestReleaseData = null;
     toast('Update notification preview banner triggered! Click "Update Now" to preview the update modal.', 'info');
   }
 
@@ -9228,21 +9249,25 @@
           const lastCheckTime = parseInt(localStorage.getItem('lordspey_last_update_check'), 10) || 0;
           const timeSinceLastCheck = Date.now() - lastCheckTime;
           if (timeSinceLastCheck < FOCUS_CHECK_MIN_INTERVAL_MS) {
-            // Check recently completed within rate limit window; use cached metadata if available
+            let hasUpdate = false;
+            let cachedTag = '';
+            let cachedData = null;
             const cachedRaw = localStorage.getItem('lordspey_cached_release');
             if (cachedRaw) {
-              const cachedData = JSON.parse(cachedRaw);
-              const cachedTag = cachedData.tag_name || cachedData.latestVersion || '';
-              const cachedVer = cachedTag.replace(/^v/i, '');
-              const hasUpdate = compareSemver(cachedVer, APP_VERSION) > 0;
-              if (hasUpdate) {
-                showUpdateNotification(cachedData);
-              }
-              isCheckingUpdates = false;
-              if (btnVault) btnVault.disabled = false;
-              if (btnGuides) btnGuides.disabled = false;
-              return { hasUpdate, latestTag: cachedTag, data: cachedData, cached: true };
+              try {
+                cachedData = JSON.parse(cachedRaw);
+                cachedTag = cachedData.tag_name || cachedData.latestVersion || '';
+                const cachedVer = cachedTag.replace(/^v/i, '');
+                hasUpdate = compareSemver(cachedVer, APP_VERSION) > 0;
+                if (hasUpdate) {
+                  showUpdateNotification(cachedData);
+                }
+              } catch (_) {}
             }
+            isCheckingUpdates = false;
+            if (btnVault) btnVault.disabled = false;
+            if (btnGuides) btnGuides.disabled = false;
+            return { hasUpdate, latestTag: cachedTag, data: cachedData, cached: true };
           }
         }
       } catch (cacheErr) {
@@ -9251,6 +9276,13 @@
     }
 
     try {
+      // Record check attempt timestamp to avoid spamming failed requests
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('lordspey_last_update_check', String(Date.now()));
+        }
+      } catch (_) {}
+
       // If running inside Electron with electronAPI bridge available, delegate to main HTTPS check
       if (typeof window !== 'undefined' && window.electronAPI && typeof window.electronAPI.checkForUpdates === 'function') {
         window.electronAPI.checkForUpdates(userInitiated);
@@ -9302,6 +9334,11 @@
         }
       }
     } catch (err) {
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('lordspey_last_update_check', String(Date.now()));
+        }
+      } catch (_) {}
       if (userInitiated) {
         console.warn('Update check failed:', err);
         const isRateLimit = String(err.message).includes('403');
@@ -9477,6 +9514,11 @@
         };
 
         if (payload.error) {
+          try {
+            if (typeof localStorage !== 'undefined') {
+              localStorage.setItem('lordspey_last_update_check', String(Date.now()));
+            }
+          } catch (_) {}
           if (payload.userInitiated) {
             const isRateLimit = String(payload.error).includes('403');
             const errorMsg = isRateLimit

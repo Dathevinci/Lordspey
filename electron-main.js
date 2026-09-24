@@ -91,8 +91,16 @@ function compareVersions(v1, v2) {
   return 0;
 }
 
+let lastMainUpdateCheckTime = 0;
+const MAIN_CHECK_COOLDOWN_MS = 15 * 60 * 1000;
+
 function checkForUpdatesInMain(win, userInitiated = false) {
   if (!win || win.isDestroyed()) return;
+  const now = Date.now();
+  if (!userInitiated && (now - lastMainUpdateCheckTime < MAIN_CHECK_COOLDOWN_MS)) {
+    return;
+  }
+  lastMainUpdateCheckTime = now;
   try {
     const req = https.get(UPDATE_CHECK_URL, {
       headers: {
@@ -132,9 +140,9 @@ function checkForUpdatesInMain(win, userInitiated = false) {
                 `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult(${payload}); }`
               );
             }
-          } else if (userInitiated && !win.isDestroyed()) {
+          } else if (!win.isDestroyed()) {
             win.webContents.executeJavaScript(
-              `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult({ error: 'HTTP ' + ${res.statusCode}, userInitiated: true }); }`
+              `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult({ error: 'HTTP ' + ${res.statusCode}, userInitiated: ${userInitiated ? 'true' : 'false'} }); }`
             );
           }
         } catch (parseErr) {
@@ -145,9 +153,9 @@ function checkForUpdatesInMain(win, userInitiated = false) {
 
     req.on('error', (err) => {
       console.warn('Update check network error in main:', err.message);
-      if (userInitiated && !win.isDestroyed()) {
+      if (!win.isDestroyed()) {
         win.webContents.executeJavaScript(
-          `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult({ error: ${JSON.stringify(err.message)}, userInitiated: true }); }`
+          `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult({ error: ${JSON.stringify(err.message)}, userInitiated: ${userInitiated ? 'true' : 'false'} }); }`
         );
       }
     });

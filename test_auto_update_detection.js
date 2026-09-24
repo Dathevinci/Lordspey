@@ -117,6 +117,10 @@ const path = require('path');
       remove: function() { if (this.parentElement && this.parentElement.removeChild) this.parentElement.removeChild(this); },
       querySelector: function(sel) {
         if (sel === '.btn-link-whats-new') return this.btnLinkWhatsNew || null;
+        if (sel === '.btn-link-update-now') {
+          if (!this.btnLinkUpdateNow) this.btnLinkUpdateNow = createMockElement('', 'button');
+          return this.btnLinkUpdateNow;
+        }
         return null;
       },
       querySelectorAll: function() { return []; },
@@ -302,6 +306,22 @@ const path = require('path');
   assert.strictEqual(result.cached, true, 'Result must indicate cached response');
   assert.strictEqual(result.hasUpdate, true, 'Result must report hasUpdate from cache');
   assert.strictEqual(bannerVer.textContent, 'v1.3.0', 'Banner must display cached v1.3.0 version');
+  // Rate-limiting check when no cached release is in localStorage
+  delete mockLocalStorage['lordspey_cached_release'];
+  mockLocalStorage['lordspey_last_update_check'] = String(Date.now() - 60000); // 1 minute ago
+  fetchCalled = false;
+  const noCacheResult = await window.checkLordSpeyUpdates(false);
+  assert.strictEqual(fetchCalled, false, 'Fetch must not be called within 15 minutes even without cached release');
+  assert.strictEqual(noCacheResult.cached, true, 'Result must be marked cached');
+  assert.strictEqual(noCacheResult.hasUpdate, false, 'Result must be false when no cached update exists');
+
+  // Rate-limiting check when cached release contains invalid/corrupted JSON
+  mockLocalStorage['lordspey_cached_release'] = '{malformed json';
+  mockLocalStorage['lordspey_last_update_check'] = String(Date.now() - 60000);
+  fetchCalled = false;
+  const corruptCacheResult = await window.checkLordSpeyUpdates(false);
+  assert.strictEqual(fetchCalled, false, 'Fetch must not be called within 15 minutes even with corrupted cache JSON');
+  assert.strictEqual(corruptCacheResult.cached, true);
   console.log('✓ Rate-limiting cache prevents redundant network requests and restores cached release state');
 
   // 9. Testing Window Focus Trigger with Rate Limiting
@@ -341,6 +361,17 @@ const path = require('path');
   assert(silentErrResult.error, 'Result must contain error');
   assert.strictEqual(toastContainer.children.length, 0, 'Background check must NEVER trigger error toast while author is working');
 
+  // Background check failure must record timestamp in localStorage so focus doesn't repeat requests
+  const errTimestamp = parseInt(mockLocalStorage['lordspey_last_update_check'], 10);
+  assert(Date.now() - errTimestamp < 5000, 'Background check error must record check timestamp in localStorage');
+
+  // Subsequent focus immediately after failure must NOT trigger another update check
+  let checkTriggerCountAfterErr = 0;
+  window.checkLordSpeyUpdates = async () => { checkTriggerCountAfterErr++; };
+  window.handleWindowFocusForUpdates();
+  assert.strictEqual(checkTriggerCountAfterErr, 0, 'Window focus immediately following an error must NOT trigger duplicate check');
+  window.checkLordSpeyUpdates = originalCheck;
+
   // User-initiated check with network failure
   const userErrResult = await window.checkLordSpeyUpdates(true);
   assert(userErrResult.error, 'Result must contain error');
@@ -373,6 +404,15 @@ const path = require('path');
   assert(!dashboardBadge.classList.contains('hidden'), 'Electron update check must show dashboard badge');
   assert(mockLocalStorage['lordspey_cached_release'].includes('v1.4.0'), 'Electron update check must cache release in localStorage');
 
+  // Electron error payload must also record check timestamp
+  mockLocalStorage['lordspey_last_update_check'] = '0';
+  window.__handleUpdateCheckResult({
+    error: 'HTTP 403 API rate limit exceeded',
+    userInitiated: false
+  });
+  const electronErrTimestamp = parseInt(mockLocalStorage['lordspey_last_update_check'], 10);
+  assert(Date.now() - electronErrTimestamp < 5000, 'Electron error payload must record check timestamp in localStorage');
+
   // Electron main process sends up-to-date payload
   window.__handleUpdateCheckResult({
     hasUpdate: false,
@@ -383,6 +423,26 @@ const path = require('path');
   assert(sidebarBadge.classList.contains('hidden'), 'Up-to-date payload must hide sidebar badge');
   assert(dashboardBadge.classList.contains('hidden'), 'Up-to-date payload must hide dashboard badge');
   console.log('✓ Electron IPC bridge correctly controls banner and badge lifecycle');
+
+  // 12. Testing Settings Update Action, Version Fallbacks, and Demo State Preservation
+  console.log('--- 12. Testing Settings Update Action, Fallbacks, and Demo State Preservation ---');
+  window.showLordSpeyUpdateNotification({ tag_name: 'v1.5.0', latestVersion: '1.5.0' });
+  const statusVaultEl = getOrCreateElement('settings-vault-update-status');
+  assert(statusVaultEl.innerHTML.includes('btn-link-update-now'), 'Settings update message must offer clickable Update Now button');
+
+  // Fallback version in modal must use APP_VERSION (1.1.2), never 1.1.0
+  window.showLordSpeyUpdateModal({});
+  const curVerChipTest = getOrCreateElement('update-current-version-chip');
+  assert(curVerChipTest.textContent.includes('v1.1.2'), 'Modal current version chip must display v1.1.2');
+  window.closeLordSpeyUpdateModal();
+
+  // Test notification preserves demo mode when clicked via dashboard indicator
+  window.triggerTestUpdateNotification();
+  dashboardIndicator.click();
+  const updateBadgeEl = getOrCreateElement('update-modal-badge');
+  assert(updateBadgeEl.textContent.includes('DEMO'), 'Dashboard indicator must preserve demo state for test notifications');
+  window.closeLordSpeyUpdateModal();
+  console.log('✓ Settings update action, semver fallback, and demo state preservation verified');
 
   console.log('\n=== ALL AUTO-UPDATE DETECTION TESTS PASSED (100%) ===\n');
 })().catch(err => {
