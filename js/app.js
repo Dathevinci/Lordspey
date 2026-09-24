@@ -2466,6 +2466,11 @@
     }
     renderProjectSettingsStats();
 
+    const vaultVerDisplay = $('#settings-vault-version-display');
+    const guidesVerDisplay = $('#settings-guides-version-display');
+    if (vaultVerDisplay) vaultVerDisplay.textContent = `v${APP_VERSION}`;
+    if (guidesVerDisplay) guidesVerDisplay.textContent = `v${APP_VERSION}`;
+
     // 2. Editor & Writing Preferences
     if (settingFontFamily) {
       settingFontFamily.value = currentEditorFont;
@@ -8625,6 +8630,9 @@
         } catch (backupErr) {
           console.warn('Pre-update safety snapshot notice:', backupErr);
         }
+        closeUpdateModal();
+        const banner = $('#update-banner');
+        if (banner) banner.classList.add('hidden');
         toast('Starting update download. Your vault notes & lore are 100% safeguarded!', 'success');
       };
     }
@@ -8647,13 +8655,35 @@
     if (modal) modal.classList.add('hidden');
   }
 
+  let isCheckingUpdates = false;
+
   async function checkAppUpdates(userInitiated = false, statusEl = null) {
-    if (statusEl) {
-      statusEl.textContent = 'Checking GitHub releases…';
-      statusEl.className = 'update-status-msg';
+    if (isCheckingUpdates) return;
+    isCheckingUpdates = true;
+
+    const btnVault = $('#settings-btn-check-update-vault');
+    const btnGuides = $('#settings-btn-check-update-guides');
+    if (btnVault) btnVault.disabled = true;
+    if (btnGuides) btnGuides.disabled = true;
+
+    const statusVault = $('#settings-vault-update-status');
+    const statusGuides = $('#settings-guides-update-status');
+    const setStatus = (text, className) => {
+      if (statusVault) { statusVault.textContent = text; statusVault.className = 'update-status-msg ' + className; }
+      if (statusGuides) { statusGuides.textContent = text; statusGuides.className = 'update-status-msg ' + className; }
+    };
+
+    if (userInitiated) {
+      setStatus('Checking GitHub releases…', '');
     }
 
     try {
+      // If running inside Electron with electronAPI bridge available, delegate to main HTTPS check
+      if (typeof window !== 'undefined' && window.electronAPI && typeof window.electronAPI.checkForUpdates === 'function') {
+        window.electronAPI.checkForUpdates();
+        return;
+      }
+
       if (typeof fetch === 'function') {
         const res = await fetch(UPDATE_API_URL, {
           headers: { 'Accept': 'application/vnd.github.v3+json' },
@@ -8666,31 +8696,33 @@
         const hasUpdate = compareSemver(latestVer, APP_VERSION) > 0;
 
         if (hasUpdate) {
-          if (statusEl) {
-            statusEl.textContent = `New update ${latestTag} available!`;
-            statusEl.className = 'update-status-msg success';
-          }
+          setStatus(`New update ${latestTag} available!`, 'success');
           showUpdateModal(data);
           return { hasUpdate: true, latestTag, data };
         } else {
-          if (statusEl) {
-            statusEl.textContent = `✓ Lord Spey is up to date (${latestTag || 'v' + APP_VERSION})`;
-            statusEl.className = 'update-status-msg success';
-          } else if (userInitiated) {
-            toast(`Lord Spey is up to date (${latestTag || 'v' + APP_VERSION})`, 'success');
+          const upToDateMsg = `✓ Lord Spey is up to date (${latestTag || 'v' + APP_VERSION})`;
+          setStatus(upToDateMsg, 'success');
+          if (userInitiated) {
+            toast(upToDateMsg, 'success');
           }
           return { hasUpdate: false, latestTag, data };
         }
       }
     } catch (err) {
       console.warn('Update check failed:', err);
-      if (statusEl) {
-        statusEl.textContent = 'Could not reach update server. Check internet.';
-        statusEl.className = 'update-status-msg alert';
-      } else if (userInitiated) {
-        toast('Unable to check for updates. Check internet connection.', 'error');
+      const isRateLimit = String(err.message).includes('403');
+      const errorMsg = isRateLimit
+        ? 'Update rate limit reached. Please try again shortly.'
+        : 'Could not reach update server. Check internet.';
+      setStatus(errorMsg, 'alert');
+      if (userInitiated) {
+        toast(errorMsg, 'error');
       }
       return { error: err.message };
+    } finally {
+      isCheckingUpdates = false;
+      if (btnVault) btnVault.disabled = false;
+      if (btnGuides) btnGuides.disabled = false;
     }
   }
 
@@ -8740,7 +8772,10 @@
       btnBannerView.addEventListener('click', () => {
         if (bannerEl) bannerEl.classList.add('hidden');
         const modal = $('#modal-update');
-        if (modal) modal.classList.remove('hidden');
+        if (modal) {
+          modal.classList.remove('hidden');
+          isUpdateModalOpen = true;
+        }
       });
     }
     if (btnBannerDismiss) {
@@ -8753,7 +8788,29 @@
     if (typeof window !== 'undefined') {
       window.__handleUpdateCheckResult = function(payload) {
         if (!payload) return;
+
+        const statusVault = $('#settings-vault-update-status');
+        const statusGuides = $('#settings-guides-update-status');
+        const setStatus = (text, className) => {
+          if (statusVault) { statusVault.textContent = text; statusVault.className = 'update-status-msg ' + className; }
+          if (statusGuides) { statusGuides.textContent = text; statusGuides.className = 'update-status-msg ' + className; }
+        };
+
+        if (payload.error) {
+          if (payload.userInitiated) {
+            const isRateLimit = String(payload.error).includes('403');
+            const errorMsg = isRateLimit
+              ? 'Update rate limit reached. Please try again shortly.'
+              : `Could not check updates: ${payload.error}`;
+            toast(errorMsg, 'error');
+            setStatus(errorMsg, 'alert');
+          }
+          return;
+        }
+
         if (payload.hasUpdate) {
+          const latestTag = payload.latestVersion || ('v' + APP_VERSION);
+          setStatus(`New update ${latestTag} available!`, 'success');
           showUpdateModal({
             tag_name: payload.latestVersion,
             name: payload.name,
@@ -8762,18 +8819,23 @@
             assets: payload.assets
           });
         } else if (payload.userInitiated) {
-          toast(`Lord Spey is up to date (v${APP_VERSION} is the latest version)`, 'success');
+          const currentTag = payload.latestVersion || ('v' + APP_VERSION);
+          const upToDateMsg = `✓ Lord Spey is up to date (${currentTag})`;
+          setStatus(upToDateMsg, 'success');
+          toast(`Lord Spey is up to date (${currentTag})`, 'success');
         }
       };
       window.checkLordSpeyUpdates = checkAppUpdates;
       window.showLordSpeyUpdateModal = showUpdateModal;
       window.closeLordSpeyUpdateModal = closeUpdateModal;
       window.LORD_SPEY_VERSION = APP_VERSION;
+      window.compareSemver = compareSemver;
     }
 
-    // Quiet startup check in background after 4s (in browser/Electron runtimes, skip in node tests)
+    // Quiet startup check in background after 4s (in browser/Capacitor runtimes, skip in node tests or when Electron handles it)
     const isNodeTest = typeof process !== 'undefined' && process.versions && process.versions.node && (typeof window === 'undefined' || !window.location || !window.location.href);
-    if (!isNodeTest && typeof setTimeout === 'function') {
+    const isElectronRuntime = typeof window !== 'undefined' && window.electronAPI && window.electronAPI.isElectron;
+    if (!isNodeTest && !isElectronRuntime && typeof setTimeout === 'function') {
       setTimeout(() => {
         checkAppUpdates(false).catch(() => {});
       }, 4000);

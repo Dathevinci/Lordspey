@@ -104,10 +104,11 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
       continue;
     }
 
-    // Check if asset already exists in release
-    const existingAsset = (release.assets || []).find(a => a.name === asset.file);
+    // Check if asset already exists in release (normalized to handle dot vs space naming)
+    const norm = n => (n || '').toLowerCase().replace(/[\s.]+/g, '.');
+    const existingAsset = (release.assets || []).find(a => norm(a.name) === norm(asset.file));
     if (existingAsset) {
-      console.log(`Asset ${asset.file} already exists (id: ${existingAsset.id}), skipping upload or replacing...`);
+      console.log(`Asset ${asset.file} already exists (id: ${existingAsset.id}), skipping upload...`);
       continue;
     }
 

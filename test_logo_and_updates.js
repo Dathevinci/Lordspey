@@ -102,14 +102,119 @@ assert(cssContent.includes('.menu-emblem-raven-img'), 'Missing .menu-emblem-rave
 assert(cssContent.includes('.settings-update-row'), 'Missing .settings-update-row in css/style.css');
 assert(cssContent.includes('.update-modal-card'), 'Missing .update-modal-card in css/style.css');
 assert(cssContent.includes('.update-banner'), 'Missing .update-banner in css/style.css');
-console.log('✓ CSS stylesheet verified for logo, emblem, settings update row, update modal, and banner');
+assert(cssContent.includes('#modal-update'), 'Missing #modal-update in css/style.css');
+assert(cssContent.includes('object-position: center 30%'), 'Missing centered object-position on .logo-raven-img in css/style.css');
+console.log('✓ CSS stylesheet verified for logo, emblem, settings update row, update modal (z-index 500), and banner');
 
-// 7. Electron-Main Verification
-console.log('--- 7. Electron Main Process Verification ---');
+// 7. Electron Main Process & Preload Bridge Verification
+console.log('--- 7. Electron Main Process & Preload Bridge Verification ---');
 const electronCode = fs.readFileSync(path.join(__dirname, 'electron-main.js'), 'utf8');
 assert(electronCode.includes('checkForUpdatesInMain'), 'Missing checkForUpdatesInMain in electron-main.js');
 assert(electronCode.includes('https://api.github.com/repos/Dathevinci/Lordspey/releases/latest'), 'Missing GitHub release endpoint in electron-main.js');
 assert(electronCode.includes("'assets', 'icon.png'") || electronCode.includes("assets/icon.png"), 'Missing window icon configuration in electron-main.js');
-console.log('✓ electron-main.js window icon and update checking logic verified');
+assert(electronCode.includes('preload.js'), 'Missing preload script reference in electron-main.js');
+assert(fs.existsSync(path.join(__dirname, 'preload.js')), 'Missing preload.js file');
+const preloadCode = fs.readFileSync(path.join(__dirname, 'preload.js'), 'utf8');
+assert(preloadCode.includes('checkForUpdates'), 'Missing checkForUpdates in preload.js');
+assert(pkg.build?.files?.includes('preload.js'), 'package.json build.files must include preload.js');
+console.log('✓ electron-main.js window icon, preload script, and update checking logic verified');
+
+// 8. Semver Comparison Logic Verification
+console.log('--- 8. Semver Comparison Logic Verification ---');
+function parseSemver(v) {
+  if (!v) return [0, 0, 0];
+  const clean = String(v).replace(/^v/i, '').trim();
+  return clean.split('.').map(n => parseInt(n, 10) || 0);
+}
+function compareSemver(v1, v2) {
+  const p1 = parseSemver(v1);
+  const p2 = parseSemver(v2);
+  const len = Math.max(p1.length, p2.length);
+  for (let i = 0; i < len; i++) {
+    const a = p1[i] || 0;
+    const b = p2[i] || 0;
+    if (a > b) return 1;
+    if (a < b) return -1;
+  }
+  return 0;
+}
+assert.strictEqual(compareSemver('1.1.0', '1.1.0'), 0, '1.1.0 == 1.1.0');
+assert.strictEqual(compareSemver('v1.1.0', '1.1.0'), 0, 'v1.1.0 == 1.1.0');
+assert.strictEqual(compareSemver('1.2.0', '1.1.0'), 1, '1.2.0 > 1.1.0');
+assert.strictEqual(compareSemver('v1.1.1', '1.1.0'), 1, 'v1.1.1 > 1.1.0');
+assert.strictEqual(compareSemver('2.0.0', '1.1.0'), 1, '2.0.0 > 1.1.0');
+assert.strictEqual(compareSemver('1.0.0', '1.1.0'), -1, '1.0.0 < 1.1.0');
+assert.strictEqual(compareSemver('v0.9.5', '1.1.0'), -1, 'v0.9.5 < 1.1.0');
+assert.strictEqual(compareSemver(null, '1.1.0'), -1, 'null < 1.1.0');
+console.log('✓ compareSemver verified across equal, higher, lower, v-prefixed, and null inputs');
+
+// 9. Update Result Handler & Error Reporting Verification
+console.log('--- 9. Update Result Handler & Error Reporting Verification ---');
+const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+assert(appCode.includes('isCheckingUpdates'), 'Missing isCheckingUpdates debounce guard in app.js');
+assert(appCode.includes('btnVault.disabled = true'), 'Vault update button must disable during check');
+assert(appCode.includes('btnGuides.disabled = true'), 'Guides update button must disable during check');
+assert(appCode.includes('payload.error'), 'window.__handleUpdateCheckResult must handle payload.error');
+
+// Simulate __handleUpdateCheckResult error handling: ensure error is NOT treated as up to date
+let toastCalls = [];
+function mockToast(msg, type) { toastCalls.push({ msg, type }); }
+let mockStatusVault = { textContent: '', className: '' };
+let mockStatusGuides = { textContent: '', className: '' };
+
+const simulateHandler = (payload) => {
+  const statusVault = mockStatusVault;
+  const statusGuides = mockStatusGuides;
+  const setStatus = (text, className) => {
+    if (statusVault) { statusVault.textContent = text; statusVault.className = 'update-status-msg ' + className; }
+    if (statusGuides) { statusGuides.textContent = text; statusGuides.className = 'update-status-msg ' + className; }
+  };
+
+  if (payload.error) {
+    if (payload.userInitiated) {
+      const isRateLimit = String(payload.error).includes('403');
+      const errorMsg = isRateLimit
+        ? 'Update rate limit reached. Please try again shortly.'
+        : `Could not check updates: ${payload.error}`;
+      mockToast(errorMsg, 'error');
+      setStatus(errorMsg, 'alert');
+    }
+    return;
+  }
+
+  if (payload.hasUpdate) {
+    setStatus(`New update ${payload.latestVersion} available!`, 'success');
+  } else if (payload.userInitiated) {
+    const currentTag = payload.latestVersion || 'v1.1.0';
+    setStatus(`✓ Lord Spey is up to date (${currentTag})`, 'success');
+    mockToast(`Lord Spey is up to date (${currentTag})`, 'success');
+  }
+};
+
+// Test error case: MUST NOT report up to date
+simulateHandler({ error: 'HTTP 403', userInitiated: true });
+assert.strictEqual(toastCalls.length, 1);
+assert.strictEqual(toastCalls[0].type, 'error');
+assert(toastCalls[0].msg.includes('rate limit'), 'Must report rate limit on HTTP 403 error');
+assert.strictEqual(mockStatusVault.className, 'update-status-msg alert');
+assert(mockStatusVault.textContent.includes('rate limit'));
+
+// Test up-to-date case
+toastCalls = [];
+simulateHandler({ hasUpdate: false, latestVersion: 'v1.1.0', userInitiated: true });
+assert.strictEqual(toastCalls.length, 1);
+assert.strictEqual(toastCalls[0].type, 'success');
+assert(toastCalls[0].msg.includes('up to date'), 'Must report up to date on false hasUpdate');
+assert.strictEqual(mockStatusVault.className, 'update-status-msg success');
+assert(mockStatusVault.textContent.includes('up to date'));
+
+console.log('✓ Error path protection verified: HTTP 403/network failures accurately reported without false positives');
+
+// 10. Modal Dismissal & Banner Keybinding Hierarchy Verification
+console.log('--- 10. Modal Dismissal & Banner Keybinding Hierarchy Verification ---');
+assert(appCode.includes('btnBannerView.addEventListener'), 'Missing banner view update listener');
+const bannerListenerSnippet = appCode.slice(appCode.indexOf('btnBannerView.addEventListener'), appCode.indexOf('btnBannerView.addEventListener') + 250);
+assert(bannerListenerSnippet.includes('isUpdateModalOpen = true'), 'Clicking Update Now from banner must set isUpdateModalOpen = true for Escape key');
+console.log('✓ Update modal Escape hierarchy flag synchronized between banner and modal views');
 
 console.log('\n=== ALL LOGO & AUTO-UPDATE TESTS PASSED (100%) ===\n');

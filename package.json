@@ -63,7 +63,8 @@
       "css/**/*",
       "js/**/*",
       "assets/**/*",
-      "electron-main.js"
+      "electron-main.js",
+      "preload.js"
     ]
   },
   "dependencies": {

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -162,6 +162,7 @@ function checkForUpdatesInMain(win, userInitiated = false) {
 
   function createWindow() {
     const iconPath = path.join(__dirname, 'assets', 'icon.png');
+    const preloadPath = path.join(__dirname, 'preload.js');
     const win = new BrowserWindow({
       width: 1280,
       height: 820,
@@ -175,6 +176,7 @@ function checkForUpdatesInMain(win, userInitiated = false) {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
+        preload: fs.existsSync(preloadPath) ? preloadPath : undefined
       },
     });
 
@@ -201,7 +203,14 @@ function checkForUpdatesInMain(win, userInitiated = false) {
       }, 5000);
     });
 
-    // Allow renderer to request update check via custom protocol or execution
+    // Allow renderer to request update check via ipcMain channel or webContents event
+    ipcMain.on('check-for-updates', (event) => {
+      const senderWin = BrowserWindow.fromWebContents(event.sender);
+      if (senderWin && !senderWin.isDestroyed()) {
+        checkForUpdatesInMain(senderWin, true);
+      }
+    });
+
     win.webContents.on('ipc-message', (event, channel) => {
       if (channel === 'check-for-updates') {
         checkForUpdatesInMain(win, true);

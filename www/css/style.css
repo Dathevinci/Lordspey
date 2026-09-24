@@ -6386,6 +6386,7 @@ img.map-custom-img[src=""] {
   height: 24px;
   border-radius: 50%;
   object-fit: cover;
+  object-position: center 30%;
   border: 1.5px solid rgba(239, 68, 68, 0.6);
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.45);
   flex-shrink: 0;
@@ -6476,6 +6477,9 @@ img.map-custom-img[src=""] {
 }
 
 /* Auto-Update Modal */
+#modal-update {
+  z-index: 500;
+}
 .update-modal-card {
   max-width: 580px;
   width: 92%;
@@ -6581,7 +6585,7 @@ img.map-custom-img[src=""] {
   top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 99999;
+  z-index: 150;
   background: rgba(14, 16, 22, 0.95);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(239, 68, 68, 0.5);
