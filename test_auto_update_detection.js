@@ -54,13 +54,14 @@ const path = require('path');
     }
     return 0;
   }
-  assert.strictEqual(compareSemver('1.1.2', '1.1.2'), 0, 'Current version 1.1.2 == 1.1.2');
-  assert.strictEqual(compareSemver('v1.1.2', '1.1.2'), 0, 'Prefixed v1.1.2 == 1.1.2');
-  assert.strictEqual(compareSemver('1.2.0', '1.1.2'), 1, '1.2.0 > 1.1.2');
-  assert.strictEqual(compareSemver('v1.3.0', '1.1.2'), 1, 'v1.3.0 > 1.1.2');
-  assert.strictEqual(compareSemver('2.0.0', '1.1.2'), 1, '2.0.0 > 1.1.2');
-  assert.strictEqual(compareSemver('1.1.1', '1.1.2'), -1, '1.1.1 < 1.1.2');
-  assert.strictEqual(compareSemver('1.0.0', '1.1.2'), -1, '1.0.0 < 1.1.2');
+  assert.strictEqual(compareSemver('1.1.3', '1.1.3'), 0, 'Current version 1.1.3 == 1.1.3');
+  assert.strictEqual(compareSemver('v1.1.3', '1.1.3'), 0, 'Prefixed v1.1.3 == 1.1.3');
+  assert.strictEqual(compareSemver('1.2.0', '1.1.3'), 1, '1.2.0 > 1.1.3');
+  assert.strictEqual(compareSemver('v1.3.0', '1.1.3'), 1, 'v1.3.0 > 1.1.3');
+  assert.strictEqual(compareSemver('2.0.0', '1.1.3'), 1, '2.0.0 > 1.1.3');
+  assert.strictEqual(compareSemver('1.1.2', '1.1.3'), -1, '1.1.2 < 1.1.3');
+  assert.strictEqual(compareSemver('1.1.1', '1.1.3'), -1, '1.1.1 < 1.1.3');
+  assert.strictEqual(compareSemver('1.0.0', '1.1.3'), -1, '1.0.0 < 1.1.3');
   console.log('✓ Semver comparisons accurate for all release scenarios');
 
   // 3. Mock DOM & app.js Environment Setup
@@ -389,7 +390,7 @@ const path = require('path');
   // Electron main process sends update payload
   window.__handleUpdateCheckResult({
     hasUpdate: true,
-    currentVersion: '1.1.2',
+    currentVersion: '1.1.3',
     latestVersion: 'v1.4.0',
     name: 'Lord Spey v1.4.0',
     body: 'Major improvements and new cosmic tools',
@@ -416,7 +417,7 @@ const path = require('path');
   // Electron main process sends up-to-date payload
   window.__handleUpdateCheckResult({
     hasUpdate: false,
-    latestVersion: 'v1.1.2',
+    latestVersion: 'v1.1.3',
     userInitiated: false
   });
   assert(banner.classList.contains('hidden'), 'Up-to-date payload must hide banner');
@@ -430,10 +431,10 @@ const path = require('path');
   const statusVaultEl = getOrCreateElement('settings-vault-update-status');
   assert(statusVaultEl.innerHTML.includes('btn-link-update-now'), 'Settings update message must offer clickable Update Now button');
 
-  // Fallback version in modal must use APP_VERSION (1.1.2), never 1.1.0
+  // Fallback version in modal must use APP_VERSION (1.1.3), never 1.1.0
   window.showLordSpeyUpdateModal({});
   const curVerChipTest = getOrCreateElement('update-current-version-chip');
-  assert(curVerChipTest.textContent.includes('v1.1.2'), 'Modal current version chip must display v1.1.2');
+  assert(curVerChipTest.textContent.includes('v1.1.3'), 'Modal current version chip must display v1.1.3');
   window.closeLordSpeyUpdateModal();
 
   // Test notification preserves demo mode when clicked via dashboard indicator

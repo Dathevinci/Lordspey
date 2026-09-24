@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '1.1.2';
+  const APP_VERSION = '1.1.3';
   const UPDATE_API_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
 
   const ALIAS_SELECTORS = {
@@ -8893,14 +8893,16 @@
   function renderWhatsNewHtml(features = WHATS_NEW_V110_FEATURES) {
     return `
       <div class="whats-new-intro" style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
-        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This update resolves document creation actions, eliminating modal and dropdown conflicts with a clean split-button experience:
+        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This release introduces automatic background update detection, real-time visual notification banners, and smart rate-limited sync:
       </div>
       <div class="whats-new-v111-patch" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px;">
-        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">✦ v1.1.2 Maintenance &amp; Bug Fixes</div>
+        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">✦ v1.1.3 Automatic Update Detection &amp; Notifications</div>
         <ul style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; padding-left: 18px; line-height: 1.4;">
-          <li>Fixed "+ New Note" action conflict where pressing the button triggered both the modal and dropdown menu simultaneously.</li>
-          <li>Added dedicated dropdown toggle button to seamlessly choose note type (Chapter, Character Note, Worldbuilding, Draft) without modal occlusion.</li>
-          <li>Enhanced sidebar footer button alignment, event isolation, keyboard Escape dismissal, and click-outside handling.</li>
+          <li><strong>Automated GitHub Release Detection:</strong> Automatic background checking for new published releases across both Electron desktop and web browser sessions.</li>
+          <li><strong>Non-Intrusive Notification Banner:</strong> Sleek floating banner with one-click <code>[Update Now]</code> access and <code>[✕]</code> dismissal.</li>
+          <li><strong>Visual Status Indicators:</strong> Subtle pulsing update badges on the Settings gear and Dashboard indicator that persist until updated.</li>
+          <li><strong>Intelligent Rate Limiting:</strong> 15-minute cooldown cache in <code>localStorage</code> preventing duplicate network requests on window focus or startup.</li>
+          <li><strong>Silent Resilience:</strong> Background checks fail silently on offline network or HTTP 403 API rate limits, while manual checks report actionable feedback.</li>
         </ul>
       </div>
       <div class="whats-new-grid">

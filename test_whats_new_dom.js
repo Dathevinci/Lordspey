@@ -167,7 +167,7 @@ assert(modalUpdate.classList.contains('hidden'));
 window.openLordSpeyWhatsNewModal();
 assert(!modalUpdate.classList.contains('hidden'), 'modal-update must be visible after openLordSpeyWhatsNewModal');
 assert(badgeEl.textContent.includes("WHAT'S NEW"), 'Badge must indicate What\'s New');
-assert(curVerChip.textContent.includes('v1.1.0') || curVerChip.textContent.includes('v1.1.1') || curVerChip.textContent.includes('v1.1.2'), 'Current version chip must show v1.1.0, v1.1.1, or v1.1.2');
+assert(curVerChip.textContent.includes('v1.1.0') || curVerChip.textContent.includes('v1.1.1') || curVerChip.textContent.includes('v1.1.2') || curVerChip.textContent.includes('v1.1.3'), 'Current version chip must show v1.1.0, v1.1.1, v1.1.2, or v1.1.3');
 assert.strictEqual(arrowEl.textContent, '✦');
 assert(newVerChip.textContent.includes('Latest Edition'), 'New version chip must show Latest Edition');
 assert.strictEqual(downloadText.textContent, 'Explore Features');
