@@ -195,25 +195,33 @@ function checkForUpdatesInMain(win, userInitiated = false) {
           sendSpeyFileToWindow(win, startupFile);
         }
       }
-      // Check for updates on startup in background
+      // Check for updates on startup in background (after 3 seconds)
       setTimeout(() => {
         if (!win.isDestroyed()) {
           checkForUpdatesInMain(win, false);
         }
-      }, 5000);
+      }, 3000);
+
+      // Periodic background check every 45 minutes while app remains open
+      setInterval(() => {
+        if (!win.isDestroyed()) {
+          checkForUpdatesInMain(win, false);
+        }
+      }, 45 * 60 * 1000);
     });
 
     // Allow renderer to request update check via ipcMain channel or webContents event
-    ipcMain.on('check-for-updates', (event) => {
+    ipcMain.on('check-for-updates', (event, userInitiated = false) => {
       const senderWin = BrowserWindow.fromWebContents(event.sender);
       if (senderWin && !senderWin.isDestroyed()) {
-        checkForUpdatesInMain(senderWin, true);
+        checkForUpdatesInMain(senderWin, !!userInitiated);
       }
     });
 
-    win.webContents.on('ipc-message', (event, channel) => {
+    win.webContents.on('ipc-message', (event, channel, ...args) => {
       if (channel === 'check-for-updates') {
-        checkForUpdatesInMain(win, true);
+        const userInitiated = args && args[0] !== undefined ? !!args[0] : false;
+        checkForUpdatesInMain(win, userInitiated);
       }
     });
 

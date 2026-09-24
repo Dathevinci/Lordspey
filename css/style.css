@@ -7031,3 +7031,75 @@ img.map-custom-img[src=""] {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
+
+/* Update indicator badges & pulsing dots */
+.btn-settings-gear {
+  position: relative;
+}
+
+.btn-settings-gear.has-update {
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+.update-badge-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.9), 0 0 10px rgba(239, 68, 68, 0.5);
+  pointer-events: none;
+  z-index: 10;
+  animation: updatePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.menu-sec-btn {
+  position: relative;
+}
+
+.menu-sec-btn.has-update-indicator {
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.menu-sec-update {
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #fca5a5 !important;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.menu-sec-update:hover {
+  background: rgba(239, 68, 68, 0.24) !important;
+  border-color: rgba(239, 68, 68, 0.8) !important;
+  color: #ffffff !important;
+}
+
+.update-badge-dot-static {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.9);
+  animation: updatePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  flex-shrink: 0;
+}
+
+@keyframes updatePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.9), 0 0 9px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    transform: scale(1.28);
+    opacity: 0.82;
+    box-shadow: 0 0 9px rgba(239, 68, 68, 1), 0 0 15px rgba(239, 68, 68, 0.7);
+  }
+}
+

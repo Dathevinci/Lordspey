@@ -4,9 +4,9 @@ const { contextBridge, ipcRenderer } = require('electron');
 try {
   contextBridge.exposeInMainWorld('electronAPI', {
     isElectron: true,
-    checkForUpdates: () => {
+    checkForUpdates: (userInitiated = false) => {
       try {
-        ipcRenderer.send('check-for-updates');
+        ipcRenderer.send('check-for-updates', userInitiated);
       } catch (err) {
         console.warn('IPC check-for-updates send error:', err);
       }
@@ -17,9 +17,9 @@ try {
   if (typeof window !== 'undefined') {
     window.electronAPI = {
       isElectron: true,
-      checkForUpdates: () => {
+      checkForUpdates: (userInitiated = false) => {
         try {
-          ipcRenderer.send('check-for-updates');
+          ipcRenderer.send('check-for-updates', userInitiated);
         } catch (e) {
           console.warn('IPC check-for-updates send error:', e);
         }

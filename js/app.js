@@ -9026,6 +9026,7 @@
         closeUpdateModal();
         const banner = $('#update-banner');
         if (banner) banner.classList.add('hidden');
+        if (typeof clearUpdateNotificationUI === 'function') clearUpdateNotificationUI();
         toast(isDemo ? 'Update preview tested! Vault safety backup created successfully.' : 'Starting update download. Your vault notes & lore are 100% safeguarded!', 'success');
       };
     }
@@ -9102,13 +9103,78 @@
     isUpdateModalOpen = true;
   }
 
-  function triggerTestUpdateNotification() {
+  function showUpdateNotification(releaseData) {
+    if (!releaseData) return;
+    const tag = releaseData.tag_name || releaseData.latestVersion || ('v' + APP_VERSION);
+    cachedLatestReleaseData = releaseData;
+
+    // 1. Update and show top banner
     const banner = $('#update-banner');
     const bannerVer = $('#update-banner-version');
-    if (banner && bannerVer) {
-      bannerVer.textContent = 'v1.2.0 (Preview)';
-      banner.classList.remove('hidden');
+    if (bannerVer) bannerVer.textContent = tag;
+    if (banner) banner.classList.remove('hidden');
+
+    // 2. Show indicator badges / pulsing dots
+    const sidebarBadge = $('#sidebar-update-badge');
+    if (sidebarBadge) sidebarBadge.classList.remove('hidden');
+
+    const dashboardBadge = $('#dashboard-update-badge');
+    if (dashboardBadge) dashboardBadge.classList.remove('hidden');
+
+    const dashboardIndicator = $('#dashboard-update-indicator');
+    if (dashboardIndicator) {
+      dashboardIndicator.classList.remove('hidden');
+      const updateText = $('#dashboard-update-text');
+      if (updateText) updateText.textContent = `Update to ${tag}`;
     }
+
+    const gearBtn = $('#btn-project-settings');
+    if (gearBtn) gearBtn.classList.add('has-update');
+
+    const menuSettingsBtn = $('#menu-btn-settings');
+    if (menuSettingsBtn) menuSettingsBtn.classList.add('has-update-indicator');
+
+    // 3. Update Settings tab status messages
+    const statusVault = $('#settings-vault-update-status');
+    const statusGuides = $('#settings-guides-update-status');
+    [statusVault, statusGuides].forEach(el => {
+      if (!el) return;
+      el.className = 'update-status-msg success';
+      el.textContent = `New update ${tag} available!`;
+    });
+  }
+
+  function clearUpdateNotificationUI() {
+    const banner = $('#update-banner');
+    if (banner) banner.classList.add('hidden');
+
+    const sidebarBadge = $('#sidebar-update-badge');
+    if (sidebarBadge) sidebarBadge.classList.add('hidden');
+
+    const dashboardBadge = $('#dashboard-update-badge');
+    if (dashboardBadge) dashboardBadge.classList.add('hidden');
+
+    const dashboardIndicator = $('#dashboard-update-indicator');
+    if (dashboardIndicator) dashboardIndicator.classList.add('hidden');
+
+    const gearBtn = $('#btn-project-settings');
+    if (gearBtn) gearBtn.classList.remove('has-update');
+
+    const menuSettingsBtn = $('#menu-btn-settings');
+    if (menuSettingsBtn) menuSettingsBtn.classList.remove('has-update-indicator');
+  }
+
+  function triggerTestUpdateNotification() {
+    showUpdateNotification({
+      tag_name: 'v1.2.0 (Preview)',
+      latestVersion: '1.2.0',
+      isDemo: true
+    });
+    const bannerVer = $('#update-banner-version');
+    if (bannerVer) {
+      bannerVer.textContent = 'v1.2.0 (Preview)';
+    }
+    cachedLatestReleaseData = null;
     toast('Update notification preview banner triggered! Click "Update Now" to preview the update modal.', 'info');
   }
 
@@ -9154,10 +9220,40 @@
       setStatus('Checking GitHub releases…', '');
     }
 
+    // Rate-limiting check for background (non-user-initiated) checks
+    const FOCUS_CHECK_MIN_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
+    if (!userInitiated) {
+      try {
+        if (typeof localStorage !== 'undefined') {
+          const lastCheckTime = parseInt(localStorage.getItem('lordspey_last_update_check'), 10) || 0;
+          const timeSinceLastCheck = Date.now() - lastCheckTime;
+          if (timeSinceLastCheck < FOCUS_CHECK_MIN_INTERVAL_MS) {
+            // Check recently completed within rate limit window; use cached metadata if available
+            const cachedRaw = localStorage.getItem('lordspey_cached_release');
+            if (cachedRaw) {
+              const cachedData = JSON.parse(cachedRaw);
+              const cachedTag = cachedData.tag_name || cachedData.latestVersion || '';
+              const cachedVer = cachedTag.replace(/^v/i, '');
+              const hasUpdate = compareSemver(cachedVer, APP_VERSION) > 0;
+              if (hasUpdate) {
+                showUpdateNotification(cachedData);
+              }
+              isCheckingUpdates = false;
+              if (btnVault) btnVault.disabled = false;
+              if (btnGuides) btnGuides.disabled = false;
+              return { hasUpdate, latestTag: cachedTag, data: cachedData, cached: true };
+            }
+          }
+        }
+      } catch (cacheErr) {
+        console.warn('Cache inspection notice:', cacheErr);
+      }
+    }
+
     try {
       // If running inside Electron with electronAPI bridge available, delegate to main HTTPS check
       if (typeof window !== 'undefined' && window.electronAPI && typeof window.electronAPI.checkForUpdates === 'function') {
-        window.electronAPI.checkForUpdates();
+        window.electronAPI.checkForUpdates(userInitiated);
         return;
       }
 
@@ -9173,11 +9269,29 @@
         const latestVer = latestTag.replace(/^v/i, '');
         const hasUpdate = compareSemver(latestVer, APP_VERSION) > 0;
 
+        // Persist check timestamp and release metadata in localStorage
+        try {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('lordspey_last_update_check', String(Date.now()));
+            localStorage.setItem('lordspey_cached_release', JSON.stringify({
+              ...data,
+              latestVersion: latestTag,
+              hasUpdate
+            }));
+          }
+        } catch (storageErr) {
+          console.warn('Could not cache update info in localStorage:', storageErr);
+        }
+
         if (hasUpdate) {
           setStatus(`New update ${latestTag} available!`, 'success');
-          showUpdateModal(data);
+          showUpdateNotification(data);
+          if (userInitiated) {
+            showUpdateModal(data);
+          }
           return { hasUpdate: true, latestTag, data };
         } else {
+          clearUpdateNotificationUI();
           const upToDateMsg = `✓ Lord Spey is up to date (${latestTag || 'v' + APP_VERSION})`;
           setStatus(upToDateMsg, 'success', true);
           if (userInitiated) {
@@ -9188,14 +9302,17 @@
         }
       }
     } catch (err) {
-      console.warn('Update check failed:', err);
-      const isRateLimit = String(err.message).includes('403');
-      const errorMsg = isRateLimit
-        ? 'Update rate limit reached. Please try again shortly.'
-        : 'Could not reach update server. Check internet.';
-      setStatus(errorMsg, 'alert');
       if (userInitiated) {
+        console.warn('Update check failed:', err);
+        const isRateLimit = String(err.message).includes('403');
+        const errorMsg = isRateLimit
+          ? 'Update rate limit reached. Please try again shortly.'
+          : 'Could not reach update server. Check internet.';
+        setStatus(errorMsg, 'alert');
         toast(errorMsg, 'error');
+      } else {
+        // Silent failure for background checks so the author is never disturbed
+        console.warn('Background update check silently skipped (offline or unreachable):', err.message);
       }
       return { error: err.message };
     } finally {
@@ -9267,6 +9384,28 @@
       });
     }
 
+    // Dashboard Update Indicator button
+    const btnDashboardUpdate = $('#dashboard-update-indicator');
+    if (btnDashboardUpdate) {
+      btnDashboardUpdate.addEventListener('click', () => {
+        const modal = $('#modal-update');
+        if (modal) {
+          modal.classList.remove('hidden');
+          isUpdateModalOpen = true;
+        }
+        if (cachedLatestReleaseData && (cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name) && compareSemver((cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name), APP_VERSION) > 0) {
+          showUpdateModal(cachedLatestReleaseData);
+        } else {
+          showUpdateModal({
+            tag_name: 'v1.2.0',
+            name: 'Lord Spey Update',
+            body: 'A new version of Lord Spey is available.',
+            html_url: 'https://github.com/Dathevinci/Lordspey/releases'
+          });
+        }
+      });
+    }
+
     // Modal close & dismissal
     const btnCloseModal = $('#btn-close-update-modal');
     const btnDismiss = $('#btn-dismiss-update');
@@ -9293,7 +9432,7 @@
           modal.classList.remove('hidden');
           isUpdateModalOpen = true;
         }
-        if (cachedLatestReleaseData && cachedLatestReleaseData.latestVersion && compareSemver(cachedLatestReleaseData.latestVersion, APP_VERSION) > 0) {
+        if (cachedLatestReleaseData && (cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name) && compareSemver((cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name), APP_VERSION) > 0) {
           showUpdateModal(cachedLatestReleaseData);
         } else {
           showUpdateModal({
@@ -9345,26 +9484,56 @@
               : `Could not check updates: ${payload.error}`;
             toast(errorMsg, 'error');
             setStatus(errorMsg, 'alert');
+          } else {
+            console.warn('Electron background update check error silently handled:', payload.error);
           }
           return;
         }
 
+        // Cache check timestamp and metadata in localStorage
+        try {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('lordspey_last_update_check', String(Date.now()));
+            localStorage.setItem('lordspey_cached_release', JSON.stringify({
+              tag_name: payload.latestVersion,
+              latestVersion: payload.latestVersion,
+              name: payload.name,
+              body: payload.body || payload.releaseNotes,
+              html_url: payload.htmlUrl,
+              assets: payload.assets,
+              hasUpdate: !!payload.hasUpdate
+            }));
+          }
+        } catch (storageErr) {
+          console.warn('Could not cache Electron update info:', storageErr);
+        }
+
+        const releaseData = {
+          tag_name: payload.latestVersion,
+          latestVersion: payload.latestVersion,
+          name: payload.name,
+          body: payload.body || payload.releaseNotes,
+          html_url: payload.htmlUrl,
+          assets: payload.assets
+        };
+        cachedLatestReleaseData = releaseData;
+
         if (payload.hasUpdate) {
           const latestTag = payload.latestVersion || ('v' + APP_VERSION);
           setStatus(`New update ${latestTag} available!`, 'success');
-          showUpdateModal({
-            tag_name: payload.latestVersion,
-            name: payload.name,
-            body: payload.body || payload.releaseNotes,
-            html_url: payload.htmlUrl,
-            assets: payload.assets
-          });
-        } else if (payload.userInitiated) {
-          const currentTag = payload.latestVersion || ('v' + APP_VERSION);
-          const upToDateMsg = `✓ Lord Spey is up to date (${currentTag})`;
-          setStatus(upToDateMsg, 'success', true);
-          toast(`Lord Spey is up to date (${currentTag}) — Here are the latest features in v${APP_VERSION}`, 'success');
-          openWhatsNewModal(payload);
+          showUpdateNotification(releaseData);
+          if (payload.userInitiated) {
+            showUpdateModal(releaseData);
+          }
+        } else {
+          clearUpdateNotificationUI();
+          if (payload.userInitiated) {
+            const currentTag = payload.latestVersion || ('v' + APP_VERSION);
+            const upToDateMsg = `✓ Lord Spey is up to date (${currentTag})`;
+            setStatus(upToDateMsg, 'success', true);
+            toast(`Lord Spey is up to date (${currentTag}) — Here are the latest features in v${APP_VERSION}`, 'success');
+            openWhatsNewModal(payload);
+          }
         }
       };
       window.checkLordSpeyUpdates = checkAppUpdates;
@@ -9372,6 +9541,9 @@
       window.closeLordSpeyUpdateModal = closeUpdateModal;
       window.openLordSpeyWhatsNewModal = openWhatsNewModal;
       window.triggerTestUpdateNotification = triggerTestUpdateNotification;
+      window.showLordSpeyUpdateNotification = showUpdateNotification;
+      window.clearLordSpeyUpdateNotification = clearUpdateNotificationUI;
+      window.handleWindowFocusForUpdates = onWindowFocusOrActive;
       window.LORD_SPEY_VERSION = APP_VERSION;
       window.compareSemver = compareSemver;
       window.openGraphView = openGraphView;
@@ -9390,13 +9562,61 @@
       window.openNote = openNote;
     }
 
-    // Quiet startup check in background after 4s (in browser/Capacitor runtimes, skip in node tests or when Electron handles it)
+    // Check cached release metadata immediately on startup
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const cachedRaw = localStorage.getItem('lordspey_cached_release');
+        if (cachedRaw) {
+          const cachedData = JSON.parse(cachedRaw);
+          const cachedTag = cachedData.tag_name || cachedData.latestVersion || '';
+          const cachedVer = cachedTag.replace(/^v/i, '');
+          if (compareSemver(cachedVer, APP_VERSION) > 0) {
+            showUpdateNotification(cachedData);
+          }
+        }
+      }
+    } catch (_) {}
+
+    // Startup background check (after 3 seconds)
     const isNodeTest = typeof process !== 'undefined' && process.versions && process.versions.node && (typeof window === 'undefined' || !window.location || !window.location.href);
-    const isElectronRuntime = typeof window !== 'undefined' && window.electronAPI && window.electronAPI.isElectron;
-    if (!isNodeTest && !isElectronRuntime && typeof setTimeout === 'function') {
+    if (!isNodeTest && typeof setTimeout === 'function') {
       setTimeout(() => {
         checkAppUpdates(false).catch(() => {});
-      }, 4000);
+      }, 3000);
+    }
+
+    // Periodic background check every 45 minutes (30–60 min range)
+    if (!isNodeTest && typeof setInterval === 'function') {
+      setInterval(() => {
+        checkAppUpdates(false).catch(() => {});
+      }, 45 * 60 * 1000);
+    }
+
+    // Focus & Visibility check (with 15–30 min rate-limit guard)
+    function onWindowFocusOrActive() {
+      try {
+        if (typeof localStorage === 'undefined') return;
+        const lastCheck = parseInt(localStorage.getItem('lordspey_last_update_check'), 10) || 0;
+        const elapsed = Date.now() - lastCheck;
+        if (elapsed >= 15 * 60 * 1000) {
+          const fn = (typeof window !== 'undefined' && window.checkLordSpeyUpdates) || checkAppUpdates;
+          fn(false).catch(() => {});
+        }
+      } catch (_) {}
+    }
+
+    if (typeof window !== 'undefined') {
+      window.handleWindowFocusForUpdates = onWindowFocusOrActive;
+      if (typeof window.addEventListener === 'function') {
+        window.addEventListener('focus', onWindowFocusOrActive);
+      }
+    }
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          onWindowFocusOrActive();
+        }
+      });
     }
   }
 
