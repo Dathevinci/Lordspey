@@ -98,6 +98,116 @@
   const menuBtnExportSpey      = $('#menu-btn-export-spey');
   const menuBtnOpenSpey        = $('#menu-btn-open-spey');
   const menuBtnProjectSettings = $('#menu-btn-project-settings');
+
+  // Feedback Enhancements DOM Elements
+  // 1. Themes & Focus Mode
+  const baseThemeCards       = $$('.base-theme-card');
+  const settingCustomAccent   = $('#setting-custom-accent');
+  const settingCustomAccentHex= $('#setting-custom-accent-hex');
+  const btnApplyCustomAccent  = $('#btn-apply-custom-accent');
+  const settingFocusAutohide  = $('#setting-focus-autohide');
+  const formatBar             = $('.format-bar');
+
+  // 2. New Note Dropdown & Section
+  const newNoteDropdown       = $('#new-note-dropdown');
+  const modalNoteSection      = $('#modal-note-section');
+
+  // 3. World Map Canvas Shapes, Regions & Enhanced Tools
+  const mapShapeSelect        = $('#map-shape-select');
+  const btnMapDrawRegion      = $('#btn-map-draw-region');
+  const mapZoomLevel          = $('#map-zoom-level');
+  const mapRegionsSvg         = $('#map-regions-svg');
+  const btnMapEditPin         = $('#btn-map-edit-pin');
+  const mapModalPinType       = $('#map-modal-pin-type');
+  const mapModalPinColor      = $('#map-modal-pin-color');
+  const mapRegionModal        = $('#map-region-modal');
+  const mapRegionInputName    = $('#map-region-input-name');
+  const mapRegionInputShape   = $('#map-region-input-shape');
+  const mapRegionInputColor   = $('#map-region-input-color');
+  const mapRegionInputDesc    = $('#map-region-input-desc');
+  const btnMapRegionCancel    = $('#btn-map-region-cancel');
+  const btnMapRegionSave      = $('#btn-map-region-save');
+  const mapRegionDetailModal  = $('#map-region-detail-modal');
+  const mapRegionDetailTitle  = $('#map-region-detail-title');
+  const mapRegionDetailMeta   = $('#map-region-detail-meta');
+  const mapRegionDetailDesc   = $('#map-region-detail-desc');
+  const btnMapRegionDetailClose  = $('#btn-map-region-detail-close');
+  const btnMapRegionDetailEdit   = $('#btn-map-region-detail-edit');
+  const btnMapRegionDetailDelete = $('#btn-map-region-detail-delete');
+
+  // 4. Galaxy Graph: Manual Nodes & Custom Connections
+  const btnGraphAddNode       = $('#btn-graph-add-node');
+  const btnGraphConnect       = $('#btn-graph-connect');
+  const graphEntityModal      = $('#graph-entity-modal');
+  const graphInputEntityTitle = $('#graph-input-entity-title');
+  const graphInputEntityType  = $('#graph-input-entity-type');
+  const graphInputEntityCat   = $('#graph-input-entity-cat');
+  const graphInputEntityColor = $('#graph-input-entity-color');
+  const graphInputEntityDesc  = $('#graph-input-entity-desc');
+  const btnGraphEntityCancel  = $('#btn-graph-entity-cancel');
+  const btnGraphEntitySave    = $('#btn-graph-entity-save');
+  const graphLinkModal        = $('#graph-link-modal');
+  const graphLinkSource       = $('#graph-link-source');
+  const graphLinkTarget       = $('#graph-link-target');
+  const graphLinkLabel        = $('#graph-link-label');
+  const graphLinkColor        = $('#graph-link-color');
+  const btnGraphLinkCancel    = $('#btn-graph-link-cancel');
+  const btnGraphLinkSave      = $('#btn-graph-link-save');
+  const graphNodeDetailModal  = $('#graph-node-detail-modal');
+  const graphDetailBadge      = $('#graph-detail-badge');
+  const graphDetailTitle      = $('#graph-detail-title');
+  const graphDetailMeta       = $('#graph-detail-meta');
+  const graphDetailDesc       = $('#graph-detail-desc');
+  const graphDetailLinksList  = $('#graph-detail-links-list');
+  const btnGraphDetailClose   = $('#btn-graph-detail-close');
+  const btnGraphDetailEdit    = $('#btn-graph-detail-edit');
+  const btnGraphDetailDelete  = $('#btn-graph-detail-delete');
+  const btnGraphDetailConnect = $('#btn-graph-detail-connect');
+  const btnGraphDetailOpenNote= $('#btn-graph-detail-open-note');
+
+  // 5. Character Codex: Image Upload & Standalone Dossier
+  const codexImageDropzone    = $('#codex-image-dropzone');
+  const codexImagePreview     = $('#codex-image-preview');
+  const codexImagePlaceholder = $('#codex-image-placeholder');
+  const codexInputImage       = $('#codex-input-image');
+  const btnCodexRemoveImage   = $('#btn-codex-remove-image');
+  const codexDetailModal      = $('#codex-detail-modal');
+  const codexDetailArchetype  = $('#codex-detail-archetype');
+  const codexDetailFaction    = $('#codex-detail-faction');
+  const codexDetailClose      = $('#btn-codex-detail-close');
+  const codexDetailAvatarImg  = $('#codex-detail-avatar-img');
+  const codexDetailAvatarFallback = $('#codex-detail-avatar-fallback');
+  const codexDetailName       = $('#codex-detail-name');
+  const codexDetailRole       = $('#codex-detail-role');
+  const codexDetailBio        = $('#codex-detail-bio');
+  const codexDetailRelsList   = $('#codex-detail-rels-list');
+  const btnCodexDetailDelete  = $('#btn-codex-detail-delete');
+  const btnCodexDetailEdit    = $('#btn-codex-detail-edit');
+  const btnCodexDetailOpenNote= $('#btn-codex-detail-open-note');
+
+  // 6. Chronology Timeline: Standalone Event Detail Modal
+  const timelineEventDetailModal = $('#timeline-event-detail-modal');
+  const timelineDetailBadge   = $('#timeline-detail-badge');
+  const timelineDetailYear    = $('#timeline-detail-year');
+  const timelineDetailClose   = $('#btn-timeline-detail-close');
+  const timelineDetailTitle   = $('#timeline-detail-title');
+  const timelineDetailEra     = $('#timeline-detail-era');
+  const timelineDetailDesc    = $('#timeline-detail-desc');
+  const btnTimelineDetailDelete = $('#btn-timeline-detail-delete');
+  const btnTimelineDetailEdit = $('#btn-timeline-detail-edit');
+  const btnTimelineDetailOpenNote = $('#btn-timeline-detail-open-note');
+
+  // Ensure new feedback modals are marked hidden initially in all environments
+  [
+    graphNodeDetailModal, graphEntityModal, graphLinkModal,
+    mapRegionDetailModal, mapRegionModal,
+    timelineEventDetailModal, codexDetailModal
+  ].forEach(m => {
+    if (m && m.classList && typeof m.classList.add === 'function') {
+      m.classList.add('hidden');
+    }
+  });
+
   const menuBtnSettings        = $('#menu-btn-settings');
 
   const speyImportModal        = $('#spey-import-modal');
@@ -449,6 +559,52 @@
   let autoEmDash          = true;
   let smartQuotes         = false;
   let currentAccentTheme  = 'crimson';
+  let currentBaseTheme       = 'dark';
+  let isFocusAutohideEnabled = true;
+  let isMapRegionDrawingMode = false;
+  let currentMapRegionPoints = [];
+  let activeEditingPin       = null;
+  let activeEditingRegion    = null;
+  let activeEditingChar      = null;
+  let activeEditingEvent     = null;
+  let activeEditingGraphNode = null;
+  let currentCharImageData   = null;
+
+  // Worldbuilding Systems State (Map, Timeline, Codex)
+  let mapCamera              = { x: 0, y: 0, zoom: 1 };
+  let mapFilter              = 'all';
+  let isMapPlacementMode     = false;
+  let isMapPanning           = false;
+  let mapPanStart            = { x: 0, y: 0 };
+  let mapDraggedPin          = null;
+  let mapDragDidMove         = false;
+  let mapDragStartX          = 0;
+  let mapDragStartY          = 0;
+  let mapTouchDist           = 0;
+  let mapTouchZoom           = 1;
+  let pendingPinClick        = { x: 50, y: 50 };
+
+  let timelineMode           = 'rail';
+  let timelineFilter         = 'all';
+  let timelineStepWidth      = 320;
+  let isTimelinePanning      = false;
+  let timelinePanStartX      = 0;
+  let timelineScrollStart    = 0;
+  let timelineTouchDist      = 0;
+  let timelineTouchStartStep = 320;
+  let timelineDidPan         = false;
+
+  let codexFilter            = 'all';
+  let hoveredCharId          = null;
+  let codexWebCamera         = { x: 0, y: 0, zoom: 1 };
+  let codexNodePositions     = new Map();
+  let isCodexPanning         = false;
+  let codexPanStart          = { x: 0, y: 0 };
+  let codexDraggedNode       = null;
+  let codexTouchDist         = 0;
+  let codexTouchStartZoom    = 1;
+  let codexDidDrag           = false;
+  let codexDragStartScreen   = { x: 0, y: 0 };
 
   function loadUserPreferences() {
     const s = (typeof Storage !== 'undefined' && typeof Storage.getSettings === 'function') ? Storage.getSettings() : {};
@@ -489,6 +645,16 @@
       smartQuotes = localStorage.getItem('lordspey_smart_quotes') === 'true';
     } else if (typeof s.smartQuotes === 'boolean') {
       smartQuotes = s.smartQuotes;
+    }
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_base_theme')) {
+      currentBaseTheme = localStorage.getItem('lordspey_base_theme');
+    } else if (typeof Storage !== 'undefined' && typeof Storage.getBaseTheme === 'function') {
+      currentBaseTheme = Storage.getBaseTheme() || 'dark';
+    }
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_focus_autohide') !== null) {
+      isFocusAutohideEnabled = localStorage.getItem('lordspey_focus_autohide') === 'true';
+    } else if (typeof s.focusAutohide === 'boolean') {
+      isFocusAutohideEnabled = s.focusAutohide;
     }
   }
 
@@ -575,6 +741,10 @@
     if (rootEl && typeof rootEl.setAttribute === 'function') {
       rootEl.setAttribute('data-accent', key);
     }
+    if (settingCustomAccent && theme.accent) {
+      settingCustomAccent.value = theme.accent;
+      if (settingCustomAccentHex) settingCustomAccentHex.value = theme.accent;
+    }
     if (typeof $$ === 'function') {
       $$('.accent-theme-card').forEach(card => {
         if (!card) return;
@@ -604,16 +774,77 @@
     }
   }
 
+  function applyBaseTheme(themeName) {
+    const valid = (themeName === 'light' || themeName === 'sepia' || themeName === 'dark') ? themeName : 'dark';
+    currentBaseTheme = valid;
+    if (typeof Storage !== 'undefined' && typeof Storage.setBaseTheme === 'function') {
+      Storage.setBaseTheme(valid);
+    }
+    const rootEl = document.documentElement || document.body;
+    if (rootEl && typeof rootEl.setAttribute === 'function') {
+      rootEl.setAttribute('data-theme', valid);
+    }
+    if (document.body && typeof document.body.setAttribute === 'function') {
+      document.body.setAttribute('data-theme', valid);
+    }
+    $$('.base-theme-card').forEach(card => {
+      if (!card) return;
+      const isMatch = card.dataset && card.dataset.baseTheme === valid;
+      if (card.classList && typeof card.classList.toggle === 'function') {
+        card.classList.toggle('active', isMatch);
+      }
+    });
+  }
+
+  function applyCustomAccent(hex) {
+    if (!hex || !/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+    if (typeof Storage !== 'undefined' && typeof Storage.setCustomAccentColor === 'function') {
+      Storage.setCustomAccentColor(hex);
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('lordspey_accent_theme', 'custom');
+      localStorage.setItem('lordspey_custom_accent', hex);
+    }
+    currentAccentTheme = 'custom';
+    const rootEl = document.documentElement || document.body;
+    if (rootEl && rootEl.style && typeof rootEl.style.setProperty === 'function') {
+      rootEl.style.setProperty('--accent', hex);
+      rootEl.style.setProperty('--red-400', hex);
+      rootEl.style.setProperty('--red-500', hex);
+      rootEl.style.setProperty('--red-600', hex);
+      rootEl.style.setProperty('--red-glow', hex + '26');
+      rootEl.style.setProperty('--red-glow-strong', hex + '4d');
+    }
+    if (rootEl && typeof rootEl.setAttribute === 'function') {
+      rootEl.setAttribute('data-accent', 'custom');
+    }
+    $$('.accent-theme-card').forEach(card => {
+      if (card && card.classList && typeof card.classList.remove === 'function') {
+        card.classList.remove('active');
+      }
+    });
+  }
+
   // ── Init ──
   init();
 
   function init() {
     loadUserPreferences();
     renderSidebar();
+    applyBaseTheme(currentBaseTheme);
     applyAccentTheme(currentAccentTheme);
+    const customAccent = (typeof Storage !== 'undefined' && typeof Storage.getCustomAccentColor === 'function')
+      ? Storage.getCustomAccentColor()
+      : (typeof localStorage !== 'undefined' ? localStorage.getItem('lordspey_custom_accent') : null);
+    if (currentAccentTheme === 'custom' && customAccent) {
+      applyCustomAccent(customAccent);
+    }
     applyTypographySettings();
     applyTypewriterState();
     bindEvents();
+    initFocusMode();
+    initNewNoteDropdown();
+    initManualGraphControls();
     initGalaxyEngine();
     initWorldbuildingSystems();
 
@@ -838,14 +1069,51 @@
           `;
         }
       } else {
-        list.innerHTML = filtered.map(n => `
-          <li class="nav-item">
-            <div class="nav-link ${n.id === activeNoteId ? 'active' : ''}" data-id="${n.id}">
-              <span class="nav-link-dot"></span>
-              <span class="nav-link-title">${escText(n.title || 'Untitled')}</span>
-            </div>
-          </li>
-        `).join('');
+        if (cat === 'chapter') {
+          // Group chapters by custom section / act if present
+          const sectionMap = new Map();
+          filtered.forEach(n => {
+            const sec = (n.section && typeof n.section === 'string' && n.section.trim()) ? n.section.trim() : '';
+            if (!sectionMap.has(sec)) sectionMap.set(sec, []);
+            sectionMap.get(sec).push(n);
+          });
+
+          if (sectionMap.size > 1 || (sectionMap.size === 1 && !sectionMap.has(''))) {
+            let sectionHtml = '';
+            sectionMap.forEach((secNotes, secName) => {
+              if (secName) {
+                sectionHtml += `<li class="nav-subsection-header font-cinzel"><span>✦ ${escText(secName)}</span></li>`;
+              }
+              sectionHtml += secNotes.map(n => `
+                <li class="nav-item">
+                  <div class="nav-link ${n.id === activeNoteId ? 'active' : ''}" data-id="${n.id}">
+                    <span class="nav-link-dot"></span>
+                    <span class="nav-link-title">${escText(n.title || 'Untitled')}</span>
+                  </div>
+                </li>
+              `).join('');
+            });
+            list.innerHTML = sectionHtml;
+          } else {
+            list.innerHTML = filtered.map(n => `
+              <li class="nav-item">
+                <div class="nav-link ${n.id === activeNoteId ? 'active' : ''}" data-id="${n.id}">
+                  <span class="nav-link-dot"></span>
+                  <span class="nav-link-title">${escText(n.title || 'Untitled')}</span>
+                </div>
+              </li>
+            `).join('');
+          }
+        } else {
+          list.innerHTML = filtered.map(n => `
+            <li class="nav-item">
+              <div class="nav-link ${n.id === activeNoteId ? 'active' : ''}" data-id="${n.id}">
+                <span class="nav-link-dot"></span>
+                <span class="nav-link-title">${escText(n.title || 'Untitled')}</span>
+              </div>
+            </li>
+          `).join('');
+        }
       }
     }
   }
@@ -1155,6 +1423,38 @@
         applyAccentTheme(card.dataset.theme);
       });
     });
+
+    // Base Visual Themes (Dark, Light, Sepia)
+    $$('.base-theme-card').forEach(card => {
+      card.addEventListener('click', () => {
+        if (card.dataset && card.dataset.baseTheme) {
+          applyBaseTheme(card.dataset.baseTheme);
+        }
+      });
+    });
+
+    // Custom Accent Color Picker
+    if (settingCustomAccent) {
+      settingCustomAccent.addEventListener('input', () => {
+        if (settingCustomAccentHex) settingCustomAccentHex.value = settingCustomAccent.value;
+      });
+    }
+    if (settingCustomAccentHex) {
+      settingCustomAccentHex.addEventListener('input', () => {
+        if (/^#[0-9a-fA-F]{6}$/.test(settingCustomAccentHex.value) && settingCustomAccent) {
+          settingCustomAccent.value = settingCustomAccentHex.value;
+        }
+      });
+    }
+    if (btnApplyCustomAccent) {
+      btnApplyCustomAccent.addEventListener('click', () => {
+        const hex = (settingCustomAccentHex && settingCustomAccentHex.value) || (settingCustomAccent && settingCustomAccent.value);
+        if (hex) {
+          applyCustomAccent(hex);
+          toast(`Custom accent ${hex} applied`, 'success');
+        }
+      });
+    }
 
     // Preview Intro Animation
     if (settingBtnPreviewIntro) {
@@ -1744,7 +2044,15 @@
   function createNoteFromModal() {
     const title = modalTitle.value.trim() || 'Untitled';
     const category = modalCategory.value;
-    const note = Storage.createNote({ title, category, body: `# ${title}\n\n` });
+    const section = (modalNoteSection && category === 'chapter') ? modalNoteSection.value.trim() : '';
+    let body = (modalOverlay && modalOverlay.dataset && modalOverlay.dataset.template) ? modalOverlay.dataset.template : `# ${title}\n\n`;
+    if (!modalOverlay.dataset.template && category === 'chapter' && section) {
+      body = `# ${title}\n\n**Section:** ${section}\n\n`;
+    }
+    const note = Storage.createNote({ title, category, section, body });
+    if (section && Storage.saveSection) {
+      Storage.saveSection({ name: section });
+    }
     closeNewNoteModal();
     renderSidebar();
     openNote(note.id);
@@ -2144,6 +2452,9 @@
     if (settingSmartQuotes) {
       settingSmartQuotes.checked = smartQuotes;
     }
+    if (settingFocusAutohide) {
+      settingFocusAutohide.checked = isFocusAutohideEnabled;
+    }
 
     // 3. Appearance & Accent Theme
     const isSkipIntro = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_skip_intro') === 'true') ||
@@ -2305,6 +2616,16 @@
       Storage.saveSetting('skipIntro', skipIntro);
     }
     Storage.saveSetting('accentTheme', currentAccentTheme);
+    Storage.saveSetting('baseTheme', currentBaseTheme);
+    if (settingFocusAutohide) {
+      isFocusAutohideEnabled = settingFocusAutohide.checked;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('lordspey_focus_autohide', String(isFocusAutohideEnabled));
+      Storage.saveSetting('focusAutohide', isFocusAutohideEnabled);
+    }
+    if (currentAccentTheme === 'custom') {
+      const customHex = (settingCustomAccentHex && settingCustomAccentHex.value) || (settingCustomAccent && settingCustomAccent.value) || '#ef4444';
+      Storage.saveSetting('customAccentColor', customHex);
+    }
 
     applyTypographySettings();
     applyAccentTheme(currentAccentTheme);
@@ -3070,6 +3391,18 @@
       return true;
     }
     if (graphModal && !graphModal.classList.contains('hidden')) {
+      if (graphNodeDetailModal && !graphNodeDetailModal.classList.contains('hidden')) {
+        graphNodeDetailModal.classList.add('hidden');
+        return true;
+      }
+      if (graphEntityModal && !graphEntityModal.classList.contains('hidden')) {
+        graphEntityModal.classList.add('hidden');
+        return true;
+      }
+      if (graphLinkModal && !graphLinkModal.classList.contains('hidden')) {
+        graphLinkModal.classList.add('hidden');
+        return true;
+      }
       closeGraphView();
       return true;
     }
@@ -3100,12 +3433,28 @@
       codexTutorialModal.classList.add('hidden');
       return true;
     }
+    if (mapRegionDetailModal && !mapRegionDetailModal.classList.contains('hidden')) {
+      mapRegionDetailModal.classList.add('hidden');
+      return true;
+    }
+    if (mapRegionModal && !mapRegionModal.classList.contains('hidden')) {
+      mapRegionModal.classList.add('hidden');
+      return true;
+    }
     if (mapPinModal && !mapPinModal.classList.contains('hidden')) {
       mapPinModal.classList.add('hidden');
       return true;
     }
+    if (timelineEventDetailModal && !timelineEventDetailModal.classList.contains('hidden')) {
+      timelineEventDetailModal.classList.add('hidden');
+      return true;
+    }
     if (timelineEventModal && !timelineEventModal.classList.contains('hidden')) {
       timelineEventModal.classList.add('hidden');
+      return true;
+    }
+    if (codexDetailModal && !codexDetailModal.classList.contains('hidden')) {
+      codexDetailModal.classList.add('hidden');
       return true;
     }
     if (codexCharModal && !codexCharModal.classList.contains('hidden')) {
@@ -3159,11 +3508,22 @@
     return false;
   }
 
-  function openNewNoteModal() {
-    modalTitle.value = '';
-    modalCategory.value = 'draft';
-    modalOverlay.classList.remove('hidden');
-    setTimeout(() => modalTitle.focus(), 100);
+  function openNewNoteModal(cat = 'draft', defaultTitle = '', template = '') {
+    if (newNoteDropdown) newNoteDropdown.classList.add('hidden');
+    if (modalTitle) modalTitle.value = defaultTitle || '';
+    if (modalCategory) modalCategory.value = cat || 'draft';
+    if (modalNoteSection) {
+      modalNoteSection.value = '';
+      const sectionField = $('#modal-field-section');
+      if (sectionField) {
+        sectionField.style.display = (cat === 'chapter') ? 'block' : 'none';
+      }
+    }
+    if (modalOverlay) {
+      modalOverlay.dataset.template = template || '';
+      modalOverlay.classList.remove('hidden');
+    }
+    setTimeout(() => { if (modalTitle) modalTitle.focus(); }, 100);
   }
 
   function closeNewNoteModal() {
@@ -4069,10 +4429,65 @@
       // Ignore
     }
 
-    graphNodes = [...hubNodes, ...noteNodes];
+    // Manual Non-Note Entities (Theme, Plot Arc, Faction, Concept)
+    const manualNodes = (Storage.getGraphNodes ? Storage.getGraphNodes() : []).map((mn, idx) => {
+      let mx = mn.x;
+      let my = mn.y;
+      if (mx === undefined || my === undefined) {
+        const angle = (idx / 4) * Math.PI * 2;
+        mx = centerX + Math.cos(angle) * (hubDist * 1.4);
+        my = centerY + Math.sin(angle) * (hubDist * 1.4);
+      }
+      return {
+        id: mn.id,
+        isHub: false,
+        isManualEntity: true,
+        type: mn.type || 'concept',
+        category: mn.category || mn.type || 'concept',
+        title: mn.title || 'Entity',
+        description: mn.description || '',
+        color: mn.color || '#38bdf8',
+        x: mx,
+        y: my,
+        targetX: mx,
+        targetY: my,
+        vx: 0,
+        vy: 0,
+        radius: 14,
+        connections: 0,
+        pulseOffset: Math.random() * Math.PI * 2,
+        hitWidth: Math.max(90, (mn.title || '').length * 8)
+      };
+    });
+    manualNodes.forEach(mn => titleToNode.set((mn.title || '').trim().toLowerCase(), mn));
 
-    // 3. Create Edges: Category Sub-branch Hierarchy + Wiki Cross-links
+    graphNodes = [...hubNodes, ...noteNodes, ...manualNodes];
+
+    // 3. Create Edges: Category Sub-branch Hierarchy + Wiki Cross-links + Manual Links
     graphEdges = [];
+
+    // Manual Custom Connections
+    const manualLinks = (Storage.getGraphLinks ? Storage.getGraphLinks() : []);
+    const idToNode = new Map();
+    graphNodes.forEach(n => idToNode.set(n.id, n));
+    manualLinks.forEach(ml => {
+      const s = idToNode.get(ml.source) || titleToNode.get((ml.source || '').toLowerCase());
+      const t = idToNode.get(ml.target) || titleToNode.get((ml.target || '').toLowerCase());
+      if (s && t && s !== t) {
+        graphEdges.push({
+          source: s,
+          target: t,
+          isHierarchy: false,
+          isWiki: false,
+          isManualLink: true,
+          label: ml.label || '',
+          color: ml.color || '#818cf8',
+          flowProgress: Math.random()
+        });
+        s.connections++;
+        t.connections++;
+      }
+    });
 
     // Category hierarchy sub-branches
     for (const n of noteNodes) {
@@ -4558,6 +4973,31 @@
       drawWikiPhoton(wp2);
     }
 
+    // 4b. Draw Manual Custom Entity Links
+    for (const e of graphEdges) {
+      if (!e.isManualLink) continue;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(e.source.x, e.source.y);
+      ctx.lineTo(e.target.x, e.target.y);
+      ctx.strokeStyle = e.color || '#818cf8';
+      ctx.lineWidth = 2.2;
+      ctx.setLineDash([5, 5]);
+      ctx.lineDashOffset = -galaxyTime * 12;
+      ctx.stroke();
+
+      if (e.label && typeof ctx.fillText === 'function') {
+        const midX = (e.source.x + e.target.x) / 2;
+        const midY = (e.source.y + e.target.y) / 2;
+        ctx.font = '500 10px "Inter", sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(e.label, midX, midY - 6);
+      }
+      ctx.restore();
+    }
+
     // 5. Draw Category Hub Nodes
     for (const n of graphNodes) {
       if (!n.isHub) continue;
@@ -4655,9 +5095,60 @@
       ctx.fillText(countLabel, n.x, pillY + pillH + 11);
     }
 
-    // 6. Draw Note Nodes (Chapters, Lore, World, Drafts)
+    // 6. Draw Note & Manual Entity Nodes
     for (const n of graphNodes) {
       if (n.isHub) continue;
+
+      if (n.isManualEntity) {
+        const isHovered = n === hoveredNode;
+        const entColor = n.color || '#38bdf8';
+        ctx.save();
+        ctx.beginPath();
+
+        if (n.type === 'theme') {
+          // Diamond shape
+          ctx.moveTo(n.x, n.y - n.radius - 4);
+          ctx.lineTo(n.x + n.radius + 4, n.y);
+          ctx.lineTo(n.x, n.y + n.radius + 4);
+          ctx.lineTo(n.x - n.radius - 4, n.y);
+          ctx.closePath();
+        } else if (n.type === 'arc') {
+          // Arc rings
+          ctx.arc(n.x, n.y, n.radius + 3, 0, Math.PI * 2);
+        } else if (n.type === 'faction') {
+          // Shield shape
+          ctx.moveTo(n.x - n.radius, n.y - n.radius);
+          ctx.lineTo(n.x + n.radius, n.y - n.radius);
+          ctx.lineTo(n.x + n.radius, n.y);
+          ctx.lineTo(n.x, n.y + n.radius + 4);
+          ctx.lineTo(n.x - n.radius, n.y);
+          ctx.closePath();
+        } else {
+          // Concept star / burst
+          ctx.arc(n.x, n.y, n.radius + 2, 0, Math.PI * 2);
+        }
+
+        ctx.fillStyle = isHovered ? '#ffffff' : entColor;
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = isHovered ? 2.5 : 1.5;
+        ctx.stroke();
+
+        // Label
+        if (typeof ctx.fillText === 'function') {
+          ctx.font = '600 11px "Cinzel", serif';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(n.title, n.x, n.y + n.radius + 8);
+
+          ctx.font = '500 9px "Inter", sans-serif';
+          ctx.fillStyle = entColor;
+          ctx.fillText(`✦ ${(n.type || 'concept').toUpperCase()}`, n.x, n.y + n.radius + 23);
+        }
+        ctx.restore();
+        continue;
+      }
       const meta = CATEGORY_META[n.category] || CATEGORY_META.chapter;
       const isHovered = n === hoveredNode;
       const isCurrentActive = n.id === activeNoteId;
@@ -4943,6 +5434,8 @@
         // Otherwise isolate this category branch in the graph
         setGraphCategoryFilter(draggedNode.category);
         toast(`Focused ${CATEGORY_META[draggedNode.category].name} branch`, 'info');
+      } else if (draggedNode.isManualEntity) {
+        openGraphNodeDetailModal(draggedNode);
       } else if (draggedNode.id) {
         // Clicked a note or chapter!
         const noteId = draggedNode.id;
@@ -5031,47 +5524,15 @@
   // DEEP WORLDBUILDING & LORE SYSTEMS (OBSIDIAN PLUS)
   // ═══════════════════════════════════════════════
 
-  // State
-  let mapCamera = { x: 0, y: 0, zoom: 1 };
-  let mapFilter = 'all';
-  let isMapPlacementMode = false;
-  let isMapPanning = false;
-  let mapPanStart = { x: 0, y: 0 };
-  let mapDraggedPin = null;
-  let mapDragDidMove = false;
-  let mapDragStartX = 0;
-  let mapDragStartY = 0;
-  let mapTouchDist = 0;
-  let mapTouchZoom = 1;
-  let pendingPinClick = { x: 50, y: 50 };
-
-  let timelineMode = 'rail'; // 'rail' or 'stream'
-  let timelineFilter = 'all';
-  let timelineStepWidth = 320;
-  let isTimelinePanning = false;
-  let timelinePanStartX = 0;
-  let timelineScrollStart = 0;
-  let timelineTouchDist = 0;
-  let timelineTouchStartStep = 320;
-  let timelineDidPan = false;
-
-  codexMode = 'cards'; // 'cards' or 'web'
-  let codexFilter = 'all';
-  let hoveredCharId = null;
-  let codexWebCamera = { x: 0, y: 0, zoom: 1 };
-  let codexNodePositions = new Map();
-  let isCodexPanning = false;
-  let codexPanStart = { x: 0, y: 0 };
-  let codexDraggedNode = null;
-  let codexTouchDist = 0;
-  let codexTouchStartZoom = 1;
-  let codexDidDrag = false;
-  let codexDragStartScreen = { x: 0, y: 0 };
+  // Worldbuilding Systems State (initialized at top of scope)
 
   function initWorldbuildingSystems() {
     initMapControls();
+    initMapShapeAndRegions();
     initTimelineControls();
     initCodexControls();
+    initCodexImageUpload();
+    initModuleDetailModals();
   }
 
   // ── 1. Interactive World Map & Pin Codex ──
@@ -5304,6 +5765,7 @@
     }
 
     renderMapPins();
+    renderMapRegions();
   }
 
   function closeMapView() {
@@ -5345,6 +5807,9 @@
   function applyMapTransform() {
     if (!mapStage) return;
     mapStage.style.transform = `translate(${mapCamera.x}px, ${mapCamera.y}px) scale(${mapCamera.zoom})`;
+    if (mapZoomLevel) {
+      mapZoomLevel.textContent = `${Math.round(mapCamera.zoom * 100)}%`;
+    }
   }
 
   function loadMapImage(dataUrl) {
@@ -5394,7 +5859,9 @@
     } else {
       ctx.fillStyle = '#06070c';
     }
-    ctx.fillRect(0, 0, w, h);
+    if (typeof ctx.fillRect === 'function') {
+      ctx.fillRect(0, 0, w, h);
+    }
 
     const mapTheme = ACCENT_THEMES[currentAccentTheme] || ACCENT_THEMES['crimson'];
     const mapAccentColor = mapTheme.accent;
@@ -5579,11 +6046,11 @@
   }
 
   function renderMapPins() {
-    if (!mapPinsContainer) return;
+    if (!mapPinsContainer || typeof document === 'undefined' || typeof document.createElement !== 'function') return;
     mapPinsContainer.innerHTML = '';
 
-    const allPins = Storage.getAllMapPins();
-    const query = mapPinSearch ? mapPinSearch.value.trim().toLowerCase() : '';
+    const allPins = Storage.getAllMapPins ? Storage.getAllMapPins() : [];
+    const query = (mapPinSearch && typeof mapPinSearch.value === 'string') ? mapPinSearch.value.trim().toLowerCase() : '';
 
     const mapEmptyPrompt = $('#map-empty-prompt');
     if (mapEmptyPrompt) {
@@ -5612,10 +6079,14 @@
       pinEl.style.left = `${pin.x}%`;
       pinEl.style.top = `${pin.y}%`;
 
+      const customColor = pin.pinColor || '';
+      const dotStyle = customColor ? `style="background: ${customColor};"` : '';
+      const pulseStyle = customColor ? `style="border-color: ${customColor};"` : '';
+
       pinEl.innerHTML = `
-        <div class="map-pin-head">
-          <div class="map-pin-pulse"></div>
-          <div class="map-pin-dot"></div>
+        <div class="map-pin-head pin-${pin.pinType || 'citadel'}">
+          <div class="map-pin-pulse" ${pulseStyle}></div>
+          <div class="map-pin-dot" ${dotStyle}></div>
         </div>
         <div class="map-pin-label">${escText(pin.title || 'Landmark')}</div>
       `;
@@ -5703,9 +6174,16 @@
       };
     }
 
+    if (btnMapEditPin) {
+      btnMapEditPin.onclick = (e) => {
+        if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        openEditPinModal(pin);
+      };
+    }
+
     mapPinPreview.onclick = (e) => {
       if (e && e.target && typeof e.target.closest === 'function') {
-        if (e.target.closest('#btn-map-preview-close') || e.target.closest('#btn-map-delete-pin')) return;
+        if (e.target.closest('#btn-map-preview-close') || e.target.closest('#btn-map-delete-pin') || e.target.closest('#btn-map-edit-pin')) return;
       }
       if (btnMapOpenNote && typeof btnMapOpenNote.onclick === 'function') {
         btnMapOpenNote.onclick();
@@ -5815,7 +6293,24 @@
     const pctX = Math.max(0, Math.min(100, ((e.clientX - stageRect.left) / stageRect.width) * 100));
     const pctY = Math.max(0, Math.min(100, ((e.clientY - stageRect.top) / stageRect.height) * 100));
 
+    if (isMapRegionDrawingMode) {
+      currentMapRegionPoints.push({ x: pctX, y: pctY });
+      if (currentMapRegionPoints.length >= 3) {
+        openEditMapRegionModal({
+          name: 'New Territory',
+          shape: 'polygon',
+          color: '#ef4444',
+          description: '',
+          points: currentMapRegionPoints
+        });
+      } else {
+        toast(`Point ${currentMapRegionPoints.length} placed (click 3+ points for territory)`, 'info');
+      }
+      return;
+    }
+
     pendingPinClick = { x: pctX, y: pctY };
+    activeEditingPin = null;
     isMapPlacementMode = false;
     updateMapPlacementUI();
     openPinModalWithCoords(pctX, pctY);
@@ -5851,20 +6346,26 @@
     const noteId = (mapModalNoteSelect && mapModalNoteSelect.value) || null;
     const category = (mapModalPinCategory && mapModalPinCategory.value) || 'world';
     const desc = (mapModalPinDesc && mapModalPinDesc.value.trim()) || '';
+    const pinType = (mapModalPinType && mapModalPinType.value) || 'citadel';
+    const pinColor = (mapModalPinColor && mapModalPinColor.value) || '#ef4444';
 
     const newPin = {
-      x: pendingPinClick.x,
-      y: pendingPinClick.y,
+      id: activeEditingPin ? activeEditingPin.id : undefined,
+      x: activeEditingPin ? activeEditingPin.x : (pendingPinClick ? pendingPinClick.x : 50),
+      y: activeEditingPin ? activeEditingPin.y : (pendingPinClick ? pendingPinClick.y : 50),
       title,
       noteId,
       category,
+      pinType,
+      pinColor,
       description: desc
     };
 
     Storage.saveMapPin(newPin);
+    activeEditingPin = null;
     if (mapPinModal) mapPinModal.classList.add('hidden');
     renderMapPins();
-    toast(`Pin "${title}" placed`, 'success');
+    toast(`Pin "${title}" saved`, 'success');
   }
 
   function onMapTouchStart(e) {
@@ -6059,8 +6560,9 @@
   }
 
   function renderTimeline() {
-    const allEvents = Storage.getAllTimelineEvents();
-    const query = timelineSearch ? timelineSearch.value.trim().toLowerCase() : '';
+    if (typeof document === 'undefined' || typeof document.createElement !== 'function') return;
+    const allEvents = Storage.getAllTimelineEvents ? Storage.getAllTimelineEvents() : [];
+    const query = (timelineSearch && typeof timelineSearch.value === 'string') ? timelineSearch.value.trim().toLowerCase() : '';
 
     const filtered = allEvents.filter(evt => {
       if (timelineFilter !== 'all' && evt.category !== timelineFilter) return false;
@@ -6160,9 +6662,13 @@
 
       card.addEventListener('click', (e) => {
         if (e.target.closest('.btn-del-timeline-evt')) return;
+        if (e.target.closest('.timeline-card-link')) {
+          closeTimelineView();
+          navigateToEventNote(evt);
+          return;
+        }
         if (timelineDidPan) return;
-        closeTimelineView();
-        navigateToEventNote(evt);
+        openTimelineEventDetailModal(evt);
       });
 
       timelineRailTrack.appendChild(card);
@@ -6275,6 +6781,7 @@
     const desc = (timelineInputDesc && timelineInputDesc.value.trim()) || '';
 
     const newEvt = {
+      id: activeEditingEvent ? activeEditingEvent.id : undefined,
       year,
       era,
       title,
@@ -6284,6 +6791,7 @@
     };
 
     Storage.saveTimelineEvent(newEvt);
+    activeEditingEvent = null;
     if (timelineEventModal) timelineEventModal.classList.add('hidden');
     renderTimeline();
     toast(`Event "${title}" recorded`, 'success');
@@ -6567,9 +7075,10 @@
   }
 
   function renderCodex() {
-    const allChars = Storage.getAllCharacters();
-    const allRels = Storage.getAllRelationships();
-    const query = codexSearch ? codexSearch.value.trim().toLowerCase() : '';
+    if (!codexGrid || typeof document === 'undefined' || typeof document.createElement !== 'function') return;
+    const allChars = Storage.getAllCharacters ? Storage.getAllCharacters() : [];
+    const allRels = Storage.getAllRelationships ? Storage.getAllRelationships() : [];
+    const query = (codexSearch && typeof codexSearch.value === 'string') ? codexSearch.value.trim().toLowerCase() : '';
 
     const filtered = allChars.filter(c => {
       if (codexFilter !== 'all' && c.archetype !== codexFilter) return false;
@@ -6635,7 +7144,7 @@
 
       card.innerHTML = `
         <div class="codex-card-top">
-          <div class="codex-avatar">${initial}</div>
+          <div class="codex-avatar">${c.image ? `<img src="${c.image}" class="codex-card-avatar-img" alt="${escText(c.name)}" />` : initial}</div>
           <div class="codex-card-meta">
             <h4 class="codex-card-name">${escText(c.name)}</h4>
             ${c.aliases ? `<div class="codex-card-alias text-xs text-muted" style="font-style: italic; margin-bottom: 2px;">"${escText(c.aliases)}"</div>` : ''}
@@ -6673,8 +7182,12 @@
 
       card.addEventListener('click', (e) => {
         if (e.target.closest('.btn-del-char')) return;
-        closeCodexView();
-        navigateToCharacterNote(c);
+        if (e.target.closest('.btn-open-dossier')) {
+          closeCodexView();
+          navigateToCharacterNote(c);
+          return;
+        }
+        openCodexDetailModal(c);
       });
 
       codexGrid.appendChild(card);
@@ -6943,7 +7456,7 @@
     const bio = (codexInputBio && codexInputBio.value.trim()) || '';
     let noteId = (codexInputNote && codexInputNote.value) || null;
 
-    if (!noteId) {
+    if (!noteId && !activeEditingChar) {
       const created = Storage.createNote({
         title: name,
         category: 'lore',
@@ -6955,17 +7468,20 @@
     }
 
     Storage.saveCharacter({
+      id: activeEditingChar ? activeEditingChar.id : undefined,
       name,
       archetype,
       faction,
       role,
       bio,
-      noteId
+      image: currentCharImageData,
+      noteId: noteId || (activeEditingChar ? activeEditingChar.noteId : null)
     });
 
+    activeEditingChar = null;
     if (codexCharModal) codexCharModal.classList.add('hidden');
     renderCodex();
-    toast(`Character "${name}" added to codex`, 'success');
+    toast(`Character "${name}" saved to codex`, 'success');
   }
 
   function openAddRelationshipModal() {
@@ -7012,6 +7528,855 @@
     if (codexRelModal) codexRelModal.classList.add('hidden');
     renderCodex();
     toast('Relationship established', 'success');
+  }
+
+
+  // ═══════════════════════════════════════════════
+  // Feedback Enhancements Controllers
+  // ═══════════════════════════════════════════════
+
+  // ── 1. Focus Mode for Writing (Auto-Hiding Formatting Toolbar) ──
+  function initFocusMode() {
+    if (settingFocusAutohide) {
+      settingFocusAutohide.addEventListener('change', () => {
+        isFocusAutohideEnabled = settingFocusAutohide.checked;
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('lordspey_focus_autohide', String(isFocusAutohideEnabled));
+        }
+        if (typeof Storage !== 'undefined' && typeof Storage.saveSetting === 'function') {
+          Storage.saveSetting('focusAutohide', isFocusAutohideEnabled);
+        }
+        if (!isFocusAutohideEnabled && formatBar) {
+          formatBar.classList.remove('focus-autohidden');
+        }
+      });
+    }
+
+    if (noteBody) {
+      const hideToolbar = () => {
+        if (isFocusAutohideEnabled && formatBar) {
+          if (noteBody.selectionStart !== undefined && noteBody.selectionStart !== noteBody.selectionEnd) return;
+          formatBar.classList.add('focus-autohidden');
+        }
+      };
+
+      const checkSelection = () => {
+        if (!formatBar) return;
+        const hasSelection = (noteBody.selectionStart !== undefined && noteBody.selectionStart !== noteBody.selectionEnd) ||
+                             (typeof window !== 'undefined' && typeof window.getSelection === 'function' && window.getSelection().toString().length > 0);
+        if (hasSelection) {
+          formatBar.classList.remove('focus-autohidden');
+        }
+      };
+
+      noteBody.addEventListener('input', hideToolbar);
+      noteBody.addEventListener('keydown', (e) => {
+        if (e.key && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          hideToolbar();
+        }
+      });
+
+      noteBody.addEventListener('select', checkSelection);
+      noteBody.addEventListener('mouseup', checkSelection);
+      noteBody.addEventListener('keyup', checkSelection);
+    }
+
+    if (editorArea) {
+      editorArea.addEventListener('mousemove', (e) => {
+        if (!formatBar) return;
+        const rect = editorArea.getBoundingClientRect ? editorArea.getBoundingClientRect() : { top: 0 };
+        const relativeY = e.clientY - rect.top;
+        if (relativeY < 120 || e.clientY < 140) {
+          formatBar.classList.remove('focus-autohidden');
+        }
+      });
+    }
+
+    if (formatBar) {
+      formatBar.addEventListener('mouseenter', () => {
+        formatBar.classList.remove('focus-autohidden');
+      });
+    }
+
+    const editorHeader = $('#editor-header');
+    if (editorHeader) {
+      editorHeader.addEventListener('mouseenter', () => {
+        if (formatBar) formatBar.classList.remove('focus-autohidden');
+      });
+    }
+  }
+
+  // ── 2. New Note Dropdown (Chapter, Character, World, Draft) ──
+  function initNewNoteDropdown() {
+    if (!btnNewNote) return;
+    btnNewNote.addEventListener('click', (e) => {
+      if (!newNoteDropdown) {
+        openNewNoteModal();
+        return;
+      }
+      e.stopPropagation();
+      newNoteDropdown.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (newNoteDropdown && !newNoteDropdown.classList.contains('hidden')) {
+        if (!e.target.closest('#btn-new-note') && !e.target.closest('#new-note-dropdown')) {
+          newNoteDropdown.classList.add('hidden');
+        }
+      }
+    });
+
+    $$('.new-dropdown-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (newNoteDropdown) newNoteDropdown.classList.add('hidden');
+        const type = item.dataset.createType || 'draft';
+        if (type === 'chapter') {
+          openNewNoteModal('chapter', '', '');
+        } else if (type === 'character') {
+          openNewNoteModal('character', 'New Character', '# Character: \n\n**Role:** \n**Faction:** \n\n## Background\n\n## Motivations\n');
+        } else if (type === 'world') {
+          openNewNoteModal('world', 'New Worldbuilding Note', '# World Lore: \n\n**Region / Concept:** \n\n## Overview\n');
+        } else {
+          openNewNoteModal('draft', '', '');
+        }
+      });
+    });
+  }
+
+  // ── 3. World Map Shapes & Territory Regions ──
+  function initMapShapeAndRegions() {
+    const savedShape = (Storage.getMapShape ? Storage.getMapShape() : 'landscape') || 'landscape';
+    if (mapShapeSelect) {
+      mapShapeSelect.value = savedShape;
+      mapShapeSelect.addEventListener('change', () => {
+        const shape = mapShapeSelect.value;
+        setMapCanvasShape(shape);
+        if (Storage.saveMapShape) Storage.saveMapShape(shape);
+      });
+    }
+    setMapCanvasShape(savedShape);
+
+    if (btnMapDrawRegion) {
+      btnMapDrawRegion.addEventListener('click', () => {
+        isMapRegionDrawingMode = !isMapRegionDrawingMode;
+        currentMapRegionPoints = [];
+        if (isMapRegionDrawingMode) {
+          btnMapDrawRegion.classList.add('active');
+          btnMapDrawRegion.classList.remove('btn-ghost');
+          btnMapDrawRegion.classList.add('btn-primary');
+          btnMapDrawRegion.textContent = 'Click Map to Draw';
+          toast('Click anywhere on the map to define territory region', 'info');
+        } else {
+          btnMapDrawRegion.classList.remove('active');
+          btnMapDrawRegion.classList.add('btn-ghost');
+          btnMapDrawRegion.classList.remove('btn-primary');
+          btnMapDrawRegion.textContent = 'Draw Region';
+        }
+      });
+    }
+
+    if (btnMapRegionCancel) {
+      btnMapRegionCancel.addEventListener('click', () => {
+        if (mapRegionModal) mapRegionModal.classList.add('hidden');
+        isMapRegionDrawingMode = false;
+        if (btnMapDrawRegion) {
+          btnMapDrawRegion.classList.remove('active', 'btn-primary');
+          btnMapDrawRegion.classList.add('btn-ghost');
+          btnMapDrawRegion.textContent = 'Draw Region';
+        }
+      });
+    }
+
+    if (btnMapRegionSave) {
+      btnMapRegionSave.addEventListener('click', saveMapRegionFromModal);
+    }
+
+    if (btnMapRegionDetailClose) {
+      btnMapRegionDetailClose.addEventListener('click', () => {
+        if (mapRegionDetailModal) mapRegionDetailModal.classList.add('hidden');
+      });
+    }
+
+    renderMapRegions();
+  }
+
+  function setMapCanvasShape(shape) {
+    if (!mapStage) return;
+    const validShape = ['landscape', 'square', 'vertical', 'oval'].includes(shape) ? shape : 'landscape';
+    mapStage.dataset.shape = validShape;
+    let w = 1600;
+    let h = 1000;
+    if (validShape === 'square') {
+      w = 1200; h = 1200;
+    } else if (validShape === 'vertical') {
+      w = 900; h = 1600;
+    } else if (validShape === 'oval') {
+      w = 1500; h = 1050;
+    }
+
+    if (mapCanvas) {
+      mapCanvas.width = w;
+      mapCanvas.height = h;
+    }
+    if (mapRegionsSvg && typeof mapRegionsSvg.setAttribute === 'function') {
+      mapRegionsSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    }
+
+    if (mapModal && !mapModal.classList.contains('hidden') && typeof document.createElement === 'function' && mapCanvas && typeof mapCanvas.getContext === 'function') {
+      if (!Storage.getCustomMapImage || !Storage.getCustomMapImage()) {
+        renderDefaultMap();
+      }
+      renderMapRegions();
+      renderMapPins();
+    }
+  }
+
+  function renderMapRegions() {
+    if (!mapRegionsSvg || typeof document === 'undefined' || typeof document.createElementNS !== 'function') return;
+    mapRegionsSvg.innerHTML = '';
+    const regions = Storage.getAllMapRegions ? Storage.getAllMapRegions() : [];
+    const w = mapCanvas ? (mapCanvas.width || 1600) : 1600;
+    const h = mapCanvas ? (mapCanvas.height || 1000) : 1000;
+
+    const setAttr = (el, k, v) => {
+      if (el && typeof el.setAttribute === 'function') el.setAttribute(k, v);
+    };
+
+    const createSvgEl = (tag) => {
+      if (typeof document !== 'undefined') {
+        if (typeof document.createElementNS === 'function') {
+          return document.createElementNS('http://www.w3.org/2000/svg', tag);
+        }
+        if (typeof document.createElement === 'function') {
+          return document.createElement(tag);
+        }
+      }
+      return null;
+    };
+
+    regions.forEach(reg => {
+      const color = reg.color || '#ef4444';
+      if (reg.shape === 'circle') {
+        const center = (reg.points && reg.points[0]) || { x: 50, y: 50 };
+        const cx = (center.x / 100) * w;
+        const cy = (center.y / 100) * h;
+        const r = reg.radius || 90;
+
+        const circle = createSvgEl('circle');
+        if (circle) {
+          setAttr(circle, 'class', 'map-region-circle');
+          setAttr(circle, 'cx', String(cx));
+          setAttr(circle, 'cy', String(cy));
+          setAttr(circle, 'r', String(r));
+          setAttr(circle, 'fill', color);
+          setAttr(circle, 'fill-opacity', '0.22');
+          setAttr(circle, 'stroke', color);
+          setAttr(circle, 'stroke-width', '2');
+          setAttr(circle, 'data-id', reg.id);
+          if (typeof circle.addEventListener === 'function') {
+            circle.addEventListener('click', (e) => {
+              if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+              openMapRegionDetailModal(reg);
+            });
+          }
+          mapRegionsSvg.appendChild(circle);
+        }
+
+        const text = createSvgEl('text');
+        if (text) {
+          setAttr(text, 'class', 'map-region-label');
+          setAttr(text, 'x', String(cx));
+          setAttr(text, 'y', String(cy));
+          text.textContent = reg.name || 'Territory';
+          mapRegionsSvg.appendChild(text);
+        }
+      } else {
+        const points = (reg.points && reg.points.length >= 3) ? reg.points : [
+          { x: 30, y: 30 }, { x: 45, y: 25 }, { x: 50, y: 40 }, { x: 35, y: 45 }
+        ];
+        const pointsStr = points.map(pt => `${(pt.x / 100) * w},${(pt.y / 100) * h}`).join(' ');
+
+        const poly = createSvgEl('polygon');
+        if (poly) {
+          setAttr(poly, 'class', 'map-region-poly');
+          setAttr(poly, 'points', pointsStr);
+          setAttr(poly, 'fill', color);
+          setAttr(poly, 'fill-opacity', '0.22');
+          setAttr(poly, 'stroke', color);
+          setAttr(poly, 'stroke-width', '2');
+          setAttr(poly, 'data-id', reg.id);
+          if (typeof poly.addEventListener === 'function') {
+            poly.addEventListener('click', (e) => {
+              if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+              openMapRegionDetailModal(reg);
+            });
+          }
+          mapRegionsSvg.appendChild(poly);
+        }
+
+        const avgX = (points.reduce((sum, p) => sum + p.x, 0) / points.length) * (w / 100);
+        const avgY = (points.reduce((sum, p) => sum + p.y, 0) / points.length) * (h / 100);
+
+        const text = createSvgEl('text');
+        if (text) {
+          setAttr(text, 'class', 'map-region-label');
+          setAttr(text, 'x', String(avgX));
+          setAttr(text, 'y', String(avgY));
+          text.textContent = reg.name || 'Territory';
+          mapRegionsSvg.appendChild(text);
+        }
+      }
+    });
+  }
+
+  function openEditMapRegionModal(region) {
+    activeEditingRegion = region;
+    if (mapRegionModal) mapRegionModal.classList.remove('hidden');
+    if (mapRegionInputName) mapRegionInputName.value = region.name || '';
+    if (mapRegionInputShape) mapRegionInputShape.value = region.shape || 'polygon';
+    if (mapRegionInputColor) mapRegionInputColor.value = region.color || '#ef4444';
+    if (mapRegionInputDesc) mapRegionInputDesc.value = region.description || '';
+  }
+
+  function saveMapRegionFromModal() {
+    const name = (mapRegionInputName && mapRegionInputName.value.trim()) || 'Unnamed Territory';
+    const shape = (mapRegionInputShape && mapRegionInputShape.value) || 'polygon';
+    const color = (mapRegionInputColor && mapRegionInputColor.value) || '#ef4444';
+    const desc = (mapRegionInputDesc && mapRegionInputDesc.value.trim()) || '';
+
+    const id = activeEditingRegion ? activeEditingRegion.id : undefined;
+    let points = (activeEditingRegion && activeEditingRegion.points) ? activeEditingRegion.points : currentMapRegionPoints;
+    if (!points || points.length === 0) {
+      points = shape === 'circle' ? [{ x: 50, y: 50 }] : [
+        { x: 40, y: 40 }, { x: 55, y: 35 }, { x: 60, y: 50 }, { x: 45, y: 55 }
+      ];
+    }
+
+    Storage.saveMapRegion({
+      id,
+      name,
+      shape,
+      color,
+      description: desc,
+      points,
+      radius: (activeEditingRegion && activeEditingRegion.radius) ? activeEditingRegion.radius : 90
+    });
+
+    if (mapRegionModal) mapRegionModal.classList.add('hidden');
+    isMapRegionDrawingMode = false;
+    activeEditingRegion = null;
+    currentMapRegionPoints = [];
+    if (btnMapDrawRegion) {
+      btnMapDrawRegion.classList.remove('active', 'btn-primary');
+      btnMapDrawRegion.classList.add('btn-ghost');
+      btnMapDrawRegion.textContent = 'Draw Region';
+    }
+    renderMapRegions();
+    toast(`Territory "${name}" saved`, 'success');
+  }
+
+  function openMapRegionDetailModal(region) {
+    if (!mapRegionDetailModal) return;
+    activeEditingRegion = region;
+    mapRegionDetailModal.classList.remove('hidden');
+    if (mapRegionDetailTitle) mapRegionDetailTitle.textContent = region.name || 'Territory';
+    if (mapRegionDetailMeta) {
+      mapRegionDetailMeta.textContent = `Geometry: ${region.shape || 'Polygon'} · Color: ${region.color || 'var(--accent)'}`;
+    }
+    if (mapRegionDetailDesc) {
+      mapRegionDetailDesc.textContent = region.description || 'No lore description provided for this territory.';
+    }
+
+    if (btnMapRegionDetailDelete) {
+      btnMapRegionDetailDelete.onclick = () => {
+        Storage.deleteMapRegion(region.id);
+        mapRegionDetailModal.classList.add('hidden');
+        renderMapRegions();
+        toast(`Deleted territory "${region.name}"`, 'info');
+      };
+    }
+
+    if (btnMapRegionDetailEdit) {
+      btnMapRegionDetailEdit.onclick = () => {
+        mapRegionDetailModal.classList.add('hidden');
+        openEditMapRegionModal(region);
+      };
+    }
+  }
+
+  function openEditPinModal(pin) {
+    activeEditingPin = pin;
+    if (!mapPinModal) return;
+    mapPinModal.classList.remove('hidden');
+    if (mapModalPinTitle) mapModalPinTitle.value = pin.title || '';
+    if (mapModalPinCategory) mapModalPinCategory.value = pin.category || 'world';
+    if (mapModalPinDesc) mapModalPinDesc.value = pin.description || '';
+    if (mapModalPinType) mapModalPinType.value = pin.pinType || 'citadel';
+    if (mapModalPinColor) mapModalPinColor.value = pin.pinColor || '#ef4444';
+    if (mapModalNoteSelect) {
+      const notes = Storage.getAllNotes();
+      mapModalNoteSelect.innerHTML = `<option value="">-- No linked note (standalone pin) --</option>` +
+        notes.map(n => `<option value="${n.id}" ${n.id === pin.noteId ? 'selected' : ''}>${escText(n.title)} (${n.category})</option>`).join('');
+    }
+  }
+
+  // ── 4. Galaxy Graph: Manual Nodes & Custom Connections ──
+  function initManualGraphControls() {
+    if (btnGraphAddNode) {
+      btnGraphAddNode.addEventListener('click', () => {
+        activeEditingGraphNode = null;
+        if (graphEntityModal) graphEntityModal.classList.remove('hidden');
+        if (graphInputEntityTitle) graphInputEntityTitle.value = '';
+        if (graphInputEntityType) graphInputEntityType.value = 'theme';
+        if (graphInputEntityColor) graphInputEntityColor.value = '#f59e0b';
+        if (graphInputEntityDesc) graphInputEntityDesc.value = '';
+        if (graphInputEntityTitle && typeof graphInputEntityTitle.focus === 'function') setTimeout(() => graphInputEntityTitle.focus(), 100);
+      });
+    }
+
+    if (btnGraphEntityCancel) {
+      btnGraphEntityCancel.addEventListener('click', () => {
+        if (graphEntityModal) graphEntityModal.classList.add('hidden');
+      });
+    }
+
+    if (btnGraphEntitySave) {
+      btnGraphEntitySave.addEventListener('click', saveGraphEntityFromModal);
+    }
+
+    if (btnGraphConnect) {
+      btnGraphConnect.addEventListener('click', () => {
+        openGraphLinkModalWithSource('');
+      });
+    }
+
+    if (btnGraphLinkCancel) {
+      btnGraphLinkCancel.addEventListener('click', () => {
+        if (graphLinkModal) graphLinkModal.classList.add('hidden');
+      });
+    }
+
+    if (btnGraphLinkSave) {
+      btnGraphLinkSave.addEventListener('click', saveGraphLinkFromModal);
+    }
+
+    if (btnGraphDetailClose) {
+      btnGraphDetailClose.addEventListener('click', () => {
+        if (graphNodeDetailModal) graphNodeDetailModal.classList.add('hidden');
+      });
+    }
+  }
+
+  function openGraphLinkModalWithSource(sourceId) {
+    if (!graphLinkModal) return;
+    graphLinkModal.classList.remove('hidden');
+
+    const allOptions = (graphNodes || []).filter(n => !n.isHub).map(n =>
+      `<option value="${n.id}" ${n.id === sourceId ? 'selected' : ''}>${escText(n.title)} (${n.isManualEntity ? n.type : n.category})</option>`
+    ).join('');
+
+    if (graphLinkSource) graphLinkSource.innerHTML = allOptions;
+    if (graphLinkTarget) {
+      graphLinkTarget.innerHTML = allOptions;
+      if (sourceId && graphLinkTarget.options.length > 1) {
+        for (let i = 0; i < graphLinkTarget.options.length; i++) {
+          if (graphLinkTarget.options[i].value !== sourceId) {
+            graphLinkTarget.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+    if (graphLinkLabel) graphLinkLabel.value = '';
+    if (graphLinkColor) graphLinkColor.value = '#818cf8';
+  }
+
+  function openEditGraphNodeModal(node) {
+    activeEditingGraphNode = node;
+    if (graphEntityModal) graphEntityModal.classList.remove('hidden');
+    if (graphInputEntityTitle) graphInputEntityTitle.value = node.title || '';
+    if (graphInputEntityType) graphInputEntityType.value = node.type || 'theme';
+    if (graphInputEntityColor) graphInputEntityColor.value = node.color || '#f59e0b';
+    if (graphInputEntityDesc) graphInputEntityDesc.value = node.description || '';
+  }
+
+  function saveGraphEntityFromModal() {
+    const title = (graphInputEntityTitle && graphInputEntityTitle.value.trim()) || 'Entity';
+    const type = (graphInputEntityType && graphInputEntityType.value) || 'theme';
+    const color = (graphInputEntityColor && graphInputEntityColor.value) || '#f59e0b';
+    const desc = (graphInputEntityDesc && graphInputEntityDesc.value.trim()) || '';
+    const id = activeEditingGraphNode ? activeEditingGraphNode.id : undefined;
+
+    Storage.saveGraphNode({
+      id,
+      title,
+      type,
+      category: type,
+      color,
+      description: desc
+    });
+
+    if (graphEntityModal) graphEntityModal.classList.add('hidden');
+    activeEditingGraphNode = null;
+    buildGalaxyData();
+    toast(`Entity "${title}" saved to graph`, 'success');
+  }
+
+  function saveGraphLinkFromModal() {
+    const source = (graphLinkSource && graphLinkSource.value) || '';
+    const target = (graphLinkTarget && graphLinkTarget.value) || '';
+    const label = (graphLinkLabel && graphLinkLabel.value.trim()) || 'relates to';
+    const color = (graphLinkColor && graphLinkColor.value) || '#818cf8';
+
+    if (!source || !target || source === target) {
+      toast('Please choose two distinct nodes to connect', 'warning');
+      return;
+    }
+
+    Storage.saveGraphLink({
+      source,
+      target,
+      label,
+      color
+    });
+
+    if (graphLinkModal) graphLinkModal.classList.add('hidden');
+    buildGalaxyData();
+    toast(`Custom connection "${label}" established`, 'success');
+  }
+
+  function openGraphNodeDetailModal(node) {
+    if (!graphNodeDetailModal) return;
+    activeEditingGraphNode = node;
+    graphNodeDetailModal.classList.remove('hidden');
+    if (graphDetailTitle) graphDetailTitle.textContent = node.title || 'Entity';
+    if (graphDetailBadge) {
+      graphDetailBadge.className = `badge badge-${node.type || 'concept'}`;
+      graphDetailBadge.textContent = (node.type || 'concept').toUpperCase();
+    }
+    if (graphDetailMeta) {
+      graphDetailMeta.textContent = `Type: ${node.type || 'Concept'} · Coordinates: (${Math.round(node.x)}, ${Math.round(node.y)})`;
+    }
+    if (graphDetailDesc) {
+      graphDetailDesc.textContent = node.description || 'No description recorded.';
+    }
+
+    if (graphDetailLinksList) {
+      const links = Storage.getGraphLinks ? Storage.getGraphLinks() : [];
+      const myLinks = links.filter(l => l.source === node.id || l.target === node.id || l.source === node.title || l.target === node.title);
+      graphDetailLinksList.innerHTML = myLinks.length > 0 ? myLinks.map(l => {
+        const otherId = (l.source === node.id || l.source === node.title) ? l.target : l.source;
+        return `<div class="text-xs" style="margin-bottom: 4px;"><strong>${escText(l.label || 'connected')}:</strong> ${escText(otherId)}</div>`;
+      }).join('') : '<div class="text-xs text-muted">No custom connections.</div>';
+    }
+
+    if (btnGraphDetailDelete) {
+      btnGraphDetailDelete.onclick = () => {
+        Storage.deleteGraphNode(node.id);
+        graphNodeDetailModal.classList.add('hidden');
+        buildGalaxyData();
+        toast(`Deleted entity "${node.title}"`, 'info');
+      };
+    }
+
+    if (btnGraphDetailEdit) {
+      btnGraphDetailEdit.onclick = () => {
+        graphNodeDetailModal.classList.add('hidden');
+        openEditGraphNodeModal(node);
+      };
+    }
+
+    if (btnGraphDetailConnect) {
+      btnGraphDetailConnect.onclick = () => {
+        graphNodeDetailModal.classList.add('hidden');
+        openGraphLinkModalWithSource(node.id);
+      };
+    }
+
+    if (btnGraphDetailOpenNote) {
+      const matchNote = Storage.findNoteByTitle ? Storage.findNoteByTitle(node.title) : null;
+      btnGraphDetailOpenNote.style.display = matchNote ? 'inline-block' : 'none';
+      btnGraphDetailOpenNote.onclick = () => {
+        graphNodeDetailModal.classList.add('hidden');
+        closeGraphView();
+        if (matchNote) openNote(matchNote.id);
+      };
+    }
+  }
+
+  // ── 5. Character Codex: Portrait Image Upload & Standalone Dossier ──
+  function initCodexImageUpload() {
+    if (codexImageDropzone) {
+      codexImageDropzone.addEventListener('click', (e) => {
+        if (e.target && e.target.closest('#btn-codex-remove-image')) return;
+        if (codexInputImage) codexInputImage.click();
+      });
+
+      codexImageDropzone.addEventListener('dragover', (e) => {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        codexImageDropzone.classList.add('drag-over');
+      });
+
+      codexImageDropzone.addEventListener('dragleave', () => {
+        codexImageDropzone.classList.remove('drag-over');
+      });
+
+      codexImageDropzone.addEventListener('drop', (e) => {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        codexImageDropzone.classList.remove('drag-over');
+        const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) processCodexImageFile(file);
+      });
+    }
+
+    if (codexInputImage) {
+      codexInputImage.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) processCodexImageFile(file);
+      });
+    }
+
+    if (btnCodexRemoveImage) {
+      btnCodexRemoveImage.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentCharImageData = null;
+        if (codexImagePreview) {
+          codexImagePreview.src = '';
+          codexImagePreview.classList.add('hidden');
+        }
+        if (codexImagePlaceholder) {
+          codexImagePlaceholder.classList.remove('hidden');
+        }
+        if (codexInputImage) codexInputImage.value = '';
+      });
+    }
+
+    if (codexDetailClose) {
+      codexDetailClose.addEventListener('click', () => {
+        if (codexDetailModal) codexDetailModal.classList.add('hidden');
+      });
+    }
+  }
+
+  function processCodexImageFile(file) {
+    if (!file || !file.type.startsWith('image/')) {
+      toast('Please select a valid image file', 'warning');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const rawData = reader.result;
+      if (typeof Image !== 'undefined' && typeof document !== 'undefined' && typeof document.createElement === 'function') {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 400;
+          let w = img.width || 300;
+          let h = img.height || 300;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext ? canvas.getContext('2d') : null;
+          let compressed = rawData;
+          if (ctx && typeof canvas.toDataURL === 'function') {
+            ctx.drawImage(img, 0, 0, w, h);
+            try {
+              compressed = canvas.toDataURL('image/jpeg', 0.82) || rawData;
+            } catch {
+              compressed = rawData;
+            }
+          }
+          currentCharImageData = compressed;
+          if (codexImagePreview) {
+            codexImagePreview.src = compressed;
+            codexImagePreview.classList.remove('hidden');
+          }
+          if (codexImagePlaceholder) codexImagePlaceholder.classList.add('hidden');
+        };
+        img.src = rawData;
+      } else {
+        currentCharImageData = rawData;
+        if (codexImagePreview) {
+          codexImagePreview.src = rawData;
+          codexImagePreview.classList.remove('hidden');
+        }
+        if (codexImagePlaceholder) codexImagePlaceholder.classList.add('hidden');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function openCodexDetailModal(char) {
+    if (!codexDetailModal) return;
+    codexDetailModal.classList.remove('hidden');
+    if (codexDetailName) codexDetailName.textContent = char.name || 'Untitled Character';
+    if (codexDetailArchetype) {
+      codexDetailArchetype.textContent = char.archetype || 'Ally';
+      codexDetailArchetype.dataset.type = char.archetype || 'Ally';
+    }
+    if (codexDetailFaction) codexDetailFaction.textContent = char.faction || 'Independent';
+    if (codexDetailRole) codexDetailRole.textContent = char.role || 'Character Dossier';
+    if (codexDetailBio) codexDetailBio.textContent = char.bio || 'No detailed background recorded.';
+
+    if (char.image) {
+      if (codexDetailAvatarImg) {
+        codexDetailAvatarImg.src = char.image;
+        codexDetailAvatarImg.classList.remove('hidden');
+        codexDetailAvatarImg.style.display = 'block';
+      }
+      if (codexDetailAvatarFallback) {
+        codexDetailAvatarFallback.classList.add('hidden');
+        codexDetailAvatarFallback.style.display = 'none';
+      }
+    } else {
+      if (codexDetailAvatarImg) {
+        codexDetailAvatarImg.classList.add('hidden');
+        codexDetailAvatarImg.style.display = 'none';
+      }
+      if (codexDetailAvatarFallback) {
+        codexDetailAvatarFallback.textContent = (char.name || 'C').charAt(0).toUpperCase();
+        codexDetailAvatarFallback.classList.remove('hidden');
+        codexDetailAvatarFallback.style.display = 'flex';
+      }
+    }
+
+    if (codexDetailRelsList) {
+      const rels = Storage.getAllRelationships ? Storage.getAllRelationships() : [];
+      const allChars = Storage.getAllCharacters ? Storage.getAllCharacters() : [];
+      const charMap = new Map();
+      allChars.forEach(c => charMap.set(c.id, c));
+      const myRels = rels.filter(r => r.sourceId === char.id || r.targetId === char.id);
+      codexDetailRelsList.innerHTML = myRels.length > 0 ? myRels.map(r => {
+        const otherId = r.sourceId === char.id ? r.targetId : r.sourceId;
+        const other = charMap.get(otherId);
+        return `<span class="codex-rel-chip"><span class="rel-type">${escText(r.type)}</span> ${escText(other ? other.name : 'Unknown')}</span>`;
+      }).join(' ') : '<span class="text-xs text-muted">No explicit relationships recorded.</span>';
+    }
+
+    if (btnCodexDetailDelete) {
+      btnCodexDetailDelete.onclick = () => {
+        Storage.deleteCharacter(char.id);
+        codexDetailModal.classList.add('hidden');
+        renderCodex();
+        toast(`Deleted character "${char.name}"`, 'info');
+      };
+    }
+
+    if (btnCodexDetailEdit) {
+      btnCodexDetailEdit.onclick = () => {
+        codexDetailModal.classList.add('hidden');
+        openEditCharacterModal(char);
+      };
+    }
+
+    if (btnCodexDetailOpenNote) {
+      btnCodexDetailOpenNote.onclick = () => {
+        codexDetailModal.classList.add('hidden');
+        closeCodexView();
+        navigateToCharacterNote(char);
+      };
+    }
+  }
+
+  function openEditCharacterModal(char) {
+    activeEditingChar = char;
+    if (codexCharModal) codexCharModal.classList.remove('hidden');
+    if (codexInputName) codexInputName.value = char.name || '';
+    if (codexInputArchetype) codexInputArchetype.value = char.archetype || 'Protagonist';
+    if (codexInputFaction) codexInputFaction.value = char.faction || '';
+    if (codexInputRole) codexInputRole.value = char.role || '';
+    if (codexInputBio) codexInputBio.value = char.bio || '';
+    if (codexInputNote) codexInputNote.value = char.noteId || '';
+    currentCharImageData = char.image || null;
+    if (currentCharImageData) {
+      if (codexImagePreview) {
+        codexImagePreview.src = currentCharImageData;
+        codexImagePreview.classList.remove('hidden');
+      }
+      if (codexImagePlaceholder) codexImagePlaceholder.classList.add('hidden');
+    } else {
+      if (codexImagePreview) {
+        codexImagePreview.src = '';
+        codexImagePreview.classList.add('hidden');
+      }
+      if (codexImagePlaceholder) codexImagePlaceholder.classList.remove('hidden');
+    }
+  }
+
+  // ── 6. Embedded Detail Modals for Timeline ──
+  function initModuleDetailModals() {
+    if (timelineDetailClose) {
+      timelineDetailClose.addEventListener('click', () => {
+        if (timelineEventDetailModal) timelineEventDetailModal.classList.add('hidden');
+      });
+    }
+
+    if (btnTimelineDetailEdit) {
+      btnTimelineDetailEdit.addEventListener('click', () => {
+        if (activeEditingEvent) {
+          if (timelineEventDetailModal) timelineEventDetailModal.classList.add('hidden');
+          openEditTimelineEventModal(activeEditingEvent);
+        }
+      });
+    }
+  }
+
+  function openTimelineEventDetailModal(evt) {
+    if (!timelineEventDetailModal) return;
+    activeEditingEvent = evt;
+    timelineEventDetailModal.classList.remove('hidden');
+    if (timelineDetailBadge) {
+      timelineDetailBadge.className = `badge badge-${evt.category || 'lore'}`;
+      timelineDetailBadge.textContent = (evt.category || 'lore').toUpperCase();
+    }
+    if (timelineDetailYear) timelineDetailYear.textContent = evt.year || 'Historical';
+    if (timelineDetailTitle) timelineDetailTitle.textContent = evt.title || 'Untitled Event';
+    if (timelineDetailEra) timelineDetailEra.textContent = evt.era ? `✦ Epoch: ${evt.era}` : 'Historical Record';
+    if (timelineDetailDesc) timelineDetailDesc.textContent = evt.description || 'No detailed lore recorded.';
+
+    if (btnTimelineDetailDelete) {
+      btnTimelineDetailDelete.onclick = () => {
+        Storage.deleteTimelineEvent(evt.id);
+        timelineEventDetailModal.classList.add('hidden');
+        renderTimeline();
+        toast(`Deleted event "${evt.title}"`, 'info');
+      };
+    }
+
+    if (btnTimelineDetailEdit) {
+      btnTimelineDetailEdit.onclick = () => {
+        timelineEventDetailModal.classList.add('hidden');
+        openEditTimelineEventModal(evt);
+      };
+    }
+
+    if (btnTimelineDetailOpenNote) {
+      btnTimelineDetailOpenNote.onclick = () => {
+        timelineEventDetailModal.classList.add('hidden');
+        closeTimelineView();
+        navigateToEventNote(evt);
+      };
+    }
+  }
+
+  function openEditTimelineEventModal(evt) {
+    activeEditingEvent = evt;
+    if (timelineEventModal) timelineEventModal.classList.remove('hidden');
+    if (timelineInputYear) timelineInputYear.value = evt.year || '';
+    if (timelineInputEra) timelineInputEra.value = evt.era || '';
+    if (timelineInputTitle) timelineInputTitle.value = evt.title || '';
+    if (timelineInputCategory) timelineInputCategory.value = evt.category || 'lore';
+    if (timelineInputDesc) timelineInputDesc.value = evt.description || '';
+    if (timelineInputNote) timelineInputNote.value = evt.noteId || '';
   }
 
 })();

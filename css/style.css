@@ -97,6 +97,51 @@
   --safe-right:  env(safe-area-inset-right, 0px);
 }
 
+/* ── Visual Base Themes (Light, Sepia, Dark) ── */
+[data-theme="light"],
+body[data-theme="light"] {
+  --bg-deep:        #f4f0e8;
+  --bg-primary:     #faf8f4;
+  --bg-secondary:   #eee8dc;
+  --bg-tertiary:    #e2dbcc;
+  --bg-hover:       #d8d0bf;
+  --bg-active:      #ccc3af;
+
+  --text-primary:   #1e1b18;
+  --text-secondary: #48433b;
+  --text-muted:     #787165;
+  --text-faint:     #9a9184;
+
+  --border:         #d4ccbd;
+  --border-subtle:  rgba(80, 70, 60, 0.12);
+
+  --shadow-sm:      0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:      0 4px 16px rgba(0,0,0,.12);
+  --shadow-lg:      0 12px 40px rgba(0,0,0,.16);
+}
+
+[data-theme="sepia"],
+body[data-theme="sepia"] {
+  --bg-deep:        #eae0cb;
+  --bg-primary:     #f4ebda;
+  --bg-secondary:   #e6dbbf;
+  --bg-tertiary:    #d9cbb2;
+  --bg-hover:       #cebfa4;
+  --bg-active:      #c3b295;
+
+  --text-primary:   #2d2319;
+  --text-secondary: #5a4b3c;
+  --text-muted:     #887765;
+  --text-faint:     #a49480;
+
+  --border:         #cebfa7;
+  --border-subtle:  rgba(60, 40, 20, 0.14);
+
+  --shadow-sm:      0 1px 3px rgba(45,35,25,.09);
+  --shadow-md:      0 4px 16px rgba(45,35,25,.14);
+  --shadow-lg:      0 12px 40px rgba(45,35,25,.2);
+}
+
 /* ── Dynamic Accent Theme Palettes ── */
 [data-accent="crimson"] {
   --accent: #ef4444;
@@ -5946,3 +5991,387 @@ img.map-custom-img[src=""] {
 
 
 
+
+/* ═══════════════════════════════════════════════
+   Lord Spey — User Feedback Enhancements
+   Themes, Focus Mode, Canvas Shapes, Regions,
+   Multi-Sections, Manual Graph, Character Portraits
+   ═══════════════════════════════════════════════ */
+
+/* ── Base Theme Grid in Settings ── */
+.base-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.base-theme-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.base-theme-card:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+}
+
+.base-theme-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px var(--red-glow);
+  background: var(--bg-tertiary);
+}
+
+.base-theme-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+.preview-dark {
+  background: #08080a;
+  color: #ef4444;
+}
+
+.preview-light {
+  background: #faf8f5;
+  color: #c2410c;
+  border-color: #d4ccbd;
+}
+
+.preview-sepia {
+  background: #f4ebda;
+  color: #b45309;
+  border-color: #cebfa7;
+}
+
+.base-theme-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.base-theme-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.base-theme-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* ── Focus Mode: Auto-Hiding Formatting Toolbar ── */
+.format-bar {
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              max-height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              padding 0.22s ease,
+              border-color 0.22s ease !important;
+  overflow: hidden;
+  max-height: 120px;
+}
+
+.format-bar.focus-autohidden {
+  opacity: 0 !important;
+  transform: translateY(-8px) scale(0.99) !important;
+  pointer-events: none !important;
+  max-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  border-bottom-color: transparent !important;
+}
+
+/* ── New Note Action Dropdown in Sidebar ── */
+.sidebar-footer {
+  position: relative;
+}
+
+.new-note-dropdown {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 14px;
+  width: calc(100% - 28px);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: fadeInDown 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.new-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background var(--transition);
+}
+
+.new-dropdown-item:hover {
+  background: var(--bg-hover);
+}
+
+.new-dropdown-item .dropdown-item-icon {
+  font-size: 1rem;
+  width: 22px;
+  text-align: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.new-dropdown-item .dropdown-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.new-dropdown-item .dropdown-item-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.new-dropdown-item .dropdown-item-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ── Multi-Section Sub-headers in Sidebar ── */
+.nav-subsection {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.nav-subsection-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px 4px 28px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.nav-subsection-header:hover {
+  color: var(--text-primary);
+}
+
+/* ── World Map: Canvas Shapes & Aspect Ratios ── */
+.map-shape-select {
+  font-size: 0.78rem;
+  height: 30px;
+  padding: 0 8px;
+}
+
+.map-zoom-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  min-width: 36px;
+}
+
+/* Shape layouts */
+.map-stage[data-shape="landscape"] {
+  width: 1600px;
+  height: 1000px;
+  border-radius: var(--radius-md);
+}
+
+.map-stage[data-shape="square"] {
+  width: 1200px;
+  height: 1200px;
+  border-radius: var(--radius-md);
+}
+
+.map-stage[data-shape="vertical"] {
+  width: 900px;
+  height: 1600px;
+  border-radius: var(--radius-md);
+}
+
+.map-stage[data-shape="oval"] {
+  width: 1500px;
+  height: 1050px;
+  border-radius: 50% !important;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.7), inset 0 0 50px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+/* ── World Map: Territory Regions SVG Layer ── */
+.map-regions-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.map-region-poly,
+.map-region-circle {
+  cursor: pointer;
+  transition: opacity 0.15s ease, stroke-width 0.15s ease;
+}
+
+.map-region-poly:hover,
+.map-region-circle:hover {
+  stroke-width: 3px !important;
+  filter: brightness(1.25);
+}
+
+.map-region-label {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  fill: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+/* Enhanced pin glyphs */
+.map-pin-head.pin-citadel { background: #ef4444; }
+.map-pin-head.pin-peak { background: #3b82f6; }
+.map-pin-head.pin-city { background: #f59e0b; }
+.map-pin-head.pin-shrine { background: #a855f7; }
+.map-pin-head.pin-water { background: #06b6d4; }
+.map-pin-head.pin-forest { background: #10b981; }
+.map-pin-head.pin-danger { background: #dc2626; }
+
+/* ── Character Codex: Image Upload Dropzone & Portrait ── */
+.char-image-dropzone {
+  position: relative;
+  width: 100%;
+  min-height: 110px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.char-image-dropzone:hover,
+.char-image-dropzone.drag-over {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+}
+
+.char-image-preview {
+  max-width: 130px;
+  max-height: 130px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.char-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.codex-card-avatar-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent);
+  flex-shrink: 0;
+}
+
+.codex-detail-avatar-wrap {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.codex-detail-avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  border: 2px solid var(--accent);
+}
+
+.inspector-portrait {
+  width: 100%;
+  max-height: 150px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+}
+
+/* ── Galaxy Graph: Non-note Entity Badges ── */
+.badge-theme {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.badge-arc {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.badge-faction {
+  background: rgba(225, 29, 72, 0.2);
+  color: #fb7185;
+  border: 1px solid rgba(225, 29, 72, 0.35);
+}
+
+.badge-concept {
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}

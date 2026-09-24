@@ -362,6 +362,100 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   const TIMELINE_KEY = 'lordspey_timeline_events';
   const CHARACTERS_KEY = 'lordspey_characters';
   const RELATIONSHIPS_KEY = 'lordspey_relationships';
+  const MAP_SHAPE_KEY = 'lordspey_map_shape';
+  const MAP_REGIONS_KEY = 'lordspey_map_regions';
+  const GRAPH_NODES_KEY = 'lordspey_graph_nodes';
+  const GRAPH_LINKS_KEY = 'lordspey_graph_links';
+  const SECTIONS_KEY = 'lordspey_sections';
+  const BASE_THEME_KEY = 'lordspey_base_theme';
+
+  const STARTER_REGIONS = [
+    {
+      id: 'reg-highlands',
+      name: 'The Ashen Highlands',
+      shape: 'polygon',
+      points: [
+        { x: 15, y: 25 },
+        { x: 38, y: 20 },
+        { x: 42, y: 55 },
+        { x: 28, y: 65 },
+        { x: 12, y: 50 }
+      ],
+      fillColor: 'rgba(239, 68, 68, 0.12)',
+      strokeColor: '#ef4444',
+      description: 'Rugged volcanic plateaus surrounding the Obsidian Gate.'
+    },
+    {
+      id: 'reg-twilight',
+      name: 'The Twilight Sea & Archipelago',
+      shape: 'polygon',
+      points: [
+        { x: 55, y: 30 },
+        { x: 85, y: 35 },
+        { x: 88, y: 75 },
+        { x: 60, y: 70 }
+      ],
+      fillColor: 'rgba(168, 85, 247, 0.12)',
+      strokeColor: '#a855f7',
+      description: 'Luminous misty expanse dotted with celestial ruins.'
+    }
+  ];
+
+  const STARTER_GRAPH_NODES = [
+    {
+      id: 'gnode-convergence',
+      title: 'The Celestial Convergence',
+      entityType: 'Theme',
+      category: 'world',
+      description: 'The recurring cosmic alignment that weakens planetary seals every 500 years.',
+      color: '#f59e0b',
+      createdAt: Date.now() - 86400000 * 3
+    },
+    {
+      id: 'gnode-tribunal',
+      title: 'The Iron Tribunal',
+      entityType: 'Faction',
+      category: 'lore',
+      description: 'Pragmatic military order dedicated to forcibly claiming cosmic relics.',
+      color: '#e11d48',
+      createdAt: Date.now() - 86400000 * 2
+    },
+    {
+      id: 'gnode-siege-arc',
+      title: 'Siege of the Spire Arc',
+      entityType: 'Plot Arc',
+      category: 'chapter',
+      description: 'Narrative spine tracing the fall of the outer sanctum to the Inquisitor vanguard.',
+      color: '#ef4444',
+      createdAt: Date.now() - 86400000 * 2
+    }
+  ];
+
+  const STARTER_GRAPH_LINKS = [
+    {
+      id: 'glink-1',
+      sourceId: 'gnode-tribunal',
+      targetId: 'gnode-siege-arc',
+      label: 'Instigates',
+      relationshipType: 'Causes',
+      color: '#e11d48',
+      createdAt: Date.now() - 86400000 * 1
+    },
+    {
+      id: 'glink-2',
+      sourceId: 'gnode-convergence',
+      targetId: 'gnode-siege-arc',
+      label: 'Catalyst for',
+      relationshipType: 'Influences',
+      color: '#f59e0b',
+      createdAt: Date.now() - 86400000 * 1
+    }
+  ];
+
+  const STARTER_SECTIONS = [
+    { id: 'sec-act-1', name: 'Act I: The Convergence Broken', order: 1 },
+    { id: 'sec-act-2', name: 'Act II: The Shattered Citadel', order: 2 }
+  ];
 
   const STARTER_PINS = [
     {
@@ -633,12 +727,13 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     return null;
   }
 
-  function createNote({ title, category, body = '', tags = '' }) {
+  function createNote({ title, category, body = '', tags = '', section = '' }) {
     const notes = getAllNotes();
     const note = {
       id: _uid(),
       title: title || 'Untitled',
       category: category || 'draft',
+      section: section || '',
       body,
       tags,
       createdAt: Date.now(),
@@ -684,9 +779,14 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     try {
       localStorage.removeItem(MAP_PINS_KEY);
       localStorage.removeItem(MAP_IMAGE_KEY);
+      localStorage.removeItem(MAP_SHAPE_KEY);
+      localStorage.removeItem(MAP_REGIONS_KEY);
       localStorage.removeItem(TIMELINE_KEY);
       localStorage.removeItem(CHARACTERS_KEY);
       localStorage.removeItem(RELATIONSHIPS_KEY);
+      localStorage.removeItem(GRAPH_NODES_KEY);
+      localStorage.removeItem(GRAPH_LINKS_KEY);
+      localStorage.removeItem(SECTIONS_KEY);
     } catch {
       // Ignore
     }
@@ -699,6 +799,11 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       localStorage.setItem(TIMELINE_KEY, JSON.stringify(STARTER_TIMELINE));
       localStorage.setItem(CHARACTERS_KEY, JSON.stringify(STARTER_CHARACTERS));
       localStorage.setItem(RELATIONSHIPS_KEY, JSON.stringify(STARTER_RELATIONSHIPS));
+      localStorage.setItem(MAP_REGIONS_KEY, JSON.stringify(STARTER_REGIONS));
+      localStorage.setItem(GRAPH_NODES_KEY, JSON.stringify(STARTER_GRAPH_NODES));
+      localStorage.setItem(GRAPH_LINKS_KEY, JSON.stringify(STARTER_GRAPH_LINKS));
+      localStorage.setItem(SECTIONS_KEY, JSON.stringify(STARTER_SECTIONS));
+      localStorage.setItem(MAP_SHAPE_KEY, 'landscape');
     } catch {
       // Ignore
     }
@@ -855,6 +960,62 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     } catch {
       return false;
     }
+  }
+
+  // ── Deep Worldbuilding: Map Canvas Shapes & Territory Regions ──
+
+  function getMapShape() {
+    try {
+      return localStorage.getItem(MAP_SHAPE_KEY) || 'landscape';
+    } catch {
+      return 'landscape';
+    }
+  }
+
+  function saveMapShape(shape) {
+    try {
+      localStorage.setItem(MAP_SHAPE_KEY, shape || 'landscape');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function getAllMapRegions() {
+    try {
+      const raw = localStorage.getItem(MAP_REGIONS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function _saveMapRegions(regions) {
+    localStorage.setItem(MAP_REGIONS_KEY, JSON.stringify(regions));
+  }
+
+  function saveMapRegion(region) {
+    const regions = getAllMapRegions();
+    if (!region.id) {
+      region.id = 'reg-' + _uid();
+      region.createdAt = Date.now();
+      regions.push(region);
+    } else {
+      const idx = regions.findIndex(r => r.id === region.id);
+      if (idx !== -1) {
+        regions[idx] = Object.assign({}, regions[idx], region, { updatedAt: Date.now() });
+      } else {
+        region.createdAt = region.createdAt || Date.now();
+        regions.push(region);
+      }
+    }
+    _saveMapRegions(regions);
+    return region;
+  }
+
+  function deleteMapRegion(id) {
+    const regions = getAllMapRegions().filter(r => r.id !== id);
+    _saveMapRegions(regions);
   }
 
   // ── Deep Worldbuilding: Chronology & Event Timeline ──
@@ -1170,6 +1331,167 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     _saveRelationships(rels);
   }
 
+  // ── Galaxy Graph: Manual Entity Nodes & Custom Connections ──
+
+  function getGraphNodes() {
+    try {
+      const raw = localStorage.getItem(GRAPH_NODES_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function _saveGraphNodes(nodes) {
+    localStorage.setItem(GRAPH_NODES_KEY, JSON.stringify(nodes));
+  }
+
+  function saveGraphNode(node) {
+    const nodes = getGraphNodes();
+    if (!node.id) {
+      node.id = 'gnode-' + _uid();
+      node.createdAt = Date.now();
+      nodes.push(node);
+    } else {
+      const idx = nodes.findIndex(n => n.id === node.id);
+      if (idx !== -1) {
+        nodes[idx] = Object.assign({}, nodes[idx], node, { updatedAt: Date.now() });
+      } else {
+        node.createdAt = node.createdAt || Date.now();
+        nodes.push(node);
+      }
+    }
+    _saveGraphNodes(nodes);
+    return node;
+  }
+
+  function deleteGraphNode(id) {
+    const nodes = getGraphNodes().filter(n => n.id !== id);
+    _saveGraphNodes(nodes);
+    // Remove links connected to this node
+    const links = getGraphLinks().filter(l => l.sourceId !== id && l.targetId !== id);
+    _saveGraphLinks(links);
+  }
+
+  function getGraphLinks() {
+    try {
+      const raw = localStorage.getItem(GRAPH_LINKS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function _saveGraphLinks(links) {
+    localStorage.setItem(GRAPH_LINKS_KEY, JSON.stringify(links));
+  }
+
+  function saveGraphLink(link) {
+    const links = getGraphLinks();
+    if (!link.id) {
+      link.id = 'glink-' + _uid();
+      link.createdAt = Date.now();
+      links.push(link);
+    } else {
+      const idx = links.findIndex(l => l.id === link.id);
+      if (idx !== -1) {
+        links[idx] = Object.assign({}, links[idx], link, { updatedAt: Date.now() });
+      } else {
+        link.createdAt = link.createdAt || Date.now();
+        links.push(link);
+      }
+    }
+    _saveGraphLinks(links);
+    return link;
+  }
+
+  function deleteGraphLink(id) {
+    const links = getGraphLinks().filter(l => l.id !== id);
+    _saveGraphLinks(links);
+  }
+
+  // ── Multi-Section & Flexible Folder Structure ──
+
+  function getAllSections() {
+    try {
+      const raw = localStorage.getItem(SECTIONS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function _saveSections(sections) {
+    localStorage.setItem(SECTIONS_KEY, JSON.stringify(sections));
+  }
+
+  function saveSection(sec) {
+    const sections = getAllSections();
+    if (!sec.id) {
+      sec.id = 'sec-' + _uid();
+      sec.createdAt = Date.now();
+      sections.push(sec);
+    } else {
+      const idx = sections.findIndex(s => s.id === sec.id);
+      if (idx !== -1) {
+        sections[idx] = Object.assign({}, sections[idx], sec, { updatedAt: Date.now() });
+      } else {
+        sec.createdAt = sec.createdAt || Date.now();
+        sections.push(sec);
+      }
+    }
+    _saveSections(sections);
+    return sec;
+  }
+
+  function deleteSection(id) {
+    const sections = getAllSections().filter(s => s.id !== id);
+    _saveSections(sections);
+  }
+
+  // ── Customizable App Themes & Visual Customization ──
+
+  function getBaseTheme() {
+    const s = getSettings();
+    if (s && s.baseTheme) return s.baseTheme;
+    try {
+      return localStorage.getItem(BASE_THEME_KEY) || 'dark';
+    } catch {
+      return 'dark';
+    }
+  }
+
+  function setBaseTheme(theme) {
+    const valid = (theme === 'light' || theme === 'sepia' || theme === 'dark') ? theme : 'dark';
+    saveSetting('baseTheme', valid);
+    try {
+      localStorage.setItem(BASE_THEME_KEY, valid);
+    } catch {
+      // Ignore
+    }
+    return valid;
+  }
+
+  function getCustomAccentColor() {
+    const s = getSettings();
+    if (s && s.customAccentColor) return s.customAccentColor;
+    try {
+      return localStorage.getItem('lordspey_custom_accent') || '#ef4444';
+    } catch {
+      return '#ef4444';
+    }
+  }
+
+  function setCustomAccentColor(hex) {
+    saveSetting('customAccentColor', hex);
+    try {
+      localStorage.setItem('lordspey_custom_accent', hex);
+    } catch {
+      // Ignore
+    }
+    return hex;
+  }
+
   function _slugify(text) {
     return String(text || '').toLowerCase().replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-');
   }
@@ -1372,6 +1694,10 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     const timelineEvents = getTimelineEvents().filter(e => e && typeof e === 'object');
     const characters = getCharacters().filter(c => c && typeof c === 'object');
     const relationships = getRelationships().filter(r => r && typeof r === 'object');
+    const mapRegions = getAllMapRegions().filter(r => r && typeof r === 'object');
+    const graphNodes = getGraphNodes().filter(g => g && typeof g === 'object');
+    const graphLinks = getGraphLinks().filter(l => l && typeof l === 'object');
+    const sections = getAllSections().filter(s => s && typeof s === 'object');
     const noteCounts = { chapter: 0, lore: 0, world: 0, draft: 0, total: notes.length };
     let wordCount = 0;
     for (const n of notes) {
@@ -1394,6 +1720,10 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       timelineEvents: timelineEvents.length,
       characters: characters.length,
       relationships: relationships.length,
+      mapRegions: mapRegions.length,
+      graphNodes: graphNodes.length,
+      graphLinks: graphLinks.length,
+      sections: sections.length,
       hasCustomMap: !!getCustomMapImage()
     };
   }
@@ -1410,6 +1740,11 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       timelineEvents: getTimelineEvents(),
       characters: getCharacters(),
       relationships: getRelationships(),
+      mapShape: getMapShape(),
+      mapRegions: getAllMapRegions(),
+      graphNodes: getGraphNodes(),
+      graphLinks: getGraphLinks(),
+      sections: getAllSections(),
       settings: getSettings()
     };
     try {
@@ -1464,16 +1799,25 @@ Confidential author reference sheet for character backstories, plot twists, psyc
         mapPins: stats.mapPins,
         timelineEvents: stats.timelineEvents,
         characters: stats.characters,
-        relationships: stats.relationships
+        relationships: stats.relationships,
+        mapRegions: stats.mapRegions,
+        graphNodes: stats.graphNodes,
+        graphLinks: stats.graphLinks,
+        sections: stats.sections
       },
       noteCounts: stats.noteCounts,
       wordCount: stats.wordCount,
       notes: getAllNotes(),
       mapPins: getAllMapPins(),
+      mapShape: getMapShape(),
+      mapRegions: getAllMapRegions(),
       customMapImage: getCustomMapImage(),
       timelineEvents: getTimelineEvents(),
       characters: getCharacters(),
       relationships: getRelationships(),
+      graphNodes: getGraphNodes(),
+      graphLinks: getGraphLinks(),
+      sections: getAllSections(),
       settings: getSettings()
     };
 
@@ -1541,6 +1885,10 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     const timelineEvents = Array.isArray(d.timelineEvents) ? d.timelineEvents.filter(e => e && typeof e === 'object') : [];
     const characters = Array.isArray(d.characters) ? d.characters.filter(c => c && typeof c === 'object') : [];
     const relationships = Array.isArray(d.relationships) ? d.relationships.filter(r => r && typeof r === 'object') : [];
+    const mapRegions = Array.isArray(d.mapRegions) ? d.mapRegions.filter(r => r && typeof r === 'object') : [];
+    const graphNodes = Array.isArray(d.graphNodes) ? d.graphNodes.filter(g => g && typeof g === 'object') : [];
+    const graphLinks = Array.isArray(d.graphLinks) ? d.graphLinks.filter(l => l && typeof l === 'object') : [];
+    const sections = Array.isArray(d.sections) ? d.sections.filter(s => s && typeof s === 'object') : [];
 
     let wordCount = 0;
     if (typeof d.wordCount === 'number') {
@@ -1587,6 +1935,11 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       timelineEventsCount: timelineEvents.length,
       charactersCount: characters.length,
       relationshipsCount: relationships.length,
+      mapRegionsCount: mapRegions.length,
+      graphNodesCount: graphNodes.length,
+      graphLinksCount: graphLinks.length,
+      sectionsCount: sections.length,
+      mapShape: typeof d.mapShape === 'string' ? d.mapShape : 'landscape',
       hasCustomMap: typeof d.customMapImage === 'string' && !!d.customMapImage,
       isSpey: !!val.isSpey,
       raw: d
@@ -1604,9 +1957,13 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       clearAllNotes();
       _saveMapPins([]);
       clearCustomMapImage();
+      _saveMapRegions([]);
       _saveTimelineEvents([]);
       _saveCharacters([]);
       _saveRelationships([]);
+      _saveGraphNodes([]);
+      _saveGraphLinks([]);
+      _saveSections([]);
 
       const rawNotes = Array.isArray(d.notes) ? d.notes : [];
       const sanitizedNotes = rawNotes
@@ -1615,6 +1972,7 @@ Confidential author reference sheet for character backstories, plot twists, psyc
           id: n.id || _uid(),
           title: typeof n.title === 'string' ? n.title : 'Untitled',
           category: typeof n.category === 'string' ? n.category : 'draft',
+          section: typeof n.section === 'string' ? n.section : '',
           tags: typeof n.tags === 'string' ? n.tags : '',
           body: typeof n.body === 'string' ? n.body : '',
           createdAt: n.createdAt || Date.now(),
@@ -1630,7 +1988,61 @@ Confidential author reference sheet for character backstories, plot twists, psyc
           x: typeof p.x === 'number' ? p.x : 50,
           y: typeof p.y === 'number' ? p.y : 50,
           description: typeof p.description === 'string' ? p.description : '',
+          pinType: typeof p.pinType === 'string' ? p.pinType : 'citadel',
+          icon: typeof p.icon === 'string' ? p.icon : '✦',
+          color: typeof p.color === 'string' ? p.color : '',
+          attributes: p.attributes || {},
           noteId: p.noteId || null
+        })));
+      }
+      if (typeof d.mapShape === 'string' && d.mapShape) {
+        saveMapShape(d.mapShape);
+      }
+      if (Array.isArray(d.mapRegions)) {
+        _saveMapRegions(d.mapRegions.filter(r => r && typeof r === 'object').map(r => ({
+          id: r.id || _uid(),
+          name: typeof r.name === 'string' ? r.name : 'Territory',
+          shape: r.shape || 'polygon',
+          points: Array.isArray(r.points) ? r.points : [],
+          center: r.center || null,
+          radius: typeof r.radius === 'number' ? r.radius : 15,
+          fillColor: r.fillColor || 'rgba(239, 68, 68, 0.12)',
+          strokeColor: r.strokeColor || '#ef4444',
+          description: typeof r.description === 'string' ? r.description : '',
+          attributes: r.attributes || {}
+        })));
+      }
+      if (Array.isArray(d.graphNodes)) {
+        _saveGraphNodes(d.graphNodes.filter(g => g && typeof g === 'object').map(g => ({
+          id: g.id || _uid(),
+          title: typeof g.title === 'string' ? g.title : 'Entity',
+          entityType: g.entityType || 'Theme',
+          category: g.category || 'world',
+          description: typeof g.description === 'string' ? g.description : '',
+          color: g.color || '#a855f7',
+          attributes: g.attributes || {},
+          x: typeof g.x === 'number' ? g.x : undefined,
+          y: typeof g.y === 'number' ? g.y : undefined,
+          createdAt: g.createdAt || Date.now()
+        })));
+      }
+      if (Array.isArray(d.graphLinks)) {
+        _saveGraphLinks(d.graphLinks.filter(l => l && typeof l === 'object').map(l => ({
+          id: l.id || _uid(),
+          sourceId: l.sourceId,
+          targetId: l.targetId,
+          label: typeof l.label === 'string' ? l.label : '',
+          relationshipType: l.relationshipType || '',
+          color: l.color || '#ef4444',
+          createdAt: l.createdAt || Date.now()
+        })));
+      }
+      if (Array.isArray(d.sections)) {
+        _saveSections(d.sections.filter(s => s && typeof s === 'object').map(s => ({
+          id: s.id || _uid(),
+          name: typeof s.name === 'string' ? s.name : 'Section',
+          description: typeof s.description === 'string' ? s.description : '',
+          order: typeof s.order === 'number' ? s.order : 0
         })));
       }
       if (typeof d.customMapImage === 'string' && d.customMapImage) {
@@ -1655,6 +2067,8 @@ Confidential author reference sheet for character backstories, plot twists, psyc
           faction: typeof c.faction === 'string' ? c.faction : '',
           role: typeof c.role === 'string' ? c.role : '',
           bio: typeof c.bio === 'string' ? c.bio : '',
+          image: typeof c.image === 'string' ? c.image : (typeof c.avatar === 'string' ? c.avatar : ''),
+          attributes: c.attributes || {},
           noteId: c.noteId || null
         })));
       }
@@ -1845,6 +2259,77 @@ Confidential author reference sheet for character backstories, plot twists, psyc
         _saveRelationships(existingRels);
       }
 
+      // Merge map regions
+      const existingRegions = getAllMapRegions().filter(r => r && typeof r === 'object');
+      const regionIds = new Set(existingRegions.map(r => r.id));
+      if (Array.isArray(d.mapRegions)) {
+        for (const reg of d.mapRegions) {
+          if (!reg || typeof reg !== 'object') continue;
+          let regClone = { ...reg };
+          if (!regClone.id || regionIds.has(regClone.id)) {
+            regClone.id = 'reg-' + _uid();
+          }
+          regionIds.add(regClone.id);
+          existingRegions.push(regClone);
+        }
+        _saveMapRegions(existingRegions);
+      }
+
+      // Merge graph nodes & links
+      const existingGNodes = getGraphNodes().filter(g => g && typeof g === 'object');
+      const gnodeIds = new Set(existingGNodes.map(g => g.id));
+      const gnodeMap = {};
+      if (Array.isArray(d.graphNodes)) {
+        for (const gn of d.graphNodes) {
+          if (!gn || typeof gn !== 'object') continue;
+          let gnClone = { ...gn };
+          if (gnClone.id && gnodeIds.has(gnClone.id)) {
+            const newGId = 'gnode-' + _uid();
+            gnodeMap[gnClone.id] = newGId;
+            gnClone.id = newGId;
+          }
+          if (!gnClone.id) gnClone.id = 'gnode-' + _uid();
+          gnodeIds.add(gnClone.id);
+          existingGNodes.push(gnClone);
+        }
+        _saveGraphNodes(existingGNodes);
+      }
+
+      const existingGLinks = getGraphLinks().filter(l => l && typeof l === 'object');
+      const glinkIds = new Set(existingGLinks.map(l => l.id));
+      if (Array.isArray(d.graphLinks)) {
+        for (const gl of d.graphLinks) {
+          if (!gl || typeof gl !== 'object') continue;
+          let glClone = { ...gl };
+          if (glClone.sourceId && gnodeMap[glClone.sourceId]) glClone.sourceId = gnodeMap[glClone.sourceId];
+          if (glClone.targetId && gnodeMap[glClone.targetId]) glClone.targetId = gnodeMap[glClone.targetId];
+          if (!glClone.id || glinkIds.has(glClone.id)) glClone.id = 'glink-' + _uid();
+          glinkIds.add(glClone.id);
+          existingGLinks.push(glClone);
+        }
+        _saveGraphLinks(existingGLinks);
+      }
+
+      // Merge custom sections
+      const existingSections = getAllSections().filter(s => s && typeof s === 'object');
+      const secNames = new Set(existingSections.map(s => (s.name || '').trim().toLowerCase()));
+      if (Array.isArray(d.sections)) {
+        for (const sec of d.sections) {
+          if (!sec || typeof sec !== 'object') continue;
+          const sName = (sec.name || '').trim().toLowerCase();
+          if (!secNames.has(sName)) {
+            existingSections.push({
+              id: sec.id || ('sec-' + _uid()),
+              name: sec.name || 'Section',
+              description: sec.description || '',
+              order: sec.order || 0
+            });
+            secNames.add(sName);
+          }
+        }
+        _saveSections(existingSections);
+      }
+
       return {
         success: true,
         mode: 'merge',
@@ -2003,5 +2488,29 @@ ${note.body || ''}`;
     getAllRelationships,
     scanNotesForCharacters,
     scanNotesForRelationships: (notes) => scanNotesForCharacters(notes).relationships,
+    // Map Canvas Shapes & Territory Regions
+    getMapShape,
+    saveMapShape,
+    getAllMapRegions,
+    getMapRegions: getAllMapRegions,
+    saveMapRegion,
+    deleteMapRegion,
+    // Galaxy Graph: Manual Nodes & Custom Connections
+    getGraphNodes,
+    saveGraphNode,
+    deleteGraphNode,
+    getGraphLinks,
+    saveGraphLink,
+    deleteGraphLink,
+    // Multi-Section Folders
+    getAllSections,
+    getSections: getAllSections,
+    saveSection,
+    deleteSection,
+    // Themes & Visual Customization
+    getBaseTheme,
+    setBaseTheme,
+    getCustomAccentColor,
+    setCustomAccentColor,
   };
 })();

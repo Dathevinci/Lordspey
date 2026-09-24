@@ -114,6 +114,37 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
+      <!-- Dropdown menu for New Note creation options -->
+      <div id="new-note-dropdown" class="new-note-dropdown hidden" role="menu" aria-label="Create Document Type">
+        <button type="button" class="new-dropdown-item" data-create-type="chapter">
+          <span class="dropdown-item-icon">✦</span>
+          <div class="dropdown-item-text">
+            <span class="dropdown-item-title">New Chapter Section</span>
+            <span class="dropdown-item-desc">Manuscript chapter or custom act/volume section</span>
+          </div>
+        </button>
+        <button type="button" class="new-dropdown-item" data-create-type="character">
+          <span class="dropdown-item-icon">👥</span>
+          <div class="dropdown-item-text">
+            <span class="dropdown-item-title">Character Note</span>
+            <span class="dropdown-item-desc">Cast profile, motivations &amp; lore</span>
+          </div>
+        </button>
+        <button type="button" class="new-dropdown-item" data-create-type="world">
+          <span class="dropdown-item-icon">🗺️</span>
+          <div class="dropdown-item-text">
+            <span class="dropdown-item-title">Worldbuilding Outline</span>
+            <span class="dropdown-item-desc">Factions, geography, magic &amp; history</span>
+          </div>
+        </button>
+        <button type="button" class="new-dropdown-item" data-create-type="draft">
+          <span class="dropdown-item-icon">✍️</span>
+          <div class="dropdown-item-text">
+            <span class="dropdown-item-title">General Note / Draft</span>
+            <span class="dropdown-item-desc">Quick thoughts, scene ideas &amp; notes</span>
+          </div>
+        </button>
+      </div>
       <!-- Hidden compatibility triggers for test harnesses & file pickers -->
       <div class="hidden" aria-hidden="true" style="display: none;">
         <button id="btn-settings" aria-hidden="true" tabindex="-1"></button>
@@ -580,6 +611,8 @@
             <button class="filter-pill" data-filter="world">World</button>
             <button class="filter-pill" data-filter="draft">Drafts</button>
           </div>
+          <button id="btn-graph-add-node" class="btn btn-sm btn-primary" title="Add manual non-note entity (Theme, Plot Arc, Faction, Concept)">+ Add Entity</button>
+          <button id="btn-graph-connect" class="btn btn-sm btn-ghost" title="Draw custom link between two nodes">Connect</button>
           <button id="btn-graph-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Galaxy Graph Guide &amp; Constellations">? Tutorial</button>
           <button id="btn-close-graph" class="icon-btn" title="Close Graph (Esc)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -647,6 +680,8 @@
             <span id="map-pin-count">0 pins</span>
             <span class="hud-sep">·</span>
             <span id="map-coords-indicator">X: 50.0% · Y: 50.0%</span>
+            <span class="hud-sep">·</span>
+            <span id="map-zoom-level" class="map-zoom-level">100%</span>
           </div>
         </div>
         <div class="map-controls">
@@ -662,6 +697,15 @@
             <button class="filter-pill" data-map-filter="draft">Drafts</button>
           </div>
           <div class="map-action-btns">
+            <select id="map-shape-select" class="form-select form-select-sm map-shape-select" title="Canvas Geography Shape">
+              <option value="landscape" selected>Landscape (16:9)</option>
+              <option value="square">Square (1:1)</option>
+              <option value="vertical">Vertical (9:16)</option>
+              <option value="oval">Oval Realm</option>
+            </select>
+            <button id="btn-map-draw-region" class="btn btn-sm btn-ghost" title="Draw territory border or political zone">
+              <span>Draw Region</span>
+            </button>
             <button id="btn-map-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="World Map Guide & Cheat Sheet">? Tutorial</button>
             <button id="btn-map-drop-pin" class="btn btn-sm btn-primary" title="Click to enter pin drop mode or place a pin">
               <span>+ Add Pin</span>
@@ -692,8 +736,9 @@
           <button id="btn-map-cancel-drop" class="btn btn-xs btn-ghost">Cancel</button>
         </div>
 
-        <div class="map-stage" id="map-stage">
+        <div class="map-stage" id="map-stage" data-shape="landscape">
           <canvas id="map-canvas" width="1600" height="1000"></canvas>
+          <svg id="map-regions-svg" class="map-regions-svg" viewBox="0 0 1600 1000" preserveAspectRatio="none"></svg>
           <div id="map-pins-container" class="map-pins-container"></div>
         </div>
 
@@ -722,6 +767,7 @@
           <h4 id="map-preview-title" class="map-preview-title font-cinzel">Location Title</h4>
           <p id="map-preview-desc" class="map-preview-desc">Note summary excerpt appears here…</p>
           <div class="map-preview-actions">
+            <button id="btn-map-edit-pin" class="btn btn-sm btn-secondary">Edit Pin</button>
             <button id="btn-map-open-note" class="btn btn-sm btn-primary">Open Note in Editor ↗</button>
             <button id="btn-map-delete-pin" class="btn btn-sm btn-danger">Delete Pin</button>
           </div>
@@ -761,6 +807,24 @@
           <option value="lore">Lore</option>
           <option value="draft">Draft</option>
         </select>
+      </div>
+      <div class="modal-field-row" style="display: flex; gap: 10px;">
+        <div class="modal-field" style="flex: 1;">
+          <label for="map-modal-pin-type">Landmark Icon / Type</label>
+          <select id="map-modal-pin-type">
+            <option value="citadel">🏰 Citadel / Fortress</option>
+            <option value="peak">⛰️ Mountain / Peak</option>
+            <option value="city">🏛️ City / Settlement</option>
+            <option value="shrine">⛩️ Shrine / Ruin</option>
+            <option value="water">⚓ Port / Waterway</option>
+            <option value="forest">🌲 Wilderness / Forest</option>
+            <option value="danger">⚔️ Battle / Danger Zone</option>
+          </select>
+        </div>
+        <div class="modal-field" style="width: 90px;">
+          <label for="map-modal-pin-color">Pin Tint</label>
+          <input type="color" id="map-modal-pin-color" value="#ef4444" style="width: 100%; height: 38px; padding: 2px; border-radius: var(--radius-sm); border: 1px solid var(--border);" />
+        </div>
       </div>
       <div class="modal-field">
         <label for="map-modal-pin-desc">Description / Lore Note</label>
@@ -1013,6 +1077,19 @@
         </select>
       </div>
       <div class="modal-field">
+        <label>Character Portrait / Concept Art</label>
+        <div id="codex-image-dropzone" class="char-image-dropzone" role="button" tabindex="0">
+          <img id="codex-image-preview" class="char-image-preview hidden" alt="Character Portrait Preview" />
+          <div id="codex-image-placeholder" class="char-image-placeholder">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Click or drop portrait / concept art here</span>
+            <span class="text-xs text-muted">PNG, JPG, WebP</span>
+          </div>
+          <input type="file" id="codex-input-image" accept="image/*" hidden />
+        </div>
+        <button type="button" id="btn-codex-remove-image" class="btn btn-xs btn-ghost text-danger hidden" style="margin-top: 6px;">Remove Image</button>
+      </div>
+      <div class="modal-field">
         <label for="codex-input-bio">Character Dossier & Description</label>
         <textarea id="codex-input-bio" rows="3" placeholder="Key motivations, background, appearance, and secrets…"></textarea>
       </div>
@@ -1188,6 +1265,10 @@
       <div class="modal-field">
         <label for="modal-note-title">Title</label>
         <input type="text" id="modal-note-title" placeholder="e.g. Chapter I, The High Citadel, Arc Outlines…" autocomplete="off" />
+      </div>
+      <div class="modal-field" id="modal-field-section">
+        <label for="modal-note-section">Section / Act / Volume (Optional)</label>
+        <input type="text" id="modal-note-section" placeholder="e.g. Act I: The Convergence, Volume II…" autocomplete="off" />
       </div>
       <div class="modal-field">
         <label for="modal-note-category">Category</label>
@@ -1638,6 +1719,17 @@
                   <span class="switch-slider"></span>
                 </label>
               </div>
+
+              <div class="settings-row">
+                <div class="settings-row-label">
+                  <div class="settings-row-title">Focus Mode (Auto-Hide Formatting Toolbar)</div>
+                  <div class="settings-row-hint">Automatically hides the top formatting toolbar while typing. Reappears when selecting text or hovering near the top.</div>
+                </div>
+                <label class="switch-control">
+                  <input type="checkbox" id="setting-focus-autohide" checked />
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
             </div>
 
             <div class="settings-group">
@@ -1671,6 +1763,35 @@
           <!-- ── Tab 3: Appearance & Accent Theme ── -->
           <div class="settings-pane" id="settings-pane-appearance">
             <div class="settings-group">
+              <h4 class="settings-group-title">Interface Visual Theme</h4>
+              <p class="settings-group-desc">Select your primary visual theme to reduce eye strain and suit your novel's aesthetic.</p>
+              
+              <div class="base-theme-grid">
+                <div class="base-theme-card active" data-base-theme="dark">
+                  <div class="base-theme-preview preview-dark">✦</div>
+                  <div class="base-theme-info">
+                    <span class="base-theme-name">Dark (Obsidian)</span>
+                    <span class="base-theme-desc">Obsidian dark obsidian canvas</span>
+                  </div>
+                </div>
+                <div class="base-theme-card" data-base-theme="light">
+                  <div class="base-theme-preview preview-light">✦</div>
+                  <div class="base-theme-info">
+                    <span class="base-theme-name">Light (Parchment)</span>
+                    <span class="base-theme-desc">Clean, warm daylight editorial page</span>
+                  </div>
+                </div>
+                <div class="base-theme-card" data-base-theme="sepia">
+                  <div class="base-theme-preview preview-sepia">✦</div>
+                  <div class="base-theme-info">
+                    <span class="base-theme-name">Sepia (Warm Paper)</span>
+                    <span class="base-theme-desc">Warm editorial book paper for low eye strain</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group">
               <h4 class="settings-group-title">Accent Theme</h4>
               <p class="settings-group-desc">Select your signature palette tint for workspace highlights, buttons, and cosmic glows.</p>
               
@@ -1699,6 +1820,15 @@
                   <div class="accent-color-circle" style="background: #10b981;"></div>
                   <span class="accent-theme-name">Emerald Lore</span>
                   <span class="accent-theme-hex">#10b981</span>
+                </div>
+              </div>
+
+              <div class="custom-accent-section" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+                <div class="custom-accent-title" style="font-size: 0.85rem; font-weight: 500; margin-bottom: 6px;">Custom Accent Color</div>
+                <div class="custom-accent-row" style="display: flex; align-items: center; gap: 8px;">
+                  <input type="color" id="setting-custom-accent" value="#ef4444" title="Pick custom accent color" style="width: 38px; height: 32px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer;" />
+                  <input type="text" id="setting-custom-accent-hex" class="form-input form-input-sm" value="#ef4444" maxlength="7" placeholder="#hex" style="width: 100px; font-family: monospace;" />
+                  <button type="button" id="btn-apply-custom-accent" class="btn btn-sm btn-secondary">Apply Custom Tint</button>
                 </div>
               </div>
             </div>
@@ -1905,6 +2035,225 @@
     <button id="intro-skip-btn" class="intro-skip-btn" title="Skip Intro (Esc / Space / Click)">
       Skip <span class="intro-skip-key">Esc</span>
     </button>
+  </div>
+
+
+  <!-- ───────── Galaxy Graph: Add Entity Modal ───────── -->
+  <div id="graph-entity-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="graph-entity-title">
+    <div class="modal">
+      <h3 class="modal-title font-cinzel" id="graph-entity-title">Add Galaxy Entity Node</h3>
+      <div class="modal-field">
+        <label for="graph-input-entity-title">Entity Title / Name</label>
+        <input type="text" id="graph-input-entity-title" placeholder="e.g. The Celestial Veil, The Iron Schism, Bloodline Curse…" autocomplete="off" />
+      </div>
+      <div class="modal-field-row" style="display: flex; gap: 10px;">
+        <div class="modal-field" style="flex: 1;">
+          <label for="graph-input-entity-type">Entity Type</label>
+          <select id="graph-input-entity-type">
+            <option value="Theme" selected>Theme</option>
+            <option value="Plot Arc">Plot Arc</option>
+            <option value="Faction">Faction</option>
+            <option value="Concept">Concept / Magic</option>
+          </select>
+        </div>
+        <div class="modal-field" style="flex: 1;">
+          <label for="graph-input-entity-cat">Cluster Affinity</label>
+          <select id="graph-input-entity-cat">
+            <option value="world" selected>World Building</option>
+            <option value="lore">Lore</option>
+            <option value="chapter">Chapter / Narrative</option>
+            <option value="draft">Draft</option>
+          </select>
+        </div>
+        <div class="modal-field" style="width: 80px;">
+          <label for="graph-input-entity-color">Color</label>
+          <input type="color" id="graph-input-entity-color" value="#f59e0b" style="width: 100%; height: 38px; border: 1px solid var(--border); border-radius: var(--radius-sm);" />
+        </div>
+      </div>
+      <div class="modal-field">
+        <label for="graph-input-entity-desc">Description / Significance</label>
+        <textarea id="graph-input-entity-desc" rows="3" placeholder="Significance, symbolic meaning, or story resonance…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="btn-graph-entity-cancel" class="btn btn-ghost">Cancel</button>
+        <button type="button" id="btn-graph-entity-save" class="btn btn-primary">Create Entity</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Galaxy Graph: Connect Nodes Modal ───────── -->
+  <div id="graph-link-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="graph-link-title">
+    <div class="modal">
+      <h3 class="modal-title font-cinzel" id="graph-link-title">Draw Custom Relationship Connection</h3>
+      <div class="modal-field">
+        <label for="graph-link-source">Source Node</label>
+        <select id="graph-link-source"></select>
+      </div>
+      <div class="modal-field">
+        <label for="graph-link-target">Target Node</label>
+        <select id="graph-link-target"></select>
+      </div>
+      <div class="modal-field-row" style="display: flex; gap: 10px;">
+        <div class="modal-field" style="flex: 1;">
+          <label for="graph-link-label">Relationship Label</label>
+          <input type="text" id="graph-link-label" placeholder="e.g. Parallels, Influences, Catalyst for…" autocomplete="off" />
+        </div>
+        <div class="modal-field" style="width: 90px;">
+          <label for="graph-link-color">Line Color</label>
+          <input type="color" id="graph-link-color" value="#ef4444" style="width: 100%; height: 38px; border: 1px solid var(--border); border-radius: var(--radius-sm);" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="btn-graph-link-cancel" class="btn btn-ghost">Cancel</button>
+        <button type="button" id="btn-graph-link-save" class="btn btn-primary">Connect Nodes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Galaxy Graph: Embedded Node Detail Modal ───────── -->
+  <div id="graph-node-detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="graph-detail-title">
+    <div class="modal modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span id="graph-detail-badge" class="badge badge-world">THEME</span>
+          <h3 class="modal-title font-cinzel" id="graph-detail-title">Entity Title</h3>
+        </div>
+        <button type="button" id="btn-graph-detail-close" class="icon-btn modal-close-btn" title="Close (Esc)">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 20px;">
+        <div id="graph-detail-meta" class="text-xs text-muted" style="margin-bottom: 10px;"></div>
+        <p id="graph-detail-desc" style="line-height: 1.6; color: var(--text-primary); white-space: pre-wrap; margin-bottom: 14px;"></p>
+        <div id="graph-detail-links-section" style="margin-top: 10px;">
+          <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Connections</div>
+          <div id="graph-detail-links-list" class="inspector-rels-list"></div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;">
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="btn-graph-detail-delete" class="btn btn-sm btn-danger">Delete</button>
+          <button type="button" id="btn-graph-detail-edit" class="btn btn-sm btn-secondary">Edit</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="btn-graph-detail-connect" class="btn btn-sm btn-ghost">+ Connect</button>
+          <button type="button" id="btn-graph-detail-open-note" class="btn btn-sm btn-primary">Open Note ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── World Map: Create Region Modal ───────── -->
+  <div id="map-region-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="map-region-modal-title">
+    <div class="modal">
+      <h3 class="modal-title font-cinzel" id="map-region-modal-title">Draw Map Territory Region</h3>
+      <div class="modal-field">
+        <label for="map-region-input-name">Territory / Region Name</label>
+        <input type="text" id="map-region-input-name" placeholder="e.g. Ashen Highlands, Kingdom of Spey, Sunless Reach" autocomplete="off" />
+      </div>
+      <div class="modal-field-row" style="display: flex; gap: 10px;">
+        <div class="modal-field" style="flex: 1;">
+          <label for="map-region-input-shape">Boundary Geometry</label>
+          <select id="map-region-input-shape">
+            <option value="polygon" selected>Polygon Zone (Territory)</option>
+            <option value="circle">Circular Zone (Domain / Radius)</option>
+          </select>
+        </div>
+        <div class="modal-field" style="width: 90px;">
+          <label for="map-region-input-color">Border Color</label>
+          <input type="color" id="map-region-input-color" value="#ef4444" style="width: 100%; height: 38px; border: 1px solid var(--border); border-radius: var(--radius-sm);" />
+        </div>
+      </div>
+      <div class="modal-field">
+        <label for="map-region-input-desc">Region Lore &amp; Territory Notes</label>
+        <textarea id="map-region-input-desc" rows="3" placeholder="Political allegiances, terrain features, danger levels, or historical events…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="btn-map-region-cancel" class="btn btn-ghost">Cancel</button>
+        <button type="button" id="btn-map-region-save" class="btn btn-primary">Save Region</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── World Map: Embedded Region Detail Modal ───────── -->
+  <div id="map-region-detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="map-region-detail-title">
+    <div class="modal modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="badge badge-world">TERRITORY</span>
+          <h3 class="modal-title font-cinzel" id="map-region-detail-title">Territory Name</h3>
+        </div>
+        <button type="button" id="btn-map-region-detail-close" class="icon-btn modal-close-btn" title="Close">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 20px;">
+        <div id="map-region-detail-meta" class="text-xs text-muted" style="margin-bottom: 8px;"></div>
+        <p id="map-region-detail-desc" style="line-height: 1.6; color: var(--text-primary); white-space: pre-wrap; margin-bottom: 0;"></p>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;">
+        <button type="button" id="btn-map-region-detail-delete" class="btn btn-sm btn-danger">Delete Region</button>
+        <button type="button" id="btn-map-region-detail-edit" class="btn btn-sm btn-primary">Edit Region</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Chronology Timeline: Embedded Event Detail Modal ───────── -->
+  <div id="timeline-event-detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="timeline-detail-title">
+    <div class="modal modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span id="timeline-detail-badge" class="badge badge-lore">LORE</span>
+          <span id="timeline-detail-year" class="timeline-card-year font-cinzel" style="font-size: 0.95rem;">Year 120</span>
+        </div>
+        <button type="button" id="btn-timeline-detail-close" class="icon-btn modal-close-btn" title="Close (Esc)">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 20px;">
+        <h4 id="timeline-detail-title" class="font-cinzel" style="font-size: 1.2rem; margin-bottom: 4px;">Event Title</h4>
+        <div id="timeline-detail-era" class="text-xs text-muted" style="margin-bottom: 12px;">Epoch / Era</div>
+        <p id="timeline-detail-desc" style="line-height: 1.6; color: var(--text-primary); white-space: pre-wrap; margin-bottom: 0;"></p>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;">
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="btn-timeline-detail-delete" class="btn btn-sm btn-danger">Delete</button>
+          <button type="button" id="btn-timeline-detail-edit" class="btn btn-sm btn-secondary">Edit Event</button>
+        </div>
+        <button type="button" id="btn-timeline-detail-open-note" class="btn btn-sm btn-primary">Open Linked Note ↗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Character Codex: Embedded Character Detail Modal ───────── -->
+  <div id="codex-detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="codex-detail-name">
+    <div class="modal modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span id="codex-detail-archetype" class="badge badge-archetype">Protagonist</span>
+          <span id="codex-detail-faction" class="text-xs text-muted">Faction</span>
+        </div>
+        <button type="button" id="btn-codex-detail-close" class="icon-btn modal-close-btn" title="Close (Esc)">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 20px;">
+        <div style="display: flex; gap: 14px; align-items: flex-start; margin-bottom: 12px;">
+          <div id="codex-detail-avatar-wrap" class="codex-detail-avatar-wrap">
+            <img id="codex-detail-avatar-img" class="codex-detail-avatar-img hidden" alt="Portrait" />
+            <div id="codex-detail-avatar-fallback" class="codex-avatar" style="width: 56px; height: 56px; font-size: 1.4rem;">C</div>
+          </div>
+          <div>
+            <h3 id="codex-detail-name" class="font-cinzel" style="font-size: 1.25rem; margin-bottom: 2px;">Character Name</h3>
+            <div id="codex-detail-role" class="text-xs text-muted" style="font-style: italic;">Role / Title</div>
+          </div>
+        </div>
+        <p id="codex-detail-bio" style="line-height: 1.6; color: var(--text-primary); white-space: pre-wrap; margin-bottom: 14px;"></p>
+        <div id="codex-detail-rels-section">
+          <div class="inspector-rels-title" style="margin-bottom: 6px;">Bonds &amp; Relationships:</div>
+          <div id="codex-detail-rels-list" class="inspector-rels-list"></div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;">
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="btn-codex-detail-delete" class="btn btn-sm btn-danger">Delete</button>
+          <button type="button" id="btn-codex-detail-edit" class="btn btn-sm btn-secondary">Edit Dossier</button>
+        </div>
+        <button type="button" id="btn-codex-detail-open-note" class="btn btn-sm btn-primary">Open Dossier Note ↗</button>
+      </div>
+    </div>
   </div>
 
   <!-- Toast container -->
