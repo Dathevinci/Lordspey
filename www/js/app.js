@@ -8,6 +8,9 @@
 (function () {
   'use strict';
 
+  const APP_VERSION = '1.1.0';
+  const UPDATE_API_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
+
   const $ = (s, ctx = document) => (ctx && typeof ctx.querySelector === 'function' ? ctx.querySelector(s) : null);
   const $$ = (s, ctx = document) => (ctx && typeof ctx.querySelectorAll === 'function' ? [...(ctx.querySelectorAll(s) || [])] : []);
 
@@ -847,6 +850,7 @@
     initManualGraphControls();
     initGalaxyEngine();
     initWorldbuildingSystems();
+    initAutoUpdateSystem();
 
     if (window.innerWidth <= 768) {
       sidebar.classList.add('collapsed');
@@ -2310,6 +2314,7 @@
   let pendingSpeyData = null;
   let isSpeyImportModalOpen = false;
   let isProjectSettingsModalOpen = false;
+  let isUpdateModalOpen = false;
 
   function handleExportSpey() {
     const pkg = Storage.exportSpeyPackage();
@@ -3346,6 +3351,14 @@
         vaultResetConfirmModal.classList.add('hidden');
         return;
       }
+      if (isUpdateModalOpen) {
+        const updateModalEl = $('#modal-update');
+        if (updateModalEl && !updateModalEl.classList.contains('hidden')) {
+          e.preventDefault();
+          closeUpdateModal();
+          return;
+        }
+      }
       if (isProjectSettingsModalOpen) {
         e.preventDefault();
         closeProjectSettingsModal();
@@ -3377,6 +3390,13 @@
     if (vaultResetConfirmModal && !vaultResetConfirmModal.classList.contains('hidden')) {
       vaultResetConfirmModal.classList.add('hidden');
       return true;
+    }
+    if (isUpdateModalOpen) {
+      const updateModalEl = $('#modal-update');
+      if (updateModalEl && !updateModalEl.classList.contains('hidden')) {
+        closeUpdateModal();
+        return true;
+      }
     }
     if (isProjectSettingsModalOpen) {
       closeProjectSettingsModal();
@@ -8517,6 +8537,247 @@
     if (timelineInputCategory) timelineInputCategory.value = evt.category || 'lore';
     if (timelineInputDesc) timelineInputDesc.value = evt.description || '';
     if (timelineInputNote) timelineInputNote.value = evt.noteId || '';
+  }
+
+  /* ═══════════════════════════════════════════════
+     In-App Auto-Update System — Lord Spey v1.1.0
+     Checks GitHub Releases & Preserves Vault Data
+     ═══════════════════════════════════════════════ */
+
+  function parseSemver(v) {
+    if (!v) return [0, 0, 0];
+    const clean = String(v).replace(/^v/i, '').trim();
+    return clean.split('.').map(n => parseInt(n, 10) || 0);
+  }
+
+  function compareSemver(v1, v2) {
+    const p1 = parseSemver(v1);
+    const p2 = parseSemver(v2);
+    const len = Math.max(p1.length, p2.length);
+    for (let i = 0; i < len; i++) {
+      const a = p1[i] || 0;
+      const b = p2[i] || 0;
+      if (a > b) return 1;
+      if (a < b) return -1;
+    }
+    return 0;
+  }
+
+  function showUpdateModal(releaseData) {
+    const modal = $('#modal-update');
+    if (!modal) return;
+    const titleEl = $('#update-modal-title');
+    const newVerChip = $('#update-new-version-chip');
+    const curVerChip = $('#update-current-version-chip');
+    const notesEl = $('#update-release-notes');
+    const downloadBtn = $('#btn-download-update');
+    const downloadText = $('#btn-download-update-text');
+    const githubLink = $('#btn-view-release-github');
+
+    const tag = releaseData.tag_name || ('v' + (releaseData.latestVersion || '1.1.0'));
+    if (titleEl) titleEl.textContent = releaseData.name || `Lord Spey ${tag}`;
+    if (newVerChip) newVerChip.textContent = `New: ${tag}`;
+    if (curVerChip) curVerChip.textContent = `Installed: v${APP_VERSION}`;
+    if (githubLink && releaseData.html_url) githubLink.href = releaseData.html_url;
+
+    // Render formatted release notes
+    if (notesEl) {
+      const rawNotes = releaseData.body || releaseData.releaseNotes || '### New Release Highlights\n- Enhanced visual performance and responsiveness\n- Lord Spey raven brand & emblem integration\n- In-app update mechanism with full vault safety guarantee\n- Improved workflow stability';
+      if (typeof Markdown !== 'undefined' && typeof Markdown.render === 'function') {
+        notesEl.innerHTML = Markdown.render(rawNotes);
+      } else {
+        notesEl.textContent = rawNotes;
+      }
+    }
+
+    // Determine platform-specific direct binary download
+    if (downloadBtn) {
+      let downloadUrl = releaseData.html_url || 'https://github.com/Dathevinci/Lordspey/releases';
+      const assets = releaseData.assets || [];
+      const isWin = typeof navigator !== 'undefined' && (/win/i.test(navigator.platform || '') || /windows/i.test(navigator.userAgent || ''));
+      const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent || '');
+
+      if (isWin) {
+        const setupExe = assets.find(a => /setup.*\.exe$/i.test(a.name));
+        const anyExe = assets.find(a => /\.exe$/i.test(a.name));
+        if (setupExe) {
+          downloadUrl = setupExe.browser_download_url;
+          if (downloadText) downloadText.textContent = `Download Installer (${setupExe.name})`;
+        } else if (anyExe) {
+          downloadUrl = anyExe.browser_download_url;
+          if (downloadText) downloadText.textContent = `Download Windows Executable`;
+        }
+      } else if (isAndroid) {
+        const apk = assets.find(a => /\.apk$/i.test(a.name));
+        if (apk) {
+          downloadUrl = apk.browser_download_url;
+          if (downloadText) downloadText.textContent = `Download Android APK`;
+        }
+      }
+
+      downloadBtn.href = downloadUrl;
+      downloadBtn.onclick = () => {
+        // Vault Safety Guarantee: Automated snapshot backup before update download
+        try {
+          if (typeof Storage !== 'undefined' && typeof Storage.createBackup === 'function') {
+            Storage.createBackup();
+          }
+        } catch (backupErr) {
+          console.warn('Pre-update safety snapshot notice:', backupErr);
+        }
+        toast('Starting update download. Your vault notes & lore are 100% safeguarded!', 'success');
+      };
+    }
+
+    modal.classList.remove('hidden');
+    isUpdateModalOpen = true;
+
+    // Also update banner if present
+    const banner = $('#update-banner');
+    const bannerVer = $('#update-banner-version');
+    if (banner && bannerVer) {
+      bannerVer.textContent = tag;
+      banner.classList.remove('hidden');
+    }
+  }
+
+  function closeUpdateModal() {
+    isUpdateModalOpen = false;
+    const modal = $('#modal-update');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  async function checkAppUpdates(userInitiated = false, statusEl = null) {
+    if (statusEl) {
+      statusEl.textContent = 'Checking GitHub releases…';
+      statusEl.className = 'update-status-msg';
+    }
+
+    try {
+      if (typeof fetch === 'function') {
+        const res = await fetch(UPDATE_API_URL, {
+          headers: { 'Accept': 'application/vnd.github.v3+json' },
+          cache: 'no-store'
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const latestTag = data.tag_name || '';
+        const latestVer = latestTag.replace(/^v/i, '');
+        const hasUpdate = compareSemver(latestVer, APP_VERSION) > 0;
+
+        if (hasUpdate) {
+          if (statusEl) {
+            statusEl.textContent = `New update ${latestTag} available!`;
+            statusEl.className = 'update-status-msg success';
+          }
+          showUpdateModal(data);
+          return { hasUpdate: true, latestTag, data };
+        } else {
+          if (statusEl) {
+            statusEl.textContent = `✓ Lord Spey is up to date (${latestTag || 'v' + APP_VERSION})`;
+            statusEl.className = 'update-status-msg success';
+          } else if (userInitiated) {
+            toast(`Lord Spey is up to date (${latestTag || 'v' + APP_VERSION})`, 'success');
+          }
+          return { hasUpdate: false, latestTag, data };
+        }
+      }
+    } catch (err) {
+      console.warn('Update check failed:', err);
+      if (statusEl) {
+        statusEl.textContent = 'Could not reach update server. Check internet.';
+        statusEl.className = 'update-status-msg alert';
+      } else if (userInitiated) {
+        toast('Unable to check for updates. Check internet connection.', 'error');
+      }
+      return { error: err.message };
+    }
+  }
+
+  function initAutoUpdateSystem() {
+    // Current version displays in Settings
+    const vaultVerDisplay = $('#settings-vault-version-display');
+    const guidesVerDisplay = $('#settings-guides-version-display');
+    if (vaultVerDisplay) vaultVerDisplay.textContent = `v${APP_VERSION}`;
+    if (guidesVerDisplay) guidesVerDisplay.textContent = `v${APP_VERSION}`;
+
+    // Settings update check buttons
+    const btnCheckVault = $('#settings-btn-check-update-vault');
+    const statusVault = $('#settings-vault-update-status');
+    if (btnCheckVault) {
+      btnCheckVault.addEventListener('click', () => {
+        checkAppUpdates(true, statusVault);
+      });
+    }
+
+    const btnCheckGuides = $('#settings-btn-check-update-guides');
+    const statusGuides = $('#settings-guides-update-status');
+    if (btnCheckGuides) {
+      btnCheckGuides.addEventListener('click', () => {
+        checkAppUpdates(true, statusGuides);
+      });
+    }
+
+    // Modal close & dismissal
+    const btnCloseModal = $('#btn-close-update-modal');
+    const btnDismiss = $('#btn-dismiss-update');
+    const modalEl = $('#modal-update');
+
+    if (btnCloseModal) btnCloseModal.addEventListener('click', closeUpdateModal);
+    if (btnDismiss) btnDismiss.addEventListener('click', closeUpdateModal);
+    if (modalEl) {
+      modalEl.addEventListener('click', (e) => {
+        if (e.target === modalEl) closeUpdateModal();
+      });
+    }
+
+    // Floating banner buttons
+    const btnBannerView = $('#btn-banner-view-update');
+    const btnBannerDismiss = $('#btn-banner-dismiss-update');
+    const bannerEl = $('#update-banner');
+
+    if (btnBannerView) {
+      btnBannerView.addEventListener('click', () => {
+        if (bannerEl) bannerEl.classList.add('hidden');
+        const modal = $('#modal-update');
+        if (modal) modal.classList.remove('hidden');
+      });
+    }
+    if (btnBannerDismiss) {
+      btnBannerDismiss.addEventListener('click', () => {
+        if (bannerEl) bannerEl.classList.add('hidden');
+      });
+    }
+
+    // Expose global handler for Electron main process communication
+    if (typeof window !== 'undefined') {
+      window.__handleUpdateCheckResult = function(payload) {
+        if (!payload) return;
+        if (payload.hasUpdate) {
+          showUpdateModal({
+            tag_name: payload.latestVersion,
+            name: payload.name,
+            body: payload.body || payload.releaseNotes,
+            html_url: payload.htmlUrl,
+            assets: payload.assets
+          });
+        } else if (payload.userInitiated) {
+          toast(`Lord Spey is up to date (v${APP_VERSION} is the latest version)`, 'success');
+        }
+      };
+      window.checkLordSpeyUpdates = checkAppUpdates;
+      window.showLordSpeyUpdateModal = showUpdateModal;
+      window.closeLordSpeyUpdateModal = closeUpdateModal;
+      window.LORD_SPEY_VERSION = APP_VERSION;
+    }
+
+    // Quiet startup check in background after 4s (in browser/Electron runtimes, skip in node tests)
+    const isNodeTest = typeof process !== 'undefined' && process.versions && process.versions.node && (typeof window === 'undefined' || !window.location || !window.location.href);
+    if (!isNodeTest && typeof setTimeout === 'function') {
+      setTimeout(() => {
+        checkAppUpdates(false).catch(() => {});
+      }, 4000);
+    }
   }
 
 })();

@@ -67,7 +67,101 @@ if (!gotSingleInstanceLock) {
     }
   });
 
+const https = require('https');
+const pkg = require('./package.json');
+const CURRENT_VERSION = pkg.version || '1.1.0';
+const UPDATE_CHECK_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
+
+function parseVersion(v) {
+  if (!v) return [0, 0, 0];
+  const clean = String(v).replace(/^v/i, '').trim();
+  return clean.split('.').map(n => parseInt(n, 10) || 0);
+}
+
+function compareVersions(v1, v2) {
+  const p1 = parseVersion(v1);
+  const p2 = parseVersion(v2);
+  const len = Math.max(p1.length, p2.length);
+  for (let i = 0; i < len; i++) {
+    const a = p1[i] || 0;
+    const b = p2[i] || 0;
+    if (a > b) return 1;
+    if (a < b) return -1;
+  }
+  return 0;
+}
+
+function checkForUpdatesInMain(win, userInitiated = false) {
+  if (!win || win.isDestroyed()) return;
+  try {
+    const req = https.get(UPDATE_CHECK_URL, {
+      headers: {
+        'User-Agent': `Lord-Spey-App/${CURRENT_VERSION}`,
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      timeout: 8000
+    }, (res) => {
+      let raw = '';
+      res.on('data', chunk => { raw += chunk; });
+      res.on('end', () => {
+        try {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            const data = JSON.parse(raw);
+            const latestTag = data.tag_name || '';
+            const latestVersion = latestTag.replace(/^v/i, '');
+            const hasUpdate = compareVersions(latestVersion, CURRENT_VERSION) > 0;
+            const payload = JSON.stringify({
+              hasUpdate,
+              currentVersion: CURRENT_VERSION,
+              latestVersion: latestTag,
+              name: data.name || latestTag,
+              body: data.body || '',
+              publishedAt: data.published_at,
+              htmlUrl: data.html_url,
+              assets: (data.assets || []).map(a => ({
+                name: a.name,
+                browser_download_url: a.browser_download_url,
+                size: a.size,
+                content_type: a.content_type
+              })),
+              userInitiated
+            }).replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+
+            if (!win.isDestroyed()) {
+              win.webContents.executeJavaScript(
+                `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult(${payload}); }`
+              );
+            }
+          } else if (userInitiated && !win.isDestroyed()) {
+            win.webContents.executeJavaScript(
+              `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult({ error: 'HTTP ' + ${res.statusCode}, userInitiated: true }); }`
+            );
+          }
+        } catch (parseErr) {
+          console.error('Failed to parse update info:', parseErr);
+        }
+      });
+    });
+
+    req.on('error', (err) => {
+      console.warn('Update check network error in main:', err.message);
+      if (userInitiated && !win.isDestroyed()) {
+        win.webContents.executeJavaScript(
+          `if (window.__handleUpdateCheckResult) { window.__handleUpdateCheckResult({ error: ${JSON.stringify(err.message)}, userInitiated: true }); }`
+        );
+      }
+    });
+
+    req.on('timeout', () => {
+      req.destroy();
+    });
+  } catch (err) {
+    console.error('Update check exception in main:', err);
+  }
+}
+
   function createWindow() {
+    const iconPath = path.join(__dirname, 'assets', 'icon.png');
     const win = new BrowserWindow({
       width: 1280,
       height: 820,
@@ -76,6 +170,7 @@ if (!gotSingleInstanceLock) {
       backgroundColor: '#08080a',
       autoHideMenuBar: true,
       title: 'Lord Spey — Author\'s Workspace',
+      icon: fs.existsSync(iconPath) ? iconPath : undefined,
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
@@ -97,6 +192,19 @@ if (!gotSingleInstanceLock) {
         if (startupFile) {
           sendSpeyFileToWindow(win, startupFile);
         }
+      }
+      // Check for updates on startup in background
+      setTimeout(() => {
+        if (!win.isDestroyed()) {
+          checkForUpdatesInMain(win, false);
+        }
+      }, 5000);
+    });
+
+    // Allow renderer to request update check via custom protocol or execution
+    win.webContents.on('ipc-message', (event, channel) => {
+      if (channel === 'check-for-updates') {
+        checkForUpdatesInMain(win, true);
       }
     });
 

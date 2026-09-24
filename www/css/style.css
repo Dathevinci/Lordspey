@@ -6375,3 +6375,239 @@ img.map-custom-img[src=""] {
   color: #c084fc;
   border: 1px solid rgba(168, 85, 247, 0.35);
 }
+
+/* ═══════════════════════════════════════════════
+   Lord Spey Raven Logo, Emblem & Auto-Update CSS
+   ═══════════════════════════════════════════════ */
+
+/* Sidebar Raven Brand Image */
+.logo-raven-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.45);
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.logo:hover .logo-raven-img {
+  transform: scale(1.12);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.85);
+}
+
+/* Dashboard Hero Emblem with Raven Art */
+.menu-emblem {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+  user-select: none;
+  animation: pulse 3s ease-in-out infinite;
+  transition: transform 200ms ease;
+}
+.menu-emblem-raven-img {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid rgba(239, 68, 68, 0.65);
+  box-shadow: 0 0 28px rgba(239, 68, 68, 0.5), inset 0 0 16px rgba(0, 0, 0, 0.6);
+  transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
+}
+.menu-emblem:hover .menu-emblem-raven-img {
+  transform: scale(1.08);
+  border-color: rgba(239, 68, 68, 0.95);
+  box-shadow: 0 0 42px rgba(239, 68, 68, 0.85);
+}
+.menu-emblem-star {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 1.25rem;
+  color: var(--red-500);
+  filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.9));
+  pointer-events: none;
+}
+
+/* Settings Update Controls */
+.settings-update-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+}
+.settings-version-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+.version-label {
+  color: var(--text-muted);
+}
+.version-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ff6b6b;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.update-status-msg {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: opacity 200ms ease;
+}
+.update-status-msg.success {
+  color: #10b981;
+}
+.update-status-msg.alert {
+  color: #ef4444;
+}
+
+/* Auto-Update Modal */
+.update-modal-card {
+  max-width: 580px;
+  width: 92%;
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 32px rgba(239, 68, 68, 0.25);
+}
+.update-raven-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
+  flex-shrink: 0;
+}
+.update-hero-banner {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(20, 22, 28, 0.95) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.update-version-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.update-version-chip {
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.update-chip-current {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.update-arrow {
+  color: var(--red-500);
+  font-weight: bold;
+}
+.update-chip-new {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ff8080;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+}
+.update-guarantee {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #34d399;
+  margin: 0;
+}
+.update-guarantee svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.update-notes-wrapper {
+  margin-bottom: 10px;
+}
+.update-notes-heading {
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.update-release-notes {
+  max-height: 220px;
+  overflow-y: auto;
+  background: rgba(8, 8, 10, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+.update-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+}
+.btn-glow {
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
+  transition: all 200ms ease;
+}
+.btn-glow:hover {
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.8);
+  transform: translateY(-1px);
+}
+
+/* Floating Banner */
+.update-banner {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  background: rgba(14, 16, 22, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 9999px;
+  padding: 6px 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(239, 68, 68, 0.3);
+  animation: slideDown 300ms ease;
+}
+.update-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.update-banner-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.update-banner-text {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+.update-banner-close {
+  width: 20px;
+  height: 20px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}

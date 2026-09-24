@@ -2,4 +2,9 @@ node_modules/
 dist/
 .DS_Store
 *.log
-*.png
+verification_*.png
+layout_debug_screenshot.png
+!assets/**
+!build/**
+!www/assets/**
+

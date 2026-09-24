@@ -5,17 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Lord Spey — Author's Workspace</title>
   <meta name="description" content="Lord Spey — AUTHOR’S WORKSPACE: Distraction-free Obsidian-inspired workspace for authors." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%2308080a'/><text x='50' y='68' text-anchor='middle' font-size='55' fill='%23ef4444'>✦</text></svg>" />
+  <link rel="icon" type="image/png" href="assets/icon.png" />
+  <link rel="shortcut icon" href="assets/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=1.0.0" />
+  <link rel="stylesheet" href="css/style.css?v=1.1.0" />
 </head>
 <body>
   <!-- ───────── Sidebar ───────── -->
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
       <h1 class="logo clickable" id="logo-home" title="Lord Spey — Go to Main Menu">
+        <img src="assets/logo.png" class="logo-raven-img" alt="Lord Spey Raven Logo" />
         <span class="logo-icon" aria-hidden="true">✦</span>
         <span class="logo-text">LORD SPEY</span>
       </h1>
@@ -170,7 +172,10 @@
     <!-- Clean Main Menu / Dashboard -->
     <div id="main-menu" class="main-menu">
       <div class="menu-hero">
-        <div class="menu-emblem" id="menu-emblem" role="button" tabindex="0" title="Replay intro animation">✦</div>
+        <div class="menu-emblem" id="menu-emblem" role="button" tabindex="0" title="Replay intro animation">
+          <img src="assets/icon.png" class="menu-emblem-raven-img" alt="Lord Spey Raven Emblem" />
+          <span class="menu-emblem-star" aria-hidden="true">✦</span>
+        </div>
         <h2 class="menu-title font-cinzel">LORD SPEY</h2>
         <p class="menu-subtitle">Distraction-free workspace for crafting prose, connecting lore, and charting story worlds.</p>
 
@@ -1648,6 +1653,22 @@
               </div>
             </div>
 
+            <div class="settings-group">
+              <h4 class="settings-group-title">Software Updates</h4>
+              <p class="settings-group-desc">Keep Lord Spey updated with the latest performance enhancements, features, and fixes.</p>
+              <div class="settings-action-row settings-update-row">
+                <div class="settings-version-tag">
+                  <span class="version-label">Current Version:</span>
+                  <span class="version-badge" id="settings-vault-version-display">v1.1.0</span>
+                </div>
+                <button type="button" id="settings-btn-check-update-vault" class="btn btn-secondary">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  Check for Updates
+                </button>
+                <span class="update-status-msg" id="settings-vault-update-status"></span>
+              </div>
+            </div>
+
             <div class="settings-group settings-group-danger">
               <h4 class="settings-group-title" style="color: var(--red-400);">Danger Zone</h4>
               <p class="settings-group-desc">Clear all notes, maps, timelines, and character dossiers from your browser storage.</p>
@@ -1956,6 +1977,22 @@
                 </button>
               </div>
             </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Software Version &amp; Updates</h4>
+              <p class="settings-group-desc">Verify your installed version or check GitHub for the latest releases.</p>
+              <div class="settings-action-row settings-update-row">
+                <div class="settings-version-tag">
+                  <span class="version-label">Current Version:</span>
+                  <span class="version-badge" id="settings-guides-version-display">v1.1.0</span>
+                </div>
+                <button type="button" id="settings-btn-check-update-guides" class="btn btn-secondary">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  Check for Updates
+                </button>
+                <span class="update-status-msg" id="settings-guides-update-status"></span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2261,11 +2298,69 @@
     </div>
   </div>
 
+  <!-- Top Update Notification Banner (shows when newer release found) -->
+  <div id="update-banner" class="update-banner hidden" role="alert">
+    <div class="update-banner-content">
+      <img src="assets/icon.png" alt="Raven Logo" class="update-banner-logo" />
+      <span class="update-banner-text"><strong>A new version of Lord Spey (<span id="update-banner-version">v1.1.0</span>) is ready!</strong></span>
+      <button type="button" id="btn-banner-view-update" class="btn btn-sm btn-primary">Update Now</button>
+      <button type="button" id="btn-banner-dismiss-update" class="icon-btn update-banner-close" title="Dismiss">✕</button>
+    </div>
+  </div>
+
+  <!-- ───────── Lord Spey Auto-Update Modal ───────── -->
+  <div id="modal-update" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="update-modal-title">
+    <div class="modal-card update-modal-card">
+      <div class="modal-header">
+        <div class="modal-header-left" style="display: flex; align-items: center; gap: 12px;">
+          <img src="assets/icon.png" alt="Lord Spey Logo" class="update-raven-badge" />
+          <div>
+            <span class="settings-modal-badge font-cinzel">✦ UPDATE AVAILABLE</span>
+            <h3 class="modal-title font-cinzel" id="update-modal-title">Lord Spey Update</h3>
+          </div>
+        </div>
+        <button id="btn-close-update-modal" class="icon-btn modal-close-btn" title="Close (Esc)">✕</button>
+      </div>
+
+      <div class="modal-body update-modal-body">
+        <div class="update-hero-banner">
+          <div class="update-version-row">
+            <span class="update-version-chip update-chip-current" id="update-current-version-chip">Installed: v1.1.0</span>
+            <span class="update-arrow">→</span>
+            <span class="update-version-chip update-chip-new" id="update-new-version-chip">New: v1.1.0</span>
+          </div>
+          <p class="update-guarantee">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <strong>Safe Update Guarantee:</strong> All manuscript drafts, vault lore, world maps, characters, and settings are 100% preserved. An automated safety backup is created upon update.
+          </p>
+        </div>
+
+        <div class="update-notes-wrapper">
+          <div class="update-notes-heading font-cinzel">Release Highlights</div>
+          <div id="update-release-notes" class="update-release-notes markdown-body"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer update-modal-footer">
+        <button type="button" id="btn-dismiss-update" class="btn btn-ghost">Dismiss</button>
+        <div style="display: flex; gap: 8px;">
+          <a id="btn-view-release-github" href="https://github.com/Dathevinci/Lordspey/releases" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            Release Notes ↗
+          </a>
+          <a id="btn-download-update" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-glow">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span id="btn-download-update-text">Instant Update &amp; Download</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <script src="js/storage.js?v=1.0.0"></script>
-  <script src="js/markdown.js?v=1.0.0"></script>
-  <script src="js/app.js?v=1.0.0"></script>
+  <script src="js/storage.js?v=1.1.0"></script>
+  <script src="js/markdown.js?v=1.1.0"></script>
+  <script src="js/app.js?v=1.1.0"></script>
 </body>
 </html>
