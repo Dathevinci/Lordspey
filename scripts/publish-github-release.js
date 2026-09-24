@@ -26,21 +26,39 @@ async function main() {
 
   const repo = 'Dathevinci/Lordspey';
   const tag = 'v1.1.0';
-  const releaseName = 'Lord Spey v1.1.0 — Raven Emblem & Auto-Update Engine';
-  const releaseBody = `## Lord Spey v1.1.0 — Raven Emblem & Auto-Update Engine
+  const releaseName = 'Lord Spey v1.1.0 — Raven Brand & Feature Expansion';
+  const releaseBody = `## Lord Spey v1.1.0 — Raven Brand & Feature Expansion
 
 Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding.
 
 ### ✦ What's New in v1.1.0
-- **Lord Spey Raven Logo Integration**:
-  - Majestic raven with luminous silhouette butterflies integrated into the application brand.
-  - Sidebar header emblem (\`✦ LORD SPEY\`), dashboard hero crest, and browser/desktop app favicons.
-  - Native multi-resolution Windows icon (\`.ico\`) configured for installers and desktop shortcuts.
-- **In-App Auto-Update System**:
-  - Built-in release detector connected to GitHub Releases API.
-  - "Check for Updates" buttons and \`v1.1.0\` version tags in **Settings → Project & .spey Vault** and **Settings → Shortcuts & Guides**.
-  - Sleek modal with release highlights and direct download link.
-  - Automated safety snapshot backup before updates so user manuscript drafts, lore, and worldbuilding remain 100% preserved.
+- **🦅 Official Raven Brand Logo**:
+  - Celestial raven emblem with butterfly silhouette accents in top navigation, header, and dashboard watermark.
+  - Native multi-resolution Windows icon (\`.ico\`) configured for installers, taskbar, and desktop launcher shortcuts.
+- **🎨 App Themes & Custom Accent Picker**:
+  - Velvet Dark, Ivory Light, and Parchment Sepia authorial reading themes.
+  - Custom Accent Color Picker with live CSS variable updates and accessible border contrast.
+- **✍️ Writing Focus Mode**:
+  - Auto-hiding formatting toolbar while typing for zero-clutter composition.
+  - Smooth fade-in on mouse hover or pause.
+- **🗺️ World Map Shapes & Region Drawing**:
+  - 16:9 Landscape, 1:1 Square, 9:16 Realm, and Oval cartographic canvas aspect ratios.
+  - Interactive territory polygon drawing with fill colors, opacity controls, and linked lore markers.
+- **📁 Multi-Section Folders & Note Dropdown**:
+  - Multi-act and multi-volume chapter folder hierarchies.
+  - Dedicated \`+ New Note\` dropdown for Chapters, Lore, Characters, and Codex documents.
+- **🌌 Expanded Galaxy Graph**:
+  - 0-collision force simulation physics with spacious distribution and legible typography.
+  - Manual entity creation for Themes, Plot Arcs, and Factions with custom directional relationship links.
+- **👤 Character Codex Portraits**:
+  - Direct portrait image upload and drag-and-drop for concept art & avatars.
+  - Aspect-ratio preserved dossier cards with zoom previews.
+- **📦 Standalone Modules**:
+  - In-module inspection and editing for Characters, Maps, and Timelines without forced note redirects.
+- **🔄 In-App Auto-Updater**:
+  - Automated background release detector connected to GitHub Releases API.
+  - "What's New in v1.1.0" changelog viewer and update notification preview tester in Settings.
+  - Automated safety snapshot backup before updates guaranteeing 100% preservation of drafts, lore, and maps.
 
 ### 📦 Windows Downloads
 - **Lord Spey Setup 1.1.0.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
@@ -65,7 +83,27 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
     console.log('Release does not exist yet:', e.message);
   }
 
-  if (!release) {
+  if (release) {
+    console.log(`Updating existing release ${release.id}...`);
+    try {
+      const updateRes = await fetch(`https://api.github.com/repos/${repo}/releases/${release.id}`, {
+        method: 'PATCH',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: releaseName,
+          body: releaseBody
+        })
+      });
+      if (updateRes.ok) {
+        release = await updateRes.json();
+        console.log(`✓ Updated release notes on ${release.name}`);
+      } else {
+        console.warn(`Could not update release notes: ${updateRes.status}`);
+      }
+    } catch (patchErr) {
+      console.warn('Failed to patch release:', patchErr.message);
+    }
+  } else {
     console.log(`Creating new release for ${tag}...`);
     const createRes = await fetch(`https://api.github.com/repos/${repo}/releases`, {
       method: 'POST',

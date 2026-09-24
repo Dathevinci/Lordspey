@@ -8643,47 +8643,92 @@
     {
       icon: '🦅',
       title: 'Official Raven Brand Logo',
-      desc: 'Celestial raven emblem in the header, dashboard, and desktop icon.'
+      desc: 'Celestial raven emblem in the header, dashboard, and desktop icon.',
+      bullets: [
+        'Luminous celestial raven emblem with butterfly silhouette accents in top navigation',
+        'Immersive watermark hero emblem displayed on the empty workspace dashboard',
+        'Official Windows taskbar, window titlebar, and launcher application icons'
+      ]
     },
     {
       icon: '🎨',
       title: 'App Themes',
-      desc: 'Dark, Light (Ivory), Sepia (Parchment), and Custom Accent Color Picker.'
+      desc: 'Dark, Light (Ivory), Sepia (Parchment), and Custom Accent Color Picker.',
+      bullets: [
+        'Three authorial reading modes: Velvet Dark, Ivory Light, and Parchment Sepia',
+        'Dynamic Accent Color Picker with live CSS variable updates',
+        'High-contrast accessible borders and refined font rendering'
+      ]
     },
     {
       icon: '✍️',
       title: 'Writing Focus Mode',
-      desc: 'Auto-hiding formatting toolbar while typing.'
+      desc: 'Auto-hiding formatting toolbar while typing.',
+      bullets: [
+        'Distraction-free canvas automatically dims formatting tools during keystrokes',
+        'Seamless toolbar reappearance upon mouse hovering or typing pauses',
+        'Supports deep immersion drafting and full-screen flow'
+      ]
     },
     {
       icon: '🗺️',
       title: 'World Map Shapes & Region Drawing',
-      desc: '16:9 Landscape, 1:1 Square, 9:16 Realm, and Oval maps with interactive territory polygon drawing.'
+      desc: '16:9 Landscape, 1:1 Square, 9:16 Realm, and Oval maps with interactive territory polygon drawing.',
+      bullets: [
+        'Four cartographic aspect ratios: 16:9 Landscape, 1:1 Square, 9:16 Realm, and Oval',
+        'Interactive territory polygon drawing with real-time vertex placement',
+        'Custom faction territory fills, opacity controls, and linked lore pins'
+      ]
     },
     {
       icon: '📁',
       title: 'Multi-Section Folders & Note Dropdown',
-      desc: 'Multi-act/volume chapters and document-type selector.'
+      desc: 'Multi-act/volume chapters and document-type selector.',
+      bullets: [
+        'Hierarchical chapter management for multi-act, multi-volume manuscripts',
+        '+ New Note dropdown with dedicated presets (Chapter, Lore, Character, Codex)',
+        'Nested drag-and-drop tree view with section badges and quick filters'
+      ]
     },
     {
       icon: '🌌',
       title: 'Expanded Galaxy Graph',
-      desc: '0-collision physics, wide spacing, and manual entity creation (Themes, Plot Arcs, Factions).'
+      desc: '0-collision physics, wide spacing, and manual entity creation (Themes, Plot Arcs, Factions).',
+      bullets: [
+        'Zero-collision force simulation with expansive node distribution and clear labels',
+        'Manual node creation for Themes, Plot Arcs, Factions, and Concepts',
+        'Custom directional links with relationship type labels and color tags'
+      ]
     },
     {
       icon: '👤',
       title: 'Character Codex Portraits',
-      desc: 'Image upload for concept art & avatars.'
+      desc: 'Image upload for concept art & avatars.',
+      bullets: [
+        'Integrated portrait dropzone for character avatars and concept art files',
+        'Zoomable thumbnail preview preserving aspect ratio with fallback silhouettes',
+        'Standalone character dossiers created independently of note files'
+      ]
     },
     {
       icon: '📦',
       title: 'Standalone Modules',
-      desc: 'In-module detail popups without forced note redirects.'
+      desc: 'In-module detail popups without forced note redirects.',
+      bullets: [
+        'Inspect and edit Characters, World Map Pins, and Timeline Events in-place',
+        'Zero forced navigation—stay focused on your current chapter or world map',
+        'Bi-directional cross-reference chips and direct note opening shortcut'
+      ]
     },
     {
       icon: '🔄',
       title: 'In-App Auto-Updater',
-      desc: 'Background check and one-click in-place updates.'
+      desc: 'Background check and one-click in-place updates.',
+      bullets: [
+        'Automated background checking against GitHub Releases with semver evaluation',
+        'Safe Pre-Update Snapshot Guarantee backing up all notes, lore, and maps',
+        'Interactive preview mode to test banners and notifications on demand'
+      ]
     }
   ];
 
@@ -8699,6 +8744,11 @@
             <div class="whats-new-card-content">
               <div class="whats-new-card-title">${f.title}</div>
               <div class="whats-new-card-desc">${f.desc}</div>
+              ${f.bullets && f.bullets.length ? `
+                <ul class="whats-new-bullets">
+                  ${f.bullets.map(b => `<li class="whats-new-bullet">${b}</li>`).join('')}
+                </ul>
+              ` : ''}
             </div>
           </div>
         `).join('')}
@@ -8719,8 +8769,11 @@
     const arrowEl = $('#update-version-arrow');
     const notesHeadingEl = $('#update-notes-heading');
     const notesEl = $('#update-release-notes');
+    const guaranteeEl = $('#update-guarantee-text');
+    const dismissBtn = $('#btn-dismiss-update');
     const downloadBtn = $('#btn-download-update');
     const downloadText = $('#btn-download-update-text');
+    const downloadIcon = $('#btn-download-update-icon');
     const githubLink = $('#btn-view-release-github');
 
     const tag = releaseData.tag_name || ('v' + (releaseData.latestVersion || '1.1.0'));
@@ -8733,6 +8786,12 @@
     }
     if (curVerChip) curVerChip.textContent = `Installed: v${APP_VERSION}`;
     if (notesHeadingEl) notesHeadingEl.textContent = isDemo ? 'Preview Highlights & Safety' : 'Release Highlights';
+    if (guaranteeEl) {
+      guaranteeEl.innerHTML = '<strong>Safe Update Guarantee:</strong> All manuscript drafts, vault lore, world maps, characters, and settings are 100% preserved. An automated safety backup is created upon update.';
+    }
+    if (dismissBtn) {
+      dismissBtn.textContent = isDemo ? 'Dismiss' : 'Remind Me Later';
+    }
     if (githubLink && releaseData.html_url) {
       githubLink.href = releaseData.html_url;
       githubLink.textContent = 'Release Notes ↗';
@@ -8758,6 +8817,14 @@
       const assets = releaseData.assets || [];
       const isWin = typeof navigator !== 'undefined' && (/win/i.test(navigator.platform || '') || /windows/i.test(navigator.userAgent || ''));
       const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent || '');
+
+      // Reset action button text and icon back to update mode
+      if (downloadText) {
+        downloadText.textContent = isDemo ? 'Test Safe Backup & Close' : 'Download & Install Update';
+      }
+      if (downloadIcon) {
+        downloadIcon.innerHTML = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>';
+      }
 
       if (isWin) {
         const setupExe = assets.find(a => /setup.*\.exe$/i.test(a.name));
@@ -8800,16 +8867,14 @@
     modal.classList.remove('hidden');
     isUpdateModalOpen = true;
 
-    // Also update banner if present
+    // When update modal opens, ensure top banner is dismissed so they do not overlap
     const banner = $('#update-banner');
-    const bannerVer = $('#update-banner-version');
-    if (banner && bannerVer) {
-      bannerVer.textContent = isDemo ? `${tag} (Demo)` : tag;
-      banner.classList.remove('hidden');
+    if (banner) {
+      banner.classList.add('hidden');
     }
   }
 
-  function openWhatsNewModal() {
+  function openWhatsNewModal(releaseData = null) {
     const modal = $('#modal-update');
     if (!modal) return;
     const badgeEl = $('#update-modal-badge');
@@ -8819,12 +8884,15 @@
     const arrowEl = $('#update-version-arrow');
     const notesHeadingEl = $('#update-notes-heading');
     const notesEl = $('#update-release-notes');
+    const guaranteeEl = $('#update-guarantee-text');
+    const dismissBtn = $('#btn-dismiss-update');
     const downloadBtn = $('#btn-download-update');
     const downloadText = $('#btn-download-update-text');
+    const downloadIcon = $('#btn-download-update-icon');
     const githubLink = $('#btn-view-release-github');
 
     if (badgeEl) badgeEl.textContent = `✦ WHAT'S NEW IN v${APP_VERSION}`;
-    if (titleEl) titleEl.textContent = `Lord Spey v${APP_VERSION} — New Features`;
+    if (titleEl) titleEl.textContent = `Lord Spey v${APP_VERSION} — New Features & UI Upgrades`;
     if (curVerChip) curVerChip.textContent = `Installed: v${APP_VERSION}`;
     if (arrowEl) arrowEl.textContent = '✦';
     if (newVerChip) {
@@ -8832,19 +8900,35 @@
       newVerChip.className = 'update-version-chip update-chip-installed';
     }
     if (notesHeadingEl) notesHeadingEl.textContent = `What's New in Lord Spey v${APP_VERSION}`;
+    if (guaranteeEl) {
+      guaranteeEl.innerHTML = `<strong>Version v${APP_VERSION} Active:</strong> You are enjoying the latest release of Lord Spey! All manuscript drafts, vault lore, world maps, characters, and settings are active and safeguarded.`;
+    }
+    if (dismissBtn) {
+      dismissBtn.textContent = 'Close';
+    }
     if (notesEl) {
       notesEl.innerHTML = renderWhatsNewHtml();
     }
     if (githubLink) {
-      githubLink.href = 'https://github.com/Dathevinci/Lordspey/releases';
+      const releaseUrl = releaseData?.html_url || (cachedLatestReleaseData && cachedLatestReleaseData.html_url) || 'https://github.com/Dathevinci/Lordspey/releases';
+      githubLink.href = releaseUrl;
       githubLink.textContent = 'Release Notes ↗';
     }
     if (downloadBtn) {
       downloadBtn.href = '#';
       if (downloadText) downloadText.textContent = 'Explore Features';
+      if (downloadIcon) {
+        downloadIcon.innerHTML = '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>';
+      }
       downloadBtn.onclick = (e) => {
         e.preventDefault();
         closeUpdateModal();
+        try {
+          if (typeof closeProjectSettingsModal === 'function') {
+            closeProjectSettingsModal();
+          }
+        } catch (_) {}
+        toast(`Enjoy exploring Lord Spey v${APP_VERSION}!`, 'info');
       };
     }
 
@@ -8931,7 +9015,8 @@
           const upToDateMsg = `✓ Lord Spey is up to date (${latestTag || 'v' + APP_VERSION})`;
           setStatus(upToDateMsg, 'success', true);
           if (userInitiated) {
-            toast(upToDateMsg + ' — Click "What\'s New in v1.1.0" to see all new features!', 'success');
+            toast(upToDateMsg + ' — Here are the latest features in v' + APP_VERSION, 'success');
+            openWhatsNewModal(data);
           }
           return { hasUpdate: false, latestTag, data };
         }
@@ -9005,6 +9090,14 @@
     if (btnTestGuides) {
       btnTestGuides.addEventListener('click', () => {
         triggerTestUpdateNotification();
+      });
+    }
+
+    // Dashboard What's New button
+    const btnWhatsNewMenu = $('#menu-btn-whats-new');
+    if (btnWhatsNewMenu) {
+      btnWhatsNewMenu.addEventListener('click', () => {
+        openWhatsNewModal();
       });
     }
 
@@ -9104,7 +9197,8 @@
           const currentTag = payload.latestVersion || ('v' + APP_VERSION);
           const upToDateMsg = `✓ Lord Spey is up to date (${currentTag})`;
           setStatus(upToDateMsg, 'success', true);
-          toast(`Lord Spey is up to date (${currentTag}) — Click "What\'s New in v1.1.0" to see all new features!`, 'success');
+          toast(`Lord Spey is up to date (${currentTag}) — Here are the latest features in v${APP_VERSION}`, 'success');
+          openWhatsNewModal(payload);
         }
       };
       window.checkLordSpeyUpdates = checkAppUpdates;

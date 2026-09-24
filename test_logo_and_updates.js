@@ -246,10 +246,20 @@ requiredFeatureTitles.forEach(title => {
 });
 console.log(`✓ All 9 What's New v1.1.0 visual features verified: ${requiredFeatureTitles.join(', ')}`);
 
+assert(htmlContent.includes('id="menu-btn-whats-new"'), 'Missing menu-btn-whats-new on dashboard in index.html');
+assert(htmlContent.includes('id="update-guarantee-text"'), 'Missing update-guarantee-text in index.html');
+assert(htmlContent.includes('id="btn-download-update-icon"'), 'Missing btn-download-update-icon in index.html');
 assert(cssContent.includes('.whats-new-grid'), 'Missing .whats-new-grid in css/style.css');
 assert(cssContent.includes('.whats-new-card'), 'Missing .whats-new-card in css/style.css');
+assert(cssContent.includes('.whats-new-bullets'), 'Missing .whats-new-bullets in css/style.css');
+assert(cssContent.includes('.whats-new-bullet'), 'Missing .whats-new-bullet in css/style.css');
 assert(cssContent.includes('.btn-link-whats-new'), 'Missing .btn-link-whats-new in css/style.css');
 assert(cssContent.includes('.update-chip-installed'), 'Missing .update-chip-installed in css/style.css');
-console.log('✓ CSS stylesheet verified for .whats-new-grid, .whats-new-card, and installed chips');
+console.log('✓ CSS stylesheet verified for .whats-new-grid, .whats-new-card, .whats-new-bullets, and installed chips');
+
+// Verify that user-initiated up-to-date checks trigger openWhatsNewModal
+assert(appCode.includes('openWhatsNewModal(data)'), 'checkAppUpdates must invoke openWhatsNewModal when user initiates check and app is up to date');
+assert(appCode.includes('openWhatsNewModal(payload)'), '__handleUpdateCheckResult must invoke openWhatsNewModal when user initiates check and app is up to date');
+console.log('✓ Automatic What\'s New modal display on up-to-date check verified');
 
 console.log('\n=== ALL LOGO & AUTO-UPDATE TESTS PASSED (100%) ===\n');

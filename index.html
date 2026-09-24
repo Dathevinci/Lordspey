@@ -324,6 +324,10 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export (.spey)
         </button>
+        <button class="menu-sec-btn menu-sec-highlight" id="menu-btn-whats-new" title="What's New in v1.1.0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          What's New (v1.1.0)
+        </button>
         <button class="menu-sec-btn" id="menu-btn-open-spey" title="Open .spey Project">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           Open (.spey)
@@ -2345,9 +2349,9 @@
             <span class="update-arrow" id="update-version-arrow">→</span>
             <span class="update-version-chip update-chip-new" id="update-new-version-chip">New: v1.1.0</span>
           </div>
-          <p class="update-guarantee">
+          <p class="update-guarantee" id="update-guarantee">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <strong>Safe Update Guarantee:</strong> All manuscript drafts, vault lore, world maps, characters, and settings are 100% preserved. An automated safety backup is created upon update.
+            <span id="update-guarantee-text"><strong>Safe Update Guarantee:</strong> All manuscript drafts, vault lore, world maps, characters, and settings are 100% preserved. An automated safety backup is created upon update.</span>
           </p>
         </div>
 
@@ -2364,7 +2368,7 @@
             Release Notes ↗
           </a>
           <a id="btn-download-update" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-glow">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <svg id="btn-download-update-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span id="btn-download-update-text">Instant Update &amp; Download</span>
           </a>
         </div>

@@ -6636,7 +6636,7 @@ img.map-custom-img[src=""] {
   z-index: 500;
 }
 .update-modal-card {
-  max-width: 640px;
+  max-width: 680px;
   width: 94%;
   border-color: rgba(239, 68, 68, 0.4);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 32px rgba(239, 68, 68, 0.25);
@@ -6714,7 +6714,7 @@ img.map-custom-img[src=""] {
   margin-bottom: 6px;
 }
 .update-release-notes {
-  max-height: 320px;
+  max-height: min(450px, 58vh);
   overflow-y: auto;
   background: var(--bg-tertiary);
   border: 1px solid var(--border);
@@ -6727,28 +6727,28 @@ img.map-custom-img[src=""] {
 /* What's New Visual Cards */
 .whats-new-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 10px;
-  margin-top: 6px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
 }
 .whats-new-card {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 10px 12px;
+  padding: 12px 14px;
   transition: all 180ms ease;
 }
 .whats-new-card:hover {
   border-color: rgba(239, 68, 68, 0.45);
   background: var(--bg-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 .whats-new-card-icon {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   line-height: 1;
   flex-shrink: 0;
   padding-top: 2px;
@@ -6758,15 +6758,38 @@ img.map-custom-img[src=""] {
   min-width: 0;
 }
 .whats-new-card-title {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 .whats-new-card-desc {
-  font-size: 0.78rem;
-  line-height: 1.4;
+  font-size: 0.8rem;
+  line-height: 1.42;
   color: var(--text-secondary);
+}
+.whats-new-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.whats-new-bullet {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.whats-new-bullet::before {
+  content: "•";
+  color: var(--red-400);
+  font-weight: bold;
+  line-height: 1;
+  flex-shrink: 0;
 }
 .btn-link-whats-new {
   font-size: inherit;
