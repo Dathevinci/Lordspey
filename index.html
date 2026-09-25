@@ -123,28 +123,36 @@
       <!-- Dropdown menu for New Note creation options -->
       <div id="new-note-dropdown" class="new-note-dropdown hidden" role="menu" aria-label="Create Document Type">
         <button type="button" class="new-dropdown-item" data-create-type="chapter">
-          <span class="dropdown-item-icon">✦</span>
+          <span class="dropdown-item-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          </span>
           <div class="dropdown-item-text">
             <span class="dropdown-item-title">New Chapter Section</span>
             <span class="dropdown-item-desc">Manuscript chapter or custom act/volume section</span>
           </div>
         </button>
         <button type="button" class="new-dropdown-item" data-create-type="character">
-          <span class="dropdown-item-icon">👥</span>
+          <span class="dropdown-item-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
           <div class="dropdown-item-text">
             <span class="dropdown-item-title">Character Note</span>
             <span class="dropdown-item-desc">Cast profile, motivations &amp; lore</span>
           </div>
         </button>
         <button type="button" class="new-dropdown-item" data-create-type="world">
-          <span class="dropdown-item-icon">🗺️</span>
+          <span class="dropdown-item-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          </span>
           <div class="dropdown-item-text">
             <span class="dropdown-item-title">Worldbuilding Outline</span>
             <span class="dropdown-item-desc">Factions, geography, magic &amp; history</span>
           </div>
         </button>
         <button type="button" class="new-dropdown-item" data-create-type="draft">
-          <span class="dropdown-item-icon">✍️</span>
+          <span class="dropdown-item-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </span>
           <div class="dropdown-item-text">
             <span class="dropdown-item-title">General Note / Draft</span>
             <span class="dropdown-item-desc">Quick thoughts, scene ideas &amp; notes</span>
@@ -178,7 +186,6 @@
       <div class="menu-hero">
         <div class="menu-emblem" id="menu-emblem" role="button" tabindex="0" title="Replay intro animation">
           <img src="assets/icon.png" class="menu-emblem-raven-img" alt="Lord Spey Raven Emblem" />
-          <span class="menu-emblem-star" aria-hidden="true">✦</span>
         </div>
         <h2 class="menu-title font-cinzel">LORD SPEY</h2>
         <p class="menu-subtitle">Distraction-free workspace for crafting prose, connecting lore, and charting story worlds.</p>
@@ -186,7 +193,9 @@
         <!-- Serene Primary Hero Action & Quick Creation Cluster -->
         <div class="hero-actions">
           <button class="hero-primary-btn menu-card" id="menu-btn-chapter" data-action="new-chapter" title="Start writing a new manuscript chapter">
-            <span class="hero-primary-icon">✦</span>
+            <span class="hero-primary-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+            </span>
             <div class="hero-primary-text">
               <span class="hero-primary-title font-cinzel">Start Writing</span>
               <span class="hero-primary-sub">Draft prose, opening scenes, and chapters</span>
@@ -224,16 +233,16 @@
       <div id="menu-empty-section" class="menu-empty-section hidden">
         <div class="menu-empty-card">
           <div class="menu-empty-left">
-            <div class="menu-empty-badge font-cinzel">✦ EMPTY VAULT STARTER</div>
+            <div class="menu-empty-badge">Empty Vault</div>
             <h4 class="menu-empty-title font-cinzel">Begin Your Novel or Explore the Sample Universe</h4>
             <p class="menu-empty-desc">Your author workspace is pristine and ready. Craft your opening scene, or load the complete sample fantasy vault showcasing chapters, interconnected wiki-link constellations, world map pins, timeline epochs, and character codices.</p>
           </div>
           <div class="menu-empty-actions">
             <button id="menu-empty-btn-sample" class="btn btn-primary menu-spey-action-btn">
-              ⚡ Load Sample Vault
+              Load Sample Vault
             </button>
             <button id="menu-empty-btn-guide" class="btn btn-secondary menu-spey-action-btn">
-              ✦ Guided Walkthrough
+              Guided Walkthrough
             </button>
           </div>
         </div>
@@ -242,7 +251,7 @@
       <!-- Native .spey Project Package Banner -->
       <div class="menu-spey-banner">
         <div class="menu-spey-banner-left">
-          <div class="menu-spey-badge font-cinzel">✦ PROJECT PACKAGE (.SPEY)</div>
+          <div class="menu-spey-badge">Project Package (.spey)</div>
           <h4 class="menu-spey-title font-cinzel">Author Workspace Bundle</h4>
           <p class="menu-spey-desc">Download chapters, lore notes, worldbuilding maps, chronology, and character codex as a single shareable .spey file.</p>
         </div>
@@ -262,10 +271,10 @@
       <div class="menu-wb-section">
         <div class="menu-wb-header">
           <div class="menu-wb-header-left">
-            <span class="menu-wb-badge">✦ WORLDBUILDING & LORE SYSTEMS</span>
-            <span class="menu-wb-hint">Spatial cartography, chronology, character dossiers & cosmos graph</span>
+            <span class="menu-wb-badge">Worldbuilding &amp; Lore Systems</span>
+            <span class="menu-wb-hint">Spatial cartography, chronology, character dossiers &amp; cosmos graph</span>
           </div>
-          <button type="button" id="dashboard-btn-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Lord Spey Guided Walkthrough">✦ Guided Walkthrough</button>
+          <button type="button" id="dashboard-btn-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Lord Spey Guided Walkthrough">Guided Walkthrough</button>
         </div>
         <div class="menu-wb-grid">
           <button class="menu-wb-card" id="dashboard-btn-map" title="Interactive World Map & Pin Placement (Ctrl+M)">
@@ -277,7 +286,7 @@
                 <span class="menu-wb-title font-cinzel">World Map</span>
                 <kbd class="shortcut-pill">Ctrl+M</kbd>
               </div>
-              <p class="menu-wb-desc">Cartographic canvas, spatial landmarks & custom fantasy maps</p>
+              <p class="menu-wb-desc">Cartographic canvas, spatial landmarks &amp; custom fantasy maps</p>
             </div>
           </button>
 
@@ -290,7 +299,7 @@
                 <span class="menu-wb-title font-cinzel">Timeline</span>
                 <kbd class="shortcut-pill">Ctrl+T</kbd>
               </div>
-              <p class="menu-wb-desc">Chronological rails, historical eras & narrative milestones</p>
+              <p class="menu-wb-desc">Chronological rails, historical eras &amp; narrative milestones</p>
             </div>
           </button>
 
@@ -303,7 +312,7 @@
                 <span class="menu-wb-title font-cinzel">Character Codex</span>
                 <kbd class="shortcut-pill">Ctrl+U</kbd>
               </div>
-              <p class="menu-wb-desc">Character dossiers, faction ties & dynamic relationship web</p>
+              <p class="menu-wb-desc">Character dossiers, faction ties &amp; dynamic relationship web</p>
             </div>
           </button>
 
@@ -316,7 +325,7 @@
                 <span class="menu-wb-title font-cinzel">Galaxy Graph</span>
                 <kbd class="shortcut-pill">Ctrl+G</kbd>
               </div>
-              <p class="menu-wb-desc">Visual cosmos graph connecting notes, tags & Obsidian wiki-links</p>
+              <p class="menu-wb-desc">Visual cosmos graph connecting notes, tags &amp; Obsidian wiki-links</p>
             </div>
           </button>
         </div>
@@ -324,11 +333,11 @@
 
       <!-- Minimalist Utility Bar -->
       <div class="menu-secondary-actions">
-        <button class="menu-sec-btn menu-sec-highlight" id="menu-btn-export-spey" title="Export Project (.spey)">
+        <button class="menu-sec-btn" id="menu-btn-export-spey" title="Export Project (.spey)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export (.spey)
         </button>
-        <button class="menu-sec-btn menu-sec-highlight" id="menu-btn-whats-new" title="What's New in v1.1.3">
+        <button class="menu-sec-btn" id="menu-btn-whats-new" title="What's New in v1.1.3">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
           What's New (v1.1.3)
         </button>
@@ -353,7 +362,7 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           Interactive Tutorial
         </button>
-        <button class="menu-sec-btn" id="menu-btn-sample" title="Optional: Load sample notes for inspiration">
+        <button class="menu-sec-btn" id="menu-btn-sample" title="Load sample notes for inspiration">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           Load Sample Vault
         </button>
@@ -522,10 +531,12 @@
         <!-- Group 2: Narrative Structure -->
         <div class="format-group format-structure" title="Narrative Structure">
           <button class="fmt-btn" data-action="heading" title="Heading (H1..H3)">H</button>
-          <button class="fmt-btn" data-action="quote" title="Blockquote (&gt;)">❝</button>
+          <button class="fmt-btn" data-action="quote" title="Blockquote (&gt;)">&ldquo;</button>
           <button class="fmt-btn" data-action="ul" title="Bullet list (•)">•</button>
           <button class="fmt-btn" data-action="ol" title="Numbered list (1.)">1.</button>
-          <button class="fmt-btn" data-action="task" title="Task checkbox (- [ ])">☑</button>
+          <button class="fmt-btn" data-action="task" title="Task checkbox (- [ ])">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="9 11 12 14 22 4"/></svg>
+          </button>
           <button id="fmt-divider" class="fmt-btn" data-action="divider" title="Horizontal rule (---)">—</button>
           <button class="fmt-btn" data-action="scene" title="Scene Separator (* * *)">* * *</button>
         </div>
@@ -536,9 +547,13 @@
         <div class="format-group format-inserts" title="Special Inserts & Lore Links">
           <button class="fmt-btn" data-action="wikilink" title="Obsidian Wiki-link [[...]]"><strong>[[ ]]</strong></button>
           <button class="fmt-btn" data-action="callout" title="Obsidian Callout Box (&gt; [!NOTE])">[!]</button>
-          <button class="fmt-btn" data-action="table" title="Insert Markdown Table">▦</button>
+          <button class="fmt-btn" data-action="table" title="Insert Markdown Table">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+          </button>
           <button class="fmt-btn" data-action="footnote" title="Footnote ([^1])">[^1]</button>
-          <button class="fmt-btn" data-action="link" title="Web link">🔗</button>
+          <button class="fmt-btn" data-action="link" title="Web link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </button>
         </div>
 
         <div class="format-sep"></div>
@@ -695,8 +710,10 @@
     <div class="map-dialog">
       <div class="map-header">
         <div class="map-title-group">
-          <span class="logo-icon">🗺️</span>
-          <h3>World Map & Pin Codex</h3>
+          <span class="logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          </span>
+          <h3>World Map &amp; Pin Codex</h3>
           <div class="map-stats">
             <span id="map-pin-count">0 pins</span>
             <span class="hud-sep">·</span>
@@ -727,7 +744,7 @@
             <button id="btn-map-draw-region" class="btn btn-sm btn-ghost" title="Draw territory border or political zone">
               <span>Draw Region</span>
             </button>
-            <button id="btn-map-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="World Map Guide & Cheat Sheet">? Tutorial</button>
+            <button id="btn-map-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="World Map Guide">Guide</button>
             <button id="btn-map-drop-pin" class="btn btn-sm btn-primary" title="Click to enter pin drop mode or place a pin">
               <span>+ Add Pin</span>
             </button>
@@ -753,7 +770,7 @@
       <div class="map-viewport" id="map-viewport">
         <!-- Floating placement banner when drop pin mode is on -->
         <div id="map-placement-hint" class="map-placement-hint hidden">
-          <span>✦ Pin Placement Mode: Click anywhere on the map to drop a pin.</span>
+          <span>Pin Placement Mode: Click anywhere on the map to drop a pin.</span>
           <button id="btn-map-cancel-drop" class="btn btn-xs btn-ghost">Cancel</button>
         </div>
 
@@ -765,7 +782,9 @@
 
         <!-- Map Empty Prompt (when 0 pins exist) -->
         <div id="map-empty-prompt" class="galaxy-empty-prompt hidden">
-          <div class="galaxy-emblem">🗺️</div>
+          <div class="galaxy-emblem">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          </div>
           <h3 class="font-cinzel">World Map Cartography</h3>
           <p>No landmark pins placed on the map yet.<br/>Drop coordinate pins to anchor citadels, passes, and regions to your lore notes.</p>
           <div class="galaxy-prompt-actions">
@@ -773,7 +792,7 @@
               + Drop First Pin
             </button>
             <button class="btn btn-ghost" id="map-btn-empty-sample">
-              ⚡ Load Sample Pins
+              Load Sample Pins
             </button>
           </div>
         </div>
@@ -800,7 +819,7 @@
           <span class="legend-item"><span class="legend-dot dot-world"></span> World Pins</span>
           <span class="legend-item"><span class="legend-dot dot-draft"></span> Draft Pins</span>
           <span class="legend-sep">|</span>
-          <span class="legend-hint">Click & drag to pan · Scroll / pinch to zoom · Drag pins to move</span>
+          <span class="legend-hint">Click &amp; drag to pan · Scroll / pinch to zoom · Drag pins to move</span>
         </div>
       </div>
     </div>
@@ -833,13 +852,13 @@
         <div class="modal-field" style="flex: 1;">
           <label for="map-modal-pin-type">Landmark Icon / Type</label>
           <select id="map-modal-pin-type">
-            <option value="citadel">🏰 Citadel / Fortress</option>
-            <option value="peak">⛰️ Mountain / Peak</option>
-            <option value="city">🏛️ City / Settlement</option>
-            <option value="shrine">⛩️ Shrine / Ruin</option>
-            <option value="water">⚓ Port / Waterway</option>
-            <option value="forest">🌲 Wilderness / Forest</option>
-            <option value="danger">⚔️ Battle / Danger Zone</option>
+            <option value="citadel">Citadel / Fortress</option>
+            <option value="peak">Mountain / Peak</option>
+            <option value="city">City / Settlement</option>
+            <option value="shrine">Shrine / Ruin</option>
+            <option value="water">Port / Waterway</option>
+            <option value="forest">Wilderness / Forest</option>
+            <option value="danger">Battle / Danger Zone</option>
           </select>
         </div>
         <div class="modal-field" style="width: 90px;">
@@ -863,8 +882,10 @@
     <div class="timeline-dialog">
       <div class="timeline-header">
         <div class="timeline-title-group">
-          <span class="logo-icon">⏳</span>
-          <h3>Chronology & Event Timeline</h3>
+          <span class="logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          <h3>Chronology &amp; Event Timeline</h3>
           <div class="timeline-stats">
             <span id="timeline-event-count">0 events</span>
           </div>
@@ -885,7 +906,7 @@
             <button id="btn-timeline-mode-rail" class="btn btn-sm btn-ghost active" title="Horizontal Chronology Rail">Rail View</button>
             <button id="btn-timeline-mode-stream" class="btn btn-sm btn-ghost" title="Vertical Story Stream">Stream View</button>
           </div>
-          <button id="btn-timeline-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Timeline Guide & Cheat Sheet">? Tutorial</button>
+          <button id="btn-timeline-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Timeline Guide">Guide</button>
           <button id="btn-timeline-add" class="btn btn-sm btn-primary" title="Add custom timeline event">
             <span>+ Add Event</span>
           </button>
@@ -913,12 +934,14 @@
 
         <!-- Empty state prompt -->
         <div id="timeline-empty-prompt" class="timeline-empty-prompt hidden">
-          <div class="timeline-empty-icon">⏳</div>
+          <div class="timeline-empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
           <h3 class="font-cinzel">No Timeline Events Yet</h3>
           <p>Parse events automatically by writing <code>@timeline: Year 342 | The Fall of the Gate</code> in your notes, or click "+ Add Event" to manually record milestones.</p>
           <div style="display: flex; gap: 10px; justify-content: center; margin-top: 14px;">
             <button id="btn-timeline-empty-add" class="btn btn-primary">+ Add First Event</button>
-            <button id="btn-timeline-empty-sample" class="btn btn-ghost">⚡ Load Sample Vault</button>
+            <button id="btn-timeline-empty-sample" class="btn btn-ghost">Load Sample Vault</button>
           </div>
         </div>
       </div>
@@ -975,8 +998,10 @@
     <div class="codex-dialog">
       <div class="codex-header">
         <div class="codex-title-group">
-          <span class="logo-icon">👥</span>
-          <h3>Character Codex & Relationship Web</h3>
+          <span class="logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
+          <h3>Character Codex &amp; Relationship Web</h3>
           <div class="codex-stats">
             <span id="codex-character-count">0 characters</span>
             <span class="hud-sep">·</span>
@@ -1000,7 +1025,7 @@
             <button id="btn-codex-mode-cards" class="btn btn-sm btn-ghost active" title="Dossier Cards">Dossiers</button>
             <button id="btn-codex-mode-web" class="btn btn-sm btn-ghost" title="Interactive Relationship Web">Relationship Web</button>
           </div>
-          <button id="btn-codex-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Character Codex Guide & Cheat Sheet">? Tutorial</button>
+          <button id="btn-codex-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Character Codex Guide">Guide</button>
           <button id="btn-codex-add-char" class="btn btn-sm btn-primary" title="Create new character dossier">
             <span>+ Character</span>
           </button>
@@ -1055,12 +1080,14 @@
 
         <!-- Empty state prompt -->
         <div id="codex-empty-prompt" class="codex-empty-prompt hidden">
-          <div class="codex-empty-icon">👥</div>
+          <div class="codex-empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
           <h3 class="font-cinzel">No Characters in Codex</h3>
           <p>Tag notes with <code>#character</code> or category <code>lore</code>, use <code>@character: Name | Archetype | Faction</code>, or click "+ Character" to start building your cast.</p>
           <div style="display: flex; gap: 10px; justify-content: center; margin-top: 14px;">
             <button id="btn-codex-empty-add" class="btn btn-primary">+ Create First Character</button>
-            <button id="btn-codex-empty-sample" class="btn btn-ghost">⚡ Load Sample Vault</button>
+            <button id="btn-codex-empty-sample" class="btn btn-ghost">Load Sample Vault</button>
           </div>
         </div>
       </div>
@@ -1565,14 +1592,16 @@
     <div class="modal-card sample-confirm-card">
       <div class="modal-header">
         <div class="modal-header-left">
-          <span class="sample-confirm-badge font-cinzel">✦ SAFETY BACKUP &amp; PROTECTION</span>
+          <span class="sample-confirm-badge font-cinzel">Safety Backup &amp; Protection</span>
           <h3 class="modal-title font-cinzel" id="sample-confirm-title">Load Sample Vault</h3>
         </div>
         <button id="btn-sample-confirm-close" class="icon-btn modal-close-btn" title="Cancel &amp; Close (Esc)">✕</button>
       </div>
       <div class="modal-body sample-confirm-body">
         <div class="sample-warning-banner">
-          <div class="sample-warning-icon">⚠️</div>
+          <div class="sample-warning-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
           <div class="sample-warning-content">
             <h4 class="sample-warning-heading">Your workspace contains active manuscripts and lore</h4>
             <p class="sample-warning-text">
@@ -1632,11 +1661,11 @@
     <div class="modal-card project-settings-card">
       <div class="modal-header">
         <div class="modal-header-left">
-          <span class="settings-modal-badge font-cinzel">✦ WORKSPACE PREFERENCES &amp; VAULT</span>
+          <span class="settings-modal-badge font-cinzel">Workspace Preferences</span>
           <h3 class="modal-title font-cinzel" id="settings-modal-title">Lord Spey Settings</h3>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
-          <button type="button" id="btn-settings-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Settings &amp; Vault Guide">? Guide</button>
+          <button type="button" id="btn-settings-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Settings &amp; Vault Guide">Guide</button>
           <button id="btn-close-project-settings" class="icon-btn modal-close-btn" title="Close Settings (Esc)">✕</button>
         </div>
       </div>
@@ -1731,10 +1760,10 @@
               <p class="settings-group-desc">Explore a rich sample fantasy vault showcasing chapters with formatting, interconnected wiki-link constellations, world map pins, timeline epochs, and character codices.</p>
               <div class="settings-action-row">
                 <button type="button" id="settings-btn-load-sample" class="btn btn-secondary" title="Load complete sample vault template">
-                  ⚡ Load Sample Vault Template
+                  Load Sample Vault Template
                 </button>
                 <button type="button" id="settings-btn-restore-backup" class="btn btn-secondary" title="Roll back to previous vault backup if sample vault was loaded">
-                  ↺ Restore Previous Vault Backup
+                  Restore Previous Vault Backup
                 </button>
               </div>
             </div>
@@ -2058,28 +2087,28 @@
 
               <div class="tour-buttons-grid">
                 <button type="button" id="settings-btn-tour-general" class="btn btn-secondary">
-                  ✦ Workspace Walkthrough
+                  Workspace Walkthrough
                 </button>
                 <button type="button" id="settings-btn-tour-editor" class="btn btn-secondary">
-                  ✍️ Editor &amp; Formatting Guide
+                  Editor &amp; Formatting Guide
                 </button>
                 <button type="button" id="settings-btn-tour-wiki" class="btn btn-secondary">
-                  🔗 Wiki-Links &amp; Mentions Guide
+                  Wiki-Links &amp; Mentions Guide
                 </button>
                 <button type="button" id="settings-btn-tour-graph" class="btn btn-secondary">
-                  🌌 Galaxy Graph Guide
+                  Galaxy Graph Guide
                 </button>
                 <button type="button" id="settings-btn-tour-map" class="btn btn-secondary">
-                  🗺️ World Map Guide
+                  World Map Guide
                 </button>
                 <button type="button" id="settings-btn-tour-timeline" class="btn btn-secondary">
-                  ⏳ Chronology Timeline Guide
+                  Chronology Timeline Guide
                 </button>
                 <button type="button" id="settings-btn-tour-codex" class="btn btn-secondary">
-                  👥 Character Codex Guide
+                  Character Codex Guide
                 </button>
                 <button type="button" id="settings-btn-tour-spey" class="btn btn-secondary">
-                  📦 Settings &amp; .spey Vault Guide
+                  Settings &amp; .spey Vault Guide
                 </button>
               </div>
             </div>
@@ -2122,7 +2151,7 @@
   <div id="vault-reset-confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
     <div class="modal-card" style="max-width: 440px;">
       <div class="modal-header">
-        <h3 class="modal-title font-cinzel text-danger" id="reset-modal-title">⚠️ Reset Vault?</h3>
+        <h3 class="modal-title font-cinzel text-danger" id="reset-modal-title">Reset Vault?</h3>
         <button id="btn-close-reset-confirm" class="icon-btn modal-close-btn" title="Cancel (Esc)">✕</button>
       </div>
       <div class="modal-body">
