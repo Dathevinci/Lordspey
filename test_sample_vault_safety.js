@@ -473,5 +473,145 @@ if (galaxyBtn) {
 
 console.log('✓ Test 10 Passed: All 5 secondary and empty-state triggers safely protected by confirmation dialog\n');
 
+// ── TEST 11: Deep Field-Level Modification & Deletion Detection ──
+console.log('--- 11. Testing Deep Field-Level Modification & Deletion Detection ---');
+Storage.clearAllNotes();
+Storage.loadStarterVault('replace', false);
+assert.strictEqual(Storage.hasUserContent(), false, 'Pristine starter vault reports hasUserContent() === false');
+
+// A. Edit a starter character's backstory
+const vespera = Storage.getCharacters().find(c => c.name === 'Vespera');
+assert(vespera, 'Vespera starter character found');
+Storage.saveCharacter({ id: vespera.id, name: 'Vespera', bio: 'Modified backstory: Raised by shadow weavers in the deep frost.' });
+assert.strictEqual(Storage.hasUserContent(), true, 'Editing starter character bio triggers hasUserContent() === true');
+
+// Revert to pristine starter
+Storage.loadStarterVault('replace', false);
+assert.strictEqual(Storage.hasUserContent(), false, 'Reverted to pristine');
+
+// B. Move a starter map pin's coordinates
+const firstPin = Storage.getAllMapPins()[0];
+assert(firstPin, 'Starter map pin found');
+Storage.saveMapPin({ id: firstPin.id, title: firstPin.title, x: firstPin.x + 10, y: firstPin.y + 10, pinType: firstPin.pinType, description: firstPin.description });
+assert.strictEqual(Storage.hasUserContent(), true, 'Moving map pin coordinates triggers hasUserContent() === true');
+
+// Revert to pristine starter
+Storage.loadStarterVault('replace', false);
+assert.strictEqual(Storage.hasUserContent(), false, 'Reverted to pristine');
+
+// C. Edit a starter timeline event
+const firstEvent = Storage.getTimelineEvents()[0];
+assert(firstEvent, 'Starter timeline event found');
+Storage.saveTimelineEvent({ id: firstEvent.id, title: 'Renamed Epoch Event', year: firstEvent.year, description: firstEvent.description });
+assert.strictEqual(Storage.hasUserContent(), true, 'Editing timeline event triggers hasUserContent() === true');
+
+// Revert to pristine starter
+Storage.loadStarterVault('replace', false);
+assert.strictEqual(Storage.hasUserContent(), false, 'Reverted to pristine');
+
+// D. Delete starter notes (user curated/pruned the vault)
+const currentStarterNotes = Storage.getAllNotes();
+Storage.deleteNote(currentStarterNotes[currentStarterNotes.length - 1].id);
+assert.strictEqual(Storage.hasUserContent(), true, 'Deleting a starter note triggers hasUserContent() === true (workspace was customized)');
+
+// Revert to pristine starter
+Storage.loadStarterVault('replace', false);
+assert.strictEqual(Storage.hasUserContent(), false, 'Reverted to pristine');
+
+// E. Add custom map region
+Storage.clearAllNotes();
+Storage.saveMapRegion({ name: 'The Ashen Vale Wards', shape: 'circle', radius: 45 });
+assert.strictEqual(Storage.hasUserContent(), true, 'Custom map region triggers hasUserContent() === true');
+
+// F. Add custom graph node
+Storage.clearAllNotes();
+Storage.saveGraphNode({ title: 'Arcane Resonance Nexus', entityType: 'Cosmology' });
+assert.strictEqual(Storage.hasUserContent(), true, 'Custom cosmos graph node triggers hasUserContent() === true');
+console.log('✓ Test 11 Passed: Field modifications, deletions, and non-note entity additions accurately detected\n');
+
+// ── TEST 12: Subview PostAction Routing Functions ──
+console.log('--- 12. Testing Subview PostAction Execution (Timeline, Codex, Map) ---');
+let timelineRenderCalled = false;
+let codexRenderCalled = false;
+let mapPinsRenderCalled = false;
+let mapRegionsRenderCalled = false;
+
+global.renderTimeline = () => { timelineRenderCalled = true; };
+window.renderTimeline = global.renderTimeline;
+global.renderCodex = () => { codexRenderCalled = true; };
+window.renderCodex = global.renderCodex;
+global.renderMapPins = () => { mapPinsRenderCalled = true; };
+window.renderMapPins = global.renderMapPins;
+global.renderMapRegions = () => { mapRegionsRenderCalled = true; };
+window.renderMapRegions = global.renderMapRegions;
+
+window.executeLoadStarterVault('replace', false, { postAction: 'timeline' });
+assert.strictEqual(timelineRenderCalled, true, 'renderTimeline() executed for timeline postAction');
+
+window.executeLoadStarterVault('replace', false, { postAction: 'codex' });
+assert.strictEqual(codexRenderCalled, true, 'renderCodex() executed for codex postAction');
+
+window.executeLoadStarterVault('replace', false, { postAction: 'map' });
+assert.strictEqual(mapPinsRenderCalled, true, 'renderMapPins() executed for map postAction');
+assert.strictEqual(mapRegionsRenderCalled, true, 'renderMapRegions() executed for map postAction');
+console.log('✓ Test 12 Passed: Real renderTimeline, renderCodex, and renderMapPins/Regions invoked on subview sample load\n');
+
+// ── TEST 13: LocalStorage Quota Exhaustion & In-Memory Recovery ──
+console.log('--- 13. Testing LocalStorage Quota Overflow Error Boundary ---');
+Storage.clearAllNotes();
+Storage.createNote({ title: 'Critical Manuscript Before Quota Crash', body: 'Immense novel chapter text.' });
+assert.strictEqual(Storage.hasUserContent(), true);
+
+// Mock localStorage.setItem to simulate QuotaExceededError for backup key
+const originalSetItem = global.localStorage.setItem;
+let quotaErrorThrown = false;
+global.localStorage.setItem = (k, v) => {
+  if (k === 'lordspey_vault_backup') {
+    quotaErrorThrown = true;
+    const err = new Error('QuotaExceededError: The quota has been exceeded.');
+    err.name = 'QuotaExceededError';
+    throw err;
+  }
+  originalSetItem(k, v);
+};
+
+// Execute load starter vault with backup
+window.executeLoadStarterVault('replace', true);
+
+// Verify quota error occurred but was handled cleanly without crashing or losing data
+assert.strictEqual(quotaErrorThrown, true, 'QuotaExceededError was triggered');
+const recoveredBackup = Storage.getVaultBackup();
+assert(recoveredBackup, 'In-memory backup fallback exists despite localStorage quota overflow');
+assert(recoveredBackup.notes.some(n => n.title === 'Critical Manuscript Before Quota Crash'), 'Backup contains user manuscript');
+
+// Restore the project from fallback backup
+Storage.restoreVaultBackup();
+const restoredNotesAfterQuota = Storage.getAllNotes();
+assert(restoredNotesAfterQuota.some(n => n.title === 'Critical Manuscript Before Quota Crash'), 'Project successfully recovered from in-memory fallback');
+
+// Restore original setItem
+global.localStorage.setItem = originalSetItem;
+console.log('✓ Test 13 Passed: LocalStorage quota exhaustion handled gracefully via memory fallback with zero data loss\n');
+
+// ── TEST 14: Custom Map Image Cleared in Replace Mode & Restored on Undo ──
+console.log('--- 14. Testing Custom Map Image Lifecycle in Replace Mode ---');
+Storage.clearAllNotes();
+Storage.createNote({ title: 'World of Eldoria Chapter 1', body: 'The map reveals secrets.' });
+Storage.saveCustomMapImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+assert(Storage.getCustomMapImage(), 'Custom map image set');
+assert.strictEqual(Storage.hasUserContent(), true, 'Custom map image triggers hasUserContent');
+
+// Load sample vault in replace mode with backup
+window.executeLoadStarterVault('replace', true);
+
+// Active vault must now have NO custom map image (sample vault uses default map canvas)
+assert.strictEqual(Storage.getCustomMapImage(), null, 'Custom map image cleared in sample vault');
+
+// Undo / Restore
+window.executeRestoreVaultBackup();
+assert(Storage.getCustomMapImage(), 'Custom map image successfully restored from safety snapshot');
+assert(Storage.findNoteByTitle('World of Eldoria Chapter 1'), 'User note restored');
+console.log('✓ Test 14 Passed: Custom map image cleanly removed on replace and fully restored on rollback\n');
+
 console.log('=== ALL SAMPLE VAULT SAFETY & RECOVERY TESTS PASSED (100%) ===\n');
 process.exit(0);

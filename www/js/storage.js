@@ -793,33 +793,12 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   }
 
   function loadStarterVault(mode = 'replace', performBackup = true) {
-    if (mode === 'merge') {
-      if (performBackup && hasUserContent()) {
-        createBackup();
-      }
-      const pkg = getStarterVaultPackage();
-      importSpeyPackage(pkg, 'merge', false);
-      return getAllNotes();
-    }
-
     if (performBackup && hasUserContent()) {
       createBackup();
     }
-    _saveAll(JSON.parse(JSON.stringify(STARTER_NOTES)));
-    try {
-      localStorage.setItem(MAP_PINS_KEY, JSON.stringify(STARTER_PINS));
-      localStorage.setItem(TIMELINE_KEY, JSON.stringify(STARTER_TIMELINE));
-      localStorage.setItem(CHARACTERS_KEY, JSON.stringify(STARTER_CHARACTERS));
-      localStorage.setItem(RELATIONSHIPS_KEY, JSON.stringify(STARTER_RELATIONSHIPS));
-      localStorage.setItem(MAP_REGIONS_KEY, JSON.stringify(STARTER_REGIONS));
-      localStorage.setItem(GRAPH_NODES_KEY, JSON.stringify(STARTER_GRAPH_NODES));
-      localStorage.setItem(GRAPH_LINKS_KEY, JSON.stringify(STARTER_GRAPH_LINKS));
-      localStorage.setItem(SECTIONS_KEY, JSON.stringify(STARTER_SECTIONS));
-      localStorage.setItem(MAP_SHAPE_KEY, 'landscape');
-    } catch {
-      // Ignore
-    }
-    return STARTER_NOTES;
+    const pkg = getStarterVaultPackage();
+    importSpeyPackage(pkg, mode, false);
+    return getAllNotes();
   }
 
   function searchNotes(query) {
@@ -1754,60 +1733,105 @@ Confidential author reference sheet for character backstories, plot twists, psyc
 
   // ── Backup Protection ──
   const BACKUP_KEY = 'lordspey_vault_backup';
+  let _lastBackupSnapshot = null;
 
-  function hasUserContent() {
+  function isVaultEmpty() {
     try {
       const notes = getAllNotes();
       const rawPins = getAllMapPins();
       const rawEvents = getTimelineEvents();
       const rawChars = getCharacters();
       const customMap = getCustomMapImage();
+      const rawRegions = getAllMapRegions();
+      const rawNodes = getGraphNodes();
+      const rawSections = getAllSections();
+      const rawRels = getRelationships();
 
-      if (customMap) return true;
-
-      // 1. If completely empty (0 notes, 0 pins, 0 events, 0 characters)
-      if ((!notes || notes.length === 0) &&
-          (!rawPins || rawPins.length === 0) &&
-          (!rawEvents || rawEvents.length === 0) &&
-          (!rawChars || rawChars.length === 0)) {
-        return false;
-      }
-
-      // 2. Check for user-created notes or edits to starter notes
-      const starterNoteMap = new Map(STARTER_NOTES.map(n => [n.id, n]));
-      for (const n of (notes || [])) {
-        if (!n || typeof n !== 'object') continue;
-        const starter = starterNoteMap.get(n.id);
-        if (!starter) return true; // User-created note!
-        if (n.title !== starter.title || n.body !== starter.body) return true; // User edited starter note!
-      }
-
-      // 3. Check for user-created map pins
-      const starterPinIds = new Set(STARTER_PINS.map(p => p.id));
-      for (const p of (rawPins || [])) {
-        if (!p || typeof p !== 'object') continue;
-        if (!starterPinIds.has(p.id)) return true;
-      }
-
-      // 4. Check for user-created timeline events
-      const starterEventIds = new Set(STARTER_TIMELINE.map(e => e.id));
-      for (const e of (rawEvents || [])) {
-        if (!e || typeof e !== 'object') continue;
-        if (!starterEventIds.has(e.id)) return true;
-      }
-
-      // 5. Check for user-created characters
-      const starterCharIds = new Set(STARTER_CHARACTERS.map(c => c.id));
-      for (const c of (rawChars || [])) {
-        if (!c || typeof c !== 'object') continue;
-        if (!starterCharIds.has(c.id)) return true;
-      }
-
-      // If all items match pristine starter templates, active vault is in pristine starter state
-      return false;
+      return (!notes || notes.length === 0) &&
+             (!rawPins || rawPins.length === 0) &&
+             (!rawEvents || rawEvents.length === 0) &&
+             (!rawChars || rawChars.length === 0) &&
+             (!rawRegions || rawRegions.length === 0) &&
+             (!rawNodes || rawNodes.length === 0) &&
+             (!rawSections || rawSections.length === 0) &&
+             (!rawRels || rawRels.length === 0) &&
+             !customMap;
     } catch {
       return false;
     }
+  }
+
+  function isPristineStarterVault() {
+    try {
+      if (getCustomMapImage()) return false;
+
+      // 1. Starter Notes
+      const notes = (getAllNotes() || []).filter(n => n && typeof n === 'object');
+      if (notes.length !== STARTER_NOTES.length) return false;
+      const starterNoteMap = new Map(STARTER_NOTES.map(n => [n.id, n]));
+      for (const n of notes) {
+        const s = starterNoteMap.get(n.id);
+        if (!s) return false;
+        if (n.title !== s.title || n.body !== s.body || n.category !== s.category || (n.tags || '') !== (s.tags || '') || (n.section || '') !== (s.section || '')) {
+          return false;
+        }
+      }
+
+      // 2. Starter Map Pins
+      const rawPins = (getAllMapPins() || []).filter(p => p && typeof p === 'object');
+      if (rawPins.length !== STARTER_PINS.length) return false;
+      const starterPinMap = new Map(STARTER_PINS.map(p => [p.id, p]));
+      for (const p of rawPins) {
+        const s = starterPinMap.get(p.id);
+        if (!s) return false;
+        const pPinType = p.pinType || 'citadel';
+        const sPinType = s.pinType || 'citadel';
+        if (p.title !== s.title || p.x !== s.x || p.y !== s.y || (p.description || '') !== (s.description || '') || pPinType !== sPinType) {
+          return false;
+        }
+      }
+
+      // 3. Starter Timeline Events
+      const rawEvents = (getTimelineEvents() || []).filter(e => e && typeof e === 'object');
+      if (rawEvents.length !== STARTER_TIMELINE.length) return false;
+      const starterEventMap = new Map(STARTER_TIMELINE.map(e => [e.id, e]));
+      for (const e of rawEvents) {
+        const s = starterEventMap.get(e.id);
+        if (!s) return false;
+        if (e.title !== s.title || (e.year || '') !== (s.year || '') || (e.description || '') !== (s.description || '')) {
+          return false;
+        }
+      }
+
+      // 4. Starter Characters
+      const rawChars = (getCharacters() || []).filter(c => c && typeof c === 'object');
+      if (rawChars.length !== STARTER_CHARACTERS.length) return false;
+      const starterCharMap = new Map(STARTER_CHARACTERS.map(c => [c.id, c]));
+      for (const c of rawChars) {
+        const s = starterCharMap.get(c.id);
+        if (!s) return false;
+        if (c.name !== s.name || (c.role || '') !== (s.role || '') || (c.bio || '') !== (s.bio || '') || (c.archetype || '') !== (s.archetype || '')) {
+          return false;
+        }
+      }
+
+      // 5. Starter Regions & Nodes
+      const rawRegions = (getAllMapRegions() || []).filter(r => r && typeof r === 'object');
+      if (rawRegions.length !== STARTER_REGIONS.length) return false;
+
+      const rawNodes = (getGraphNodes() || []).filter(g => g && typeof g === 'object');
+      if (rawNodes.length !== STARTER_GRAPH_NODES.length) return false;
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function hasUserContent() {
+    if (isVaultEmpty()) return false;
+    if (isPristineStarterVault()) return false;
+    return true;
   }
 
   function getStarterVaultPackage() {
@@ -1855,21 +1879,53 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       sections: getAllSections(),
       settings: getSettings()
     };
+    _lastBackupSnapshot = snapshot;
+
+    let persisted = false;
     try {
       localStorage.setItem(BACKUP_KEY, JSON.stringify(snapshot));
+      persisted = true;
     } catch (e) {
-      console.warn('Unable to persist backup snapshot to localStorage:', e);
+      console.warn('Unable to persist full backup snapshot to localStorage (quota may be exceeded). Trying light snapshot without custom map image...', e);
+      try {
+        const lightSnapshot = { ...snapshot, customMapImage: null };
+        localStorage.setItem(BACKUP_KEY, JSON.stringify(lightSnapshot));
+        persisted = true;
+      } catch (e2) {
+        console.warn('Unable to persist light backup snapshot to localStorage:', e2);
+        try {
+          localStorage.removeItem(BACKUP_KEY);
+        } catch (_) {}
+      }
     }
+
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem(BACKUP_KEY, JSON.stringify(snapshot));
+      }
+    } catch {
+      // Ignore
+    }
+
     return snapshot;
   }
 
   function getVaultBackup() {
     try {
       const raw = localStorage.getItem(BACKUP_KEY);
-      return raw ? JSON.parse(raw) : null;
+      if (raw) return JSON.parse(raw);
     } catch {
-      return null;
+      // continue to fallbacks
     }
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        const sess = sessionStorage.getItem(BACKUP_KEY);
+        if (sess) return JSON.parse(sess);
+      }
+    } catch {
+      // continue to fallbacks
+    }
+    return _lastBackupSnapshot || null;
   }
 
   function restoreVaultBackup() {
@@ -2096,6 +2152,7 @@ Confidential author reference sheet for character backstories, plot twists, psyc
           x: typeof p.x === 'number' ? p.x : 50,
           y: typeof p.y === 'number' ? p.y : 50,
           description: typeof p.description === 'string' ? p.description : '',
+          terrain: typeof p.terrain === 'string' ? p.terrain : '',
           pinType: typeof p.pinType === 'string' ? p.pinType : 'citadel',
           icon: typeof p.icon === 'string' ? p.icon : '✦',
           color: typeof p.color === 'string' ? p.color : '',
@@ -2177,6 +2234,9 @@ Confidential author reference sheet for character backstories, plot twists, psyc
         _saveCharacters(d.characters.filter(c => c && typeof c === 'object').map(c => ({
           id: c.id || _uid(),
           name: typeof c.name === 'string' ? c.name : 'Unknown',
+          aliases: typeof c.aliases === 'string' ? c.aliases : '',
+          psychProfile: typeof c.psychProfile === 'string' ? c.psychProfile : '',
+          status: typeof c.status === 'string' ? c.status : 'Active',
           archetype: typeof c.archetype === 'string' ? c.archetype : 'Protagonist',
           faction: typeof c.faction === 'string' ? c.faction : '',
           role: typeof c.role === 'string' ? c.role : '',
@@ -2256,6 +2316,8 @@ Confidential author reference sheet for character backstories, plot twists, psyc
             x: typeof p.x === 'number' ? p.x : 50,
             y: typeof p.y === 'number' ? p.y : 50,
             description: typeof p.description === 'string' ? p.description : '',
+            terrain: typeof p.terrain === 'string' ? p.terrain : '',
+            pinType: typeof p.pinType === 'string' ? p.pinType : 'citadel',
             noteId: p.noteId || null
           };
           if (pinIds.has(pinClone.id)) {
@@ -2312,10 +2374,15 @@ Confidential author reference sheet for character backstories, plot twists, psyc
           let chClone = {
             id: ch.id || _uid(),
             name: typeof ch.name === 'string' ? ch.name : 'Unknown',
+            aliases: typeof ch.aliases === 'string' ? ch.aliases : '',
+            psychProfile: typeof ch.psychProfile === 'string' ? ch.psychProfile : '',
+            status: typeof ch.status === 'string' ? ch.status : 'Active',
             archetype: typeof ch.archetype === 'string' ? ch.archetype : 'Protagonist',
             faction: typeof ch.faction === 'string' ? ch.faction : '',
             role: typeof ch.role === 'string' ? ch.role : '',
             bio: typeof ch.bio === 'string' ? ch.bio : '',
+            image: typeof ch.image === 'string' ? ch.image : (typeof ch.avatar === 'string' ? ch.avatar : ''),
+            attributes: ch.attributes || {},
             noteId: ch.noteId || null
           };
           const trimmedName = chClone.name.trim().toLowerCase();
@@ -2586,6 +2653,7 @@ ${note.body || ''}`;
     hasUserContent,
     hasExistingWork: hasUserContent,
     isVaultEmpty: () => !hasUserContent(),
+    isPristineStarterVault,
     getStarterVaultPackage,
     // Map Pins
     getAllMapPins,

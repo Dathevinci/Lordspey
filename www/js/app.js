@@ -1631,7 +1631,10 @@
           return;
         }
         const dateStr = b.timestamp ? new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-        if (confirm(`Restore previous vault backup${dateStr ? ' (from ' + dateStr + ')' : ''}? Your current workspace will be replaced with the saved backup.`)) {
+        const shouldRestore = (typeof confirm === 'function')
+          ? confirm(`Restore previous vault backup${dateStr ? ' (from ' + dateStr + ')' : ''}? Your current workspace will be replaced with the saved backup.`)
+          : (typeof window !== 'undefined' && typeof window.confirm === 'function' ? window.confirm(`Restore previous vault backup${dateStr ? ' (from ' + dateStr + ')' : ''}? Your current workspace will be replaced with the saved backup.`) : true);
+        if (shouldRestore) {
           executeRestoreVaultBackup();
         }
       });
@@ -2615,6 +2618,8 @@
         if (stats.characters) details.push(`<span class="sample-breakdown-chip"><strong>${stats.characters}</strong> characters</span>`);
         if (stats.timelineEvents) details.push(`<span class="sample-breakdown-chip"><strong>${stats.timelineEvents}</strong> timeline milestones</span>`);
         if (stats.mapPins) details.push(`<span class="sample-breakdown-chip"><strong>${stats.mapPins}</strong> map landmarks</span>`);
+        if (stats.mapRegions) details.push(`<span class="sample-breakdown-chip"><strong>${stats.mapRegions}</strong> map regions</span>`);
+        if (stats.graphNodes) details.push(`<span class="sample-breakdown-chip"><strong>${stats.graphNodes}</strong> cosmos entities</span>`);
         if (stats.hasCustomMap) details.push(`<span class="sample-breakdown-chip">✦ <strong>Custom Cartography Map</strong></span>`);
         sampleConfirmDetails.innerHTML = details.join(' ');
       }
@@ -2649,11 +2654,21 @@
       if (typeof renderProjectSettingsStats === 'function') renderProjectSettingsStats();
 
       if (options && options.postAction === 'timeline') {
-        if (typeof renderTimelineEvents === 'function') renderTimelineEvents();
+        if (typeof window !== 'undefined' && typeof window.renderTimeline === 'function') window.renderTimeline();
+        else if (typeof renderTimeline === 'function') renderTimeline();
+        else if (typeof renderTimelineEvents === 'function') renderTimelineEvents();
       } else if (options && options.postAction === 'codex') {
-        if (typeof renderCodexUI === 'function') renderCodexUI();
+        if (typeof window !== 'undefined' && typeof window.renderCodex === 'function') window.renderCodex();
+        else if (typeof renderCodex === 'function') renderCodex();
+        else if (typeof renderCodexUI === 'function') renderCodexUI();
       } else if (options && options.postAction === 'map') {
-        if (typeof renderMapPins === 'function') renderMapPins();
+        if (typeof window !== 'undefined' && typeof window.renderMapPins === 'function') window.renderMapPins();
+        else if (typeof renderMapPins === 'function') renderMapPins();
+        if (typeof window !== 'undefined' && typeof window.renderMapRegions === 'function') window.renderMapRegions();
+        else if (typeof renderMapRegions === 'function') renderMapRegions();
+        if (typeof renderDefaultMap === 'function' && typeof Storage !== 'undefined' && !Storage.getCustomMapImage()) {
+          renderDefaultMap();
+        }
       } else if (options && options.postAction === 'galaxy') {
         if (typeof buildGalaxyData === 'function') buildGalaxyData();
       } else {
