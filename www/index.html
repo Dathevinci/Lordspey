@@ -18,7 +18,6 @@
     <div class="sidebar-header">
       <h1 class="logo clickable" id="logo-home" title="Lord Spey — Go to Main Menu">
         <img src="assets/logo.png" class="logo-raven-img" alt="Lord Spey Raven Logo" />
-        <span class="logo-icon" aria-hidden="true">✦</span>
         <span class="logo-text">LORD SPEY</span>
       </h1>
       <button id="sidebar-toggle" class="icon-btn sidebar-collapse-btn" title="Collapse sidebar" aria-label="Collapse sidebar">
@@ -595,7 +594,12 @@
         <!-- Floating Outline Panel -->
         <aside id="outline-drawer" class="outline-drawer hidden">
           <div class="outline-header">
-            <div class="outline-title"><span class="outline-icon">✦</span> Document Outline</div>
+            <div class="outline-title">
+              <span class="outline-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </span>
+              <span>Document Outline</span>
+            </div>
             <button id="btn-close-outline" class="icon-btn btn-xs" title="Close outline">×</button>
           </div>
           <ul id="outline-list" class="outline-list"></ul>
@@ -611,7 +615,9 @@
           <section id="backlinks-panel" class="backlinks-panel">
             <div class="backlinks-header" id="backlinks-toggle-header">
               <div class="backlinks-title">
-                <span class="backlinks-icon">✦</span>
+                <span class="backlinks-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </span>
                 <span>Linked Mentions</span>
                 <span id="backlinks-count" class="backlinks-count">0</span>
               </div>
@@ -633,7 +639,9 @@
     <div class="graph-dialog">
       <div class="graph-header">
         <div class="graph-title-group">
-          <span class="logo-icon galaxy-pulse">✦</span>
+          <span class="logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><line x1="12" y1="9" x2="18" y2="6"/><line x1="12" y1="15" x2="6" y2="18"/></svg>
+          </span>
           <h3>Galaxy Graph</h3>
           <div class="graph-stats">
             <span id="graph-node-count">0 notes</span> · <span id="graph-edge-count">0 links</span>
@@ -678,7 +686,9 @@
 
         <!-- Galaxy Empty Prompt (if 0 notes exist) -->
         <div id="galaxy-empty-prompt" class="galaxy-empty-prompt hidden">
-          <div class="galaxy-emblem">✦</div>
+          <div class="galaxy-emblem">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><line x1="12" y1="9" x2="18" y2="6"/><line x1="12" y1="15" x2="6" y2="18"/><line x1="14" y1="14" x2="17" y2="18"/></svg>
+          </div>
           <h3 class="font-cinzel">Galaxy Graph</h3>
           <p>No notes in this graph yet.<br/>Create notes and link them using [[Note Title]] to visualize connections across your universe.</p>
           <div class="galaxy-prompt-actions">
@@ -697,7 +707,7 @@
           <span class="legend-item"><span class="legend-dot dot-world"></span> World Building</span>
           <span class="legend-item"><span class="legend-dot dot-draft"></span> Drafts</span>
           <span class="legend-sep">|</span>
-          <span class="legend-item"><span class="legend-hub-symbol">✦</span> Category Hub</span>
+          <span class="legend-item"><span class="legend-hub-symbol">●</span> Category Hub</span>
           <span class="legend-item"><span class="legend-branch-line"></span> Sub-branch</span>
         </div>
         <div class="graph-hint">Click note to open in editor · Click category hub to focus branch · Drag to move · Scroll to zoom</div>
@@ -1217,7 +1227,10 @@
     <div class="modal metrics-dialog">
       <div class="metrics-dialog-header">
         <div class="metrics-dialog-title font-cinzel">
-          <span class="text-accent">✦</span> Manuscript Statistics
+          <span class="text-accent" style="display: inline-flex; align-items: center; vertical-align: middle; margin-right: 6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </span>
+          <span>Manuscript Statistics</span>
         </div>
         <button id="btn-close-metrics" class="icon-btn btn-xs" title="Close">✕</button>
       </div>
@@ -1365,7 +1378,9 @@
       </div>
 
       <div class="tutorial-card-body">
-        <div class="tutorial-icon-box" id="tutorial-icon-box">✦</div>
+        <div class="tutorial-icon-box" id="tutorial-icon-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
         <h3 class="tutorial-card-title font-cinzel" id="tutorial-title">Welcome to Lord Spey</h3>
         <p class="tutorial-card-desc" id="tutorial-desc"></p>
         
@@ -1390,7 +1405,9 @@
     <div class="modal wb-tutorial-dialog">
       <div class="wb-tutorial-header">
         <div class="wb-tutorial-title-wrap">
-          <span class="wb-tutorial-icon">🗺️</span>
+          <span class="wb-tutorial-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          </span>
           <div>
             <h3 class="modal-title font-cinzel">World Map Guide & Tutorial</h3>
             <span class="wb-tutorial-sub">Spatial cartography, landmarks & geography</span>
@@ -1437,7 +1454,9 @@
     <div class="modal wb-tutorial-dialog">
       <div class="wb-tutorial-header">
         <div class="wb-tutorial-title-wrap">
-          <span class="wb-tutorial-icon">⏳</span>
+          <span class="wb-tutorial-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
           <div>
             <h3 class="modal-title font-cinzel">Timeline Guide & Tutorial</h3>
             <span class="wb-tutorial-sub">Chronology, epochs & narrative milestones</span>
@@ -1485,7 +1504,9 @@
     <div class="modal wb-tutorial-dialog">
       <div class="wb-tutorial-header">
         <div class="wb-tutorial-title-wrap">
-          <span class="wb-tutorial-icon">👥</span>
+          <span class="wb-tutorial-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
           <div>
             <h3 class="modal-title font-cinzel">Character Codex Guide & Tutorial</h3>
             <span class="wb-tutorial-sub">Character dossiers, factions & relationship web</span>
@@ -1536,14 +1557,16 @@
     <div class="modal-card spey-import-card">
       <div class="modal-header">
         <div class="modal-header-left">
-          <span class="spey-badge font-cinzel">✦ PROJECT BUNDLE DETECTED</span>
+          <span class="spey-badge font-cinzel">Project Bundle Detected</span>
           <h3 class="modal-title font-cinzel" id="spey-import-title">Open Lord Spey Project</h3>
         </div>
         <button id="btn-import-modal-close" class="icon-btn modal-close-btn" title="Cancel &amp; Close (Esc)">✕</button>
       </div>
       <div class="modal-body spey-import-body">
         <div class="spey-project-hero">
-          <div class="spey-project-emblem">✦</div>
+          <div class="spey-project-emblem">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </div>
           <div class="spey-project-meta">
             <h4 class="spey-project-name" id="spey-import-proj-name">Lord Spey Manuscript</h4>
             <span class="spey-project-tag" id="spey-import-format-tag">Native .spey Bundle · Version 1</span>
@@ -1929,21 +1952,21 @@
               
               <div class="base-theme-grid">
                 <div class="base-theme-card active" data-base-theme="dark">
-                  <div class="base-theme-preview preview-dark">✦</div>
+                  <div class="base-theme-preview preview-dark"></div>
                   <div class="base-theme-info">
                     <span class="base-theme-name">Dark (Obsidian)</span>
                     <span class="base-theme-desc">Obsidian dark obsidian canvas</span>
                   </div>
                 </div>
                 <div class="base-theme-card" data-base-theme="light">
-                  <div class="base-theme-preview preview-light">✦</div>
+                  <div class="base-theme-preview preview-light"></div>
                   <div class="base-theme-info">
                     <span class="base-theme-name">Light (Parchment)</span>
                     <span class="base-theme-desc">Clean, warm daylight editorial page</span>
                   </div>
                 </div>
                 <div class="base-theme-card" data-base-theme="sepia">
-                  <div class="base-theme-preview preview-sepia">✦</div>
+                  <div class="base-theme-preview preview-sepia"></div>
                   <div class="base-theme-info">
                     <span class="base-theme-name">Sepia (Warm Paper)</span>
                     <span class="base-theme-desc">Warm editorial book paper for low eye strain</span>
@@ -2011,7 +2034,7 @@
 
               <div style="margin-top: 12px;">
                 <button type="button" id="setting-btn-preview-intro" class="btn btn-secondary">
-                  ✦ Preview Intro Star Animation
+                  Preview Intro Animation
                 </button>
               </div>
             </div>
@@ -2172,7 +2195,9 @@
   <!-- Drag-and-drop .spey File Overlay -->
   <div id="spey-dropzone" class="spey-dropzone hidden" aria-hidden="true">
     <div class="spey-dropzone-inner">
-      <div class="spey-dropzone-star">✦</div>
+      <div class="spey-dropzone-star">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
       <h3 class="font-cinzel">Drop .spey Project Here</h3>
       <p>Release to inspect and open author workspace bundle</p>
     </div>
@@ -2454,7 +2479,9 @@
   <!-- Persistent Sample Vault Restore Banner / Undo Notification -->
   <div id="sample-vault-restore-banner" class="sample-restore-banner hidden" role="alert">
     <div class="sample-restore-banner-content">
-      <div class="sample-restore-icon">✦</div>
+      <div class="sample-restore-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+      </div>
       <span class="sample-restore-text">
         <strong>Sample vault loaded.</strong> Your previous project was safely archived.
       </span>
@@ -2470,7 +2497,7 @@
         <div class="modal-header-left" style="display: flex; align-items: center; gap: 12px;">
           <img src="assets/icon.png" alt="Lord Spey Logo" class="update-raven-badge" />
           <div>
-            <span class="settings-modal-badge font-cinzel" id="update-modal-badge">✦ UPDATE AVAILABLE</span>
+            <span class="settings-modal-badge font-cinzel" id="update-modal-badge">UPDATE AVAILABLE</span>
             <h3 class="modal-title font-cinzel" id="update-modal-title">Lord Spey Update</h3>
           </div>
         </div>

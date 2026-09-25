@@ -1170,7 +1170,7 @@
             let sectionHtml = '';
             sortedEntries.forEach(([secName, secNotes]) => {
               if (secName) {
-                sectionHtml += `<li class="nav-subsection-header font-cinzel"><span>✦ ${escText(secName)}</span></li>`;
+                sectionHtml += `<li class="nav-subsection-header font-cinzel"><span>${escText(secName)}</span></li>`;
               }
               sectionHtml += secNotes.map(n => `
                 <li class="nav-item">
@@ -2508,7 +2508,7 @@
         <div class="spey-breakdown-item"><strong>${summary.timelineEventsCount || 0}</strong> chronology events</div>
         <div class="spey-breakdown-item"><strong>${summary.charactersCount || 0}</strong> character dossiers</div>
         <div class="spey-breakdown-item"><strong>${summary.relationshipsCount || 0}</strong> relationship bonds</div>
-        ${summary.hasCustomMap ? '<div class="spey-breakdown-item">✦ <strong>Custom Cartography Map</strong> included</div>' : ''}
+        ${summary.hasCustomMap ? '<div class="spey-breakdown-item"><strong>Custom Cartography Map</strong> included</div>' : ''}
       `;
     }
 
@@ -2620,7 +2620,7 @@
         if (stats.mapPins) details.push(`<span class="sample-breakdown-chip"><strong>${stats.mapPins}</strong> map landmarks</span>`);
         if (stats.mapRegions) details.push(`<span class="sample-breakdown-chip"><strong>${stats.mapRegions}</strong> map regions</span>`);
         if (stats.graphNodes) details.push(`<span class="sample-breakdown-chip"><strong>${stats.graphNodes}</strong> cosmos entities</span>`);
-        if (stats.hasCustomMap) details.push(`<span class="sample-breakdown-chip">✦ <strong>Custom Cartography Map</strong></span>`);
+        if (stats.hasCustomMap) details.push(`<span class="sample-breakdown-chip"><strong>Custom Cartography Map</strong></span>`);
         sampleConfirmDetails.innerHTML = details.join(' ');
       }
 
@@ -3144,112 +3144,112 @@
     {
       step: '1 of 8',
       category: 'Workspace Overview',
-      icon: '✦',
+      icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
       title: 'Welcome to Lord Spey',
       desc: 'Lord Spey is your minimal, local-first author workspace crafted for novelists and worldbuilders. Inspired by Obsidian, it lets you draft chapters, organize manuscript lore, and interconnect your universe without distractions.',
       features: [
-        { icon: '🗂', text: '<strong>Four Dedicated Shelves:</strong> Chapters (prose & scenes), Lore (factions & relics), World (geography & realms), and Drafts (outlines & beat sheets).' },
-        { icon: '✦', text: '<strong>100% Private & Offline:</strong> Stored locally in your browser storage with zero latency, zero cloud tracking, and zero sign-up required.' },
-        { icon: '⚡', text: '<strong>Quick Switcher (<kbd>Ctrl+K</kbd> / <kbd>Ctrl+O</kbd>):</strong> Search and jump to any document, lore entry, or outline instantly.' }
+        { icon: '•', text: '<strong>Four Dedicated Shelves:</strong> Chapters (prose & scenes), Lore (factions & relics), World (geography & realms), and Drafts (outlines & beat sheets).' },
+        { icon: '•', text: '<strong>100% Private & Offline:</strong> Stored locally in your browser storage with zero latency, zero cloud tracking, and zero sign-up required.' },
+        { icon: '•', text: '<strong>Quick Switcher (<kbd>Ctrl+K</kbd> / <kbd>Ctrl+O</kbd>):</strong> Search and jump to any document, lore entry, or outline instantly.' }
       ],
       tip: 'Click any category card on the dashboard or "+ New Note" in the sidebar to jump straight into drafting.'
     },
     {
       step: '2 of 8',
       category: 'Editor & Formatting',
-      icon: '✍️',
+      icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
       title: 'Author Drafting & Formatting',
       desc: 'A distraction-free writing environment equipped with professional author formatting controls and live split preview:',
       features: [
         { icon: '—', text: '<strong>Dialogue & Smart Typography:</strong> Type <code>--</code> to auto-expand to em-dash (—), or use curly quotes (“ ”), single quotes (‘ ’), and ellipsis (…).' },
-        { icon: '✦', text: '<strong>Extended Markdown:</strong> Scene breaks (<code>* * *</code>), task checklists (<code>- [ ]</code>), strikethrough (<code>~~text~~</code>), and highlighters (<code>==text==</code>).' },
+        { icon: '•', text: '<strong>Extended Markdown:</strong> Scene breaks (<code>* * *</code>), task checklists (<code>- [ ]</code>), strikethrough (<code>~~text~~</code>), and highlighters (<code>==text==</code>).' },
         { icon: '[!]', text: '<strong>Callouts & Tables:</strong> One-click inserts for Obsidian callouts (<code>> [!NOTE]</code>, <code>> [!QUOTE]</code>) and markdown tables.' },
         { icon: '↕', text: '<strong>Typography & Line Height:</strong> Choose between Lora, Inter, JetBrains Mono, or Playfair, adjust font size, and cycle line spacing (1.5, 1.8, 2.1).' },
-        { icon: '✦', text: '<strong>Typewriter Mode & Metrics:</strong> Keep the active line vertically centered while drafting, and click the word meter for detailed readability metrics.' }
+        { icon: '•', text: '<strong>Typewriter Mode & Metrics:</strong> Keep the active line vertically centered while drafting, and click the word meter for detailed readability metrics.' }
       ],
       tip: 'Press <kbd>Ctrl+\\</kbd> for live split view, <kbd>Alt+O</kbd> for document outline, or <kbd>Ctrl+F</kbd> for in-editor find and replace.'
     },
     {
       step: '3 of 8',
       category: 'Wiki-Links',
-      icon: '🔗',
+      icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
       title: 'Obsidian Wiki-Links & Mentions',
       desc: 'Cross-reference people, places, factions, and relics seamlessly inside your prose using double square brackets:',
       features: [
         { icon: '[[ ]]', text: '<strong>Standard Link:</strong> Type <code>[[The Obsidian Gate]]</code> to link directly to that note.' },
         { icon: '[[ | ]]', text: '<strong>Custom Display Alias:</strong> Type <code>[[The Obsidian Gate|The High Portal]]</code> to display custom anchor text.' },
-        { icon: '✦', text: '<strong>Auto-Create on Click:</strong> Clicking a link to an unwritten entry automatically prompts you to create it immediately.' },
-        { icon: '✦', text: '<strong>Linked Mentions Panel:</strong> The panel at the bottom of every note reveals all backlinks and references pointing to it.' }
+        { icon: '•', text: '<strong>Auto-Create on Click:</strong> Clicking a link to an unwritten entry automatically prompts you to create it immediately.' },
+        { icon: '•', text: '<strong>Linked Mentions Panel:</strong> The panel at the bottom of every note reveals all backlinks and references pointing to it.' }
       ],
       tip: 'Use the <kbd>[[ ]]</kbd> button in the formatting bar to quickly wrap any selected text in wiki brackets.'
     },
     {
       step: '4 of 8',
       category: 'Galaxy Graph',
-      icon: '🌌',
+      icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><line x1="12" y1="9" x2="18" y2="6"/><line x1="12" y1="15" x2="6" y2="18"/></svg>',
       title: 'Interactive Galaxy Graph',
       desc: 'Visualize your stories, lore entries, and chapters as an interconnected galaxy of stars and category hubs:',
       features: [
-        { icon: '✦', text: '<strong>Category Sun Hubs:</strong> Four glowing core suns anchor Chapters (crimson), Lore (amber), World (amethyst), and Drafts (slate).' },
-        { icon: '✦', text: '<strong>Sub-Branch Constellations:</strong> Notes cluster organically around their category hub, grouped by story arcs and tags.' },
-        { icon: '✦', text: '<strong>Luminous Links:</strong> Bidirectional wiki-links illuminate glowing constellation beams connecting your manuscript.' },
-        { icon: '✦', text: '<strong>Interactive Controls:</strong> Drag background to pan, scroll to zoom, click category hubs to focus sub-branches, and click any star to jump into editing.' }
+        { icon: '•', text: '<strong>Category Sun Hubs:</strong> Four glowing core suns anchor Chapters (crimson), Lore (amber), World (amethyst), and Drafts (slate).' },
+        { icon: '•', text: '<strong>Sub-Branch Constellations:</strong> Notes cluster organically around their category hub, grouped by story arcs and tags.' },
+        { icon: '•', text: '<strong>Luminous Links:</strong> Bidirectional wiki-links illuminate glowing constellation beams connecting your manuscript.' },
+        { icon: '•', text: '<strong>Interactive Controls:</strong> Drag background to pan, scroll to zoom, click category hubs to focus sub-branches, and click any star to jump into editing.' }
       ],
       tip: 'Press <kbd>Ctrl+G</kbd> anytime to open the Galaxy Graph, or use the category filter pills at the top to isolate specific shelves.'
     },
     {
       step: '5 of 8',
       category: 'World Map',
-      icon: '🗺️',
+      icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
       title: 'Interactive World Map & Cartography',
       desc: 'Anchor your worldbuilding in physical geography with procedural terrain, custom map art, and coordinate pins:',
       features: [
-        { icon: '✦', text: '<strong>Procedural & Custom Maps:</strong> Explore procedural fantasy terrain or upload your own high-resolution world map image.' },
-        { icon: '📍', text: '<strong>Drop Coordinate Pins:</strong> Click "Place Pin" and tap anywhere on the canvas (or double-click) to drop pins with precise (X, Y) coordinates.' },
-        { icon: '✦', text: '<strong>Attach to Lore Notes:</strong> Link pins directly to worldbuilding entries; clicking a pin displays an interactive preview card and direct jump.' },
-        { icon: '✦', text: '<strong>Smooth Zoom & Pan:</strong> Drag to pan the map, scroll wheel to zoom, or use multi-touch pinch gestures on mobile devices.' }
+        { icon: '•', text: '<strong>Procedural & Custom Maps:</strong> Explore procedural fantasy terrain or upload your own high-resolution world map image.' },
+        { icon: '•', text: '<strong>Drop Coordinate Pins:</strong> Click "Place Pin" and tap anywhere on the canvas (or double-click) to drop pins with precise (X, Y) coordinates.' },
+        { icon: '•', text: '<strong>Attach to Lore Notes:</strong> Link pins directly to worldbuilding entries; clicking a pin displays an interactive preview card and direct jump.' },
+        { icon: '•', text: '<strong>Smooth Zoom & Pan:</strong> Drag to pan the map, scroll wheel to zoom, or use multi-touch pinch gestures on mobile devices.' }
       ],
       tip: 'Press <kbd>Ctrl+M</kbd> to launch the World Map, or tag notes with coordinates to associate them automatically.'
     },
     {
       step: '6 of 8',
       category: 'Chronology Timeline',
-      icon: '⏳',
+      icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
       title: 'Chronology & Event Timeline',
       desc: 'Track narrative pacing, historic epochs, battle dates, and chapter milestones across time:',
       features: [
-        { icon: '✦', text: '<strong>Dual View Modes:</strong> Toggle between a visual Rail Timeline with epoch milestone nodes and a narrative Event Stream.' },
-        { icon: '✦', text: '<strong>Era & Epoch Organization:</strong> Group milestones by epochs (e.g. "Age of Foundations", "The Convergence") with filterable eras.' },
-        { icon: '✦', text: '<strong>Automatic Note Tag Scanning:</strong> Spey automatically indexes events tagged with <code>@timeline(Year, Era)</code> or <code>@event</code> in note text.' },
-        { icon: '✦', text: '<strong>Chapter Milestone Linking:</strong> Click any milestone card to jump directly to its associated chapter or lore entry in the editor.' }
+        { icon: '•', text: '<strong>Dual View Modes:</strong> Toggle between a visual Rail Timeline with epoch milestone nodes and a narrative Event Stream.' },
+        { icon: '•', text: '<strong>Era & Epoch Organization:</strong> Group milestones by epochs (e.g. "Age of Foundations", "The Convergence") with filterable eras.' },
+        { icon: '•', text: '<strong>Automatic Note Tag Scanning:</strong> Spey automatically indexes events tagged with <code>@timeline(Year, Era)</code> or <code>@event</code> in note text.' },
+        { icon: '•', text: '<strong>Chapter Milestone Linking:</strong> Click any milestone card to jump directly to its associated chapter or lore entry in the editor.' }
       ],
       tip: 'Press <kbd>Ctrl+T</kbd> to open the Chronology Timeline and inspect story pacing across your saga.'
     },
     {
       step: '7 of 8',
       category: 'Character Codex',
-      icon: '👥',
+      icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
       title: 'Character Codex & Relationship Webs',
       desc: 'Develop your cast, psychological archetypes, factions, and relationship dynamics:',
       features: [
-        { icon: '✦', text: '<strong>Character Dossiers:</strong> Record character archetypes (Protagonist, Antagonist, Mentor, Ally), factions, roles, and status.' },
-        { icon: '✦', text: '<strong>Interactive Web Canvas:</strong> Switch to the "Relationship Web" view to see force-directed relationship lines connecting your cast.' },
-        { icon: '✦', text: '<strong>Dynamic Connections:</strong> Map relationships ("Mentor to", "Nemesis of", "Allied with", "Pursues") with custom descriptions.' },
-        { icon: '✦', text: '<strong>Auto-Scanning Character Tags:</strong> Tag notes with <code>@character: Name | Archetype | Faction</code> to populate dossiers automatically.' }
+        { icon: '•', text: '<strong>Character Dossiers:</strong> Record character archetypes (Protagonist, Antagonist, Mentor, Ally), factions, roles, and status.' },
+        { icon: '•', text: '<strong>Interactive Web Canvas:</strong> Switch to the "Relationship Web" view to see force-directed relationship lines connecting your cast.' },
+        { icon: '•', text: '<strong>Dynamic Connections:</strong> Map relationships ("Mentor to", "Nemesis of", "Allied with", "Pursues") with custom descriptions.' },
+        { icon: '•', text: '<strong>Auto-Scanning Character Tags:</strong> Tag notes with <code>@character: Name | Archetype | Faction</code> to populate dossiers automatically.' }
       ],
       tip: 'Press <kbd>Ctrl+U</kbd> to open the Character Codex, or switch between Card Dossier and Relationship Web views.'
     },
     {
       step: '8 of 8',
       category: 'Settings & .spey',
-      icon: '📦',
+      icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
       title: 'Settings, Themes & .spey Vault Bundles',
       desc: 'Safeguard your creative work and customize your workspace aesthetics:',
       features: [
-        { icon: '📦', text: '<strong>Portable .spey Project Bundles:</strong> Export your entire novel library—notes, map pins, timeline, characters, and settings—into a single file.' },
-        { icon: '✦', text: '<strong>Merge & Replace Import:</strong> Import existing .spey bundles with automatic safety backups and non-destructive merge collision handling.' },
-        { icon: '🎨', text: '<strong>Accent Themes:</strong> Switch between Crimson, Ruby, Amber/Gold, Amethyst, and Emerald accent palettes.' },
-        { icon: '⚡', text: '<strong>Sample Vault Template:</strong> Instantly reload the complete sample vault anytime via Settings Tab 1 or empty state buttons.' }
+        { icon: '•', text: '<strong>Portable .spey Project Bundles:</strong> Export your entire novel library—notes, map pins, timeline, characters, and settings—into a single file.' },
+        { icon: '•', text: '<strong>Merge & Replace Import:</strong> Import existing .spey bundles with automatic safety backups and non-destructive merge collision handling.' },
+        { icon: '•', text: '<strong>Accent Themes:</strong> Switch between Crimson, Ruby, Amber/Gold, Amethyst, and Emerald accent palettes.' },
+        { icon: '•', text: '<strong>Sample Vault Template:</strong> Instantly reload the complete sample vault anytime via Settings Tab 1 or empty state buttons.' }
       ],
       tip: 'Press <kbd>Ctrl+,</kbd> to open Project Settings, or drag and drop any <code>.spey</code> file directly into the application.'
     }
@@ -3296,7 +3296,7 @@
 
     tutorialStepBadge.textContent = `Step ${data.step}`;
     tutorialCategoryTag.textContent = data.category;
-    tutorialIconBox.textContent = data.icon;
+    tutorialIconBox.innerHTML = data.icon;
     tutorialTitle.textContent = data.title;
     tutorialDesc.textContent = data.desc;
 
@@ -3323,7 +3323,7 @@
 
     // Update buttons
     btnTutorialPrev.style.visibility = index === 0 ? 'hidden' : 'visible';
-    btnTutorialNext.textContent = index === TUTORIAL_STEPS.length - 1 ? 'Get Started ✦' : 'Next →';
+    btnTutorialNext.textContent = index === TUTORIAL_STEPS.length - 1 ? 'Get Started' : 'Next →';
   }
 
   function insertTextAtCursor(text) {
@@ -4454,7 +4454,7 @@
       halo: (ACCENT_THEMES[currentAccentTheme] && ACCENT_THEMES[currentAccentTheme].accent) || '#ef4444',
       glow: (ACCENT_THEMES[currentAccentTheme] && ACCENT_THEMES[currentAccentTheme].redGlowStrong) || 'rgba(239, 68, 68, 0.45)',
       core: '#ffffff',
-      icon: '✦',
+      icon: '●',
       angle: -3 * Math.PI / 4,
     },
     lore: {
@@ -4464,7 +4464,7 @@
       halo: '#f97316',
       glow: 'rgba(249, 115, 22, 0.45)',
       core: '#ffffff',
-      icon: '✦',
+      icon: '●',
       angle: -Math.PI / 4,
     },
     world: {
@@ -4474,7 +4474,7 @@
       halo: '#a855f7',
       glow: 'rgba(168, 85, 247, 0.45)',
       core: '#ffffff',
-      icon: '✦',
+      icon: '●',
       angle: Math.PI / 4,
     },
     draft: {
@@ -4484,7 +4484,7 @@
       halo: '#94a3b8',
       glow: 'rgba(148, 163, 184, 0.45)',
       core: '#ffffff',
-      icon: '✦',
+      icon: '●',
       angle: 3 * Math.PI / 4,
     },
   };
@@ -4669,7 +4669,7 @@
       }
       if (hudActionHint) {
         if (catNotes.length > 0) {
-          hudActionHint.textContent = `✦ Click to open "${catNotes[0].title}" or isolate`;
+          hudActionHint.textContent = `Click to open "${catNotes[0].title}" or isolate`;
         } else {
           hudActionHint.textContent = graphFilter === node.category ? 'Click to show all categories' : 'Click to isolate this category';
         }
@@ -4684,7 +4684,7 @@
         hudConnectionsCount.textContent = `${wikiLinks} wiki connection${wikiLinks === 1 ? '' : 's'} · ${node.subBranch}`;
       }
       if (hudActionHint) {
-        hudActionHint.textContent = '✦ Click to open in editor';
+        hudActionHint.textContent = 'Click to open in editor';
       }
     }
   }
@@ -5529,10 +5529,10 @@
       ctx.font = '600 13px "Cinzel", serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(meta.icon || '✦', n.x, n.y);
+      ctx.fillText(meta.icon || '●', n.x, n.y);
 
       // Hub Category Title Badge
-      const titleText = `✦ ${meta.name.toUpperCase()}`;
+      const titleText = meta.name.toUpperCase();
       const countLabel = meta.key === 'chapter' ? (n.nodeCount === 1 ? '1 chapter' : `${n.nodeCount} chapters`)
         : meta.key === 'lore' ? (n.nodeCount === 1 ? '1 lore entry' : `${n.nodeCount} lore entries`)
         : meta.key === 'world' ? (n.nodeCount === 1 ? '1 location' : `${n.nodeCount} locations`)
@@ -5614,7 +5614,7 @@
 
           ctx.font = '500 9px "Inter", sans-serif';
           ctx.fillStyle = entColor;
-          ctx.fillText(`✦ ${(n.type || 'concept').toUpperCase()}`, n.x, n.y + n.radius + 23);
+          ctx.fillText((n.type || 'concept').toUpperCase(), n.x, n.y + n.radius + 23);
         }
         ctx.restore();
         continue;
@@ -7126,7 +7126,7 @@
     erasMap.forEach(era => {
       const eraChip = document.createElement('div');
       eraChip.className = 'timeline-era-chip';
-      eraChip.textContent = `✦ ${era.name}`;
+      eraChip.textContent = era.name;
       eraChip.style.left = `${(era.startIdx * stepWidth) + 80}px`;
       timelineRailEras.appendChild(eraChip);
     });
@@ -7192,7 +7192,7 @@
         currentEra = era;
         const eraBanner = document.createElement('div');
         eraBanner.className = 'timeline-stream-era-header';
-        eraBanner.innerHTML = `<span>✦ ${escText(era)}</span>`;
+        eraBanner.innerHTML = `<span>${escText(era)}</span>`;
         timelineStreamContainer.appendChild(eraBanner);
       }
 
@@ -8935,7 +8935,7 @@
     }
     if (timelineDetailYear) timelineDetailYear.textContent = evt.year || 'Historical';
     if (timelineDetailTitle) timelineDetailTitle.textContent = evt.title || 'Untitled Event';
-    if (timelineDetailEra) timelineDetailEra.textContent = evt.era ? `✦ Epoch: ${evt.era}` : 'Historical Record';
+    if (timelineDetailEra) timelineDetailEra.textContent = evt.era ? `Epoch: ${evt.era}` : 'Historical Record';
     if (timelineDetailDesc) timelineDetailDesc.textContent = evt.description || 'No detailed lore recorded.';
 
     if (btnTimelineDetailDelete) {
@@ -9097,7 +9097,7 @@
         Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This release introduces automatic background update detection, real-time visual notification banners, and smart rate-limited sync:
       </div>
       <div class="whats-new-v111-patch" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px;">
-        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">✦ v1.1.3 Automatic Update Detection &amp; Notifications</div>
+        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">v1.1.3 Automatic Update Detection &amp; Notifications</div>
         <ul style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; padding-left: 18px; line-height: 1.4;">
           <li><strong>Automated GitHub Release Detection:</strong> Automatic background checking for new published releases across both Electron desktop and web browser sessions.</li>
           <li><strong>Non-Intrusive Notification Banner:</strong> Sleek floating banner with one-click <code>[Update Now]</code> access and <code>[✕]</code> dismissal.</li>
@@ -9147,7 +9147,7 @@
     const githubLink = $('#btn-view-release-github');
 
     const tag = (releaseData && (releaseData.tag_name || (releaseData.latestVersion ? ('v' + String(releaseData.latestVersion).replace(/^v/i, '')) : null))) || ('v' + APP_VERSION);
-    if (badgeEl) badgeEl.textContent = isActuallyDemo ? '✦ UPDATE PREVIEW (DEMO)' : '✦ UPDATE AVAILABLE';
+    if (badgeEl) badgeEl.textContent = isActuallyDemo ? 'UPDATE PREVIEW (DEMO)' : 'UPDATE AVAILABLE';
     if (titleEl) titleEl.textContent = (releaseData && releaseData.name) || `Lord Spey ${tag}${isActuallyDemo ? ' (Preview)' : ''}`;
     if (arrowEl) arrowEl.textContent = '→';
     if (newVerChip) {
@@ -9262,7 +9262,7 @@
     const downloadIcon = $('#btn-download-update-icon');
     const githubLink = $('#btn-view-release-github');
 
-    if (badgeEl) badgeEl.textContent = `✦ WHAT'S NEW IN v${APP_VERSION}`;
+    if (badgeEl) badgeEl.textContent = `WHAT'S NEW IN v${APP_VERSION}`;
     if (titleEl) titleEl.textContent = `Lord Spey v${APP_VERSION} — New Features & UI Upgrades`;
     if (curVerChip) curVerChip.textContent = `Installed: v${APP_VERSION}`;
     if (arrowEl) arrowEl.textContent = '✦';
