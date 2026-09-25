@@ -25,33 +25,32 @@ async function main() {
   }
 
   const repo = 'Dathevinci/Lordspey';
-  const tag = 'v1.1.3';
-  const releaseName = 'Lord Spey v1.1.3 — Automatic Update Detection & Visual Notifications';
-  const releaseBody = `## Lord Spey v1.1.3 — Automatic Update Detection & Visual Notifications
+  const tag = 'v1.1.4';
+  const releaseName = 'Lord Spey v1.1.4 — Sample Vault Data-Loss Protection & Minimalist UI Overhaul';
+  const releaseBody = `## Lord Spey v1.1.4 — Sample Vault Data-Loss Protection & Minimalist UI Overhaul
 
 Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding.
 
-### ✦ What's New & Improved in v1.1.3
-- **🔄 Automatic Background Release Detection**:
-  - Automatically queries the GitHub Releases API to detect new versions across both Electron desktop and web browser sessions.
-  - Startup check with a gentle 3-second delay to ensure zero impact on workspace initial render.
-  - Periodic background polling every 45 minutes and automatic checks upon window refocus.
-- **🔔 Real-Time Visual Notifications & Update Banners**:
-  - Non-intrusive floating top banner (\`#update-banner\`) offering instant \`[Update Now]\` action and quick dismiss (\`[✕]\`).
-  - Subtle pulsing update badges on the sidebar Settings gear (\`#btn-project-settings\`) and top Dashboard indicator.
-  - Dismissing the floating banner maintains subtle gear and dashboard badges until updated or dismissed.
-- **🛡️ Rate-Limiting Cache & Error Resilience**:
-  - 15-minute rate-limit cooldown cache (\`localStorage\`) prevents redundant network requests on repeated focus switches.
-  - Silent background error handling: offline network failures or GitHub API rate limits (HTTP 403) fail silently in the background while user-initiated manual checks provide actionable status alerts.
-- **⚡ Safe Update Guarantee & In-Place Backups**:
-  - Automated safety snapshot before updates ensuring 100% preservation of manuscript drafts, vault lore, world maps, characters, and settings.
-- **✍️ Workspace & Editor Refinements**:
-  - Seamless split-button "+ New Note" and type selector dropdown menu.
-  - Editor layout geometry isolation, unconstrained vertical flow, and configurable Tab indentation.
+### ✦ What's New & Improved in v1.1.4
+- **🛡️ Sample Vault Data-Loss Prevention & Rollback**:
+  - **Accidental Overwrite Protection**: Intelligent user content detection (\`Storage.hasUserContent()\`, \`Storage.isPristineStarterVault()\`) prevents accidental progress loss when selecting the Sample Vault while working on a project with chapters, lore, characters, maps, or timeline milestones.
+  - **Interactive Safety Confirmation Modal**: Populated vaults trigger an immediate confirmation modal with live project statistics and three non-destructive options: **Backup & Replace**, **Merge with Sample Vault**, or **Cancel**.
+  - **1-Click Instant Undo / Restore**: Automatic pre-replacement safety snapshot with an immediate floating banner (\`[Undo / Restore My Work]\`) and permanent Settings restore control (\`[Restore Previous Vault Backup]\`).
+  - **Non-Destructive Universe Merging**: Merge mode safely incorporates sample lore, timeline milestones, and map regions alongside your custom project without overwriting any user content.
+  - **Quota Error Boundary**: In-memory and session storage fallback snapshots protect against \`QuotaExceededError\` if storage quota is constrained.
+- **✨ Minimalist UI/UX & Distraction-Free Redesign ("Un-slopped")**:
+  - **Purged Neon Glows & Halos**: Eradicated aggressive red box shadows, neon halos, and visual clutter across input fields, wiki links, tags, and modal dialogs. Replaced with soft, refined elevation shadows and clean focus rings.
+  - **Emoji & Sparkle Decoupling**: Removed gratuitous sparkle emojis (\`✦\`) and decorative clutter from logo headers, outline drawers, linked mentions, metrics, and graph legends.
+  - **Editorial Typography**: Serene, comfortable drafting canvas with classic publishing asterisks (\`* * *\`) for scene breaks and refined headline tracking.
+  - **Compact Formatting Bar**: Unified single-line formatting toolbar with sleek 150ms ease transitions.
+  - **Decluttered Sidebar & Modals**: Clean tree hierarchy, unobtrusive split \`+ New Note\` button, and streamlined dialogs.
+- **🔄 Real-Time GitHub Release Detection & In-App Updates**:
+  - Automatic background detection of new GitHub releases with notification banners and status badges.
+  - 15-minute rate-limiting cooldown cache and safe pre-update snapshots.
 
 ### 📦 Downloads & Binaries
-- **Lord Spey Setup 1.1.3.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
-- **Lord Spey 1.1.3.exe**: Portable standalone executable (no installation required).
+- **Lord Spey Setup 1.1.4.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
+- **Lord Spey 1.1.4.exe**: Portable standalone executable (no installation required).
 - **Lord.Spey.apk / app-debug.apk**: Android package for mobile writing and worldbuilding.
 `;
 
@@ -145,8 +144,8 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
   }
 
   const assetsToUpload = [
-    { file: 'Lord Spey Setup 1.1.3.exe', label: 'Lord Spey Setup 1.1.3.exe', contentType: 'application/x-msdos-program' },
-    { file: 'Lord Spey 1.1.3.exe', label: 'Lord Spey 1.1.3.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord Spey Setup 1.1.4.exe', label: 'Lord Spey Setup 1.1.4.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord Spey 1.1.4.exe', label: 'Lord Spey 1.1.4.exe', contentType: 'application/x-msdos-program' },
     { file: 'Lord.Spey.apk', label: 'Lord.Spey.apk', contentType: 'application/vnd.android.package-archive' },
     { file: 'app-debug.apk', label: 'app-debug.apk', contentType: 'application/vnd.android.package-archive' }
   ];
@@ -201,7 +200,7 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
     const uploadedAssetNames = (updatedRelease.assets || []).map(a => a.name);
     console.log(`Total release assets on GitHub: ${uploadedAssetNames.length}`);
     uploadedAssetNames.forEach(a => console.log(`  - ${a}`));
-    const expectedAssets = ['Lord Spey Setup 1.1.3.exe', 'Lord Spey 1.1.3.exe', 'Lord.Spey.apk', 'app-debug.apk'];
+    const expectedAssets = ['Lord Spey Setup 1.1.4.exe', 'Lord Spey 1.1.4.exe', 'Lord.Spey.apk', 'app-debug.apk'];
     const norm = n => (n || '').toLowerCase().replace(/[\s.]+/g, '.');
     let allFound = true;
     for (const exp of expectedAssets) {

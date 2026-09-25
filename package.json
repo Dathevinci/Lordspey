@@ -1,6 +1,6 @@
 {
   "name": "lord-spey",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding.",
   "main": "electron-main.js",
   "scripts": {
