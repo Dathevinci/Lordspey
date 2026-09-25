@@ -7103,3 +7103,222 @@ img.map-custom-img[src=""] {
   }
 }
 
+/* ═══════════════════════════════════════════════
+   Sample Vault Protection Modal & Restore Banner
+   ═══════════════════════════════════════════════ */
+
+.sample-confirm-card {
+  max-width: 620px;
+  width: 100%;
+}
+
+.sample-confirm-badge {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: #f59e0b;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.sample-warning-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: var(--radius-md, 8px);
+  margin-bottom: 16px;
+}
+
+.sample-warning-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.sample-warning-content {
+  flex: 1;
+}
+
+.sample-warning-heading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin: 0 0 4px 0;
+}
+
+.sample-warning-text {
+  font-size: 0.83rem;
+  color: var(--text-secondary, #d4d4d8);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.sample-project-summary {
+  background: var(--bg-secondary, #18181b);
+  border: 1px solid var(--border, #27272a);
+  border-radius: var(--radius-md, 8px);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.sample-summary-heading {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #a1a1aa);
+  margin: 0 0 10px 0;
+}
+
+.sample-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.sample-breakdown-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted, #a1a1aa);
+}
+
+.sample-breakdown-chip {
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border, #27272a);
+  border-radius: 9999px;
+}
+
+.sample-breakdown-chip strong {
+  color: var(--text-primary, #f4f4f5);
+}
+
+.sample-choices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sample-choice-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  background: var(--bg-secondary, #18181b);
+  border: 1px solid var(--border, #27272a);
+  border-radius: var(--radius-md, 8px);
+  transition: all 0.2s ease;
+}
+
+.sample-choice-item:hover {
+  border-color: var(--border-hover, #3f3f46);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.sample-choice-info {
+  flex: 1;
+}
+
+.sample-choice-info strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary, #f4f4f5);
+  margin-bottom: 3px;
+}
+
+.sample-choice-info p {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #a1a1aa);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.sample-choice-item .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Floating Persistent Restore Banner */
+.sample-restore-banner {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 500;
+  background: var(--bg-secondary, #18181b);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--accent, #ef4444);
+  border-radius: var(--radius-md, 8px);
+  padding: 12px 18px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(239, 68, 68, 0.25);
+  animation: bannerSlideUp 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 480px;
+}
+
+@keyframes bannerSlideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.sample-restore-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sample-restore-icon {
+  font-size: 1.25rem;
+  color: var(--accent, #ef4444);
+  flex-shrink: 0;
+}
+
+.sample-restore-text {
+  font-size: 0.84rem;
+  color: var(--text-primary, #f4f4f5);
+  flex: 1;
+  line-height: 1.4;
+}
+
+.sample-restore-text strong {
+  color: var(--accent, #ef4444);
+}
+
+.sample-banner-close {
+  width: 22px;
+  height: 22px;
+  font-size: 0.85rem;
+  color: var(--text-muted, #71717a);
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .sample-choice-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .sample-choice-item .btn {
+    width: 100%;
+  }
+  .sample-restore-banner {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-width: none;
+  }
+  .sample-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+

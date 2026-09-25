@@ -792,8 +792,20 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     }
   }
 
-  function loadStarterVault() {
-    _saveAll(STARTER_NOTES);
+  function loadStarterVault(mode = 'replace', performBackup = true) {
+    if (mode === 'merge') {
+      if (performBackup && hasUserContent()) {
+        createBackup();
+      }
+      const pkg = getStarterVaultPackage();
+      importSpeyPackage(pkg, 'merge', false);
+      return getAllNotes();
+    }
+
+    if (performBackup && hasUserContent()) {
+      createBackup();
+    }
+    _saveAll(JSON.parse(JSON.stringify(STARTER_NOTES)));
     try {
       localStorage.setItem(MAP_PINS_KEY, JSON.stringify(STARTER_PINS));
       localStorage.setItem(TIMELINE_KEY, JSON.stringify(STARTER_TIMELINE));
@@ -1743,10 +1755,94 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   // ── Backup Protection ──
   const BACKUP_KEY = 'lordspey_vault_backup';
 
+  function hasUserContent() {
+    try {
+      const notes = getAllNotes();
+      const rawPins = getAllMapPins();
+      const rawEvents = getTimelineEvents();
+      const rawChars = getCharacters();
+      const customMap = getCustomMapImage();
+
+      if (customMap) return true;
+
+      // 1. If completely empty (0 notes, 0 pins, 0 events, 0 characters)
+      if ((!notes || notes.length === 0) &&
+          (!rawPins || rawPins.length === 0) &&
+          (!rawEvents || rawEvents.length === 0) &&
+          (!rawChars || rawChars.length === 0)) {
+        return false;
+      }
+
+      // 2. Check for user-created notes or edits to starter notes
+      const starterNoteMap = new Map(STARTER_NOTES.map(n => [n.id, n]));
+      for (const n of (notes || [])) {
+        if (!n || typeof n !== 'object') continue;
+        const starter = starterNoteMap.get(n.id);
+        if (!starter) return true; // User-created note!
+        if (n.title !== starter.title || n.body !== starter.body) return true; // User edited starter note!
+      }
+
+      // 3. Check for user-created map pins
+      const starterPinIds = new Set(STARTER_PINS.map(p => p.id));
+      for (const p of (rawPins || [])) {
+        if (!p || typeof p !== 'object') continue;
+        if (!starterPinIds.has(p.id)) return true;
+      }
+
+      // 4. Check for user-created timeline events
+      const starterEventIds = new Set(STARTER_TIMELINE.map(e => e.id));
+      for (const e of (rawEvents || [])) {
+        if (!e || typeof e !== 'object') continue;
+        if (!starterEventIds.has(e.id)) return true;
+      }
+
+      // 5. Check for user-created characters
+      const starterCharIds = new Set(STARTER_CHARACTERS.map(c => c.id));
+      for (const c of (rawChars || [])) {
+        if (!c || typeof c !== 'object') continue;
+        if (!starterCharIds.has(c.id)) return true;
+      }
+
+      // If all items match pristine starter templates, active vault is in pristine starter state
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  function getStarterVaultPackage() {
+    return {
+      format: 'lord-spey-package',
+      version: 1,
+      appName: 'Lord Spey',
+      projectName: 'Lord Spey Sample Universe',
+      title: 'Lord Spey Sample Universe',
+      notes: JSON.parse(JSON.stringify(STARTER_NOTES)),
+      mapPins: JSON.parse(JSON.stringify(STARTER_PINS)),
+      timelineEvents: JSON.parse(JSON.stringify(STARTER_TIMELINE)),
+      characters: JSON.parse(JSON.stringify(STARTER_CHARACTERS)),
+      relationships: JSON.parse(JSON.stringify(STARTER_RELATIONSHIPS)),
+      mapRegions: JSON.parse(JSON.stringify(STARTER_REGIONS)),
+      graphNodes: JSON.parse(JSON.stringify(STARTER_GRAPH_NODES)),
+      graphLinks: JSON.parse(JSON.stringify(STARTER_GRAPH_LINKS)),
+      sections: JSON.parse(JSON.stringify(STARTER_SECTIONS)),
+      mapShape: 'landscape',
+      customMapImage: null
+    };
+  }
+
   function createBackup() {
+    const rawNotes = getAllNotes();
+    const notes = Array.isArray(rawNotes) ? rawNotes : [];
+    const projTitle = (typeof getProjectTitle === 'function' && getProjectTitle()) || 'Lord Spey Manuscript';
     const snapshot = {
+      format: 'lord-spey-package',
+      version: 1,
+      appName: 'Lord Spey',
+      projectName: projTitle,
+      title: projTitle,
       timestamp: new Date().toISOString(),
-      notes: getAllNotes(),
+      notes,
       mapPins: getAllMapPins(),
       customMapImage: getCustomMapImage(),
       timelineEvents: getTimelineEvents(),
@@ -2484,8 +2580,13 @@ ${note.body || ''}`;
     importSpeyPackage,
     importSpey: importSpeyPackage,
     createBackup,
+    createVaultBackup: createBackup,
     getVaultBackup,
     restoreVaultBackup,
+    hasUserContent,
+    hasExistingWork: hasUserContent,
+    isVaultEmpty: () => !hasUserContent(),
+    getStarterVaultPackage,
     // Map Pins
     getAllMapPins,
     getMapPins: getAllMapPins,

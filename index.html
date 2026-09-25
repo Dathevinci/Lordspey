@@ -1560,6 +1560,73 @@
     </div>
   </div>
 
+  <!-- Sample Vault Safety Confirmation Modal -->
+  <div id="modal-sample-vault-confirm" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="sample-confirm-title">
+    <div class="modal-card sample-confirm-card">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="sample-confirm-badge font-cinzel">✦ SAFETY BACKUP &amp; PROTECTION</span>
+          <h3 class="modal-title font-cinzel" id="sample-confirm-title">Load Sample Vault</h3>
+        </div>
+        <button id="btn-sample-confirm-close" class="icon-btn modal-close-btn" title="Cancel &amp; Close (Esc)">✕</button>
+      </div>
+      <div class="modal-body sample-confirm-body">
+        <div class="sample-warning-banner">
+          <div class="sample-warning-icon">⚠️</div>
+          <div class="sample-warning-content">
+            <h4 class="sample-warning-heading">Your workspace contains active manuscripts and lore</h4>
+            <p class="sample-warning-text">
+              Loading the sample universe will modify your active workspace. An automatic safety snapshot will be created before any changes, and you can <strong>Undo / Restore</strong> your work at any time.
+            </p>
+          </div>
+        </div>
+
+        <div class="sample-project-summary">
+          <h5 class="sample-summary-heading font-cinzel">Current Project Contents to Protect:</h5>
+          <div class="spey-stats-grid sample-stats-grid">
+            <div class="spey-stat-card">
+              <span class="spey-stat-value" id="sample-stat-notes">0</span>
+              <span class="spey-stat-label">Total Notes</span>
+            </div>
+            <div class="spey-stat-card">
+              <span class="spey-stat-value" id="sample-stat-chapters">0</span>
+              <span class="spey-stat-label">Chapters</span>
+            </div>
+            <div class="spey-stat-card">
+              <span class="spey-stat-value" id="sample-stat-lore">0</span>
+              <span class="spey-stat-label">Lore &amp; World</span>
+            </div>
+            <div class="spey-stat-card">
+              <span class="spey-stat-value" id="sample-stat-words">0</span>
+              <span class="spey-stat-label">Word Count</span>
+            </div>
+          </div>
+          <div class="sample-breakdown-details" id="sample-confirm-details"></div>
+        </div>
+
+        <div class="sample-choices-list">
+          <div class="sample-choice-item">
+            <div class="sample-choice-info">
+              <strong>Backup &amp; Replace</strong>
+              <p>Automatically creates an instant snapshot backup of all your work, then loads the complete sample universe. You can restore your project with 1-click at any time.</p>
+            </div>
+            <button type="button" id="btn-sample-confirm-replace" class="btn btn-danger">Backup &amp; Replace</button>
+          </div>
+          <div class="sample-choice-item">
+            <div class="sample-choice-info">
+              <strong>Merge with Sample Vault</strong>
+              <p>Safely appends sample chapters, codex dossiers, and map landmarks without deleting or overwriting any of your existing work.</p>
+            </div>
+            <button type="button" id="btn-sample-confirm-merge" class="btn btn-secondary">Merge with Sample Vault</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer sample-confirm-actions">
+        <button id="btn-sample-confirm-cancel" class="btn btn-ghost">Cancel (Keep My Work Untouched)</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Comprehensive Obsidian-Grade Settings Modal -->
   <div id="project-settings-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
     <div class="modal-card project-settings-card">
@@ -1665,6 +1732,9 @@
               <div class="settings-action-row">
                 <button type="button" id="settings-btn-load-sample" class="btn btn-secondary" title="Load complete sample vault template">
                   ⚡ Load Sample Vault Template
+                </button>
+                <button type="button" id="settings-btn-restore-backup" class="btn btn-secondary" title="Roll back to previous vault backup if sample vault was loaded">
+                  ↺ Restore Previous Vault Backup
                 </button>
               </div>
             </div>
@@ -2349,6 +2419,18 @@
       <span class="update-banner-text"><strong>A new version of Lord Spey (<span id="update-banner-version">v1.2.0</span>) is ready!</strong></span>
       <button type="button" id="btn-banner-view-update" class="btn btn-sm btn-primary">Update Now</button>
       <button type="button" id="btn-banner-dismiss-update" class="icon-btn update-banner-close" title="Dismiss">✕</button>
+    </div>
+  </div>
+
+  <!-- Persistent Sample Vault Restore Banner / Undo Notification -->
+  <div id="sample-vault-restore-banner" class="sample-restore-banner hidden" role="alert">
+    <div class="sample-restore-banner-content">
+      <div class="sample-restore-icon">✦</div>
+      <span class="sample-restore-text">
+        <strong>Sample vault loaded.</strong> Your previous project was safely archived.
+      </span>
+      <button type="button" id="btn-sample-undo-restore" class="btn btn-sm btn-primary">Undo / Restore My Work</button>
+      <button type="button" id="btn-sample-dismiss-banner" class="icon-btn sample-banner-close" title="Dismiss">✕</button>
     </div>
   </div>
 

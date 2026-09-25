@@ -299,11 +299,29 @@
   const btnCancelResetVault     = $('#btn-cancel-reset-vault');
   const btnConfirmResetVault    = $('#btn-confirm-reset-vault');
 
+  const modalSampleVaultConfirm   = $('#modal-sample-vault-confirm') || $('#sample-vault-confirm-modal');
+  const btnSampleConfirmClose     = $('#btn-sample-confirm-close');
+  const btnSampleConfirmCancel    = $('#btn-sample-confirm-cancel');
+  const btnSampleConfirmReplace   = $('#btn-sample-confirm-replace') || $('#btn-sample-confirm-backup-replace');
+  const btnSampleConfirmMerge     = $('#btn-sample-confirm-merge');
+  const sampleStatNotes           = $('#sample-stat-notes');
+  const sampleStatChapters        = $('#sample-stat-chapters');
+  const sampleStatLore            = $('#sample-stat-lore');
+  const sampleStatWords           = $('#sample-stat-words');
+  const sampleConfirmDetails      = $('#sample-confirm-details');
+
+  const sampleVaultRestoreBanner  = $('#sample-vault-restore-banner');
+  const btnSampleUndoRestore      = $('#btn-sample-undo-restore');
+  const btnSampleDismissBanner    = $('#btn-sample-dismiss-banner');
+  const settingsBtnRestoreBackup  = $('#settings-btn-restore-backup');
+
   const speyDropzone           = $('#spey-dropzone');
 
   if (speyImportModal && speyImportModal.classList) speyImportModal.classList.add('hidden');
   if (projectSettingsModal && projectSettingsModal.classList) projectSettingsModal.classList.add('hidden');
   if (vaultResetConfirmModal && vaultResetConfirmModal.classList) vaultResetConfirmModal.classList.add('hidden');
+  if (modalSampleVaultConfirm && modalSampleVaultConfirm.classList) modalSampleVaultConfirm.classList.add('hidden');
+  if (sampleVaultRestoreBanner && sampleVaultRestoreBanner.classList) sampleVaultRestoreBanner.classList.add('hidden');
   if (speyDropzone && speyDropzone.classList) speyDropzone.classList.add('hidden');
 
   // Find & Replace
@@ -1243,10 +1261,7 @@
     menuBtnGraph.addEventListener('click', openGraphView);
     menuBtnSwitcher.addEventListener('click', openQuickSwitcher);
     menuBtnSample.addEventListener('click', () => {
-      Storage.loadStarterVault();
-      renderSidebar();
-      renderMainMenuRecent();
-      toast('Loaded sample vault', 'success');
+      handleRequestLoadSampleVault();
     });
 
     // Sidebar actions
@@ -1605,11 +1620,20 @@
     }
     if (settingsBtnLoadSample) {
       settingsBtnLoadSample.addEventListener('click', () => {
-        Storage.loadStarterVault();
-        renderSidebar();
-        renderMainMenuRecent();
-        if (typeof updateSettingsStats === 'function') updateSettingsStats();
-        toast('Loaded rich sample vault template', 'success');
+        handleRequestLoadSampleVault();
+      });
+    }
+    if (settingsBtnRestoreBackup) {
+      settingsBtnRestoreBackup.addEventListener('click', () => {
+        const b = (typeof Storage !== 'undefined' && typeof Storage.getVaultBackup === 'function') ? Storage.getVaultBackup() : null;
+        if (!b) {
+          toast('No previous vault backup found', 'info');
+          return;
+        }
+        const dateStr = b.timestamp ? new Date(b.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+        if (confirm(`Restore previous vault backup${dateStr ? ' (from ' + dateStr + ')' : ''}? Your current workspace will be replaced with the saved backup.`)) {
+          executeRestoreVaultBackup();
+        }
       });
     }
     if (btnSettingsTutorial) {
@@ -1630,30 +1654,18 @@
     }
     if (btnTimelineEmptySample) {
       btnTimelineEmptySample.addEventListener('click', () => {
-        Storage.loadStarterVault();
-        renderSidebar();
-        renderMainMenuRecent();
-        renderTimelineEvents();
-        toast('Loaded sample vault', 'success');
+        handleRequestLoadSampleVault({ postAction: 'timeline' });
       });
     }
     if (btnCodexEmptySample) {
       btnCodexEmptySample.addEventListener('click', () => {
-        Storage.loadStarterVault();
-        renderSidebar();
-        renderMainMenuRecent();
-        renderCodexUI();
-        toast('Loaded sample vault', 'success');
+        handleRequestLoadSampleVault({ postAction: 'codex' });
       });
     }
 
     if (menuEmptyBtnSample) {
       menuEmptyBtnSample.addEventListener('click', () => {
-        Storage.loadStarterVault();
-        renderSidebar();
-        renderMainMenuRecent();
-        if (typeof updateSettingsStats === 'function') updateSettingsStats();
-        toast('Loaded rich sample vault template', 'success');
+        handleRequestLoadSampleVault();
       });
     }
     if (menuEmptyBtnGuide) {
@@ -1674,11 +1686,7 @@
     }
     if (mapBtnEmptySample) {
       mapBtnEmptySample.addEventListener('click', () => {
-        Storage.loadStarterVault();
-        renderSidebar();
-        renderMainMenuRecent();
-        renderMapPins();
-        toast('Loaded sample map pins', 'success');
+        handleRequestLoadSampleVault({ postAction: 'map' });
       });
     }
 
@@ -1968,11 +1976,7 @@
       openNote(n.id);
     });
     galaxyBtnLoadDemo.addEventListener('click', () => {
-      Storage.loadStarterVault();
-      renderSidebar();
-      renderMainMenuRecent();
-      buildGalaxyData();
-      toast('Loaded sample vault', 'success');
+      handleRequestLoadSampleVault({ postAction: 'galaxy' });
     });
 
     // Deep Worldbuilding View Triggers
@@ -2568,6 +2572,184 @@
     } else {
       showMainMenu();
     }
+  }
+
+  // ═══════════════════════════════════════════════
+  // Sample Vault Safety & Instant Recovery Controller
+  // ═══════════════════════════════════════════════
+
+  let isSampleConfirmModalOpen = false;
+  let pendingSampleLoadOptions = null;
+
+  function handleRequestLoadSampleVault(options = {}) {
+    const hasContent = (typeof Storage !== 'undefined' && typeof Storage.hasUserContent === 'function')
+      ? Storage.hasUserContent()
+      : ((typeof Storage !== 'undefined' && Storage.getAllNotes && Storage.getAllNotes().length > 0) || false);
+
+    if (!hasContent) {
+      // Pristine / empty vault: load smoothly without unnecessary friction
+      executeLoadStarterVault('replace', false, options);
+      return;
+    }
+
+    // Existing work detected: warn user and open confirmation dialog
+    openSampleVaultConfirmModal(options);
+  }
+
+  function openSampleVaultConfirmModal(options = {}) {
+    pendingSampleLoadOptions = options;
+    isSampleConfirmModalOpen = true;
+
+    if (modalSampleVaultConfirm) {
+      const stats = (typeof Storage !== 'undefined' && typeof Storage.getWorkspaceStats === 'function')
+        ? Storage.getWorkspaceStats()
+        : { totalNotes: 0, chapters: 0, lore: 0, world: 0, wordCount: 0, mapPins: 0, timelineEvents: 0, characters: 0 };
+
+      if (sampleStatNotes) sampleStatNotes.textContent = String(stats.totalNotes || 0);
+      if (sampleStatChapters) sampleStatChapters.textContent = String(stats.chapters || 0);
+      if (sampleStatLore) sampleStatLore.textContent = String((stats.lore || 0) + (stats.world || 0));
+      if (sampleStatWords) sampleStatWords.textContent = (stats.wordCount || 0).toLocaleString();
+
+      if (sampleConfirmDetails) {
+        const details = [];
+        if (stats.characters) details.push(`<span class="sample-breakdown-chip"><strong>${stats.characters}</strong> characters</span>`);
+        if (stats.timelineEvents) details.push(`<span class="sample-breakdown-chip"><strong>${stats.timelineEvents}</strong> timeline milestones</span>`);
+        if (stats.mapPins) details.push(`<span class="sample-breakdown-chip"><strong>${stats.mapPins}</strong> map landmarks</span>`);
+        if (stats.hasCustomMap) details.push(`<span class="sample-breakdown-chip">✦ <strong>Custom Cartography Map</strong></span>`);
+        sampleConfirmDetails.innerHTML = details.join(' ');
+      }
+
+      modalSampleVaultConfirm.classList.remove('hidden');
+    }
+  }
+
+  function closeSampleVaultConfirmModal() {
+    isSampleConfirmModalOpen = false;
+    pendingSampleLoadOptions = null;
+    if (modalSampleVaultConfirm) {
+      modalSampleVaultConfirm.classList.add('hidden');
+    }
+  }
+
+  function executeLoadStarterVault(mode = 'replace', performBackup = true, options = {}) {
+    try {
+      clearTimeout(saveTimer);
+      activeNoteId = null;
+
+      if (typeof Storage !== 'undefined' && typeof Storage.loadStarterVault === 'function') {
+        Storage.loadStarterVault(mode, performBackup);
+      }
+
+      closeSampleVaultConfirmModal();
+      if (typeof closeProjectSettingsModal === 'function') closeProjectSettingsModal();
+
+      renderSidebar();
+      renderMainMenuRecent();
+      if (typeof updateSettingsStats === 'function') updateSettingsStats();
+      if (typeof renderProjectSettingsStats === 'function') renderProjectSettingsStats();
+
+      if (options && options.postAction === 'timeline') {
+        if (typeof renderTimelineEvents === 'function') renderTimelineEvents();
+      } else if (options && options.postAction === 'codex') {
+        if (typeof renderCodexUI === 'function') renderCodexUI();
+      } else if (options && options.postAction === 'map') {
+        if (typeof renderMapPins === 'function') renderMapPins();
+      } else if (options && options.postAction === 'galaxy') {
+        if (typeof buildGalaxyData === 'function') buildGalaxyData();
+      } else {
+        const all = Storage.getAllNotes();
+        if (all.length > 0) {
+          const firstChap = all.find(n => n.category === 'chapter') || all[0];
+          openNote(firstChap.id);
+        } else {
+          showMainMenu();
+        }
+      }
+
+      if (mode === 'merge') {
+        toast('Sample vault merged successfully! Your existing manuscripts are preserved.', 'success');
+      } else {
+        toast('Loaded sample vault template', 'success');
+      }
+
+      // Display persistent undo/restore banner if a backup exists
+      if (performBackup && typeof Storage !== 'undefined' && typeof Storage.getVaultBackup === 'function' && Storage.getVaultBackup()) {
+        showSampleRestoreBanner();
+      }
+    } catch (err) {
+      toast('Failed to load sample vault: ' + (err.message || 'unknown error'), 'error');
+    }
+  }
+
+  function showSampleRestoreBanner() {
+    if (sampleVaultRestoreBanner) {
+      sampleVaultRestoreBanner.classList.remove('hidden');
+    }
+  }
+
+  function hideSampleRestoreBanner() {
+    if (sampleVaultRestoreBanner) {
+      sampleVaultRestoreBanner.classList.add('hidden');
+    }
+  }
+
+  function executeRestoreVaultBackup() {
+    if (typeof Storage === 'undefined' || typeof Storage.getVaultBackup !== 'function' || !Storage.getVaultBackup()) {
+      toast('No previous vault backup found', 'info');
+      return;
+    }
+    try {
+      clearTimeout(saveTimer);
+      activeNoteId = null;
+      const success = Storage.restoreVaultBackup();
+      if (success) {
+        hideSampleRestoreBanner();
+        refreshWorkspaceAfterImport();
+        if (typeof renderProjectSettingsStats === 'function') renderProjectSettingsStats();
+        toast('Workspace successfully restored from safety backup!', 'success');
+      } else {
+        toast('Failed to restore vault backup', 'error');
+      }
+    } catch (err) {
+      toast('Error restoring backup: ' + (err.message || 'unknown error'), 'error');
+    }
+  }
+
+  // Wire Sample Vault Confirmation & Restore Banner Event Listeners
+  if (btnSampleConfirmReplace) {
+    btnSampleConfirmReplace.addEventListener('click', () => {
+      executeLoadStarterVault('replace', true, pendingSampleLoadOptions);
+    });
+  }
+  if (btnSampleConfirmMerge) {
+    btnSampleConfirmMerge.addEventListener('click', () => {
+      executeLoadStarterVault('merge', true, pendingSampleLoadOptions);
+    });
+  }
+  if (btnSampleConfirmCancel) {
+    btnSampleConfirmCancel.addEventListener('click', () => {
+      closeSampleVaultConfirmModal();
+    });
+  }
+  if (btnSampleConfirmClose) {
+    btnSampleConfirmClose.addEventListener('click', () => {
+      closeSampleVaultConfirmModal();
+    });
+  }
+  if (modalSampleVaultConfirm) {
+    modalSampleVaultConfirm.addEventListener('click', e => {
+      if (e.target === modalSampleVaultConfirm) closeSampleVaultConfirmModal();
+    });
+  }
+  if (btnSampleUndoRestore) {
+    btnSampleUndoRestore.addEventListener('click', () => {
+      executeRestoreVaultBackup();
+    });
+  }
+  if (btnSampleDismissBanner) {
+    btnSampleDismissBanner.addEventListener('click', () => {
+      hideSampleRestoreBanner();
+    });
   }
 
   function switchSettingsTab(tabName) {
@@ -3531,6 +3713,10 @@
   }
 
   function handleBackOrEscape() {
+    if (isSampleConfirmModalOpen) {
+      closeSampleVaultConfirmModal();
+      return true;
+    }
     if (vaultResetConfirmModal && !vaultResetConfirmModal.classList.contains('hidden')) {
       vaultResetConfirmModal.classList.add('hidden');
       return true;
@@ -9666,6 +9852,13 @@
 
     if (typeof window !== 'undefined') {
       window.handleWindowFocusForUpdates = onWindowFocusOrActive;
+      window.handleRequestLoadSampleVault = handleRequestLoadSampleVault;
+      window.openSampleVaultConfirmModal = openSampleVaultConfirmModal;
+      window.closeSampleVaultConfirmModal = closeSampleVaultConfirmModal;
+      window.executeLoadStarterVault = executeLoadStarterVault;
+      window.executeRestoreVaultBackup = executeRestoreVaultBackup;
+      window.showSampleRestoreBanner = showSampleRestoreBanner;
+      window.hideSampleRestoreBanner = hideSampleRestoreBanner;
       if (typeof window.addEventListener === 'function') {
         window.addEventListener('focus', onWindowFocusOrActive);
       }
