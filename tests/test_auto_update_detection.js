@@ -54,14 +54,14 @@ const path = require('path');
     }
     return 0;
   }
-  assert.strictEqual(compareSemver('1.1.5', '1.1.5'), 0, 'Current version 1.1.5 == 1.1.5');
-  assert.strictEqual(compareSemver('v1.1.5', '1.1.5'), 0, 'Prefixed v1.1.5 == 1.1.5');
-  assert.strictEqual(compareSemver('1.2.0', '1.1.5'), 1, '1.2.0 > 1.1.5');
-  assert.strictEqual(compareSemver('v1.3.0', '1.1.5'), 1, 'v1.3.0 > 1.1.5');
-  assert.strictEqual(compareSemver('2.0.0', '1.1.5'), 1, '2.0.0 > 1.1.5');
-  assert.strictEqual(compareSemver('1.1.4', '1.1.5'), -1, '1.1.4 < 1.1.5');
-  assert.strictEqual(compareSemver('1.1.3', '1.1.5'), -1, '1.1.3 < 1.1.5');
-  assert.strictEqual(compareSemver('1.0.0', '1.1.5'), -1, '1.0.0 < 1.1.5');
+  assert.strictEqual(compareSemver('1.2.0', '1.2.0'), 0, 'Current version 1.2.0 == 1.2.0');
+  assert.strictEqual(compareSemver('v1.2.0', '1.2.0'), 0, 'Prefixed v1.2.0 == 1.2.0');
+  assert.strictEqual(compareSemver('1.3.0', '1.2.0'), 1, '1.3.0 > 1.2.0');
+  assert.strictEqual(compareSemver('v1.3.0', '1.2.0'), 1, 'v1.3.0 > 1.2.0');
+  assert.strictEqual(compareSemver('2.0.0', '1.2.0'), 1, '2.0.0 > 1.2.0');
+  assert.strictEqual(compareSemver('1.1.5', '1.2.0'), -1, '1.1.5 < 1.2.0');
+  assert.strictEqual(compareSemver('1.1.4', '1.2.0'), -1, '1.1.4 < 1.2.0');
+  assert.strictEqual(compareSemver('1.0.0', '1.2.0'), -1, '1.0.0 < 1.2.0');
   console.log('✓ Semver comparisons accurate for all release scenarios');
 
   // 3. Mock DOM & app.js Environment Setup
@@ -231,23 +231,23 @@ const path = require('path');
   assert(dashboardBadge.classList.contains('hidden'), 'Dashboard badge must start hidden');
   assert(dashboardIndicator.classList.contains('hidden'), 'Dashboard update indicator must start hidden');
 
-  // Trigger update notification with newer release v1.2.0
+  // Trigger update notification with newer release v1.3.0
   window.showLordSpeyUpdateNotification({
-    tag_name: 'v1.2.0',
-    latestVersion: 'v1.2.0',
-    name: 'Lord Spey v1.2.0',
-    body: '### What\'s New in v1.2.0\n- Dynamic update notifications\n- Automated backup guarantee',
-    html_url: 'https://github.com/Dathevinci/Lordspey/releases/tag/v1.2.0'
+    tag_name: 'v1.3.0',
+    latestVersion: '1.3.0',
+    name: 'Lord Spey v1.3.0',
+    body: '### What\'s New in v1.3.0\n- Dynamic update notifications\n- Automated backup guarantee',
+    html_url: 'https://github.com/Dathevinci/Lordspey/releases/tag/v1.3.0'
   });
 
   assert(!banner.classList.contains('hidden'), 'Update banner must become visible');
-  assert.strictEqual(bannerVer.textContent, 'v1.2.0', 'Update banner must show latest version tag');
+  assert.strictEqual(bannerVer.textContent, 'v1.3.0', 'Update banner must show latest version tag');
   assert(!sidebarBadge.classList.contains('hidden'), 'Sidebar gear badge must become visible');
   assert(!dashboardBadge.classList.contains('hidden'), 'Dashboard settings badge must become visible');
   assert(!dashboardIndicator.classList.contains('hidden'), 'Dashboard update indicator button must become visible');
-  assert.strictEqual(dashboardUpdateText.textContent, 'Update to v1.2.0', 'Dashboard indicator text must show update target');
+  assert.strictEqual(dashboardUpdateText.textContent, 'Update to v1.3.0', 'Dashboard indicator text must show update target');
   assert(btnGear.classList.contains('has-update'), 'Sidebar gear button must have .has-update class');
-  console.log('✓ Banner, sidebar gear badge, and dashboard indicators successfully display new version v1.2.0');
+  console.log('✓ Banner, sidebar gear badge, and dashboard indicators successfully display new version v1.3.0');
 
   // 5. Testing Banner Interaction: [Update Now] opens #modal-update
   console.log('--- 5. Testing [Update Now] Banner Click & Modal Opening ---');
@@ -259,7 +259,7 @@ const path = require('path');
   assert(!sidebarBadge.classList.contains('hidden'), 'Sidebar badge must stay visible while update is pending');
 
   const newVerChip = getOrCreateElement('update-new-version-chip');
-  assert(newVerChip.textContent.includes('v1.2.0'), 'Version chip must display new version');
+  assert(newVerChip.textContent.includes('v1.3.0'), 'Version chip must display new version');
   window.closeLordSpeyUpdateModal();
   assert(modalUpdate.classList.contains('hidden'), 'Modal must close cleanly');
   console.log('✓ [Update Now] button opens update modal and transitions state cleanly');
@@ -275,7 +275,7 @@ const path = require('path');
   // 7. Testing Banner Dismissal Preserving Subtle Badges
   console.log('--- 7. Testing Banner Dismissal Preserving Subtle Badges ---');
   // Show banner again
-  window.showLordSpeyUpdateNotification({ tag_name: 'v1.2.0', latestVersion: 'v1.2.0' });
+  window.showLordSpeyUpdateNotification({ tag_name: 'v1.3.0', latestVersion: '1.3.0' });
   assert(!banner.classList.contains('hidden'));
 
   const btnBannerDismiss = getOrCreateElement('btn-banner-dismiss-update');
@@ -417,7 +417,7 @@ const path = require('path');
   // Electron main process sends up-to-date payload
   window.__handleUpdateCheckResult({
     hasUpdate: false,
-    latestVersion: 'v1.1.5',
+    latestVersion: 'v1.2.0',
     userInitiated: false
   });
   assert(banner.classList.contains('hidden'), 'Up-to-date payload must hide banner');
@@ -433,10 +433,10 @@ const path = require('path');
   const statusVaultEl = getOrCreateElement('settings-vault-update-status');
   assert(statusVaultEl.innerHTML.includes('btn-link-update-now'), 'Settings update message must offer clickable Update Now button');
 
-  // Fallback version in modal must use APP_VERSION (1.1.5), never 1.1.0
+  // Fallback version in modal must use APP_VERSION (1.2.0), never 1.1.0
   window.showLordSpeyUpdateModal({});
   const curVerChipTest = getOrCreateElement('update-current-version-chip');
-  assert(curVerChipTest.textContent.includes('v1.1.5'), 'Modal current version chip must display v1.1.5');
+  assert(curVerChipTest.textContent.includes('v1.2.0'), 'Modal current version chip must display v1.2.0');
   window.closeLordSpeyUpdateModal();
 
   // Test notification preserves demo mode when clicked via dashboard indicator

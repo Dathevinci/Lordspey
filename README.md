@@ -4,7 +4,7 @@
 
 [![Website](https://img.shields.io/badge/website-dathevinci.github.io%2FLordspey-111116?style=for-the-badge&logo=github)](https://dathevinci.github.io/Lordspey/)
 [![Launch Web App](https://img.shields.io/badge/launch-web%20app-ef4444?style=for-the-badge)](https://dathevinci.github.io/Lordspey/app/)
-[![Release](https://img.shields.io/badge/release-v1.1.5-111116?style=for-the-badge)](https://github.com/Dathevinci/Lordspey/releases/tag/v1.1.5)
+[![Release](https://img.shields.io/badge/release-v1.2.0-111116?style=for-the-badge)](https://github.com/Dathevinci/Lordspey/releases/tag/v1.2.0)
 [![License](https://img.shields.io/badge/license-MIT-111116?style=for-the-badge)](LICENSE)
 
 ---
@@ -93,8 +93,8 @@ The compiled `.apk` will be in **`android/app/build/outputs/apk/debug/app-debug.
 ## 📱 Releases & Downloads
 
 Pre-built binaries for **Windows (`.exe`)** and **Android (`.apk`)** are available on the **[Releases](https://github.com/Dathevinci/Lordspey/releases)** page:
-- **`Lord.Spey.Setup.1.1.5.exe`**: Windows NSIS installer.
-- **`Lord.Spey.1.1.5.exe`**: Standalone portable Windows executable.
+- **`Lord.Spey.Setup.1.2.0.exe`**: Windows NSIS installer.
+- **`Lord.Spey.1.2.0.exe`**: Standalone portable Windows executable.
 - **`Lord.Spey.apk`**: Sideloadable Android package.
 
 ---

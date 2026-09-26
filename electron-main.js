@@ -69,7 +69,7 @@ if (!gotSingleInstanceLock) {
 
 const https = require('https');
 const pkg = require('./package.json');
-const CURRENT_VERSION = pkg.version || '1.1.5';
+const CURRENT_VERSION = pkg.version || '1.2.0';
 const UPDATE_CHECK_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
 
 function parseVersion(v) {

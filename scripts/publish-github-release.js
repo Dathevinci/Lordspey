@@ -25,31 +25,30 @@ async function main() {
   }
 
   const repo = 'Dathevinci/Lordspey';
-  const tag = 'v1.1.5';
-  const releaseName = 'Lord Spey v1.1.5 — Creative Map Studio, Custom Sizing & Cartography Tools';
-  const releaseBody = `## Lord Spey v1.1.5 — Creative Map Studio, Custom Sizing & Cartography Tools
+  const tag = 'v1.2.0';
+  const releaseName = 'Lord Spey v1.2.0 — Universe Atlas & Ambient Animated Themes';
+  const releaseBody = `## Lord Spey v1.2.0 — Universe Atlas & Ambient Animated Themes
 
 Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding.
 
-### ✦ What's New & Improved in v1.1.5
-- **🎨 Creative Photoshop-Like Map Studio**:
-  - **Full Cartography Drawing Suite**: Dedicated drawing mode (\`Paint / Studio\`) equipped with freeform ink brush, fine pencil for borders/rivers, precision eraser, fractal landmass coastline sculptor, and geometric tools (rectangles, ellipses, straight lines, multi-point polygons).
-  - **Fantasy Terrain Stampers**: Quick-draw terrain brushes for mountain ranges (\`▲▲▲\`), dense forests (\`♣♣♣\`), desert dunes (\`〜〜\`), swamps (\`≈≈\`), and rolling hills (\`⌒⌒\`).
-  - **Color Palette & Swatches**: 10 fantasy cartography swatches (Deep Ocean, Coastal Azure, Parchment, Grassland, Basalt Mountain, Evergreen Forest, Desert Sand, Volcanic Ash, Crimson Kingdom, Royal Gold) plus full RGB/Hex color picker.
-  - **Multi-Layer Drawing System**: Create, hide/show, reorder, adjust layer opacity (0%–100%), and one-click "Bake Layers" to flatten onto the permanent base canvas.
-  - **Flood Fill Bucket**: High-speed flat 1D queue flood-fill with color tolerance for instant continental or ocean tinting.
-- **📐 Custom Canvas Shapes & Dimensions**:
-  - **Precision Sizing**: Set custom map dimensions from 500 px to 4000 px with aspect-ratio locking and 1-click presets (Cinema 16:9, Ultrawide 24:10, Square 1:1, Vertical Scroll 9:16).
-  - **Boundary Framing**: Choice of Classic Rectangle, Circular/Oval Vignette with soft atmospheric shadows, and Archival Parchment vintage antique deckled borders.
-- **🗺️ High-DPI Export & Gesture Navigation**:
-  - **Elliptical PNG Export**: Exports crisp high-resolution maps compositing background, drawings, layers, and dynamically scaled landmark pins & territory labels, with accurate elliptical clipping masks.
-  - **Two-Finger Touch Navigation**: Pinch-to-zoom and canvas panning seamlessly bypasses drawing tools on touch devices.
-- **🛡️ Data Safety & Backward Compatibility**:
-  - Seamless persistence in \`Storage\`, \`.spey\` project bundle import/export, and multi-tier storage quota fallback protection.
+### ✦ What's New & Improved in v1.2.0
+- **🌌 Lord Spey Universe Atlas & Multi-Tier Cartography**:
+  - **Hierarchical Cosmic Mapping**: Seamless nested tier structure spanning Galaxy / Sector, Star System, World Surface, and Local / Station deckplans.
+  - **Radial Solar Cores & Concentric Orbital Rings**: Dedicated star system canvas featuring luminous radial central stars, concentric planetary orbital guide rings, and toggleable orbital paths.
+  - **Celestial Pins & Drill-Down Previews**: Rich celestial pin taxonomy (Galaxies, Stars, Planets, Moons, Space Stations, Asteroid Belts) with deep-link realm preview modals and one-click realm switching (\`[ 🪐 Enter Star System ]\` / \`[ 🗺️ View World Map ]\`).
+  - **Interstellar Hyperlane Route Pen**: Draw dashed luminous trade routes and hyperlanes directly connecting star systems.
+  - **Multiverse .spey Package Serialization**: Complete multi-map universe registry and child maps bundled into portable \`.spey\` projects with non-destructive merge and duplicate pin guards.
+- **✨ Ambient Animated Themes**:
+  - **Distraction-Free Atmospheric Backdrops**: Five calm themes selectable in Settings: **Default Serene Obsidian**, **Cosmic Starfield** (gentle twinkling celestial stars), **Ethereal Nebula** (slow-drifting celestial auroras), **Cozy Fireflies & Embers** (warm twilight embers), and **Midnight Rain & Mist** (soothing rain streaks).
+  - **Lightweight Hardware Acceleration**: Zero CPU lag, smooth canvas particle rendering, auto-pauses during heavy operations, and honors \`prefers-reduced-motion\`.
+- **🎨 Photoshop-Style Map Studio & Custom Sizing**:
+  - Custom canvas sizing (500px to 4000px), multi-layer drawing system, terrain stampers, fractal landmass sculpting, and high-DPI PNG export.
+- **🛡️ Data Safety & Sovereign Vault**:
+  - Automatic pre-update backups, non-destructive sample vault merging, and 100% offline-first privacy.
 
 ### 📦 Downloads & Binaries
-- **Lord Spey Setup 1.1.5.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
-- **Lord Spey 1.1.5.exe**: Portable standalone executable (no installation required).
+- **Lord Spey Setup 1.2.0.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
+- **Lord Spey 1.2.0.exe**: Portable standalone executable (no installation required).
 - **Lord.Spey.apk / app-debug.apk**: Android package for mobile writing and worldbuilding.
 `;
 
@@ -143,8 +142,8 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
   }
 
   const assetsToUpload = [
-    { file: 'Lord Spey Setup 1.1.5.exe', label: 'Lord Spey Setup 1.1.5.exe', contentType: 'application/x-msdos-program' },
-    { file: 'Lord Spey 1.1.5.exe', label: 'Lord Spey 1.1.5.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord Spey Setup 1.2.0.exe', label: 'Lord Spey Setup 1.2.0.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord Spey 1.2.0.exe', label: 'Lord Spey 1.2.0.exe', contentType: 'application/x-msdos-program' },
     { file: 'Lord.Spey.apk', label: 'Lord.Spey.apk', contentType: 'application/vnd.android.package-archive' },
     { file: 'app-debug.apk', label: 'app-debug.apk', contentType: 'application/vnd.android.package-archive' }
   ];
@@ -199,7 +198,7 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
     const uploadedAssetNames = (updatedRelease.assets || []).map(a => a.name);
     console.log(`Total release assets on GitHub: ${uploadedAssetNames.length}`);
     uploadedAssetNames.forEach(a => console.log(`  - ${a}`));
-    const expectedAssets = ['Lord Spey Setup 1.1.5.exe', 'Lord Spey 1.1.5.exe', 'Lord.Spey.apk', 'app-debug.apk'];
+    const expectedAssets = ['Lord Spey Setup 1.2.0.exe', 'Lord Spey 1.2.0.exe', 'Lord.Spey.apk', 'app-debug.apk'];
     const norm = n => (n || '').toLowerCase().replace(/[\s.]+/g, '.');
     let allFound = true;
     for (const exp of expectedAssets) {

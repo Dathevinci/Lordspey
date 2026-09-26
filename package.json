@@ -1,6 +1,6 @@
 {
   "name": "lord-spey",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding.",
   "homepage": "https://dathevinci.github.io/Lordspey/",
   "main": "electron-main.js",

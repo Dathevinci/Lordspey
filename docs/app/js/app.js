@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '1.1.5';
+  const APP_VERSION = '1.2.0';
   const UPDATE_API_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
 
   const ALIAS_SELECTORS = {
@@ -11947,6 +11947,26 @@
 
   const WHATS_NEW_V110_FEATURES = [
     {
+      icon: '🌌',
+      title: 'Universe Atlas & Multi-Tier Cartography',
+      desc: 'Hierarchical mapping across Galaxy / Sector, Star System, World Surface, and Station Deckplans.',
+      bullets: [
+        'Multi-tier realm navigation with interactive breadcrumbs and level badges',
+        'Radial solar cores with concentric orbital guide rings and hyperlane pen',
+        'Celestial pins with interactive drill-down previews and multiverse .spey export'
+      ]
+    },
+    {
+      icon: '✨',
+      title: 'Ambient Animated Themes',
+      desc: 'Distraction-free atmospheric backdrops in Settings for deep creative immersion.',
+      bullets: [
+        'Cosmic Starfield with gentle twinkling stars and deep space calm',
+        'Ethereal Nebula with drifting celestial aurora clouds',
+        'Cozy Fireflies & Embers and Midnight Rain & Mist soothing atmospheres'
+      ]
+    },
+    {
       icon: '🦅',
       title: 'Official Raven Brand Logo',
       desc: 'Celestial raven emblem in the header, dashboard, and desktop icon.',
@@ -12041,16 +12061,16 @@
   function renderWhatsNewHtml(features = WHATS_NEW_V110_FEATURES) {
     return `
       <div class="whats-new-intro" style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
-        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This major update delivers a creative Photoshop-like Map Studio, custom canvas dimensions, terrain sculpting, and multi-layer cartography tools:
+        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This flagship release introduces the multi-tier Lord Spey Universe Atlas, celestial cartography tools, and immersive ambient animated themes:
       </div>
       <div class="whats-new-v111-patch" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px;">
-        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">v1.1.5 Creative Map Studio &amp; Custom Sizing</div>
+        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">v1.2.0 Universe Atlas &amp; Ambient Animated Themes</div>
         <ul style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; padding-left: 18px; line-height: 1.4;">
-          <li><strong>Custom Canvas Shapes &amp; Sizing:</strong> Set any map size from 500px up to 4000px, aspect-ratio locking, and framing presets (Cinema 16:9, Ultrawide 24:10, Square 1:1, Vertical Scroll 9:16, Oval Vignette, and Archival Parchment).</li>
-          <li><strong>Photoshop-Style Map Studio:</strong> Dedicated cartography workspace with freeform ink brush, fine pencil, eraser, fractal landmass coastline sculptor, and geometric shapes (rectangles, ellipses, lines, and multi-point polygons).</li>
-          <li><strong>Fantasy Terrain Brushes:</strong> Instant stampers for mountain ranges, dense forests, desert dunes, swamps, and rolling hills.</li>
-          <li><strong>Multi-Layer Drawing System:</strong> Create, reorder, hide/show, adjust opacity (0%–100%), and one-click "Bake Layers" onto the base canvas.</li>
-          <li><strong>High-DPI Export &amp; Touch Navigation:</strong> Clean elliptical PNG exports with landmark pin scaling and two-finger gesture bypass for smooth pinch-to-zoom.</li>
+          <li><strong>Lord Spey Universe Atlas:</strong> Multi-tier hierarchical mapping spanning Galaxy / Sector, Star System, World Surface, and Local / Station deckplans with breadcrumb navigation.</li>
+          <li><strong>Radial Solar Cores &amp; Orbital Guide Rings:</strong> Dedicated star system canvas with central luminous stars, concentric planetary orbit rings, and toggleable orbital paths.</li>
+          <li><strong>Celestial Pins &amp; Drill-Down Previews:</strong> Celestial pin classifications (Galaxies, Stars, Planets, Moons, Space Stations, Asteroid Belts) with deep-link realm previews.</li>
+          <li><strong>Hyperlane Route Pen:</strong> Cartographic hyperlane and trade route drawing between star systems with dashed energy styling.</li>
+          <li><strong>Ambient Animated Themes:</strong> Atmospheric canvas backdrops in Settings (Default Serene, Cosmic Starfield, Ethereal Nebula, Cozy Fireflies &amp; Embers, Midnight Rain &amp; Mist).</li>
         </ul>
       </div>
       <div class="whats-new-grid">
@@ -12334,9 +12354,9 @@
 
   function triggerTestUpdateNotification() {
     const demoPayload = {
-      tag_name: 'v1.2.0 (Preview)',
-      latestVersion: '1.2.0',
-      name: 'Lord Spey v1.2.0 (Demo)',
+      tag_name: 'v1.3.0 (Preview)',
+      latestVersion: '1.3.0',
+      name: 'Lord Spey v1.3.0 (Demo)',
       body: '### Update Preview\n- Preview of future updates and notifications\n- Seamless one-click background updates\n- Automated pre-update snapshot backup\n- Full vault safety guarantee',
       html_url: 'https://github.com/Dathevinci/Lordspey/releases',
       isDemo: true
@@ -12344,7 +12364,7 @@
     showUpdateNotification(demoPayload);
     const bannerVer = $('#update-banner-version');
     if (bannerVer) {
-      bannerVer.textContent = 'v1.2.0 (Preview)';
+      bannerVer.textContent = 'v1.3.0 (Preview)';
     }
     toast('Update notification preview banner triggered! Click "Update Now" to preview the update modal.', 'info');
   }
@@ -12589,11 +12609,11 @@
           modal.classList.remove('hidden');
           isUpdateModalOpen = true;
         }
-        if (cachedLatestReleaseData && (cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name) && compareSemver((cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name), APP_VERSION) > 0) {
+        if (cachedLatestReleaseData && (cachedLatestReleaseData.isDemo || ((cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name) && compareSemver((cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name), APP_VERSION) > 0))) {
           showUpdateModal(cachedLatestReleaseData);
         } else {
           showUpdateModal({
-            tag_name: 'v1.2.0',
+            tag_name: 'v' + APP_VERSION,
             name: 'Lord Spey Update',
             body: 'A new version of Lord Spey is available.',
             html_url: 'https://github.com/Dathevinci/Lordspey/releases'
@@ -12628,12 +12648,12 @@
           modal.classList.remove('hidden');
           isUpdateModalOpen = true;
         }
-        if (cachedLatestReleaseData && (cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name) && compareSemver((cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name), APP_VERSION) > 0) {
+        if (cachedLatestReleaseData && (cachedLatestReleaseData.isDemo || ((cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name) && compareSemver((cachedLatestReleaseData.latestVersion || cachedLatestReleaseData.tag_name), APP_VERSION) > 0))) {
           showUpdateModal(cachedLatestReleaseData);
         } else {
           showUpdateModal({
-            tag_name: 'v1.2.0',
-            name: 'Lord Spey v1.2.0 (Demo)',
+            tag_name: 'v1.3.0',
+            name: 'Lord Spey v1.3.0 (Demo)',
             body: '### Update Preview\n- Preview of future updates and notifications\n- Seamless one-click background updates\n- Automated pre-update snapshot backup\n- Full vault safety guarantee',
             html_url: 'https://github.com/Dathevinci/Lordspey/releases'
           }, true);

@@ -31,7 +31,7 @@ console.log('✓ All 11 raven logo, icon, and favicon assets exist with valid no
 // 2. Package.json Configuration Verification
 console.log('--- 2. Package.json Configuration Verification ---');
 const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
-assert(['1.1.0', '1.1.1', '1.1.2', '1.1.3', '1.1.4', '1.1.5'].includes(pkg.version), 'package.json version must be valid');
+assert(['1.1.0', '1.1.1', '1.1.2', '1.1.3', '1.1.4', '1.1.5', '1.2.0'].includes(pkg.version), 'package.json version must be valid');
 assert.strictEqual(pkg.build?.win?.icon, 'assets/icon.ico', 'build.win.icon must be configured to assets/icon.ico');
 assert(pkg.build?.files?.includes('assets/**/*'), 'build.files must include assets/**/*');
 console.log('✓ package.json v' + pkg.version + ', build.win.icon, and assets/**/* bundle inclusion verified');
@@ -70,7 +70,7 @@ assert(vaultPaneHtml.includes('id="settings-btn-whats-new-vault"'), 'Missing set
 assert(vaultPaneHtml.includes('id="settings-btn-check-update-vault"'), 'Missing settings-btn-check-update-vault in vault pane');
 assert(vaultPaneHtml.includes('id="settings-btn-test-update-vault"'), 'Missing settings-btn-test-update-vault in vault pane');
 assert(vaultPaneHtml.includes('id="settings-vault-update-status"'), 'Missing settings-vault-update-status in vault pane');
-assert(vaultPaneHtml.includes('v1.1.0') || vaultPaneHtml.includes('v1.1.1') || vaultPaneHtml.includes('v1.1.2') || vaultPaneHtml.includes('v1.1.3') || vaultPaneHtml.includes('v1.1.4') || vaultPaneHtml.includes('v1.1.5'), 'Current version must be rendered in vault pane');
+assert(vaultPaneHtml.includes('v1.1.0') || vaultPaneHtml.includes('v1.1.1') || vaultPaneHtml.includes('v1.1.2') || vaultPaneHtml.includes('v1.1.3') || vaultPaneHtml.includes('v1.1.4') || vaultPaneHtml.includes('v1.1.5') || vaultPaneHtml.includes('v1.2.0'), 'Current version must be rendered in vault pane');
 
 // Guides tab
 const guidesPaneMatch = htmlContent.match(/<div class="settings-pane[^"]*" id="settings-pane-keybindings">([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>\s*<div class="modal-footer">/);
@@ -81,7 +81,7 @@ assert(guidesPaneHtml.includes('id="settings-btn-whats-new-guides"'), 'Missing s
 assert(guidesPaneHtml.includes('id="settings-btn-check-update-guides"'), 'Missing settings-btn-check-update-guides in guides pane');
 assert(guidesPaneHtml.includes('id="settings-btn-test-update-guides"'), 'Missing settings-btn-test-update-guides in guides pane');
 assert(guidesPaneHtml.includes('id="settings-guides-update-status"'), 'Missing settings-guides-update-status in guides pane');
-assert(guidesPaneHtml.includes('v1.1.0') || guidesPaneHtml.includes('v1.1.1') || guidesPaneHtml.includes('v1.1.2') || guidesPaneHtml.includes('v1.1.3') || guidesPaneHtml.includes('v1.1.4') || guidesPaneHtml.includes('v1.1.5'), 'Current version must be rendered in guides pane');
+assert(guidesPaneHtml.includes('v1.1.0') || guidesPaneHtml.includes('v1.1.1') || guidesPaneHtml.includes('v1.1.2') || guidesPaneHtml.includes('v1.1.3') || guidesPaneHtml.includes('v1.1.4') || guidesPaneHtml.includes('v1.1.5') || guidesPaneHtml.includes('v1.2.0'), 'Current version must be rendered in guides pane');
 
 console.log('✓ Settings tabs update controls verified: v' + pkg.version + ' displays, What\'s New, Test Notification, and Check for Updates buttons');
 

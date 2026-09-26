@@ -36,7 +36,7 @@ assert(landingHtml.includes('href="app/"'), 'Launch Web App link must point to a
 
 // Hero Section
 assert(landingHtml.includes('hero-section'), 'Hero section must exist');
-assert(landingHtml.includes('v1.1.5 Released') || landingHtml.includes('v1.1.5'), 'Hero must mention version 1.1.5');
+assert(landingHtml.includes('v1.2.0 Released') || landingHtml.includes('v1.2.0'), 'Hero must mention version 1.2.0');
 assert(landingHtml.includes('The Distraction-Free Studio'), 'Hero headline must be present');
 
 // Features
@@ -55,8 +55,8 @@ assert(landingHtml.includes('Artistic Cartography Tools'), 'Map studio tools bul
 
 // Downloads Matrix
 assert(landingHtml.includes('id="downloads"'), 'Downloads section must exist');
-assert(landingHtml.includes('Lord%20Spey%20Setup%201.1.5.exe'), 'Missing Windows installer download link for v1.1.5');
-assert(landingHtml.includes('Lord%20Spey%201.1.5.exe'), 'Missing Windows portable download link for v1.1.5');
+assert(landingHtml.includes('Lord%20Spey%20Setup%201.2.0.exe'), 'Missing Windows installer download link for v1.2.0');
+assert(landingHtml.includes('Lord%20Spey%201.2.0.exe'), 'Missing Windows portable download link for v1.2.0');
 assert(landingHtml.includes('Lord.Spey.apk'), 'Missing Android APK download link');
 assert(landingHtml.includes('app-debug.apk'), 'Missing Android debug APK download link');
 
@@ -82,13 +82,13 @@ assert(fs.existsSync(docsAppJsFile), 'docs/app/js/app.js must exist');
 assert(fs.existsSync(docsAppCssFile), 'docs/app/css/style.css must exist');
 
 const appHtml = fs.readFileSync(docsAppIndexFile, 'utf8');
-assert(appHtml.includes('v1.1.5'), 'docs/app/index.html must be updated to v1.1.5');
+assert(appHtml.includes('v1.2.0'), 'docs/app/index.html must be updated to v1.2.0');
 assert(appHtml.includes('id="sidebar"'), 'docs/app/index.html must contain full app DOM');
 assert(appHtml.includes('id="editor-area"'), 'docs/app/index.html must contain editor area');
 assert(appHtml.includes('id="map-modal"'), 'docs/app/index.html must contain map studio modal');
 
 const appJs = fs.readFileSync(docsAppJsFile, 'utf8');
-assert(appJs.includes("const APP_VERSION = '1.1.5'"), 'docs/app/js/app.js must reflect APP_VERSION 1.1.5');
+assert(appJs.includes("const APP_VERSION = '1.2.0'"), 'docs/app/js/app.js must reflect APP_VERSION 1.2.0');
 console.log('✓ docs/app contains the full, functional, standalone Lord Spey web application');
 
 // 5. Verify Brand Assets Copied to docs/assets
