@@ -3767,7 +3767,7 @@
     // Allow skipping intro with Esc, Space, or Enter
     if (introSplash && !introSplash.classList.contains('hidden')) {
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault();
+        if (e.preventDefault) e.preventDefault();
         dismissIntroSplash();
         return;
       }
@@ -3857,6 +3857,24 @@
       return true;
     }
     if (mapModal && !mapModal.classList.contains('hidden')) {
+      if (typeof isMapStudioActive !== 'undefined' && isMapStudioActive && typeof studioPolygonPoints !== 'undefined' && studioPolygonPoints && studioPolygonPoints.length > 0) {
+        studioPolygonPoints = [];
+        if (typeof renderCompositeLayers === 'function') renderCompositeLayers();
+        toast('Polygon drawing cancelled', 'info');
+        return true;
+      }
+      if (mapDimensionsModal && !mapDimensionsModal.classList.contains('hidden')) {
+        mapDimensionsModal.classList.add('hidden');
+        const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+        if (mapShapeSelect && curMap.shape) {
+          mapShapeSelect.value = curMap.shape;
+        }
+        return true;
+      }
+      if (mapLayersPanel && !mapLayersPanel.classList.contains('hidden')) {
+        mapLayersPanel.classList.add('hidden');
+        return true;
+      }
       if (isMapRegionDrawingMode) {
         isMapRegionDrawingMode = false;
         currentMapRegionPoints = [];
@@ -6104,7 +6122,9 @@
         Storage.clearCustomMapImage();
         if (Storage.clearMapDrawing) Storage.clearMapDrawing();
         clearMapImageElement();
-        if (typeof clearActiveLayer === 'function') {
+        if (typeof resetAllMapLayers === 'function') {
+          resetAllMapLayers();
+        } else if (typeof clearActiveLayer === 'function') {
           clearActiveLayer();
         }
         renderDefaultMap();
@@ -8397,6 +8417,15 @@
     const validShapes = ['landscape', 'square', 'vertical', 'oval', 'ultrawide', 'parchment', 'custom'];
     const validShape = validShapes.includes(shape) ? shape : 'landscape';
     mapStage.dataset.shape = validShape;
+    if (boundaryFrame) {
+      mapStage.dataset.boundaryShape = boundaryFrame;
+    } else if (validShape === 'oval') {
+      mapStage.dataset.boundaryShape = 'oval';
+    } else if (validShape === 'parchment') {
+      mapStage.dataset.boundaryShape = 'parchment';
+    } else {
+      mapStage.dataset.boundaryShape = 'landscape';
+    }
     let w = 1600;
     let h = 1000;
     if (validShape === 'square') {
@@ -8799,7 +8828,7 @@
         visible: l.visible,
         opacity: l.opacity,
         imageData: imgData,
-        dataUrl: (l.canvas && typeof l.canvas.toDataURL === 'function') ? l.canvas.toDataURL() : null
+        dataUrl: (!imgData && l.canvas && typeof l.canvas.toDataURL === 'function') ? l.canvas.toDataURL() : null
       };
     });
     studioUndoStack.push({
@@ -8829,7 +8858,7 @@
         visible: l.visible,
         opacity: l.opacity,
         imageData: imgData,
-        dataUrl: (l.canvas && typeof l.canvas.toDataURL === 'function') ? l.canvas.toDataURL() : null
+        dataUrl: (!imgData && l.canvas && typeof l.canvas.toDataURL === 'function') ? l.canvas.toDataURL() : null
       };
     });
     studioRedoStack.push({
@@ -8862,7 +8891,7 @@
         visible: l.visible,
         opacity: l.opacity,
         imageData: imgData,
-        dataUrl: (l.canvas && typeof l.canvas.toDataURL === 'function') ? l.canvas.toDataURL() : null
+        dataUrl: (!imgData && l.canvas && typeof l.canvas.toDataURL === 'function') ? l.canvas.toDataURL() : null
       };
     });
     studioUndoStack.push({
@@ -8884,16 +8913,20 @@
       const c = createLayerCanvas(w, h);
       if (c && typeof c.getContext === 'function') {
         const ctx = c.getContext('2d');
+        let restored = false;
         if (ctx && sl.imageData && typeof ctx.putImageData === 'function') {
           try {
             ctx.putImageData(sl.imageData, 0, 0);
+            restored = true;
           } catch (_) {}
-        } else if (ctx && sl.dataUrl && typeof Image !== 'undefined') {
+        }
+        if (!restored && ctx && sl.dataUrl && typeof Image !== 'undefined') {
           const img = new Image();
           img.onload = () => {
             if (ctx && typeof ctx.drawImage === 'function') {
               ctx.drawImage(img, 0, 0);
               renderCompositeLayers();
+              persistStudioDrawing();
             }
           };
           img.src = sl.dataUrl;
@@ -8949,6 +8982,7 @@
     const oldH = mapPaintCanvas.height || 1000;
     if (oldW === newW && oldH === newH) return;
 
+    saveUndoSnapshot();
     mapPaintCanvas.width = newW;
     mapPaintCanvas.height = newH;
 
@@ -8997,6 +9031,10 @@
 
   function handleStudioPointerDown(e) {
     if (!isMapStudioActive) return;
+    if (e.touches && e.touches.length > 1) {
+      isStudioDrawing = false;
+      return;
+    }
     if (e.button === 1 || e.spaceKey || isSpacePressed) return;
     if (e.button !== undefined && e.button !== 0) return;
 
@@ -9054,6 +9092,10 @@
 
   function handleStudioPointerMove(e) {
     if (!isMapStudioActive) return;
+    if (e.touches && e.touches.length > 1) {
+      isStudioDrawing = false;
+      return;
+    }
 
     if (studioCurrentTool === 'shape' && studioShapeKind === 'polygon') {
       if (studioPolygonPoints.length > 0) {
@@ -9211,7 +9253,18 @@
     const ctx = getActiveLayerContext();
     if (!ctx) return;
     const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-    if (dist < 2) return;
+    if (dist < 2) {
+      if (typeof ctx.save === 'function') ctx.save();
+      ctx.fillStyle = studioBrushColor;
+      ctx.globalAlpha = studioBrushAlpha;
+      if (typeof ctx.beginPath === 'function' && typeof ctx.arc === 'function') {
+        ctx.beginPath();
+        ctx.arc(p1.x, p1.y, Math.max(1.5, studioBrushRadius / 4), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      if (typeof ctx.restore === 'function') ctx.restore();
+      return;
+    }
     const segments = Math.max(1, Math.floor(dist / 14));
     const dx = (p2.x - p1.x) / segments;
     const dy = (p2.y - p1.y) / segments;
@@ -9474,7 +9527,14 @@
   }
 
   function finishPolygonDrawing() {
-    if (studioPolygonPoints.length >= 3) {
+    const rawPts = studioPolygonPoints || [];
+    const pts = [];
+    for (const pt of rawPts) {
+      if (pts.length === 0 || Math.hypot(pt.x - pts[pts.length - 1].x, pt.y - pts[pts.length - 1].y) > 3) {
+        pts.push(pt);
+      }
+    }
+    if (pts.length >= 3) {
       const ctx = getActiveLayerContext();
       if (ctx) {
         if (typeof ctx.save === 'function') ctx.save();
@@ -9484,9 +9544,9 @@
         ctx.globalAlpha = studioBrushAlpha;
         if (typeof ctx.beginPath === 'function') {
           ctx.beginPath();
-          ctx.moveTo(studioPolygonPoints[0].x, studioPolygonPoints[0].y);
-          for (let i = 1; i < studioPolygonPoints.length; i++) {
-            ctx.lineTo(studioPolygonPoints[i].x, studioPolygonPoints[i].y);
+          ctx.moveTo(pts[0].x, pts[0].y);
+          for (let i = 1; i < pts.length; i++) {
+            ctx.lineTo(pts[i].x, pts[i].y);
           }
           ctx.closePath();
           if (studioShapeShouldFill && typeof ctx.fill === 'function') {
@@ -9496,15 +9556,27 @@
         }
         if (typeof ctx.restore === 'function') ctx.restore();
       }
-      toast(`Polygon completed with ${studioPolygonPoints.length} vertices`, 'success');
+      toast(`Polygon completed with ${pts.length} vertices`, 'success');
     }
     studioPolygonPoints = [];
     renderCompositeLayers();
     persistStudioDrawing();
   }
 
-  function parseHexColor(hex, alpha) {
-    let c = (hex || '#000000').replace('#', '');
+  function parseHexColor(colorStr, alpha) {
+    const defaultAlpha = Math.round((typeof alpha === 'number' ? alpha : 1) * 255);
+    if (!colorStr) return { r: 0, g: 0, b: 0, a: defaultAlpha };
+    if (colorStr.startsWith('rgb')) {
+      const match = colorStr.match(/\d+(\.\d+)?/g);
+      if (match && match.length >= 3) {
+        const r = parseInt(match[0], 10) || 0;
+        const g = parseInt(match[1], 10) || 0;
+        const b = parseInt(match[2], 10) || 0;
+        const a = match[3] !== undefined ? Math.round(parseFloat(match[3]) * 255) : defaultAlpha;
+        return { r, g, b, a };
+      }
+    }
+    let c = (colorStr || '#000000').replace('#', '');
     if (c.length === 3) {
       c = c.split('').map(ch => ch + ch).join('');
     }
@@ -9512,8 +9584,7 @@
     const r = (num >> 16) & 255;
     const g = (num >> 8) & 255;
     const b = num & 255;
-    const a = Math.round((typeof alpha === 'number' ? alpha : 1) * 255);
-    return { r, g, b, a };
+    return { r, g, b, a: defaultAlpha };
   }
 
   function colorDistance(r1, g1, b1, a1, r2, g2, b2, a2) {
@@ -9670,6 +9741,62 @@
     toast(`Cleared ${layer.name}`, 'info');
   }
 
+  function resetAllMapLayers() {
+    saveUndoSnapshot();
+    const w = mapPaintCanvas ? mapPaintCanvas.width : 1600;
+    const h = mapPaintCanvas ? mapPaintCanvas.height : 1000;
+    mapStudioLayers = [{
+      id: 'layer_1',
+      name: 'Base Landmass',
+      visible: true,
+      opacity: 1.0,
+      canvas: createLayerCanvas(w, h)
+    }];
+    activeStudioLayerId = 'layer_1';
+    if (mapPaintCanvas && typeof mapPaintCanvas.getContext === 'function') {
+      const ctx = mapPaintCanvas.getContext('2d');
+      if (ctx && typeof ctx.clearRect === 'function') {
+        ctx.clearRect(0, 0, mapPaintCanvas.width, mapPaintCanvas.height);
+      }
+    }
+    renderCompositeLayers();
+    renderLayersPanel();
+    if (Storage.saveMap) {
+      Storage.saveMap({
+        drawingData: null,
+        layers: [{
+          id: 'layer_1',
+          name: 'Base Landmass',
+          visible: true,
+          opacity: 1.0,
+          dataUrl: null
+        }]
+      });
+    }
+  }
+
+  function moveMapLayer(layerId, dir) {
+    const idx = mapStudioLayers.findIndex(l => l.id === layerId);
+    if (idx === -1) return;
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= mapStudioLayers.length) return;
+    saveUndoSnapshot();
+    const temp = mapStudioLayers[idx];
+    mapStudioLayers[idx] = mapStudioLayers[targetIdx];
+    mapStudioLayers[targetIdx] = temp;
+    renderLayersPanel();
+    renderCompositeLayers();
+    persistStudioDrawing();
+  }
+
+  function renameMapLayer(layerId, newName) {
+    const layer = mapStudioLayers.find(l => l.id === layerId);
+    if (!layer || !newName || !newName.trim()) return;
+    layer.name = newName.trim();
+    renderLayersPanel();
+    persistStudioDrawing();
+  }
+
   function renderLayersPanel() {
     if (studioLayerCount) {
       studioLayerCount.textContent = String(mapStudioLayers.length);
@@ -9701,8 +9828,18 @@
 
       const nameSpan = document.createElement('span');
       nameSpan.className = 'layer-name';
-      nameSpan.title = 'Click to activate';
+      nameSpan.title = 'Click to activate · Double-click to rename';
       nameSpan.textContent = layer.name || 'Layer';
+      if (typeof nameSpan.addEventListener === 'function') {
+        nameSpan.addEventListener('dblclick', (e) => {
+          if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+          const promptFn = (typeof window !== 'undefined' && typeof window.prompt === 'function') ? window.prompt : (typeof prompt === 'function' ? prompt : null);
+          const newName = promptFn ? promptFn('Rename layer:', layer.name) : null;
+          if (newName && newName.trim()) {
+            renameMapLayer(layer.id, newName);
+          }
+        });
+      }
 
       if (typeof item.appendChild === 'function') {
         item.appendChild(visBtn);
@@ -9710,6 +9847,42 @@
       }
 
       if (mapStudioLayers.length > 1) {
+        const controlsWrap = document.createElement('div');
+        controlsWrap.className = 'layer-controls';
+        controlsWrap.style.display = 'inline-flex';
+        controlsWrap.style.gap = '2px';
+        controlsWrap.style.alignItems = 'center';
+
+        if (i < mapStudioLayers.length - 1) {
+          const upBtn = document.createElement('button');
+          upBtn.type = 'button';
+          upBtn.className = 'icon-btn btn-xs btn-move-layer-up';
+          upBtn.title = 'Move Layer Up';
+          upBtn.textContent = '▲';
+          if (typeof upBtn.addEventListener === 'function') {
+            upBtn.addEventListener('click', (e) => {
+              if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+              moveMapLayer(layer.id, 1);
+            });
+          }
+          controlsWrap.appendChild(upBtn);
+        }
+
+        if (i > 0) {
+          const downBtn = document.createElement('button');
+          downBtn.type = 'button';
+          downBtn.className = 'icon-btn btn-xs btn-move-layer-down';
+          downBtn.title = 'Move Layer Down';
+          downBtn.textContent = '▼';
+          if (typeof downBtn.addEventListener === 'function') {
+            downBtn.addEventListener('click', (e) => {
+              if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+              moveMapLayer(layer.id, -1);
+            });
+          }
+          controlsWrap.appendChild(downBtn);
+        }
+
         const delBtn = document.createElement('button');
         delBtn.type = 'button';
         delBtn.className = 'icon-btn btn-xs btn-delete-layer';
@@ -9721,8 +9894,10 @@
             deleteMapLayer(layer.id);
           });
         }
+        controlsWrap.appendChild(delBtn);
+
         if (typeof item.appendChild === 'function') {
-          item.appendChild(delBtn);
+          item.appendChild(controlsWrap);
         }
       }
 
@@ -9829,6 +10004,18 @@
     const ctx = (expCanvas && typeof expCanvas.getContext === 'function') ? expCanvas.getContext('2d') : null;
     if (!ctx) return;
 
+    const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+    const stageBoundary = mapStage ? (mapStage.dataset.boundaryShape || mapStage.dataset.shape) : null;
+    const stageRadius = mapStage ? mapStage.style.borderRadius : '';
+    const isOval = stageBoundary === 'oval' || stageRadius === '50%' || curMap.boundaryShape === 'oval' || curMap.shape === 'oval';
+    if (isOval && typeof ctx.ellipse === 'function' && typeof ctx.clip === 'function') {
+      if (typeof ctx.beginPath === 'function') {
+        ctx.beginPath();
+        ctx.ellipse(w / 2, h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+        ctx.clip();
+      }
+    }
+
     // 1. Draw base canvas or custom image element
     const customImgEl = (typeof document !== 'undefined' && document.getElementById) ? document.getElementById('map-custom-img') : mapCustomImg;
     let customImgDrawn = false;
@@ -9845,7 +10032,18 @@
     }
 
     // 2. Draw paint layers composite
-    if (mapPaintCanvas && typeof ctx.drawImage === 'function') {
+    renderCompositeLayers();
+    if (mapStudioLayers && mapStudioLayers.length > 0) {
+      for (const layer of mapStudioLayers) {
+        if (!layer.visible || !layer.canvas) continue;
+        if (typeof ctx.save === 'function') ctx.save();
+        ctx.globalAlpha = typeof layer.opacity === 'number' ? layer.opacity : 1.0;
+        if (typeof ctx.drawImage === 'function') {
+          ctx.drawImage(layer.canvas, 0, 0, w, h);
+        }
+        if (typeof ctx.restore === 'function') ctx.restore();
+      }
+    } else if (mapPaintCanvas && typeof ctx.drawImage === 'function') {
       ctx.drawImage(mapPaintCanvas, 0, 0, w, h);
     }
 
@@ -10005,12 +10203,12 @@
 
     const frame = (mapDimShapeFrame && mapDimShapeFrame.value) || 'landscape';
     let chosenShape = 'custom';
-    if (w === 1600 && h === 1000) chosenShape = 'landscape';
-    else if (w === 1200 && h === 1200) chosenShape = 'square';
-    else if (w === 900 && h === 1600) chosenShape = 'vertical';
-    else if (w === 1500 && h === 1050) chosenShape = 'oval';
-    else if (w === 2100 && h === 900) chosenShape = 'ultrawide';
-    else if (w === 1600 && h === 1200) chosenShape = 'parchment';
+    if (w === 1600 && h === 1000 && frame === 'landscape') chosenShape = 'landscape';
+    else if (w === 1200 && h === 1200 && frame === 'landscape') chosenShape = 'square';
+    else if (w === 900 && h === 1600 && frame === 'landscape') chosenShape = 'vertical';
+    else if (w === 1500 && h === 1050 && frame === 'oval') chosenShape = 'oval';
+    else if (w === 2100 && h === 900 && frame === 'landscape') chosenShape = 'ultrawide';
+    else if (w === 1600 && h === 1200 && frame === 'parchment') chosenShape = 'parchment';
 
     if (mapShapeSelect) {
       mapShapeSelect.value = chosenShape;
@@ -10230,12 +10428,22 @@
       btnMapDimensions.addEventListener('click', openMapDimensionsModal);
     }
 
+    const closeDimModal = () => {
+      if (mapDimensionsModal) mapDimensionsModal.classList.add('hidden');
+      const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+      if (mapShapeSelect && curMap.shape) {
+        mapShapeSelect.value = curMap.shape;
+      }
+    };
+
     if (btnMapDimCancel) {
-      btnMapDimCancel.addEventListener('click', () => {
-        if (mapDimensionsModal) mapDimensionsModal.classList.add('hidden');
-        const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
-        if (mapShapeSelect && curMap.shape) {
-          mapShapeSelect.value = curMap.shape;
+      btnMapDimCancel.addEventListener('click', closeDimModal);
+    }
+
+    if (mapDimensionsModal && typeof mapDimensionsModal.addEventListener === 'function') {
+      mapDimensionsModal.addEventListener('click', (e) => {
+        if (e && e.target === mapDimensionsModal) {
+          closeDimModal();
         }
       });
     }
@@ -10261,6 +10469,28 @@
         }
       });
     });
+
+    const syncActivePresetPill = () => {
+      const curW = parseInt(mapDimWidth ? mapDimWidth.value : '0', 10);
+      const curH = parseInt(mapDimHeight ? mapDimHeight.value : '0', 10);
+      const frame = (mapDimShapeFrame && mapDimShapeFrame.value) || 'landscape';
+      dimPresetBtns.forEach(btn => {
+        const bw = parseInt(btn.dataset.w, 10);
+        const bh = parseInt(btn.dataset.h, 10);
+        const bshape = btn.dataset.shape;
+        const matchesFrame = (bshape === 'oval' && frame === 'oval') ||
+                             (bshape === 'parchment' && frame === 'parchment') ||
+                             (bshape !== 'oval' && bshape !== 'parchment' && frame === 'landscape');
+        if (bw === curW && bh === curH && matchesFrame) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    };
+    if (mapDimWidth) mapDimWidth.addEventListener('input', syncActivePresetPill);
+    if (mapDimHeight) mapDimHeight.addEventListener('input', syncActivePresetPill);
+    if (mapDimShapeFrame) mapDimShapeFrame.addEventListener('change', syncActivePresetPill);
 
     // 8. Paint Canvas Pointer Events
     if (mapPaintCanvas && typeof mapPaintCanvas.addEventListener === 'function') {
@@ -10333,6 +10563,9 @@
       window.openMapDimensionsModal = openMapDimensionsModal;
       window.addNewMapLayer = addNewMapLayer;
       window.deleteMapLayer = deleteMapLayer;
+      window.moveMapLayer = moveMapLayer;
+      window.renameMapLayer = renameMapLayer;
+      window.resetAllMapLayers = resetAllMapLayers;
       window.undoStudioStroke = undoStudioStroke;
       window.redoStudioStroke = redoStudioStroke;
       window.clearActiveLayer = clearActiveLayer;

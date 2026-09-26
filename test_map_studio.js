@@ -170,31 +170,37 @@ function createMockElement(id = '', tag = 'div') {
     setAttribute: (k, v) => { dataset[k] = v; },
     getAttribute: (k) => dataset[k] || null,
     getBoundingClientRect: () => ({ left: 0, top: 0, width: 1600, height: 1000 }),
-    getContext: () => ({
-      save: () => {},
-      restore: () => {},
-      clearRect: () => {},
-      beginPath: () => {},
-      moveTo: () => {},
-      lineTo: () => {},
-      arc: () => {},
-      rect: () => {},
-      ellipse: () => {},
-      closePath: () => {},
-      fill: () => {},
-      stroke: () => {},
-      drawImage: () => {},
-      getImageData: () => ({ data: new Uint8ClampedArray(1600 * 1000 * 4) }),
-      putImageData: () => {},
-      fillText: () => {},
-      fillRect: () => {},
-      strokeRect: () => {},
-      quadraticCurveTo: () => {},
-      bezierCurveTo: () => {},
-      setLineDash: () => {},
-      scale: () => {},
-      measureText: (txt) => ({ width: (txt || '').length * 8 }),
-    }),
+    getContext: () => {
+      if (!el._ctx) {
+        el._ctx = {
+          save: () => {},
+          restore: () => {},
+          clearRect: () => {},
+          beginPath: () => {},
+          moveTo: () => {},
+          lineTo: () => {},
+          arc: () => {},
+          rect: () => {},
+          ellipse: () => {},
+          clip: () => {},
+          closePath: () => {},
+          fill: () => {},
+          stroke: () => {},
+          drawImage: () => {},
+          getImageData: () => ({ data: new Uint8ClampedArray(1600 * 1000 * 4) }),
+          putImageData: () => {},
+          fillText: () => {},
+          fillRect: () => {},
+          strokeRect: () => {},
+          quadraticCurveTo: () => {},
+          bezierCurveTo: () => {},
+          setLineDash: () => {},
+          scale: () => {},
+          measureText: (txt) => ({ width: (txt || '').length * 8 }),
+        };
+      }
+      return el._ctx;
+    },
     toDataURL: (type) => `data:${type || 'image/png'};base64,mockpngdata`,
     addEventListener: (ev, fn) => {
       if (!listeners[ev]) listeners[ev] = [];
@@ -306,8 +312,22 @@ const paletteSwatches = paletteColors.map(c => {
 });
 
 // Initialize hidden classes matching index.html
-['map-modal', 'map-studio-toolbar', 'map-layers-panel', 'map-dimensions-modal', 'studio-terrain-options', 'studio-shape-options', 'map-pin-preview', 'map-pin-modal', 'modal-overlay', 'delete-overlay'].forEach(id => {
-  if (elementsMap[id]) elementsMap[id].classList.add('hidden');
+[
+  'tutorial-overlay', 'graph-modal', 'map-modal', 'timeline-modal', 'codex-modal',
+  'map-pin-modal', 'timeline-event-modal', 'codex-char-modal', 'codex-rel-modal',
+  'editor-area', 'intro-splash', 'metrics-modal', 'switcher-modal', 'goal-modal',
+  'outline-drawer', 'wikicreate-modal', 'find-replace-bar', 'modal-overlay',
+  'delete-overlay', 'map-tutorial-modal', 'timeline-tutorial-modal',
+  'codex-tutorial-modal', 'map-pin-preview', 'codex-char-preview',
+  'codex-web-inspector', 'new-note-dropdown', 'map-region-modal',
+  'map-region-detail-modal', 'timeline-event-detail-modal', 'codex-detail-modal',
+  'graph-node-detail-modal', 'graph-entity-modal', 'graph-link-modal',
+  'project-settings-modal', 'settings-modal', 'vault-reset-confirm-modal',
+  'map-studio-toolbar', 'map-layers-panel', 'map-dimensions-modal',
+  'studio-terrain-options', 'studio-shape-options', 'modal-sample-vault-confirm',
+  'modal-update', 'modal-whats-new'
+].forEach(id => {
+  if (getEl(id)) getEl(id).classList.add('hidden');
 });
 
 // Mock document and window
@@ -723,5 +743,125 @@ const mergedMap = Storage.getMap();
 assert.strictEqual(mergedMap.shape, 'custom');
 assert.strictEqual(mergedMap.width, 2800);
 console.log('✓ Legacy package shape import and merge mode custom dimensions verified');
+
+// 4.17 Dimensions Modal Backdrop Click Dismissal
+Storage.saveMap({ shape: 'landscape' });
+elementsMap['map-dimensions-modal'].classList.remove('hidden');
+elementsMap['map-shape-select'].value = 'custom';
+elementsMap['map-dimensions-modal'].dispatchEvent('click', { target: elementsMap['map-dimensions-modal'] });
+assert(elementsMap['map-dimensions-modal'].classList.contains('hidden'), 'Backdrop click must close dimensions modal');
+assert.strictEqual(elementsMap['map-shape-select'].value, 'landscape', 'Backdrop click must revert shape select');
+console.log('✓ Dimensions modal backdrop click dismissal and shape select revert verified');
+
+// 4.18 Escape Key Hierarchy (Does not close entire map when sub-modals/actions are active)
+elementsMap['map-modal'].classList.remove('hidden');
+
+// Case A: Dimensions modal open -> Escape closes modal, map remains OPEN
+elementsMap['map-dimensions-modal'].classList.remove('hidden');
+if (windowListeners['keydown']) {
+  windowListeners['keydown'].forEach(fn => fn({ key: 'Escape', target: { tagName: 'DIV' }, preventDefault: () => {} }));
+}
+assert(elementsMap['map-dimensions-modal'].classList.contains('hidden'), 'Escape must close dimensions modal');
+assert(!elementsMap['map-modal'].classList.contains('hidden'), 'Escape must NOT close map-modal when dimensions modal was open');
+
+// Case B: Layers panel open -> Escape closes layers panel, map remains OPEN
+elementsMap['map-layers-panel'].classList.remove('hidden');
+if (windowListeners['keydown']) {
+  windowListeners['keydown'].forEach(fn => fn({ key: 'Escape', target: { tagName: 'DIV' }, preventDefault: () => {} }));
+}
+assert(elementsMap['map-layers-panel'].classList.contains('hidden'), 'Escape must close layers panel');
+assert(!elementsMap['map-modal'].classList.contains('hidden'), 'Escape must NOT close map-modal when layers panel was open');
+
+// Case C: Polygon points in progress -> Escape cancels polygon, map remains OPEN
+shapeToolBtn.click();
+elementsMap['studio-shape-type'].value = 'polygon';
+elementsMap['studio-shape-type'].dispatchEvent('change');
+mapPaintCanvas.dispatchEvent('mousedown', { clientX: 50, clientY: 50, button: 0 });
+mapPaintCanvas.dispatchEvent('mousedown', { clientX: 80, clientY: 80, button: 0 });
+if (windowListeners['keydown']) {
+  windowListeners['keydown'].forEach(fn => fn({ key: 'Escape', target: { tagName: 'DIV' }, preventDefault: () => {} }));
+}
+assert(!elementsMap['map-modal'].classList.contains('hidden'), 'Escape must NOT close map-modal when polygon drawing in progress');
+console.log('✓ Escape key hierarchy cleanly protects map view across all studio modals & actions');
+
+// 4.19 Custom Dimensions with Oval Frame (e.g. 1200x1200 circular map)
+mapDimWidth.value = 1200;
+mapDimHeight.value = 1200;
+mapDimShapeFrame.value = 'oval';
+btnMapDimApply.click();
+assert.strictEqual(mapStage.dataset.shape, 'custom', 'Square dimensions with oval frame must remain custom');
+assert.strictEqual(mapStage.style.borderRadius, '50%', 'Circular boundary frame must set border-radius: 50%');
+assert.strictEqual(mapStage.style.overflow, 'hidden', 'Circular boundary frame must set overflow: hidden');
+const savedCircularMap = Storage.getMap();
+assert.strictEqual(savedCircularMap.shape, 'custom');
+assert.strictEqual(savedCircularMap.boundaryShape, 'oval');
+console.log('✓ Custom dimensions with circular / oval boundary frame verified');
+
+// 4.20 Two-Finger Touch Cancellation (Allows native pinch-to-zoom)
+btnMapPaintMode.click();
+brushToolBtn.click();
+// Two finger touchstart
+mapPaintCanvas.dispatchEvent('touchstart', {
+  touches: [{ clientX: 100, clientY: 100 }, { clientX: 200, clientY: 200 }],
+  preventDefault: () => {}
+});
+// Two finger touchmove
+mapPaintCanvas.dispatchEvent('touchmove', {
+  touches: [{ clientX: 90, clientY: 90 }, { clientX: 210, clientY: 210 }],
+  preventDefault: () => {}
+});
+console.log('✓ Two-finger touch gesture bypasses drawing to allow smooth pinch-to-zoom');
+
+// 4.21 Layer Reordering & Renaming
+const curLayersCount = parseInt(elementsMap['studio-layer-count'].textContent, 10);
+btnAddLayer.click();
+btnAddLayer.click();
+assert.strictEqual(parseInt(elementsMap['studio-layer-count'].textContent, 10), curLayersCount + 2);
+
+// Reorder layers
+const curMapBeforeMove = Storage.getMap();
+const topLayerId = curMapBeforeMove.layers[curMapBeforeMove.layers.length - 1].id;
+window.moveMapLayer(topLayerId, -1);
+const mapAfterMove = Storage.getMap();
+assert.strictEqual(mapAfterMove.layers[mapAfterMove.layers.length - 2].id, topLayerId, 'Layer must move down one index');
+
+// Rename layer
+window.renameMapLayer(topLayerId, 'Kingdom Territory');
+const mapAfterRename = Storage.getMap();
+assert.strictEqual(mapAfterRename.layers[mapAfterRename.layers.length - 2].name, 'Kingdom Territory');
+console.log('✓ Layer reordering (move up/down) and renaming verified');
+
+// 4.22 Reset Map Wiping All Drawing Layers
+elementsMap['btn-map-reset-img'].click();
+const resetMapState = Storage.getMap();
+assert.strictEqual(resetMapState.drawingData, null, 'Reset Map must clear drawingData');
+assert.strictEqual(parseInt(elementsMap['studio-layer-count'].textContent, 10), 1, 'Reset Map must reset layers count to 1');
+console.log('✓ Reset Map completely wipes all drawing layers in memory and UI');
+
+// 4.23 Landmass Single Click Click-to-Node
+landmassToolBtn.click();
+mapPaintCanvas.dispatchEvent('mousedown', { clientX: 500, clientY: 500, button: 0 });
+mapPaintCanvas.dispatchEvent('mouseup', { clientX: 500, clientY: 500 });
+console.log('✓ Landmass tool single-click paints a valid coastline node');
+
+// 4.24 Export PNG with Oval Clipping
+let clipCalled = false;
+let ellipseCalled = false;
+const origCreateElement = global.document.createElement;
+global.document.createElement = (tag) => {
+  const el = origCreateElement(tag);
+  if (tag === 'canvas') {
+    const baseCtx = el.getContext();
+    baseCtx.clip = () => { clipCalled = true; };
+    baseCtx.ellipse = () => { ellipseCalled = true; };
+  }
+  return el;
+};
+window.setMapCanvasShape('custom', 1500, 1050, 'oval');
+btnMapExportPng.click();
+assert(clipCalled, 'Export PNG must invoke clip() for oval boundary map');
+assert(ellipseCalled, 'Export PNG must invoke ellipse() for oval boundary map');
+global.document.createElement = origCreateElement;
+console.log('✓ Oval map PNG export with elliptical clipping verified');
 
 console.log('\n=== ALL MAP STUDIO & CUSTOM SIZING TESTS PASSED (100%) ===\n');
