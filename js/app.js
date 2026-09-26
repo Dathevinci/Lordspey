@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '1.1.4';
+  const APP_VERSION = '1.1.5';
   const UPDATE_API_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
 
   const ALIAS_SELECTORS = {
@@ -11160,16 +11160,16 @@
   function renderWhatsNewHtml(features = WHATS_NEW_V110_FEATURES) {
     return `
       <div class="whats-new-intro" style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
-        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This edition introduces comprehensive sample vault data-loss prevention, non-destructive merging, one-click rollback, and a minimalist un-slopped UI overhaul:
+        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This major update delivers a creative Photoshop-like Map Studio, custom canvas dimensions, terrain sculpting, and multi-layer cartography tools:
       </div>
       <div class="whats-new-v111-patch" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px;">
-        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">v1.1.4 Vault Protection &amp; Minimalist UI Overhaul</div>
+        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">v1.1.5 Creative Map Studio &amp; Custom Sizing</div>
         <ul style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; padding-left: 18px; line-height: 1.4;">
-          <li><strong>Sample Vault Overwrite Protection:</strong> Smart detection of user drafts, characters, and lore prevents accidental data loss when loading the sample vault.</li>
-          <li><strong>Safety Backups &amp; 1-Click Rollback:</strong> Instant automatic vault snapshot with an immediate <code>[Undo / Restore My Work]</code> banner and permanent Settings restore control.</li>
-          <li><strong>Non-Destructive Merge:</strong> Option to seamlessly merge the starter universe into your existing world without modifying or losing custom work.</li>
-          <li><strong>Distraction-Free Minimalist UI:</strong> Purged neon glow drop-shadows and gratuitous emojis; streamlined single-line formatting toolbar, refined typography, and serene drafting canvas.</li>
-          <li><strong>Automated Background Updates:</strong> Real-time detection of GitHub releases with notifications, visual status badges, and 15-minute rate-limiting cache.</li>
+          <li><strong>Custom Canvas Shapes &amp; Sizing:</strong> Set any map size from 500px up to 4000px, aspect-ratio locking, and framing presets (Cinema 16:9, Ultrawide 24:10, Square 1:1, Vertical Scroll 9:16, Oval Vignette, and Archival Parchment).</li>
+          <li><strong>Photoshop-Style Map Studio:</strong> Dedicated cartography workspace with freeform ink brush, fine pencil, eraser, fractal landmass coastline sculptor, and geometric shapes (rectangles, ellipses, lines, and multi-point polygons).</li>
+          <li><strong>Fantasy Terrain Brushes:</strong> Instant stampers for mountain ranges, dense forests, desert dunes, swamps, and rolling hills.</li>
+          <li><strong>Multi-Layer Drawing System:</strong> Create, reorder, hide/show, adjust opacity (0%–100%), and one-click "Bake Layers" onto the base canvas.</li>
+          <li><strong>High-DPI Export &amp; Touch Navigation:</strong> Clean elliptical PNG exports with landmark pin scaling and two-finger gesture bypass for smooth pinch-to-zoom.</li>
         </ul>
       </div>
       <div class="whats-new-grid">

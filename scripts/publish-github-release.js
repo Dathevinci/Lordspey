@@ -25,32 +25,31 @@ async function main() {
   }
 
   const repo = 'Dathevinci/Lordspey';
-  const tag = 'v1.1.4';
-  const releaseName = 'Lord Spey v1.1.4 — Sample Vault Data-Loss Protection & Minimalist UI Overhaul';
-  const releaseBody = `## Lord Spey v1.1.4 — Sample Vault Data-Loss Protection & Minimalist UI Overhaul
+  const tag = 'v1.1.5';
+  const releaseName = 'Lord Spey v1.1.5 — Creative Map Studio, Custom Sizing & Cartography Tools';
+  const releaseBody = `## Lord Spey v1.1.5 — Creative Map Studio, Custom Sizing & Cartography Tools
 
 Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding.
 
-### ✦ What's New & Improved in v1.1.4
-- **🛡️ Sample Vault Data-Loss Prevention & Rollback**:
-  - **Accidental Overwrite Protection**: Intelligent user content detection (\`Storage.hasUserContent()\`, \`Storage.isPristineStarterVault()\`) prevents accidental progress loss when selecting the Sample Vault while working on a project with chapters, lore, characters, maps, or timeline milestones.
-  - **Interactive Safety Confirmation Modal**: Populated vaults trigger an immediate confirmation modal with live project statistics and three non-destructive options: **Backup & Replace**, **Merge with Sample Vault**, or **Cancel**.
-  - **1-Click Instant Undo / Restore**: Automatic pre-replacement safety snapshot with an immediate floating banner (\`[Undo / Restore My Work]\`) and permanent Settings restore control (\`[Restore Previous Vault Backup]\`).
-  - **Non-Destructive Universe Merging**: Merge mode safely incorporates sample lore, timeline milestones, and map regions alongside your custom project without overwriting any user content.
-  - **Quota Error Boundary**: In-memory and session storage fallback snapshots protect against \`QuotaExceededError\` if storage quota is constrained.
-- **✨ Minimalist UI/UX & Distraction-Free Redesign ("Un-slopped")**:
-  - **Purged Neon Glows & Halos**: Eradicated aggressive red box shadows, neon halos, and visual clutter across input fields, wiki links, tags, and modal dialogs. Replaced with soft, refined elevation shadows and clean focus rings.
-  - **Emoji & Sparkle Decoupling**: Removed gratuitous sparkle emojis (\`✦\`) and decorative clutter from logo headers, outline drawers, linked mentions, metrics, and graph legends.
-  - **Editorial Typography**: Serene, comfortable drafting canvas with classic publishing asterisks (\`* * *\`) for scene breaks and refined headline tracking.
-  - **Compact Formatting Bar**: Unified single-line formatting toolbar with sleek 150ms ease transitions.
-  - **Decluttered Sidebar & Modals**: Clean tree hierarchy, unobtrusive split \`+ New Note\` button, and streamlined dialogs.
-- **🔄 Real-Time GitHub Release Detection & In-App Updates**:
-  - Automatic background detection of new GitHub releases with notification banners and status badges.
-  - 15-minute rate-limiting cooldown cache and safe pre-update snapshots.
+### ✦ What's New & Improved in v1.1.5
+- **🎨 Creative Photoshop-Like Map Studio**:
+  - **Full Cartography Drawing Suite**: Dedicated drawing mode (\`Paint / Studio\`) equipped with freeform ink brush, fine pencil for borders/rivers, precision eraser, fractal landmass coastline sculptor, and geometric tools (rectangles, ellipses, straight lines, multi-point polygons).
+  - **Fantasy Terrain Stampers**: Quick-draw terrain brushes for mountain ranges (\`▲▲▲\`), dense forests (\`♣♣♣\`), desert dunes (\`〜〜\`), swamps (\`≈≈\`), and rolling hills (\`⌒⌒\`).
+  - **Color Palette & Swatches**: 10 fantasy cartography swatches (Deep Ocean, Coastal Azure, Parchment, Grassland, Basalt Mountain, Evergreen Forest, Desert Sand, Volcanic Ash, Crimson Kingdom, Royal Gold) plus full RGB/Hex color picker.
+  - **Multi-Layer Drawing System**: Create, hide/show, reorder, adjust layer opacity (0%–100%), and one-click "Bake Layers" to flatten onto the permanent base canvas.
+  - **Flood Fill Bucket**: High-speed flat 1D queue flood-fill with color tolerance for instant continental or ocean tinting.
+- **📐 Custom Canvas Shapes & Dimensions**:
+  - **Precision Sizing**: Set custom map dimensions from 500 px to 4000 px with aspect-ratio locking and 1-click presets (Cinema 16:9, Ultrawide 24:10, Square 1:1, Vertical Scroll 9:16).
+  - **Boundary Framing**: Choice of Classic Rectangle, Circular/Oval Vignette with soft atmospheric shadows, and Archival Parchment vintage antique deckled borders.
+- **🗺️ High-DPI Export & Gesture Navigation**:
+  - **Elliptical PNG Export**: Exports crisp high-resolution maps compositing background, drawings, layers, and dynamically scaled landmark pins & territory labels, with accurate elliptical clipping masks.
+  - **Two-Finger Touch Navigation**: Pinch-to-zoom and canvas panning seamlessly bypasses drawing tools on touch devices.
+- **🛡️ Data Safety & Backward Compatibility**:
+  - Seamless persistence in \`Storage\`, \`.spey\` project bundle import/export, and multi-tier storage quota fallback protection.
 
 ### 📦 Downloads & Binaries
-- **Lord Spey Setup 1.1.4.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
-- **Lord Spey 1.1.4.exe**: Portable standalone executable (no installation required).
+- **Lord Spey Setup 1.1.5.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
+- **Lord Spey 1.1.5.exe**: Portable standalone executable (no installation required).
 - **Lord.Spey.apk / app-debug.apk**: Android package for mobile writing and worldbuilding.
 `;
 
@@ -144,8 +143,8 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
   }
 
   const assetsToUpload = [
-    { file: 'Lord Spey Setup 1.1.4.exe', label: 'Lord Spey Setup 1.1.4.exe', contentType: 'application/x-msdos-program' },
-    { file: 'Lord Spey 1.1.4.exe', label: 'Lord Spey 1.1.4.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord Spey Setup 1.1.5.exe', label: 'Lord Spey Setup 1.1.5.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord Spey 1.1.5.exe', label: 'Lord Spey 1.1.5.exe', contentType: 'application/x-msdos-program' },
     { file: 'Lord.Spey.apk', label: 'Lord.Spey.apk', contentType: 'application/vnd.android.package-archive' },
     { file: 'app-debug.apk', label: 'app-debug.apk', contentType: 'application/vnd.android.package-archive' }
   ];
@@ -200,7 +199,7 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
     const uploadedAssetNames = (updatedRelease.assets || []).map(a => a.name);
     console.log(`Total release assets on GitHub: ${uploadedAssetNames.length}`);
     uploadedAssetNames.forEach(a => console.log(`  - ${a}`));
-    const expectedAssets = ['Lord Spey Setup 1.1.4.exe', 'Lord Spey 1.1.4.exe', 'Lord.Spey.apk', 'app-debug.apk'];
+    const expectedAssets = ['Lord Spey Setup 1.1.5.exe', 'Lord Spey 1.1.5.exe', 'Lord.Spey.apk', 'app-debug.apk'];
     const norm = n => (n || '').toLowerCase().replace(/[\s.]+/g, '.');
     let allFound = true;
     for (const exp of expectedAssets) {
