@@ -1,0 +1,692 @@
+/* ==========================================================================
+   Lord Spey — Minimalist Landing Page Stylesheet
+   Designed for authors, novelists, and worldbuilders.
+   Clean, distraction-free, zero-slop aesthetic.
+   ========================================================================== */
+
+:root {
+  --bg-base: #0c0e12;
+  --bg-surface: #14171f;
+  --bg-surface-elevated: #1a1e28;
+  --bg-surface-hover: #202533;
+  --border-subtle: #232836;
+  --border-muted: #1e222e;
+  --border-focus: #3e465d;
+  
+  --text-primary: #f0f2f5;
+  --text-secondary: #9aa0ad;
+  --text-muted: #646c7e;
+  
+  --accent-crimson: #b93838;
+  --accent-crimson-hover: #cf4343;
+  --accent-crimson-subtle: rgba(185, 56, 56, 0.14);
+  --accent-gold: #c99e3a;
+  --accent-gold-subtle: rgba(201, 158, 58, 0.12);
+  --accent-blue-subtle: rgba(70, 130, 200, 0.12);
+  
+  --font-serif: 'Lora', 'Playfair Display', Georgia, serif;
+  --font-display: 'Cinzel', serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.6);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  background-color: var(--bg-base);
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ───────── Typography ───────── */
+h1, h2, h3, h4 {
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.font-serif { font-family: var(--font-serif); }
+.font-display { font-family: var(--font-display); letter-spacing: 0.04em; }
+.font-mono { font-family: var(--font-mono); }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ───────── Layout Container ───────── */
+.container {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ───────── Navbar ───────── */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(12, 14, 18, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: border-color 0.2s ease;
+}
+
+.site-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.nav-brand-img {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  border: 1px solid var(--border-subtle);
+}
+
+.nav-brand-name {
+  font-family: var(--font-display);
+  letter-spacing: 0.12em;
+  font-size: 1rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+
+.nav-link {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  transition: color 0.15s ease;
+}
+
+.nav-link:hover {
+  color: var(--text-primary);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ───────── Buttons & CTAs ───────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent-crimson);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.btn-primary:hover {
+  background: var(--accent-crimson-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(185, 56, 56, 0.35);
+}
+
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-surface-elevated);
+  border-color: var(--border-focus);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface);
+}
+
+.btn-large {
+  padding: 13px 24px;
+  font-size: 1rem;
+  border-radius: var(--radius-md);
+}
+
+/* ───────── Hero Section ───────── */
+.hero-section {
+  padding: 84px 0 64px;
+  text-align: center;
+  position: relative;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.hero-badge-tag {
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+.hero-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  max-width: 860px;
+  margin: 0 auto 20px;
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 680px;
+  margin: 0 auto 36px;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.hero-subtext {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.hero-subtext a {
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.hero-subtext a:hover {
+  color: var(--text-primary);
+}
+
+/* ───────── App Mockup Frame ───────── */
+.mockup-wrapper {
+  margin-top: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  text-align: left;
+}
+
+.mockup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: rgba(16, 19, 26, 0.95);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.mockup-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.mockup-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #333a4d;
+}
+
+.mockup-title {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.mockup-content {
+  display: grid;
+  grid-template-columns: 240px 1fr 220px;
+  min-height: 440px;
+  background: var(--bg-base);
+}
+
+.mockup-sidebar {
+  border-right: 1px solid var(--border-subtle);
+  padding: 16px;
+  background: var(--bg-surface);
+}
+
+.mockup-sidebar-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.mockup-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 4px;
+}
+
+.mockup-sidebar-item.active {
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.mockup-editor {
+  padding: 32px 40px;
+}
+
+.mockup-editor-heading {
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.mockup-editor-text {
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin-bottom: 16px;
+}
+
+.mockup-editor-break {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.4em;
+  margin: 24px 0;
+}
+
+.mockup-drawer {
+  border-left: 1px solid var(--border-subtle);
+  padding: 16px;
+  background: var(--bg-surface);
+}
+
+/* ───────── Features Grid ───────── */
+.section {
+  padding: 80px 0;
+}
+
+.section-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 54px;
+}
+
+.section-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.section-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.feature-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  transition: all 0.2s ease;
+}
+
+.feature-card:hover {
+  background: var(--bg-surface-elevated);
+  border-color: var(--border-focus);
+  transform: translateY(-2px);
+}
+
+.feature-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.feature-title {
+  font-size: 1.15rem;
+  margin-bottom: 10px;
+}
+
+.feature-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ───────── Spotlight Map Studio ───────── */
+.spotlight-card {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 44px;
+  margin-top: 32px;
+}
+
+.spotlight-bullets {
+  list-style: none;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.spotlight-bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+.spotlight-bullet svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: #34d399;
+}
+
+.spotlight-preview {
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.spotlight-tools-bar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  align-items: center;
+}
+
+.spotlight-canvas-mock {
+  height: 200px;
+  border-radius: var(--radius-sm);
+  background: #11151f;
+  border: 1px dashed var(--border-focus);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight-canvas-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
+
+/* ───────── Philosophy / Why Section ───────── */
+.philosophy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.philosophy-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 28px;
+}
+
+.philosophy-metric {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  color: var(--accent-gold);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.philosophy-title {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.philosophy-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ───────── Download Matrix ───────── */
+.downloads-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.download-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.download-card:hover {
+  border-color: var(--border-focus);
+  transform: translateY(-2px);
+}
+
+.download-card.highlight {
+  border-color: var(--accent-crimson);
+  background: linear-gradient(180deg, rgba(185, 56, 56, 0.08) 0%, var(--bg-surface) 100%);
+}
+
+.download-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.download-title {
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+.download-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.download-desc {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+.download-card .btn {
+  width: 100%;
+}
+
+/* ───────── Footer ───────── */
+.site-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 48px 0 36px;
+  background: var(--bg-base);
+  margin-top: 80px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-nav {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+
+.footer-nav a:hover {
+  color: var(--text-primary);
+}
+
+/* ───────── Responsive Breakpoints ───────── */
+@media (max-width: 960px) {
+  .hero-title { font-size: 2.3rem; }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .downloads-grid { grid-template-columns: 1fr; max-width: 440px; margin: 0 auto; }
+  .philosophy-grid { grid-template-columns: 1fr; }
+  .spotlight-card { grid-template-columns: 1fr; }
+  .mockup-content { grid-template-columns: 1fr; }
+  .mockup-sidebar, .mockup-drawer { display: none; }
+}
+
+@media (max-width: 640px) {
+  .hero-title { font-size: 1.85rem; }
+  .features-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .hero-actions { flex-direction: column; width: 100%; }
+  .hero-actions .btn { width: 100%; }
+}
