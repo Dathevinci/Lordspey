@@ -47,8 +47,8 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
   - Automatic pre-update backups, non-destructive sample vault merging, and 100% offline-first privacy.
 
 ### 📦 Downloads & Binaries
-- **Lord Spey Setup 1.2.0.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
-- **Lord Spey 1.2.0.exe**: Portable standalone executable (no installation required).
+- **Lord.Spey.Setup.1.2.0.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
+- **Lord.Spey.1.2.0.exe**: Portable standalone executable (no installation required).
 - **Lord.Spey.apk / app-debug.apk**: Android package for mobile writing and worldbuilding.
 `;
 
@@ -142,14 +142,18 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
   }
 
   const assetsToUpload = [
-    { file: 'Lord Spey Setup 1.2.0.exe', label: 'Lord Spey Setup 1.2.0.exe', contentType: 'application/x-msdos-program' },
-    { file: 'Lord Spey 1.2.0.exe', label: 'Lord Spey 1.2.0.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord.Spey.Setup.1.2.0.exe', altFile: 'Lord Spey Setup 1.2.0.exe', label: 'Lord.Spey.Setup.1.2.0.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord.Spey.1.2.0.exe', altFile: 'Lord Spey 1.2.0.exe', label: 'Lord.Spey.1.2.0.exe', contentType: 'application/x-msdos-program' },
     { file: 'Lord.Spey.apk', label: 'Lord.Spey.apk', contentType: 'application/vnd.android.package-archive' },
     { file: 'app-debug.apk', label: 'app-debug.apk', contentType: 'application/vnd.android.package-archive' }
   ];
 
   for (const asset of assetsToUpload) {
-    const filePath = path.join(distDir, asset.file);
+    let filePath = path.join(distDir, asset.file);
+    if (!fs.existsSync(filePath) && asset.altFile) {
+      const altPath = path.join(distDir, asset.altFile);
+      if (fs.existsSync(altPath)) filePath = altPath;
+    }
     if (!fs.existsSync(filePath)) {
       console.warn(`File not found: ${filePath}`);
       continue;
@@ -198,7 +202,7 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
     const uploadedAssetNames = (updatedRelease.assets || []).map(a => a.name);
     console.log(`Total release assets on GitHub: ${uploadedAssetNames.length}`);
     uploadedAssetNames.forEach(a => console.log(`  - ${a}`));
-    const expectedAssets = ['Lord Spey Setup 1.2.0.exe', 'Lord Spey 1.2.0.exe', 'Lord.Spey.apk', 'app-debug.apk'];
+    const expectedAssets = ['Lord.Spey.Setup.1.2.0.exe', 'Lord.Spey.1.2.0.exe', 'Lord.Spey.apk', 'app-debug.apk'];
     const norm = n => (n || '').toLowerCase().replace(/[\s.]+/g, '.');
     let allFound = true;
     for (const exp of expectedAssets) {

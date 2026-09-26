@@ -93,9 +93,9 @@ The compiled `.apk` will be in **`android/app/build/outputs/apk/debug/app-debug.
 ## 📱 Releases & Downloads
 
 Pre-built binaries for **Windows (`.exe`)** and **Android (`.apk`)** are available on the **[Releases](https://github.com/Dathevinci/Lordspey/releases)** page:
-- **`Lord.Spey.Setup.1.2.0.exe`**: Windows NSIS installer.
-- **`Lord.Spey.1.2.0.exe`**: Standalone portable Windows executable.
-- **`Lord.Spey.apk`**: Sideloadable Android package.
+- **[`Lord.Spey.Setup.1.2.0.exe`](https://github.com/Dathevinci/Lordspey/releases/download/v1.2.0/Lord.Spey.Setup.1.2.0.exe)**: Windows NSIS installer.
+- **[`Lord.Spey.1.2.0.exe`](https://github.com/Dathevinci/Lordspey/releases/download/v1.2.0/Lord.Spey.1.2.0.exe)**: Standalone portable Windows executable.
+- **[`Lord.Spey.apk`](https://github.com/Dathevinci/Lordspey/releases/download/v1.2.0/Lord.Spey.apk)**: Sideloadable Android package.
 
 ---
 

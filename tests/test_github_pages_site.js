@@ -55,8 +55,8 @@ assert(landingHtml.includes('Artistic Cartography Tools'), 'Map studio tools bul
 
 // Downloads Matrix
 assert(landingHtml.includes('id="downloads"'), 'Downloads section must exist');
-assert(landingHtml.includes('Lord%20Spey%20Setup%201.2.0.exe'), 'Missing Windows installer download link for v1.2.0');
-assert(landingHtml.includes('Lord%20Spey%201.2.0.exe'), 'Missing Windows portable download link for v1.2.0');
+assert(landingHtml.includes('Lord.Spey.Setup.1.2.0.exe'), 'Missing Windows installer download link for v1.2.0');
+assert(landingHtml.includes('Lord.Spey.1.2.0.exe'), 'Missing Windows portable download link for v1.2.0');
 assert(landingHtml.includes('Lord.Spey.apk'), 'Missing Android APK download link');
 assert(landingHtml.includes('app-debug.apk'), 'Missing Android debug APK download link');
 
