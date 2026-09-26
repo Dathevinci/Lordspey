@@ -21,7 +21,9 @@
 
 - **Obsidian-Style [[Wiki-Links]]**: Cross-reference characters, factions, and realms using `[[Note Title]]` or `[[Target|Custom Alias]]`. Click any link to jump directly or create the note instantly.
 - **Living Galaxy Graph (`Ctrl+G`)**: Dynamic, interactive constellation starfield mapping your entire story universe. Visualizes category hubs (**Chapters**, **Lore**, **World Building**, **Drafts**), orbital sub-branches, and photon pulse connections.
-- **Interactive Map Studio**: Full creative freedom to craft custom world maps. Set custom canvas dimensions (16:9, 4:3, 1:1, custom px), paint coastlines and landmasses with fractal terrain brushes, draw geometric borders, manage layers, undo/redo, place interactive lore pins, and export high-res PNGs.
+- **Universe Atlas & Multi-Scale Cartography**: Map entire universes across nested tiers: **Galaxies / Sectors**, **Star Systems** (with radial celestial cores and concentric orbital guide rings), **World Maps** (continents & biomes), and **Station/Vessel Deckplans**. Jump seamlessly between realms using interactive breadcrumbs and one-click pin drill-downs (`[ 🪐 Enter Star System ]` / `[ 🗺️ View World Map ]`).
+- **Interactive Map Studio**: Full creative freedom to craft custom maps. Set custom canvas dimensions (16:9, 4:3, 1:1, custom px), paint coastlines with fractal terrain brushes, draw glowing interstellar hyperlanes, manage drawing layers, undo/redo, place celestial lore pins, and export high-res PNGs isolated to the active realm.
+- **Ambient Animated Themes**: Subtle, calm atmospheric backdrops in Settings designed for author immersion without distraction: **Cosmic Starfield** (gentle twinkling stars), **Ethereal Nebula** (slow-drifting celestial clouds), **Cozy Fireflies / Embers** (warm twilight glow), and **Midnight Rain & Mist** (peaceful rain streaks), with zero battery drain and complete `prefers-reduced-motion` support.
 - **Chronicle Timelines & Codex**: Organize historical story eras, character timelines, and deep codex dossiers with linked markdown notes.
 - **Live Side-by-Side Split View (`Ctrl+\`)**: Write in Markdown on the left, watch beautifully formatted typography render live on the right.
 - **Document & Scene Outline (`Alt+O`)**: Automatic table of contents generated from `# Headings` and narrative `* * *` scene breaks. Click any heading to jump directly to it.
@@ -53,7 +55,7 @@ Open **`http://localhost:8095`** in your browser.
 All automated tests are organized cleanly in the `tests/` directory:
 
 ```bash
-# Run all 22 automated test suites (markdown, graph, timeline, map studio, vault safety, etc.)
+# Run all 23 automated test suites (markdown, graph, timeline, map studio, universe atlas, etc.)
 npm test
 ```
 

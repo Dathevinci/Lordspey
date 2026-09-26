@@ -522,6 +522,28 @@
   const btnCloseMapTutorial = $('#btn-close-map-tutorial');
   const btnDismissMapTutorial = $('#btn-dismiss-map-tutorial');
 
+  // Universe Atlas & Celestial Cartography
+  const mapAtlasSelect            = $('#map-atlas-select');
+  const mapAtlasBreadcrumbs       = $('#map-atlas-breadcrumbs');
+  const mapTierBadge              = $('#map-tier-badge');
+  const btnAtlasNewMap            = $('#btn-atlas-new-map');
+  const btnAtlasDeleteMap         = $('#btn-atlas-delete-map');
+  const btnMapOrbitalRings        = $('#btn-map-orbital-rings');
+  const mapCelestialThemeSelect   = $('#map-celestial-theme-select');
+  const btnMapDrillDown           = $('#btn-map-drill-down');
+  const mapModalPinSubmap         = $('#map-modal-pin-submap');
+  const atlasMapModal             = $('#atlas-map-modal');
+  const atlasModalName            = $('#atlas-modal-name');
+  const atlasModalTier            = $('#atlas-modal-tier');
+  const atlasModalParent          = $('#atlas-modal-parent');
+  const atlasModalTheme           = $('#atlas-modal-theme');
+  const atlasModalShape           = $('#atlas-modal-shape');
+  const atlasModalDesc            = $('#atlas-modal-desc');
+  const btnAtlasModalCancel       = $('#btn-atlas-modal-cancel');
+  const btnAtlasModalSave         = $('#btn-atlas-modal-save');
+  const ambientThemeContainer     = $('#ambient-theme-container');
+  const ambientThemeCanvas        = $('#ambient-theme-canvas');
+
   // Chronology & Event Timeline
   const btnTimelineView       = $('#btn-timeline-view');
   const menuBtnTimeline       = $('#menu-btn-timeline');
@@ -641,6 +663,7 @@
   let smartQuotes         = false;
   let currentAccentTheme  = 'crimson';
   let currentBaseTheme       = 'dark';
+  let currentAnimatedTheme   = 'none';
   let isFocusAutohideEnabled = true;
   let isMapRegionDrawingMode = false;
   let currentMapRegionPoints = [];
@@ -761,6 +784,11 @@
       isFocusAutohideEnabled = localStorage.getItem('lordspey_focus_autohide') === 'true';
     } else if (typeof s.focusAutohide === 'boolean') {
       isFocusAutohideEnabled = s.focusAutohide;
+    }
+    if (typeof Storage !== 'undefined' && typeof Storage.getAnimatedTheme === 'function') {
+      currentAnimatedTheme = Storage.getAnimatedTheme() || 'none';
+    } else if (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_animated_theme')) {
+      currentAnimatedTheme = localStorage.getItem('lordspey_animated_theme') || 'none';
     }
   }
 
@@ -950,6 +978,314 @@
     });
   }
 
+  // ── Ambient Animated Themes Engine ──
+  let ambientAnimationId = null;
+  let ambientParticles = [];
+  let isAmbientLoopRunning = false;
+
+  function resizeAmbientCanvas() {
+    if (!ambientThemeCanvas || typeof window === 'undefined') return;
+    const w = window.innerWidth || 1280;
+    const h = window.innerHeight || 800;
+    if (ambientThemeCanvas.width !== w || ambientThemeCanvas.height !== h) {
+      ambientThemeCanvas.width = w;
+      ambientThemeCanvas.height = h;
+    }
+  }
+
+  function initAmbientParticles(theme, w, h) {
+    ambientParticles = [];
+    if (theme === 'cosmic-void') {
+      for (let i = 0; i < 60; i++) {
+        ambientParticles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: 0.6 + Math.random() * 1.6,
+          alpha: 0.2 + Math.random() * 0.7,
+          baseAlpha: 0.2 + Math.random() * 0.7,
+          twinkleSpeed: 0.015 + Math.random() * 0.03,
+          phase: Math.random() * Math.PI * 2,
+          speedX: (Math.random() - 0.5) * 0.08,
+          speedY: -0.05 - Math.random() * 0.15,
+          color: Math.random() > 0.3 ? '#ffffff' : (Math.random() > 0.5 ? '#bae6fd' : '#fef08a')
+        });
+      }
+    } else if (theme === 'ethereal-nebula') {
+      const hues = [270, 210, 240, 320, 180];
+      for (let i = 0; i < 20; i++) {
+        ambientParticles.push({
+          isCloud: true,
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: 60 + Math.random() * 100,
+          baseAlpha: 0.05 + Math.random() * 0.08,
+          hue: hues[Math.floor(Math.random() * hues.length)],
+          phase: Math.random() * Math.PI * 2,
+          speedX: (Math.random() - 0.5) * 0.12,
+          speedY: (Math.random() - 0.5) * 0.12
+        });
+      }
+      for (let i = 0; i < 30; i++) {
+        ambientParticles.push({
+          isCloud: false,
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: 0.8 + Math.random() * 1.4,
+          baseAlpha: 0.3 + Math.random() * 0.5,
+          phase: Math.random() * Math.PI * 2,
+          speedX: (Math.random() - 0.5) * 0.08,
+          speedY: -0.05 - Math.random() * 0.1
+        });
+      }
+    } else if (theme === 'warm-embers') {
+      const colors = ['#f59e0b', '#ef4444', '#f97316', '#fbbf24'];
+      for (let i = 0; i < 45; i++) {
+        ambientParticles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: 1 + Math.random() * 2.2,
+          speedY: -0.5 - Math.random() * 1.2,
+          swaySpeed: 0.02 + Math.random() * 0.03,
+          swayAmp: 0.4 + Math.random() * 0.8,
+          phase: Math.random() * Math.PI * 2,
+          alpha: 0.2 + Math.random() * 0.8,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
+    } else if (theme === 'midnight-rain') {
+      for (let i = 0; i < 55; i++) {
+        ambientParticles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          len: 16 + Math.random() * 18,
+          speedY: 8 + Math.random() * 6,
+          speedX: -1.5 - Math.random() * 1.5,
+          alpha: 0.15 + Math.random() * 0.3
+        });
+      }
+    }
+  }
+
+  function renderAmbientFrame() {
+    if (!ambientThemeCanvas || typeof ambientThemeCanvas.getContext !== 'function') return;
+    const ctx = ambientThemeCanvas.getContext('2d');
+    if (!ctx) return;
+    const w = ambientThemeCanvas.width || 1280;
+    const h = ambientThemeCanvas.height || 800;
+
+    if (typeof ctx.clearRect === 'function') {
+      ctx.clearRect(0, 0, w, h);
+    }
+
+    if (currentAnimatedTheme === 'cosmic-void') {
+      ambientParticles.forEach(p => {
+        p.phase += p.twinkleSpeed;
+        p.alpha = Math.max(0.08, Math.min(0.9, p.baseAlpha + Math.sin(p.phase) * 0.35));
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.y < 0) { p.y = h; p.x = Math.random() * w; }
+        if (p.x < 0) p.x = w;
+        if (p.x > w) p.x = 0;
+
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        if (typeof ctx.beginPath === 'function') {
+          ctx.beginPath();
+          if (typeof ctx.arc === 'function') ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          if (typeof ctx.fill === 'function') ctx.fill();
+        }
+      });
+      ctx.globalAlpha = 1.0;
+    } else if (currentAnimatedTheme === 'ethereal-nebula') {
+      ambientParticles.forEach(p => {
+        p.phase += 0.01;
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.x < -p.r) p.x = w + p.r;
+        if (p.x > w + p.r) p.x = -p.r;
+        if (p.y < -p.r) p.y = h + p.r;
+        if (p.y > h + p.r) p.y = -p.r;
+
+        if (p.isCloud) {
+          const oscAlpha = Math.max(0.02, p.baseAlpha + Math.sin(p.phase) * 0.025);
+          if (typeof ctx.createRadialGradient === 'function') {
+            const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+            grad.addColorStop(0, `hsla(${p.hue}, 80%, 65%, ${oscAlpha})`);
+            grad.addColorStop(0.5, `hsla(${p.hue}, 80%, 55%, ${oscAlpha * 0.4})`);
+            grad.addColorStop(1, `hsla(${p.hue}, 80%, 45%, 0)`);
+            ctx.fillStyle = grad;
+            if (typeof ctx.fillRect === 'function') ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
+          }
+        } else {
+          const speckAlpha = Math.max(0.1, p.baseAlpha + Math.sin(p.phase) * 0.2);
+          ctx.fillStyle = '#bae6fd';
+          ctx.globalAlpha = speckAlpha;
+          if (typeof ctx.beginPath === 'function') {
+            ctx.beginPath();
+            if (typeof ctx.arc === 'function') ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            if (typeof ctx.fill === 'function') ctx.fill();
+          }
+          ctx.globalAlpha = 1.0;
+        }
+      });
+    } else if (currentAnimatedTheme === 'warm-embers') {
+      ambientParticles.forEach(p => {
+        p.phase += p.swaySpeed;
+        p.x += Math.sin(p.phase) * p.swayAmp;
+        p.y += p.speedY;
+        if (p.y < -10) {
+          p.y = h + 10;
+          p.x = Math.random() * w;
+        }
+        const heightRatio = Math.max(0, p.y / h);
+        const fadeAlpha = p.alpha * Math.min(1, heightRatio * 1.5);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0.05, fadeAlpha);
+        if (typeof ctx.beginPath === 'function') {
+          ctx.beginPath();
+          if (typeof ctx.arc === 'function') ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          if (typeof ctx.fill === 'function') ctx.fill();
+        }
+      });
+      ctx.globalAlpha = 1.0;
+    } else if (currentAnimatedTheme === 'midnight-rain') {
+      ctx.lineWidth = 1;
+      ambientParticles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.y > h) {
+          p.y = -p.len;
+          p.x = Math.random() * (w + 200);
+        }
+        ctx.strokeStyle = `rgba(147, 197, 253, ${p.alpha})`;
+        if (typeof ctx.beginPath === 'function') {
+          ctx.beginPath();
+          if (typeof ctx.moveTo === 'function') ctx.moveTo(p.x, p.y);
+          if (typeof ctx.lineTo === 'function') ctx.lineTo(p.x + p.speedX * 2, p.y + p.len);
+          if (typeof ctx.stroke === 'function') ctx.stroke();
+        }
+      });
+    }
+  }
+
+  function startAmbientAnimation(theme) {
+    stopAmbientAnimation();
+    if (theme === 'none' || !ambientThemeCanvas) return;
+    resizeAmbientCanvas();
+    const w = (ambientThemeCanvas && ambientThemeCanvas.width) || 1280;
+    const h = (ambientThemeCanvas && ambientThemeCanvas.height) || 800;
+    initAmbientParticles(theme, w, h);
+
+    const isReduced = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced) {
+      renderAmbientFrame();
+      return;
+    }
+
+    isAmbientLoopRunning = true;
+    function loop() {
+      if (!isAmbientLoopRunning) return;
+      renderAmbientFrame();
+      if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+        ambientAnimationId = window.requestAnimationFrame(loop);
+      }
+    }
+    if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+      ambientAnimationId = window.requestAnimationFrame(loop);
+    } else {
+      renderAmbientFrame();
+    }
+  }
+
+  function stopAmbientAnimation() {
+    isAmbientLoopRunning = false;
+    if (ambientAnimationId && typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function') {
+      window.cancelAnimationFrame(ambientAnimationId);
+    }
+    ambientAnimationId = null;
+    if (ambientThemeCanvas && typeof ambientThemeCanvas.getContext === 'function') {
+      const ctx = ambientThemeCanvas.getContext('2d');
+      if (ctx && typeof ctx.clearRect === 'function') {
+        ctx.clearRect(0, 0, ambientThemeCanvas.width || 1280, ambientThemeCanvas.height || 800);
+      }
+    }
+  }
+
+  function applyAnimatedTheme(themeName) {
+    const validThemes = ['none', 'cosmic-void', 'ethereal-nebula', 'warm-embers', 'midnight-rain'];
+    const valid = validThemes.includes(themeName) ? themeName : 'none';
+    currentAnimatedTheme = valid;
+
+    if (typeof Storage !== 'undefined' && typeof Storage.setAnimatedTheme === 'function') {
+      Storage.setAnimatedTheme(valid);
+    } else if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('lordspey_animated_theme', valid);
+    }
+
+    const rootEl = document.documentElement || document.body;
+    if (rootEl && typeof rootEl.setAttribute === 'function') {
+      rootEl.setAttribute('data-animated-theme', valid);
+    }
+    if (document.body && typeof document.body.setAttribute === 'function') {
+      document.body.setAttribute('data-animated-theme', valid);
+    }
+
+    if (typeof $$ === 'function') {
+      $$('.animated-theme-card').forEach(card => {
+        if (!card) return;
+        const isMatch = card.dataset && card.dataset.animatedTheme === valid;
+        if (card.classList && typeof card.classList.toggle === 'function') {
+          card.classList.toggle('active', isMatch);
+        }
+      });
+    }
+
+    if (valid === 'none') {
+      stopAmbientAnimation();
+    } else {
+      startAmbientAnimation(valid);
+    }
+  }
+
+  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (isAmbientLoopRunning) {
+          stopAmbientAnimation();
+          isAmbientLoopRunning = true;
+        }
+      } else {
+        if (isAmbientLoopRunning || (currentAnimatedTheme && currentAnimatedTheme !== 'none')) {
+          startAmbientAnimation(currentAnimatedTheme);
+        }
+      }
+    });
+  }
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('resize', () => {
+      if (currentAnimatedTheme !== 'none') {
+        resizeAmbientCanvas();
+      }
+    });
+  }
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    try {
+      const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (reducedMotionQuery) {
+        const handleMotionChange = () => {
+          if (currentAnimatedTheme !== 'none') {
+            startAmbientAnimation(currentAnimatedTheme);
+          }
+        };
+        if (typeof reducedMotionQuery.addEventListener === 'function') {
+          reducedMotionQuery.addEventListener('change', handleMotionChange);
+        } else if (typeof reducedMotionQuery.addListener === 'function') {
+          reducedMotionQuery.addListener(handleMotionChange);
+        }
+      }
+    } catch {}
+  }
+
   // ── Init ──
   init();
 
@@ -958,6 +1294,7 @@
     renderSidebar();
     applyBaseTheme(currentBaseTheme);
     applyAccentTheme(currentAccentTheme);
+    applyAnimatedTheme(currentAnimatedTheme);
     const customAccent = (typeof Storage !== 'undefined' && typeof Storage.getCustomAccentColor === 'function')
       ? Storage.getCustomAccentColor()
       : (typeof localStorage !== 'undefined' ? localStorage.getItem('lordspey_custom_accent') : null);
@@ -1591,6 +1928,15 @@
       card.addEventListener('click', () => {
         if (card.dataset && card.dataset.baseTheme) {
           applyBaseTheme(card.dataset.baseTheme);
+        }
+      });
+    });
+
+    // Ambient Animated Themes (None, Cosmic Void, Nebula, Embers, Midnight Rain)
+    $$('.animated-theme-card').forEach(card => {
+      card.addEventListener('click', () => {
+        if (card.dataset && card.dataset.animatedTheme) {
+          applyAnimatedTheme(card.dataset.animatedTheme);
         }
       });
     });
@@ -3857,6 +4203,10 @@
       return true;
     }
     if (mapModal && !mapModal.classList.contains('hidden')) {
+      if (isAtlasMapModalOpen && atlasMapModal && !atlasMapModal.classList.contains('hidden')) {
+        closeAtlasMapModal();
+        return true;
+      }
       if (typeof isMapStudioActive !== 'undefined' && isMapStudioActive && typeof studioPolygonPoints !== 'undefined' && studioPolygonPoints && studioPolygonPoints.length > 0) {
         studioPolygonPoints = [];
         if (typeof renderCompositeLayers === 'function') renderCompositeLayers();
@@ -6216,6 +6566,59 @@
       btnMapPinSave.addEventListener('click', savePinFromModal);
     }
 
+    // Universe Atlas Switcher & Modal Controls
+    if (mapAtlasSelect) {
+      mapAtlasSelect.addEventListener('change', () => {
+        switchAtlasMap(mapAtlasSelect.value);
+      });
+    }
+
+    if (btnAtlasNewMap) {
+      btnAtlasNewMap.addEventListener('click', () => {
+        openAtlasMapModal({ parentMapId: Storage.getActiveMapId ? Storage.getActiveMapId() : 'default' });
+      });
+    }
+
+    if (btnAtlasDeleteMap) {
+      btnAtlasDeleteMap.addEventListener('click', deleteAtlasMap);
+    }
+
+    if (btnAtlasModalCancel) {
+      btnAtlasModalCancel.addEventListener('click', closeAtlasMapModal);
+    }
+
+    if (btnAtlasModalSave) {
+      btnAtlasModalSave.addEventListener('click', saveAtlasMapFromModal);
+    }
+
+    if (atlasMapModal) {
+      atlasMapModal.addEventListener('click', (e) => {
+        if (e.target === atlasMapModal) closeAtlasMapModal();
+      });
+    }
+
+    if (btnMapOrbitalRings) {
+      btnMapOrbitalRings.addEventListener('click', () => {
+        const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+        curMap.orbitalRings = !curMap.orbitalRings;
+        if (Storage.saveMap) Storage.saveMap(curMap);
+        updateAtlasNavigationUI();
+        renderDefaultMap();
+        toast(curMap.orbitalRings ? 'Orbital rings enabled' : 'Orbital rings hidden', 'info');
+      });
+    }
+
+    if (mapCelestialThemeSelect) {
+      mapCelestialThemeSelect.addEventListener('change', () => {
+        const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+        curMap.celestialTheme = mapCelestialThemeSelect.value;
+        if (Storage.saveMap) Storage.saveMap(curMap);
+        updateAtlasNavigationUI();
+        renderDefaultMap();
+        toast(`Celestial theme set to ${mapCelestialThemeSelect.value}`, 'info');
+      });
+    }
+
     // Map viewport pan & click interactions
     if (mapViewport) {
       mapViewport.addEventListener('mousedown', onMapMouseDown);
@@ -6310,7 +6713,8 @@
       mapPinPreview.style.display = 'none';
     }
 
-    const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+    const activeMapId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
+    const curMap = (Storage.getMap ? Storage.getMap(activeMapId) : null) || {};
     const shape = curMap.shape || (Storage.getMapShape ? Storage.getMapShape() : 'landscape') || 'landscape';
     if (typeof setMapCanvasShape === 'function') {
       setMapCanvasShape(shape, curMap.width, curMap.height, curMap.boundaryShape);
@@ -6331,6 +6735,7 @@
 
     renderMapPins();
     renderMapRegions();
+    updateAtlasNavigationUI();
 
     if (typeof renderCompositeLayers === 'function') {
       renderCompositeLayers();
@@ -6341,6 +6746,8 @@
     if (!mapModal) return;
     mapModal.classList.add('hidden');
     if (mapPinModal) mapPinModal.classList.add('hidden');
+    if (atlasMapModal) atlasMapModal.classList.add('hidden');
+    isAtlasMapModalOpen = false;
     if (mapPinPreview) {
       mapPinPreview.classList.add('hidden');
       mapPinPreview.style.display = 'none';
@@ -6353,6 +6760,221 @@
     }
     isMapPlacementMode = false;
     updateMapPlacementUI();
+  }
+
+  // ── Universe Atlas & Multi-Map Hierarchy Controller ──
+  let atlasLinkingPin = null;
+  let isAtlasMapModalOpen = false;
+
+  function updateAtlasNavigationUI() {
+    const allMaps = Storage.getMapRegistry ? Storage.getMapRegistry() : [];
+    const activeMapId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
+    const curMap = (Storage.getMap ? Storage.getMap(activeMapId) : null) || {};
+    const curTier = curMap.tier || 'world';
+
+    // 1. Map Switcher Select Dropdown
+    if (mapAtlasSelect) {
+      mapAtlasSelect.innerHTML = allMaps.map(m => {
+        const icon = m.tier === 'galaxy' ? '🌌' : m.tier === 'system' ? '☀️' : m.tier === 'local' ? '🛰️' : '🌍';
+        const indent = m.parentId ? '  ↳ ' : '';
+        const isSel = m.id === activeMapId ? 'selected' : '';
+        return `<option value="${m.id}" ${isSel}>${indent}${icon} ${escText(m.title)} (${m.tier || 'world'})</option>`;
+      }).join('');
+      mapAtlasSelect.value = activeMapId;
+    }
+
+    // 2. Interactive Breadcrumbs
+    if (mapAtlasBreadcrumbs) {
+      const crumbs = Storage.getMapBreadcrumbs ? Storage.getMapBreadcrumbs(activeMapId) : [{ id: activeMapId, title: curMap.title || 'Known Realm', tier: curTier }];
+      mapAtlasBreadcrumbs.innerHTML = crumbs.map((crumb, idx) => {
+        const icon = crumb.tier === 'galaxy' ? '🌌' : crumb.tier === 'system' ? '☀️' : crumb.tier === 'local' ? '🛰️' : '🌍';
+        const isLast = idx === crumbs.length - 1;
+        const cls = isLast ? 'atlas-crumb current font-cinzel' : 'atlas-crumb font-cinzel';
+        const link = `<button type="button" class="${cls}" data-map-id="${crumb.id}">${icon} ${escText(crumb.title)}</button>`;
+        const sep = !isLast ? `<span class="atlas-crumb-sep">›</span>` : '';
+        return link + sep;
+      }).join('');
+
+      $$('.atlas-crumb', mapAtlasBreadcrumbs).forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetId = btn.dataset && btn.dataset.mapId;
+          if (targetId && targetId !== activeMapId) {
+            switchAtlasMap(targetId);
+          }
+        });
+      });
+    }
+
+    // 3. Tier Badge
+    if (mapTierBadge) {
+      mapTierBadge.className = `badge badge-atlas badge-tier-${curTier}`;
+      mapTierBadge.textContent = curTier.toUpperCase();
+    }
+
+    // 4. Orbital Rings Button Active State
+    if (btnMapOrbitalRings) {
+      if (curMap.orbitalRings) {
+        btnMapOrbitalRings.classList.add('active', 'btn-primary');
+        btnMapOrbitalRings.classList.remove('btn-ghost');
+      } else {
+        btnMapOrbitalRings.classList.remove('active', 'btn-primary');
+        btnMapOrbitalRings.classList.add('btn-ghost');
+      }
+    }
+
+    // 5. Celestial Theme Dropdown
+    if (mapCelestialThemeSelect) {
+      mapCelestialThemeSelect.value = curMap.celestialTheme || (curTier === 'galaxy' || curTier === 'system' ? 'cosmic-void' : 'standard-parchment');
+    }
+
+    // 6. Delete Map Button (only for non-root realm maps)
+    if (btnAtlasDeleteMap) {
+      if (activeMapId !== 'default') {
+        btnAtlasDeleteMap.style.display = 'inline-flex';
+        btnAtlasDeleteMap.classList.remove('hidden');
+      } else {
+        btnAtlasDeleteMap.style.display = 'none';
+        btnAtlasDeleteMap.classList.add('hidden');
+      }
+    }
+  }
+
+  function deleteAtlasMap() {
+    const activeMapId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
+    if (activeMapId === 'default') {
+      toast('Cannot delete the root realm map', 'warning');
+      return;
+    }
+    const curMap = (Storage.getMap ? Storage.getMap(activeMapId) : null) || {};
+    const mapName = curMap.title || curMap.name || 'this realm';
+    const confirmed = (typeof window !== 'undefined' && typeof window.confirm === 'function')
+      ? window.confirm(`Permanently delete map "${mapName}"? Any pins, regions, and layers on this map will be removed, and child maps will be re-parented.`)
+      : true;
+    if (!confirmed) return;
+
+    const parentId = curMap.parentMapId || curMap.parentId || 'default';
+    if (Storage.deleteMapFromRegistry) {
+      Storage.deleteMapFromRegistry(activeMapId);
+    }
+    switchAtlasMap(parentId);
+    toast(`Deleted map "${mapName}"`, 'info');
+  }
+
+  function switchAtlasMap(targetMapId) {
+    if (!targetMapId) return;
+    if (Storage.getMapById && !Storage.getMapById(targetMapId)) {
+      console.warn('Atlas map not found:', targetMapId);
+      return;
+    }
+    if (isMapStudioActive && typeof persistStudioDrawing === 'function') {
+      persistStudioDrawing();
+    }
+
+    if (Storage.setActiveMapId) {
+      Storage.setActiveMapId(targetMapId);
+    }
+
+    const curMap = (Storage.getMap ? Storage.getMap(targetMapId) : null) || {};
+    const shape = curMap.shape || 'landscape';
+    if (typeof setMapCanvasShape === 'function') {
+      setMapCanvasShape(shape, curMap.width, curMap.height, curMap.boundaryShape);
+    }
+    if (mapShapeSelect) {
+      mapShapeSelect.value = shape;
+    }
+
+    const customImg = Storage.getCustomMapImage ? Storage.getCustomMapImage(targetMapId) : null;
+    if (customImg && typeof customImg === 'string' && customImg.trim().length > 0) {
+      loadMapImage(customImg);
+    } else {
+      clearMapImageElement();
+      renderDefaultMap();
+    }
+
+    if (typeof initMapLayers === 'function') {
+      initMapLayers();
+    }
+
+    renderMapPins();
+    renderMapRegions();
+    updateAtlasNavigationUI();
+    resetMapCamera();
+
+    toast(`Atlas: Switched to ${curMap.title || 'Map'}`, 'info');
+  }
+
+  function openAtlasMapModal(opts = {}) {
+    if (!atlasMapModal) return;
+    atlasLinkingPin = opts.linkingPin || null;
+    isAtlasMapModalOpen = true;
+    atlasMapModal.classList.remove('hidden');
+
+    if (atlasModalParent) {
+      const allMaps = Storage.getMapRegistry ? Storage.getMapRegistry() : [];
+      const parentId = opts.parentMapId || (Storage.getActiveMapId ? Storage.getActiveMapId() : 'default');
+      atlasModalParent.innerHTML = `<option value="">-- Root Universe Tier --</option>` +
+        allMaps.map(m => {
+          const icon = m.tier === 'galaxy' ? '🌌' : m.tier === 'system' ? '☀️' : m.tier === 'local' ? '🛰️' : '🌍';
+          const isSel = m.id === parentId ? 'selected' : '';
+          return `<option value="${m.id}" ${isSel}>${icon} ${escText(m.title)} (${m.tier || 'world'})</option>`;
+        }).join('');
+      atlasModalParent.value = parentId;
+    }
+
+    if (atlasModalName) {
+      atlasModalName.value = opts.suggestedName || '';
+      setTimeout(() => atlasModalName && atlasModalName.focus && atlasModalName.focus(), 80);
+    }
+    if (atlasModalTier) {
+      atlasModalTier.value = opts.suggestedTier || 'world';
+    }
+    if (atlasModalTheme) {
+      atlasModalTheme.value = opts.suggestedTheme || 'cosmic-void';
+    }
+    if (atlasModalShape) {
+      atlasModalShape.value = opts.suggestedShape || 'landscape';
+    }
+    if (atlasModalDesc) {
+      atlasModalDesc.value = '';
+    }
+  }
+
+  function closeAtlasMapModal() {
+    isAtlasMapModalOpen = false;
+    if (atlasMapModal) atlasMapModal.classList.add('hidden');
+    atlasLinkingPin = null;
+  }
+
+  function saveAtlasMapFromModal() {
+    const title = (atlasModalName && atlasModalName.value.trim()) || 'Celestial Realm';
+    const tier = (atlasModalTier && atlasModalTier.value) || 'world';
+    const parentId = (atlasModalParent && atlasModalParent.value) || null;
+    const celestialTheme = (atlasModalTheme && atlasModalTheme.value) || 'cosmic-void';
+    const shape = (atlasModalShape && atlasModalShape.value) || 'landscape';
+    const desc = (atlasModalDesc && atlasModalDesc.value.trim()) || '';
+
+    const newMap = Storage.createChildMap ? Storage.createChildMap(parentId, {
+      title,
+      tier,
+      celestialTheme,
+      shape,
+      description: desc
+    }) : null;
+
+    if (newMap && atlasLinkingPin) {
+      atlasLinkingPin.subMapId = newMap.id;
+      if (Storage.saveMapPin) {
+        Storage.saveMapPin(atlasLinkingPin);
+      }
+    }
+
+    closeAtlasMapModal();
+
+    if (newMap) {
+      switchAtlasMap(newMap.id);
+      toast(`Created Atlas Map "${title}"`, 'success');
+    }
   }
 
   function resetMapCamera() {
@@ -6422,6 +7044,136 @@
 
     const w = (mapCanvas && mapCanvas.width) ? mapCanvas.width : 1600;
     const h = (mapCanvas && mapCanvas.height) ? mapCanvas.height : 1000;
+
+    const activeMapId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
+    const curMap = (Storage.getMap ? Storage.getMap(activeMapId) : null) || {};
+    const curTier = curMap.tier || 'world';
+    const celestialTheme = curMap.celestialTheme || (curTier === 'galaxy' || curTier === 'system' ? 'cosmic-void' : 'standard-parchment');
+    const isCosmic = celestialTheme === 'cosmic-void' || celestialTheme === 'nebula' || curTier === 'galaxy' || curTier === 'system';
+
+    if (isCosmic) {
+      if (ctx.createRadialGradient) {
+        const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 50, w / 2, h / 2, Math.max(w, h) * 0.7);
+        bgGrad.addColorStop(0, '#090d1a');
+        bgGrad.addColorStop(0.5, '#050711');
+        bgGrad.addColorStop(1, '#020308');
+        ctx.fillStyle = bgGrad;
+      } else {
+        ctx.fillStyle = '#050711';
+      }
+      if (typeof ctx.fillRect === 'function') ctx.fillRect(0, 0, w, h);
+
+      // Starfield (deterministic)
+      for (let i = 0; i < 180; i++) {
+        const sx = ((i * 379) % (w - 30)) + 15;
+        const sy = ((i * 617) % (h - 30)) + 15;
+        const sr = (i % 3 === 0) ? 1.5 : (i % 5 === 0 ? 2 : 0.8);
+        const sa = 0.25 + ((i * 13) % 75) / 100;
+        ctx.fillStyle = (i % 7 === 0) ? '#bae6fd' : ((i % 11 === 0) ? '#fef08a' : '#ffffff');
+        ctx.globalAlpha = sa;
+        if (typeof ctx.beginPath === 'function') {
+          ctx.beginPath();
+          if (typeof ctx.arc === 'function') ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+          if (typeof ctx.fill === 'function') ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1.0;
+
+      // Interstellar Nebula clouds (if nebula theme or galaxy tier)
+      if (celestialTheme === 'nebula' || curTier === 'galaxy') {
+        const nebulae = [
+          { x: w * 0.35, y: h * 0.45, r: 260, color: 'rgba(168, 85, 247, 0.15)' },
+          { x: w * 0.65, y: h * 0.55, r: 300, color: 'rgba(56, 189, 248, 0.14)' },
+          { x: w * 0.5, y: h * 0.35, r: 220, color: 'rgba(236, 72, 153, 0.12)' }
+        ];
+        nebulae.forEach(c => {
+          if (typeof ctx.createRadialGradient === 'function') {
+            const ng = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r);
+            ng.addColorStop(0, c.color);
+            ng.addColorStop(0.6, c.color.replace(/[\d\.]+\)$/, '0.04)'));
+            ng.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = ng;
+            if (typeof ctx.fillRect === 'function') ctx.fillRect(c.x - c.r, c.y - c.r, c.r * 2, c.r * 2);
+          }
+        });
+      }
+
+      // Orbital Guide Rings (if star system or orbital rings enabled)
+      const showOrbitalRings = curMap.orbitalRings !== undefined ? curMap.orbitalRings : (curTier === 'system');
+      const cx = w / 2;
+      const cy = h / 2;
+      if (showOrbitalRings) {
+        const ringRadii = [90, 160, 240, 330, 440, 560, 700];
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.22)';
+        ctx.lineWidth = 1;
+        if (ctx.setLineDash) ctx.setLineDash([6, 8]);
+        ringRadii.forEach((r, idx) => {
+          if (typeof ctx.beginPath === 'function') {
+            ctx.beginPath();
+            if (typeof ctx.arc === 'function') ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            if (typeof ctx.stroke === 'function') ctx.stroke();
+          }
+          if (typeof ctx.fillText === 'function') {
+            ctx.font = "9px 'Cinzel', serif";
+            ctx.fillStyle = 'rgba(147, 197, 253, 0.4)';
+            ctx.fillText(`ORBIT ${idx + 1} (${r * 2} AU)`, cx + r - 12, cy - 6);
+          }
+        });
+        if (ctx.setLineDash) ctx.setLineDash([]);
+      }
+
+      // Central Luminary / Stellar Core (for system tier)
+      if (curTier === 'system') {
+        if (typeof ctx.createRadialGradient === 'function') {
+          const starGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 48);
+          starGlow.addColorStop(0, '#ffffff');
+          starGlow.addColorStop(0.2, '#fef08a');
+          starGlow.addColorStop(0.5, 'rgba(245, 158, 11, 0.6)');
+          starGlow.addColorStop(1, 'rgba(245, 158, 11, 0)');
+          ctx.fillStyle = starGlow;
+          if (typeof ctx.fillRect === 'function') ctx.fillRect(cx - 48, cy - 48, 96, 96);
+        }
+        ctx.fillStyle = '#fffbeb';
+        if (typeof ctx.beginPath === 'function') {
+          ctx.beginPath();
+          if (typeof ctx.arc === 'function') ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+          if (typeof ctx.fill === 'function') ctx.fill();
+        }
+        if (typeof ctx.fillText === 'function') {
+          ctx.font = "bold 11px 'Cinzel', serif";
+          ctx.fillStyle = '#fef08a';
+          ctx.textAlign = 'center';
+          ctx.fillText('STELLAR CORE', cx, cy + 28);
+        }
+      }
+
+      // Galactic Nucleus (if galaxy tier)
+      if (curTier === 'galaxy') {
+        const cx = w / 2;
+        const cy = h / 2;
+        if (typeof ctx.createRadialGradient === 'function') {
+          const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 120);
+          coreGlow.addColorStop(0, '#ffffff');
+          coreGlow.addColorStop(0.2, 'rgba(216, 180, 254, 0.8)');
+          coreGlow.addColorStop(0.6, 'rgba(147, 51, 234, 0.25)');
+          coreGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = coreGlow;
+          if (typeof ctx.fillRect === 'function') ctx.fillRect(cx - 120, cy - 120, 240, 240);
+        }
+        if (typeof ctx.fillText === 'function') {
+          ctx.font = "bold 12px 'Cinzel', serif";
+          ctx.fillStyle = 'rgba(216, 180, 254, 0.7)';
+          ctx.textAlign = 'center';
+          ctx.fillText('GALACTIC NUCLEUS', cx, cy + 34);
+        }
+      }
+
+      // Outer cosmic border
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+      ctx.lineWidth = 2;
+      if (typeof ctx.strokeRect === 'function') ctx.strokeRect(20, 20, w - 40, h - 40);
+      return;
+    }
 
     const isLight = currentBaseTheme === 'light';
     const isSepia = currentBaseTheme === 'sepia';
@@ -6643,11 +7395,12 @@
     if (!mapPinsContainer || typeof document === 'undefined' || typeof document.createElement !== 'function') return;
     mapPinsContainer.innerHTML = '';
 
-    const allPins = Storage.getAllMapPins ? Storage.getAllMapPins() : [];
+    const activeMapId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
+    const allPins = Storage.getAllMapPins ? Storage.getAllMapPins(activeMapId) : [];
     const query = (mapPinSearch && typeof mapPinSearch.value === 'string') ? mapPinSearch.value.trim().toLowerCase() : '';
 
     const mapEmptyPrompt = $('#map-empty-prompt');
-    const allRegions = Storage.getAllMapRegions ? Storage.getAllMapRegions() : [];
+    const allRegions = Storage.getAllMapRegions ? Storage.getAllMapRegions(activeMapId) : [];
     if (mapEmptyPrompt) {
       if (allPins.length === 0 && allRegions.length === 0) {
         mapEmptyPrompt.classList.remove('hidden');
@@ -6674,7 +7427,7 @@
       pinEl.style.left = `${pin.x}%`;
       pinEl.style.top = `${pin.y}%`;
 
-      const customColor = pin.pinColor || '';
+      const customColor = pin.pinColor || pin.color || '';
       const dotStyle = customColor ? `style="background: ${customColor};"` : '';
       const pulseStyle = customColor ? `style="border-color: ${customColor};"` : '';
 
@@ -6750,6 +7503,44 @@
       mapPreviewDesc.textContent = summaryText || 'No detailed note entry yet. Click below to open or create.';
     }
 
+    if (btnMapDrillDown) {
+      const isCelestial = ['star', 'planet', 'gas_giant', 'station', 'jump_gate', 'asteroid', 'nebula_cloud'].includes(pin.pinType) || !!pin.subMapId;
+      if (isCelestial) {
+        btnMapDrillDown.style.display = 'inline-flex';
+        btnMapDrillDown.classList.remove('hidden');
+        const subMap = (pin.subMapId && Storage.getMapById) ? Storage.getMapById(pin.subMapId) : null;
+        if (subMap) {
+          const targetName = subMap.title || subMap.name || 'Sub-Map';
+          const icon = (subMap && subMap.tier === 'system') ? '☀️' : (subMap && subMap.tier === 'local') ? '🛰️' : '🌍';
+          btnMapDrillDown.textContent = `${icon} Enter ${targetName} ↗`;
+          btnMapDrillDown.onclick = (e) => {
+            if (e && e.stopPropagation) e.stopPropagation();
+            if (mapPinPreview) {
+              mapPinPreview.classList.add('hidden');
+              mapPinPreview.style.display = 'none';
+            }
+            switchAtlasMap(pin.subMapId);
+          };
+        } else {
+          if (pin.subMapId) pin.subMapId = null;
+          const actionLabel = pin.pinType === 'star' ? 'Create Star System' : (pin.pinType === 'planet' || pin.pinType === 'gas_giant') ? 'Create Surface Map' : (pin.pinType === 'station' ? 'Create Station Deck' : 'Create Sub-Map');
+          btnMapDrillDown.textContent = `🌌 + ${actionLabel} ↗`;
+          btnMapDrillDown.onclick = (e) => {
+            if (e && e.stopPropagation) e.stopPropagation();
+            openAtlasMapModal({
+              parentMapId: Storage.getActiveMapId ? Storage.getActiveMapId() : 'default',
+              suggestedName: pin.title || 'New Realm',
+              linkingPin: pin,
+              suggestedTier: pin.pinType === 'star' ? 'system' : (pin.pinType === 'planet' || pin.pinType === 'gas_giant') ? 'world' : (pin.pinType === 'station' ? 'local' : 'world')
+            });
+          };
+        }
+      } else {
+        btnMapDrillDown.style.display = 'none';
+        btnMapDrillDown.classList.add('hidden');
+      }
+    }
+
     if (btnMapOpenNote) {
       btnMapOpenNote.onclick = () => {
         closeMapView();
@@ -6779,7 +7570,7 @@
 
     mapPinPreview.onclick = (e) => {
       if (e && e.target && typeof e.target.closest === 'function') {
-        if (e.target.closest('#btn-map-preview-close') || e.target.closest('#btn-map-delete-pin') || e.target.closest('#btn-map-edit-pin')) return;
+        if (e.target.closest('#btn-map-preview-close') || e.target.closest('#btn-map-delete-pin') || e.target.closest('#btn-map-edit-pin') || e.target.closest('#btn-map-drill-down')) return;
       }
       if (btnMapOpenNote && typeof btnMapOpenNote.onclick === 'function') {
         btnMapOpenNote.onclick();
@@ -6954,6 +7745,18 @@
       };
     }
 
+    if (mapModalPinSubmap) {
+      const allMaps = Storage.getMapRegistry ? Storage.getMapRegistry() : [];
+      const currentActiveId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
+      const candidateMaps = allMaps.filter(m => m.id !== currentActiveId);
+      mapModalPinSubmap.innerHTML = `<option value="">-- No sub-map linked --</option>` +
+        candidateMaps.map(m => {
+          const tierIcon = m.tier === 'galaxy' ? '🌌' : m.tier === 'system' ? '☀️' : m.tier === 'local' ? '🛰️' : '🌍';
+          return `<option value="${m.id}">${tierIcon} ${escText(m.title)} (${m.tier || 'world'})</option>`;
+        }).join('');
+      mapModalPinSubmap.value = '';
+    }
+
     if (mapModalPinTitle) mapModalPinTitle.value = '';
     if (mapModalPinDesc) mapModalPinDesc.value = '';
     if (mapModalPinTitle && typeof mapModalPinTitle.focus === 'function') setTimeout(() => mapModalPinTitle.focus(), 100);
@@ -6966,9 +7769,12 @@
     const desc = (mapModalPinDesc && mapModalPinDesc.value.trim()) || '';
     const pinType = (mapModalPinType && mapModalPinType.value) || 'citadel';
     const pinColor = (mapModalPinColor && mapModalPinColor.value) || '#ef4444';
+    const subMapId = (mapModalPinSubmap && mapModalPinSubmap.value) || null;
+    const activeMapId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
 
     const newPin = {
       id: activeEditingPin ? activeEditingPin.id : undefined,
+      mapId: activeEditingPin ? (activeEditingPin.mapId || activeMapId) : activeMapId,
       x: activeEditingPin ? activeEditingPin.x : (pendingPinClick ? pendingPinClick.x : 50),
       y: activeEditingPin ? activeEditingPin.y : (pendingPinClick ? pendingPinClick.y : 50),
       title,
@@ -6976,6 +7782,8 @@
       category,
       pinType,
       pinColor,
+      color: pinColor,
+      subMapId,
       description: desc
     };
 
@@ -8494,7 +9302,8 @@
   function renderMapRegions() {
     if (!mapRegionsSvg || typeof document === 'undefined' || typeof document.createElementNS !== 'function') return;
     mapRegionsSvg.innerHTML = '';
-    const regions = Storage.getAllMapRegions ? Storage.getAllMapRegions() : [];
+    const activeMapId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
+    const regions = Storage.getAllMapRegions ? Storage.getAllMapRegions(activeMapId) : [];
     const w = mapCanvas ? (mapCanvas.width || 1600) : 1600;
     const h = mapCanvas ? (mapCanvas.height || 1000) : 1000;
 
@@ -8614,8 +9423,10 @@
       ];
     }
 
+    const activeMapId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
     Storage.saveMapRegion({
       id,
+      mapId: activeEditingRegion ? (activeEditingRegion.mapId || activeMapId) : activeMapId,
       name,
       shape,
       color,
@@ -8674,11 +9485,27 @@
     if (mapModalPinCategory) mapModalPinCategory.value = pin.category || 'world';
     if (mapModalPinDesc) mapModalPinDesc.value = pin.description || '';
     if (mapModalPinType) mapModalPinType.value = pin.pinType || 'citadel';
-    if (mapModalPinColor) mapModalPinColor.value = pin.pinColor || '#ef4444';
+    if (mapModalPinColor) mapModalPinColor.value = pin.pinColor || pin.color || '#ef4444';
     if (mapModalNoteSelect) {
       const notes = Storage.getAllNotes();
       mapModalNoteSelect.innerHTML = `<option value="">-- No linked note (standalone pin) --</option>` +
         notes.map(n => `<option value="${n.id}" ${n.id === pin.noteId ? 'selected' : ''}>${escText(n.title)} (${n.category})</option>`).join('');
+    }
+    if (mapModalPinSubmap) {
+      const allMaps = Storage.getMapRegistry ? Storage.getMapRegistry() : [];
+      const currentActiveId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
+      const candidateMaps = allMaps.filter(m => m.id !== currentActiveId);
+      mapModalPinSubmap.innerHTML = `<option value="">-- No sub-map linked --</option>` +
+        candidateMaps.map(m => {
+          const tierIcon = m.tier === 'galaxy' ? '🌌' : m.tier === 'system' ? '☀️' : m.tier === 'local' ? '🛰️' : '🌍';
+          const isSel = (pin && pin.subMapId === m.id) ? 'selected' : '';
+          return `<option value="${m.id}" ${isSel}>${tierIcon} ${escText(m.title)} (${m.tier || 'world'})</option>`;
+        }).join('');
+      if (pin && pin.subMapId) {
+        mapModalPinSubmap.value = pin.subMapId;
+      } else {
+        mapModalPinSubmap.value = '';
+      }
     }
   }
 
@@ -9087,6 +9914,10 @@
     } else if (studioCurrentTool === 'landmass') {
       drawLandmassStroke(pos, pos);
       renderCompositeLayers();
+    } else if (studioCurrentTool === 'hyperlane') {
+      studioHyperlaneDashOffset = 0;
+      drawHyperlaneStroke(pos, pos);
+      renderCompositeLayers();
     }
   }
 
@@ -9142,6 +9973,10 @@
       drawLandmassStroke(studioPrevPos, pos);
       studioPrevPos = pos;
       renderCompositeLayers();
+    } else if (studioCurrentTool === 'hyperlane') {
+      drawHyperlaneStroke(studioPrevPos, pos);
+      studioPrevPos = pos;
+      renderCompositeLayers();
     }
   }
 
@@ -9158,6 +9993,49 @@
 
     renderCompositeLayers();
     persistStudioDrawing();
+  }
+
+  let studioHyperlaneDashOffset = 0;
+
+  function drawHyperlaneStroke(p1, p2) {
+    const ctx = getActiveLayerContext();
+    if (!ctx) return;
+    if (typeof ctx.save === 'function') ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = studioBrushColor || '#38bdf8';
+    ctx.fillStyle = studioBrushColor || '#38bdf8';
+    ctx.lineWidth = Math.max(2, Math.min(10, studioBrushRadius));
+    ctx.globalAlpha = studioBrushAlpha;
+    if (ctx.setLineDash) {
+      ctx.setLineDash([8, 6]);
+      ctx.lineDashOffset = studioHyperlaneDashOffset;
+    }
+    if (ctx.shadowBlur !== undefined) {
+      ctx.shadowColor = studioBrushColor || '#38bdf8';
+      ctx.shadowBlur = 8;
+    }
+    if (typeof ctx.beginPath === 'function') {
+      ctx.beginPath();
+      if (p1.x === p2.x && p1.y === p2.y) {
+        if (typeof ctx.arc === 'function') {
+          ctx.arc(p1.x, p1.y, Math.max(1, studioBrushRadius / 2), 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x + 0.01, p2.y);
+          ctx.stroke();
+        }
+      } else {
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+        const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        studioHyperlaneDashOffset = (studioHyperlaneDashOffset - dist) % 14;
+      }
+    }
+    if (ctx.setLineDash) ctx.setLineDash([]);
+    if (typeof ctx.restore === 'function') ctx.restore();
   }
 
   function drawBrushStroke(p1, p2) {
@@ -10050,7 +10928,9 @@
     const scale = Math.max(0.6, Math.min(3.0, w / 1600));
 
     // 3. Render territory regions
-    const regions = Storage.getAllMapRegions ? Storage.getAllMapRegions() : [];
+    const activeMapId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
+    const activeMap = (Storage.getMapById ? Storage.getMapById(activeMapId) : null) || {};
+    const regions = Storage.getAllMapRegions ? Storage.getAllMapRegions(activeMapId) : [];
     const regFontSize = Math.round(14 * scale);
     regions.forEach(reg => {
       if (typeof ctx.save === 'function') ctx.save();
@@ -10107,7 +10987,7 @@
     });
 
     // 4. Render map pins
-    const pins = Storage.getAllMapPins ? Storage.getAllMapPins() : [];
+    const pins = Storage.getAllMapPins ? Storage.getAllMapPins(activeMapId) : [];
     const pinRadius = Math.round(6 * scale);
     const pinFontSize = Math.round(12 * scale);
     pins.forEach(pin => {
@@ -10147,7 +11027,8 @@
         const dataUrl = expCanvas.toDataURL('image/png');
         const a = document.createElement('a');
         a.href = dataUrl;
-        a.download = `lordspey-world-map-${Date.now()}.png`;
+        const mapNameSlug = (activeMap.title || activeMap.name || 'world').toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+        a.download = `lordspey-${mapNameSlug}-map-${Date.now()}.png`;
         if (typeof document.body !== 'undefined' && typeof document.body.appendChild === 'function') {
           document.body.appendChild(a);
           if (typeof a.click === 'function') a.click();
@@ -10155,7 +11036,7 @@
         } else if (typeof a.click === 'function') {
           a.click();
         }
-        toast('World map exported successfully as PNG!', 'success');
+        toast(`Map "${activeMap.title || 'Realm'}" exported successfully as PNG!`, 'success');
       }
     } catch (err) {
       console.error('Map Studio: Export error', err);
@@ -11940,6 +12821,13 @@
       window.executeRestoreVaultBackup = executeRestoreVaultBackup;
       window.showSampleRestoreBanner = showSampleRestoreBanner;
       window.hideSampleRestoreBanner = hideSampleRestoreBanner;
+      window.switchAtlasMap = switchAtlasMap;
+      window.openAtlasMapModal = openAtlasMapModal;
+      window.closeAtlasMapModal = closeAtlasMapModal;
+      window.deleteAtlasMap = deleteAtlasMap;
+      window.updateAtlasNavigationUI = updateAtlasNavigationUI;
+      window.applyAnimatedTheme = applyAnimatedTheme;
+      window.getActiveAnimatedTheme = () => currentAnimatedTheme;
       if (typeof window.addEventListener === 'function') {
         window.addEventListener('focus', onWindowFocusOrActive);
       }

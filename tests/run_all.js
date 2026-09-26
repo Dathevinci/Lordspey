@@ -27,7 +27,8 @@ const testSuites = [
   'test_auto_update_detection.js',
   'test_sample_vault_safety.js',
   'test_map_studio.js',
-  'test_github_pages_site.js'
+  'test_github_pages_site.js',
+  'test_universe_atlas.js'
 ];
 
 let passedCount = 0;

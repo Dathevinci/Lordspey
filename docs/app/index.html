@@ -13,6 +13,11 @@
   <link rel="stylesheet" href="css/style.css?v=1.1.5" />
 </head>
 <body>
+  <!-- ───────── Ambient Animated Theme Backdrop ───────── -->
+  <div id="ambient-theme-container" class="ambient-theme-container" aria-hidden="true">
+    <canvas id="ambient-theme-canvas"></canvas>
+  </div>
+
   <!-- ───────── Sidebar ───────── -->
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
@@ -723,8 +728,13 @@
           <span class="logo-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
           </span>
-          <h3>World Map &amp; Pin Codex</h3>
+          <div class="map-atlas-title-wrap">
+            <h3 id="map-modal-title">Universe Atlas &amp; Map Codex</h3>
+            <nav id="map-atlas-breadcrumbs" class="map-atlas-breadcrumbs" aria-label="Universe Atlas Breadcrumbs"></nav>
+          </div>
           <div class="map-stats">
+            <span id="map-tier-badge" class="badge badge-atlas">World</span>
+            <span class="hud-sep">·</span>
             <span id="map-pin-count">0 pins</span>
             <span class="hud-sep">·</span>
             <span id="map-coords-indicator">X: 50.0% · Y: 50.0%</span>
@@ -745,6 +755,23 @@
             <button class="filter-pill" data-map-filter="draft">Drafts</button>
           </div>
           <div class="map-action-btns">
+            <select id="map-atlas-select" class="form-select form-select-sm map-atlas-select" title="Universe Atlas: Switch Celestial Map &amp; Tier">
+              <option value="default">🌍 Known Realm (World)</option>
+            </select>
+            <button id="btn-atlas-new-map" class="btn btn-sm btn-ghost" title="Create child sub-map or sibling star system / world map">
+              <span>🌌 + Sub-Map</span>
+            </button>
+            <button id="btn-atlas-delete-map" class="btn btn-sm btn-ghost btn-atlas-delete hidden" title="Delete current realm map from Atlas">
+              <span>🗑️ Delete Map</span>
+            </button>
+            <button id="btn-map-orbital-rings" class="btn btn-sm btn-ghost" title="Toggle Concentric Celestial Orbital Rings">
+              <span>🪐 Orbit Rings</span>
+            </button>
+            <select id="map-celestial-theme-select" class="form-select form-select-sm map-celestial-select" title="Celestial Backdrop Theme">
+              <option value="standard-parchment">📜 Ancient Parchment</option>
+              <option value="cosmic-void">🌌 Cosmic Void</option>
+              <option value="nebula">✨ Interstellar Nebula</option>
+            </select>
             <select id="map-shape-select" class="form-select form-select-sm map-shape-select" title="Canvas Geography Shape">
               <option value="landscape" selected>Landscape (16:9)</option>
               <option value="square">Square (1:1)</option>
@@ -804,6 +831,7 @@
             <button type="button" class="studio-btn studio-tool-btn" data-tool="terrain" title="Terrain Sculpting (Mountains, Forests, Hills)">⛰️ Terrain</button>
             <button type="button" class="studio-btn studio-tool-btn" data-tool="landmass" title="Coastline & Landmass (Fractal Jagged Edge)">🏝️ Coast</button>
             <button type="button" class="studio-btn studio-tool-btn" data-tool="shape" title="Geometric Shapes (Rect, Ellipse, Line, Polygon)">⬡ Shapes</button>
+            <button type="button" class="studio-btn studio-tool-btn" data-tool="hyperlane" title="Interstellar Hyperlane (Glowing Celestial Route Pen)">⚡ Hyperlane</button>
             <button type="button" class="studio-btn studio-tool-btn" data-tool="fill" title="Fill Bucket (Flood Fill Ocean / Land)">🪣 Fill</button>
             <button type="button" class="studio-btn studio-tool-btn" data-tool="eraser" title="Eraser">🧹 Eraser</button>
           </div>
@@ -928,6 +956,7 @@
           <h4 id="map-preview-title" class="map-preview-title font-cinzel">Location Title</h4>
           <p id="map-preview-desc" class="map-preview-desc">Note summary excerpt appears here…</p>
           <div class="map-preview-actions">
+            <button id="btn-map-drill-down" class="btn btn-sm btn-primary map-drill-down-btn" style="display: none;">🪐 Enter Star System ↗</button>
             <button id="btn-map-edit-pin" class="btn btn-sm btn-secondary">Edit Pin</button>
             <button id="btn-map-open-note" class="btn btn-sm btn-primary">Open Note in Editor ↗</button>
             <button id="btn-map-delete-pin" class="btn btn-sm btn-danger">Delete Pin</button>
@@ -973,19 +1002,36 @@
         <div class="modal-field" style="flex: 1;">
           <label for="map-modal-pin-type">Landmark Icon / Type</label>
           <select id="map-modal-pin-type">
-            <option value="citadel">Citadel / Fortress</option>
-            <option value="peak">Mountain / Peak</option>
-            <option value="city">City / Settlement</option>
-            <option value="shrine">Shrine / Ruin</option>
-            <option value="water">Port / Waterway</option>
-            <option value="forest">Wilderness / Forest</option>
-            <option value="danger">Battle / Danger Zone</option>
+            <optgroup label="Planetary &amp; Landmark">
+              <option value="citadel">Citadel / Fortress</option>
+              <option value="peak">Mountain / Peak</option>
+              <option value="city">City / Settlement</option>
+              <option value="shrine">Shrine / Ruin</option>
+              <option value="water">Port / Waterway</option>
+              <option value="forest">Wilderness / Forest</option>
+              <option value="danger">Battle / Danger Zone</option>
+            </optgroup>
+            <optgroup label="Celestial &amp; Cosmic">
+              <option value="star">☀️ Star / Luminary</option>
+              <option value="planet">🌍 Terrestrial Planet</option>
+              <option value="gas_giant">🪐 Gas Giant</option>
+              <option value="station">🛰️ Orbital Station / Outpost</option>
+              <option value="jump_gate">🌀 Jump Gate / Wormhole</option>
+              <option value="asteroid">☄️ Asteroid Belt / Comet</option>
+              <option value="nebula_cloud">🌌 Cosmic Nebula / Anomaly</option>
+            </optgroup>
           </select>
         </div>
         <div class="modal-field" style="width: 90px;">
           <label for="map-modal-pin-color">Pin Tint</label>
           <input type="color" id="map-modal-pin-color" value="#ef4444" style="width: 100%; height: 38px; padding: 2px; border-radius: var(--radius-sm); border: 1px solid var(--border);" />
         </div>
+      </div>
+      <div class="modal-field">
+        <label for="map-modal-pin-submap">Linked Sub-Map (Universe Atlas Drill-Down)</label>
+        <select id="map-modal-pin-submap">
+          <option value="">-- No sub-map linked --</option>
+        </select>
       </div>
       <div class="modal-field">
         <label for="map-modal-pin-desc">Description / Lore Note</label>
@@ -1039,6 +1085,66 @@
       <div class="modal-actions">
         <button type="button" id="btn-map-dim-cancel" class="btn btn-ghost">Cancel</button>
         <button type="button" id="btn-map-dim-apply" class="btn btn-primary">Apply Dimensions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── Atlas Map Creator / Editor Modal ───────── -->
+  <div id="atlas-map-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="atlas-modal-title" style="z-index: 10005;">
+    <div class="modal" style="max-width: 520px;">
+      <h3 class="modal-title font-cinzel" id="atlas-modal-title">Universe Atlas: New Celestial Map</h3>
+      <p class="modal-subtitle" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+        Create a hierarchical realm, star system, planetary surface, or station map.
+      </p>
+      <div class="modal-field">
+        <label for="atlas-modal-name">Map Name / Stellar Designation</label>
+        <input type="text" id="atlas-modal-name" placeholder="e.g. Sol System, Arrakis Surface, Station Asteria" autocomplete="off" />
+      </div>
+      <div class="modal-field-row" style="display: flex; gap: 10px;">
+        <div class="modal-field" style="flex: 1;">
+          <label for="atlas-modal-tier">Atlas Hierarchy Tier</label>
+          <select id="atlas-modal-tier">
+            <option value="galaxy">🌌 Galaxy / Universe Tier</option>
+            <option value="system">☀️ Star System / Orbital Tier</option>
+            <option value="world" selected>🌍 World / Planetary Surface Tier</option>
+            <option value="local">🛰️ Station / Citadel / Local Site</option>
+          </select>
+        </div>
+        <div class="modal-field" style="flex: 1;">
+          <label for="atlas-modal-parent">Parent Map</label>
+          <select id="atlas-modal-parent">
+            <option value="">-- Root Universe Tier --</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field-row" style="display: flex; gap: 10px;">
+        <div class="modal-field" style="flex: 1;">
+          <label for="atlas-modal-theme">Celestial Canvas Theme</label>
+          <select id="atlas-modal-theme">
+            <option value="cosmic-void">🌌 Cosmic Void (Starfield)</option>
+            <option value="nebula">✨ Interstellar Nebula</option>
+            <option value="standard-parchment" selected>📜 Ancient Parchment</option>
+          </select>
+        </div>
+        <div class="modal-field" style="flex: 1;">
+          <label for="atlas-modal-shape">Geometry Shape</label>
+          <select id="atlas-modal-shape">
+            <option value="landscape" selected>Landscape (16:9)</option>
+            <option value="square">Square (1:1)</option>
+            <option value="vertical">Vertical (9:16)</option>
+            <option value="oval">Oval Realm</option>
+            <option value="ultrawide">Ultrawide (21:9)</option>
+            <option value="parchment">Classic Parchment (4:3)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label for="atlas-modal-desc">Description / Astrological Notes</label>
+        <textarea id="atlas-modal-desc" rows="2" placeholder="Brief lore summary for this sector, planet, or station…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-atlas-modal-cancel" type="button" class="btn btn-ghost">Cancel</button>
+        <button id="btn-atlas-modal-save" type="button" class="btn btn-primary">Create Atlas Map</button>
       </div>
     </div>
   </div>
@@ -2169,6 +2275,59 @@
                   <input type="color" id="setting-custom-accent" value="#ef4444" title="Pick custom accent color" style="width: 38px; height: 32px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer;" />
                   <input type="text" id="setting-custom-accent-hex" class="form-input form-input-sm" value="#ef4444" maxlength="7" placeholder="#hex" style="width: 100px; font-family: monospace;" />
                   <button type="button" id="btn-apply-custom-accent" class="btn btn-sm btn-secondary">Apply Custom Tint</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h4 class="settings-group-title">Ambient Animated Theme</h4>
+              <p class="settings-group-desc">Subtle, atmospheric motion behind the writing canvas. Ultra-calm, low-power, and designed for distraction-free immersion.</p>
+              
+              <div class="animated-theme-grid" id="animated-theme-grid">
+                <div class="animated-theme-card active" data-animated-theme="none">
+                  <div class="animated-theme-preview preview-none">
+                    <span class="preview-badge">Static</span>
+                  </div>
+                  <div class="animated-theme-info">
+                    <span class="animated-theme-name">Distraction Free (Clean)</span>
+                    <span class="animated-theme-desc">Solid obsidian dark canvas with zero ambient motion</span>
+                  </div>
+                </div>
+                <div class="animated-theme-card" data-animated-theme="cosmic-void">
+                  <div class="animated-theme-preview preview-cosmic-void">
+                    <span class="preview-badge">Cosmic</span>
+                  </div>
+                  <div class="animated-theme-info">
+                    <span class="animated-theme-name">Cosmic Starfield</span>
+                    <span class="animated-theme-desc">Gentle twinkling celestial stars and deep space stardust</span>
+                  </div>
+                </div>
+                <div class="animated-theme-card" data-animated-theme="ethereal-nebula">
+                  <div class="animated-theme-preview preview-ethereal-nebula">
+                    <span class="preview-badge">Nebula</span>
+                  </div>
+                  <div class="animated-theme-info">
+                    <span class="animated-theme-name">Ethereal Nebula</span>
+                    <span class="animated-theme-desc">Slow-drifting interstellar violet and cyan cosmic clouds</span>
+                  </div>
+                </div>
+                <div class="animated-theme-card" data-animated-theme="warm-embers">
+                  <div class="animated-theme-preview preview-warm-embers">
+                    <span class="preview-badge">Embers</span>
+                  </div>
+                  <div class="animated-theme-info">
+                    <span class="animated-theme-name">Cozy Fireflies / Embers</span>
+                    <span class="animated-theme-desc">Soft, warm golden embers rising gently into twilight</span>
+                  </div>
+                </div>
+                <div class="animated-theme-card" data-animated-theme="midnight-rain">
+                  <div class="animated-theme-preview preview-midnight-rain">
+                    <span class="preview-badge">Rain</span>
+                  </div>
+                  <div class="animated-theme-info">
+                    <span class="animated-theme-name">Midnight Rain &amp; Mist</span>
+                    <span class="animated-theme-desc">Calm, vertical rain streaks with subtle atmospheric mist</span>
+                  </div>
                 </div>
               </div>
             </div>

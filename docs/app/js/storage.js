@@ -369,6 +369,9 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   const SECTIONS_KEY = 'lordspey_sections';
   const BASE_THEME_KEY = 'lordspey_base_theme';
   const MAP_DATA_KEY = 'lordspey_map_data';
+  const MAPS_REGISTRY_KEY = 'lordspey_maps_registry';
+  const ACTIVE_MAP_ID_KEY = 'lordspey_active_map_id';
+  const ANIMATED_THEME_KEY = 'lordspey_animated_theme';
 
   const STARTER_REGIONS = [
     {
@@ -883,10 +886,14 @@ Confidential author reference sheet for character backstories, plot twists, psyc
 
   // ── Deep Worldbuilding: Map Pins ──
 
-  function getAllMapPins() {
+  function getAllMapPins(filterMapId) {
     try {
       const raw = localStorage.getItem(MAP_PINS_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const pins = raw ? JSON.parse(raw) : [];
+      if (filterMapId && filterMapId !== 'all' && filterMapId !== '*') {
+        return pins.filter(p => (p.mapId || 'default') === filterMapId);
+      }
+      return pins;
     } catch {
       return [];
     }
@@ -901,7 +908,12 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   }
 
   function saveMapPin(pin) {
-    const pins = getAllMapPins();
+    const pins = getAllMapPins('all');
+    if (!pin.mapId) {
+      pin.mapId = getActiveMapId() || 'default';
+    }
+    if (pin.pinColor && !pin.color) pin.color = pin.pinColor;
+    if (pin.color && !pin.pinColor) pin.pinColor = pin.color;
     if (!pin.id) {
       pin.id = 'pin-' + _uid();
       pin.createdAt = Date.now();
@@ -920,24 +932,43 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   }
 
   function deleteMapPin(id) {
-    const pins = getAllMapPins().filter(p => p.id !== id);
+    const pins = getAllMapPins('all').filter(p => p.id !== id);
     _saveMapPins(pins);
   }
 
-  function getCustomMapImage() {
+  function _getMapImageKey(targetMapId) {
+    const activeId = targetMapId || (typeof getActiveMapId === 'function' ? getActiveMapId() : 'default') || 'default';
+    return (activeId === 'default') ? MAP_IMAGE_KEY : `lordspey_map_image_${activeId}`;
+  }
+
+  function getCustomMapImage(targetMapId) {
     try {
-      return localStorage.getItem(MAP_IMAGE_KEY) || null;
+      const activeId = targetMapId || (typeof getActiveMapId === 'function' ? getActiveMapId() : 'default') || 'default';
+      const key = _getMapImageKey(activeId);
+      const img = localStorage.getItem(key);
+      if (!img && activeId === 'default') {
+        return localStorage.getItem('lordspey_map_image_default') || null;
+      }
+      return img || null;
     } catch {
       return null;
     }
   }
 
-  function saveCustomMapImage(dataUrl) {
+  function saveCustomMapImage(dataUrl, targetMapId) {
     try {
+      const activeId = targetMapId || (typeof getActiveMapId === 'function' ? getActiveMapId() : 'default') || 'default';
+      const key = _getMapImageKey(activeId);
       if (dataUrl) {
-        localStorage.setItem(MAP_IMAGE_KEY, dataUrl);
+        localStorage.setItem(key, dataUrl);
+        if (activeId === 'default') {
+          try { localStorage.setItem('lordspey_map_image_default', dataUrl); } catch {}
+        }
       } else {
-        localStorage.removeItem(MAP_IMAGE_KEY);
+        localStorage.removeItem(key);
+        if (activeId === 'default') {
+          try { localStorage.removeItem('lordspey_map_image_default'); } catch {}
+        }
       }
       return true;
     } catch {
@@ -945,13 +976,8 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     }
   }
 
-  function clearCustomMapImage() {
-    try {
-      localStorage.removeItem(MAP_IMAGE_KEY);
-      return true;
-    } catch {
-      return false;
-    }
+  function clearCustomMapImage(targetMapId) {
+    return saveCustomMapImage(null, targetMapId);
   }
 
   // ── Deep Worldbuilding: Map Canvas Shapes & Territory Regions ──
@@ -1016,13 +1042,349 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     }
   }
 
-  function getMap() {
+  // ── Lord Spey Universe Atlas: Multi-Tier Celestial Cartography & Registry ──
+
+  function getMapRegistry() {
+    try {
+      const raw = localStorage.getItem(MAPS_REGISTRY_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {
+      // Fall through to auto-migrate
+    }
+
+    let rawData = null;
     try {
       const raw = localStorage.getItem(MAP_DATA_KEY);
+      if (raw) rawData = JSON.parse(raw);
+    } catch {}
+
+    const shape = (rawData && rawData.shape) || getMapShape() || 'landscape';
+    const dims = getDimensionsForShape(shape, rawData && rawData.width, rawData && rawData.height);
+    const defaultRootMap = {
+      id: 'default',
+      name: (rawData && rawData.name) || 'Known Realm',
+      tier: (rawData && rawData.tier) || 'world',
+      parentMapId: null,
+      description: 'Primary world cartography and celestial atlas tier.',
+      shape,
+      width: dims.width,
+      height: dims.height,
+      customWidth: (rawData && typeof rawData.customWidth === 'number') ? rawData.customWidth : dims.width,
+      customHeight: (rawData && typeof rawData.customHeight === 'number') ? rawData.customHeight : dims.height,
+      aspectRatio: (rawData && rawData.aspectRatio) || getAspectRatioForShape(shape, dims.width, dims.height),
+      boundaryShape: (rawData && rawData.boundaryShape) || shape,
+      celestialTheme: (rawData && rawData.celestialTheme) || 'standard-parchment',
+      orbitalRings: (rawData && typeof rawData.orbitalRings === 'boolean') ? rawData.orbitalRings : false,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    _saveMapRegistry([defaultRootMap]);
+    return [defaultRootMap];
+  }
+
+  function _saveMapRegistry(registry) {
+    try {
+      localStorage.setItem(MAPS_REGISTRY_KEY, JSON.stringify(registry));
+    } catch (e) {
+      console.warn('Unable to persist maps registry:', e);
+    }
+  }
+
+  function getActiveMapId() {
+    try {
+      const id = localStorage.getItem(ACTIVE_MAP_ID_KEY);
+      if (id) {
+        const reg = getMapRegistry();
+        if (reg.some(m => m.id === id)) {
+          return id;
+        }
+      }
+    } catch {
+      // Ignore
+    }
+    return 'default';
+  }
+
+  function setActiveMapId(newMapId) {
+    const reg = getMapRegistry();
+    const targetMap = reg.find(m => m.id === newMapId);
+    if (!targetMap) return false;
+    const prevActiveId = getActiveMapId();
+    if (prevActiveId === newMapId) return newMapId;
+
+    // Cache current active map's raw JSON to its own dedicated key
+    try {
+      const curData = localStorage.getItem(MAP_DATA_KEY);
+      if (curData) {
+        localStorage.setItem(`lordspey_map_data_${prevActiveId}`, curData);
+      }
+    } catch {}
+
+    // Load new map data into MAP_DATA_KEY
+    try {
+      const nextData = localStorage.getItem(`lordspey_map_data_${newMapId}`);
+      if (nextData) {
+        localStorage.setItem(MAP_DATA_KEY, nextData);
+      } else {
+        const dims = getDimensionsForShape(targetMap.shape, targetMap.customWidth, targetMap.customHeight);
+        const freshMapData = {
+          shape: targetMap.shape || 'landscape',
+          width: targetMap.width || dims.width,
+          height: targetMap.height || dims.height,
+          customWidth: targetMap.customWidth || dims.width,
+          customHeight: targetMap.customHeight || dims.height,
+          aspectRatio: targetMap.aspectRatio || '16:9',
+          boundaryShape: targetMap.boundaryShape || targetMap.shape || 'landscape',
+          celestialTheme: targetMap.celestialTheme || ((targetMap.tier === 'galaxy' || targetMap.tier === 'system') ? 'cosmic-void' : 'standard-parchment'),
+          orbitalRings: targetMap.orbitalRings !== undefined ? targetMap.orbitalRings : (targetMap.tier === 'system'),
+          drawingData: null,
+          layers: [],
+          updatedAt: Date.now()
+        };
+        localStorage.setItem(MAP_DATA_KEY, JSON.stringify(freshMapData));
+      }
+    } catch {}
+
+    try {
+      localStorage.setItem(ACTIVE_MAP_ID_KEY, newMapId);
+    } catch {}
+    return newMapId;
+  }
+
+  function getMapById(id) {
+    const reg = getMapRegistry();
+    return reg.find(m => m.id === id) || null;
+  }
+
+  function saveMapToRegistry(mapMeta) {
+    if (!mapMeta || typeof mapMeta !== 'object') return false;
+    const reg = getMapRegistry();
+    const id = mapMeta.id || ('map-' + _uid());
+    const existingIdx = reg.findIndex(m => m.id === id);
+
+    const validTiers = ['galaxy', 'system', 'world', 'local'];
+    const tier = validTiers.includes(mapMeta.tier) ? mapMeta.tier : 'world';
+
+    const validCelestialThemes = ['standard-parchment', 'cosmic-void', 'nebula'];
+    const celestialTheme = validCelestialThemes.includes(mapMeta.celestialTheme)
+      ? mapMeta.celestialTheme
+      : ((tier === 'galaxy' || tier === 'system') ? 'cosmic-void' : 'standard-parchment');
+
+    const orbitalRings = typeof mapMeta.orbitalRings === 'boolean'
+      ? mapMeta.orbitalRings
+      : (tier === 'system');
+
+    const dims = getDimensionsForShape(mapMeta.shape || 'landscape', mapMeta.width, mapMeta.height);
+
+    const mapTitle = typeof mapMeta.title === 'string' && mapMeta.title.trim() ? mapMeta.title.trim() : (typeof mapMeta.name === 'string' && mapMeta.name.trim() ? mapMeta.name.trim() : 'Unnamed Map');
+    const updated = {
+      id,
+      name: mapTitle,
+      title: mapTitle,
+      tier,
+      parentMapId: mapMeta.parentMapId || mapMeta.parentId || null,
+      parentId: mapMeta.parentMapId || mapMeta.parentId || null,
+      description: typeof mapMeta.description === 'string' ? mapMeta.description : '',
+      shape: mapMeta.shape || 'landscape',
+      width: typeof mapMeta.width === 'number' ? mapMeta.width : dims.width,
+      height: typeof mapMeta.height === 'number' ? mapMeta.height : dims.height,
+      customWidth: typeof mapMeta.customWidth === 'number' ? mapMeta.customWidth : dims.width,
+      customHeight: typeof mapMeta.customHeight === 'number' ? mapMeta.customHeight : dims.height,
+      aspectRatio: mapMeta.aspectRatio || getAspectRatioForShape(mapMeta.shape || 'landscape', dims.width, dims.height),
+      boundaryShape: mapMeta.boundaryShape || mapMeta.shape || 'landscape',
+      celestialTheme,
+      orbitalRings,
+      createdAt: mapMeta.createdAt || Date.now(),
+      updatedAt: Date.now()
+    };
+
+    if (existingIdx !== -1) {
+      reg[existingIdx] = Object.assign({}, reg[existingIdx], updated);
+    } else {
+      reg.push(updated);
+    }
+    _saveMapRegistry(reg);
+
+    // If saving active map, update current map data metadata as well
+    if (getActiveMapId() === id) {
+      try {
+        const cur = getMap();
+        saveMap({
+          ...cur,
+          shape: updated.shape,
+          width: updated.width,
+          height: updated.height,
+          customWidth: updated.customWidth,
+          customHeight: updated.customHeight,
+          aspectRatio: updated.aspectRatio,
+          boundaryShape: updated.boundaryShape,
+          celestialTheme: updated.celestialTheme,
+          orbitalRings: updated.orbitalRings
+        });
+      } catch {}
+    }
+    return updated;
+  }
+
+  function deleteMapFromRegistry(id) {
+    if (id === 'default') return false; // Guard root default map
+    let reg = getMapRegistry();
+    const targetMap = reg.find(m => m.id === id);
+    if (!targetMap) return false;
+
+    const newParentId = targetMap.parentMapId || targetMap.parentId || null;
+
+    // Re-parent any child maps under this map to the parent of this map
+    reg = reg.filter(m => m.id !== id).map(m => {
+      if (m.parentMapId === id || m.parentId === id) {
+        return {
+          ...m,
+          parentMapId: newParentId,
+          parentId: newParentId,
+          updatedAt: Date.now()
+        };
+      }
+      return m;
+    });
+    _saveMapRegistry(reg);
+
+    // Clean up pins assigned to this map, and unlink subMapId from other pins
+    const pins = getAllMapPins('all')
+      .filter(p => (p.mapId || 'default') !== id)
+      .map(p => {
+        if (p.subMapId === id) {
+          return { ...p, subMapId: null, updatedAt: Date.now() };
+        }
+        return p;
+      });
+    _saveMapPins(pins);
+
+    // Clean up regions assigned to this map
+    const regions = getAllMapRegions('all').filter(r => (r.mapId || 'default') !== id);
+    _saveMapRegions(regions);
+
+    try {
+      localStorage.removeItem(`lordspey_map_data_${id}`);
+      localStorage.removeItem(`lordspey_map_image_${id}`);
+    } catch {}
+
+    if (getActiveMapId() === id) {
+      setActiveMapId(newParentId || 'default');
+    }
+    return true;
+  }
+
+  function getMapBreadcrumbs(mapId) {
+    const targetId = mapId || getActiveMapId();
+    const reg = getMapRegistry();
+    const mapDict = new Map(reg.map(m => [m.id, m]));
+    const chain = [];
+    let cur = mapDict.get(targetId);
+    const visited = new Set();
+    while (cur && !visited.has(cur.id)) {
+      visited.add(cur.id);
+      chain.unshift(cur);
+      const parentId = cur.parentMapId || cur.parentId;
+      if (parentId) {
+        cur = mapDict.get(parentId);
+      } else {
+        break;
+      }
+    }
+    return chain;
+  }
+
+  function createChildMap(parentMapId, opts = {}) {
+    const parent = parentMapId ? (getMapById(parentMapId) || null) : null;
+    const pTier = parent ? parent.tier : 'galaxy';
+    let childTier = 'world';
+    if (pTier === 'galaxy') childTier = 'system';
+    else if (pTier === 'system') childTier = 'world';
+    else if (pTier === 'world') childTier = 'local';
+
+    const childName = opts.name || opts.title || (
+      childTier === 'system' ? `${(parent && (parent.title || parent.name)) || 'Star'} System` :
+      childTier === 'world' ? `${(parent && (parent.title || parent.name)) || 'Planet'} Surface` :
+      `${(parent && (parent.title || parent.name)) || 'Station'} Sector`
+    );
+
+    const childCelestialTheme = (childTier === 'galaxy' || childTier === 'system')
+      ? 'cosmic-void'
+      : (opts.celestialTheme || 'standard-parchment');
+
+    return saveMapToRegistry({
+      name: childName,
+      title: childName,
+      tier: opts.tier || childTier,
+      parentMapId: parent ? parent.id : null,
+      parentId: parent ? parent.id : null,
+      description: opts.description || '',
+      shape: opts.shape || (childTier === 'system' ? 'square' : 'landscape'),
+      celestialTheme: childCelestialTheme,
+      orbitalRings: (opts.orbitalRings !== undefined) ? opts.orbitalRings : (childTier === 'system')
+    });
+  }
+
+  function getAllMapsData() {
+    const reg = getMapRegistry();
+    const store = {};
+    const activeId = getActiveMapId();
+    reg.forEach(m => {
+      if (m.id === activeId) {
+        store[m.id] = getMap();
+      } else {
+        try {
+          const raw = localStorage.getItem(`lordspey_map_data_${m.id}`);
+          store[m.id] = raw ? JSON.parse(raw) : null;
+        } catch {
+          store[m.id] = null;
+        }
+      }
+    });
+    return store;
+  }
+
+  function getMap(targetMapId) {
+    const activeId = getActiveMapId();
+    const mapId = targetMapId || activeId;
+    try {
+      const storageKey = (mapId === activeId) ? MAP_DATA_KEY : `lordspey_map_data_${mapId}`;
+      let raw = localStorage.getItem(storageKey);
+      if (!raw && mapId !== activeId) {
+        raw = localStorage.getItem(MAP_DATA_KEY);
+      }
       const parsed = raw ? JSON.parse(raw) : {};
-      const shape = parsed.shape || getMapShape() || 'landscape';
-      const dims = getDimensionsForShape(shape, parsed.width, parsed.height);
+      let regMap = null;
+      try {
+        const regRaw = localStorage.getItem(MAPS_REGISTRY_KEY);
+        if (regRaw) {
+          const regArr = JSON.parse(regRaw);
+          if (Array.isArray(regArr)) regMap = regArr.find(m => m.id === mapId) || null;
+        }
+      } catch {}
+
+      const shape = parsed.shape || (regMap && regMap.shape) || getMapShape() || 'landscape';
+      const dims = getDimensionsForShape(shape, parsed.width || (regMap && regMap.width), parsed.height || (regMap && regMap.height));
+      const tier = parsed.tier || (regMap && regMap.tier) || 'world';
+      const celestialTheme = parsed.celestialTheme || (regMap && regMap.celestialTheme) || ((tier === 'galaxy' || tier === 'system') ? 'cosmic-void' : 'standard-parchment');
+      const orbitalRings = parsed.orbitalRings !== undefined ? parsed.orbitalRings : (regMap && regMap.orbitalRings !== undefined ? regMap.orbitalRings : (tier === 'system'));
+
+      const mapName = parsed.name || (regMap && (regMap.name || regMap.title)) || 'Known Realm';
+      const mapParent = parsed.parentMapId !== undefined ? parsed.parentMapId : (regMap ? (regMap.parentMapId || regMap.parentId) : null);
       return {
+        id: mapId,
+        name: mapName,
+        title: mapName,
+        tier,
+        parentMapId: mapParent,
+        parentId: mapParent,
+        celestialTheme,
+        orbitalRings,
         shape,
         width: dims.width,
         height: dims.height,
@@ -1032,14 +1394,33 @@ Confidential author reference sheet for character backstories, plot twists, psyc
         boundaryShape: parsed.boundaryShape || shape,
         drawingData: parsed.drawingData || null,
         layers: Array.isArray(parsed.layers) ? parsed.layers : [],
-        customImage: getCustomMapImage(),
-        pins: getAllMapPins(),
-        regions: getAllMapRegions()
+        customImage: getCustomMapImage(mapId),
+        pins: getAllMapPins(mapId),
+        regions: getAllMapRegions(mapId)
       };
     } catch {
-      const shape = getMapShape() || 'landscape';
+      let regMap = null;
+      try {
+        const regRaw = localStorage.getItem(MAPS_REGISTRY_KEY);
+        if (regRaw) {
+          const regArr = JSON.parse(regRaw);
+          if (Array.isArray(regArr)) regMap = regArr.find(m => m.id === mapId) || null;
+        }
+      } catch {}
+      const shape = (regMap && regMap.shape) || getMapShape() || 'landscape';
       const dims = getDimensionsForShape(shape);
+      const tier = (regMap && regMap.tier) || 'world';
+      const mapName = (regMap && (regMap.name || regMap.title)) || 'Known Realm';
+      const mapParent = regMap ? (regMap.parentMapId || regMap.parentId) : null;
       return {
+        id: mapId,
+        name: mapName,
+        title: mapName,
+        tier,
+        parentMapId: mapParent,
+        parentId: mapParent,
+        celestialTheme: (regMap && regMap.celestialTheme) || ((tier === 'galaxy' || tier === 'system') ? 'cosmic-void' : 'standard-parchment'),
+        orbitalRings: (regMap && regMap.orbitalRings !== undefined) ? regMap.orbitalRings : (tier === 'system'),
         shape,
         width: dims.width,
         height: dims.height,
@@ -1049,29 +1430,44 @@ Confidential author reference sheet for character backstories, plot twists, psyc
         boundaryShape: shape,
         drawingData: null,
         layers: [],
-        customImage: getCustomMapImage(),
-        pins: getAllMapPins(),
-        regions: getAllMapRegions()
+        customImage: getCustomMapImage(mapId),
+        pins: getAllMapPins(mapId),
+        regions: getAllMapRegions(mapId)
       };
     }
   }
 
-  function saveMap(mapData) {
+  function saveMap(mapData, targetMapId) {
     try {
       if (!mapData || typeof mapData !== 'object') return false;
-      const current = getMap();
+      const activeId = getActiveMapId();
+      const mapId = targetMapId || activeId;
+      const current = getMap(mapId);
       const shape = mapData.shape || current.shape || 'landscape';
-      if (mapData.shape) {
+      if (mapData.shape && mapId === activeId) {
         saveMapShape(mapData.shape);
       }
       if (mapData.customImage !== undefined) {
-        saveCustomMapImage(mapData.customImage);
+        saveCustomMapImage(mapData.customImage, mapId);
       }
       if (Array.isArray(mapData.pins)) {
-        _saveMapPins(mapData.pins);
+        const otherPins = getAllMapPins('all').filter(p => (p.mapId || 'default') !== mapId);
+        const incomingPins = mapData.pins
+          .filter(p => !p.mapId || p.mapId === mapId)
+          .map(p => ({
+            ...p,
+            mapId: mapId,
+            pinColor: p.pinColor || p.color || '',
+            color: p.color || p.pinColor || ''
+          }));
+        _saveMapPins([...otherPins, ...incomingPins]);
       }
       if (Array.isArray(mapData.regions)) {
-        _saveMapRegions(mapData.regions);
+        const otherRegions = getAllMapRegions('all').filter(r => (r.mapId || 'default') !== mapId);
+        const incomingRegions = mapData.regions
+          .filter(r => !r.mapId || r.mapId === mapId)
+          .map(r => ({ ...r, mapId: mapId }));
+        _saveMapRegions([...otherRegions, ...incomingRegions]);
       }
 
       const presetDims = getDimensionsForShape(shape, mapData.width || current.width, mapData.height || current.height);
@@ -1114,8 +1510,17 @@ Confidential author reference sheet for character backstories, plot twists, psyc
 
       const drawingData = mapData.drawingData !== undefined ? mapData.drawingData : current.drawingData;
       const layers = Array.isArray(mapData.layers) ? mapData.layers : current.layers;
+      const tier = mapData.tier || current.tier || 'world';
+      const celestialTheme = mapData.celestialTheme || current.celestialTheme || ((tier === 'galaxy' || tier === 'system') ? 'cosmic-void' : 'standard-parchment');
+      const orbitalRings = mapData.orbitalRings !== undefined ? mapData.orbitalRings : (current.orbitalRings || false);
 
       const toStore = {
+        id: mapId,
+        name: mapData.name || current.name || 'Known Realm',
+        tier,
+        parentMapId: mapData.parentMapId !== undefined ? mapData.parentMapId : current.parentMapId,
+        celestialTheme,
+        orbitalRings,
         shape,
         width,
         height,
@@ -1128,40 +1533,75 @@ Confidential author reference sheet for character backstories, plot twists, psyc
         updatedAt: Date.now()
       };
 
+      const storageKey = (mapId === activeId) ? MAP_DATA_KEY : `lordspey_map_data_${mapId}`;
       try {
-        localStorage.setItem(MAP_DATA_KEY, JSON.stringify(toStore));
+        localStorage.setItem(storageKey, JSON.stringify(toStore));
+        if (mapId === activeId) {
+          try { localStorage.setItem(`lordspey_map_data_${activeId}`, JSON.stringify(toStore)); } catch {}
+        }
       } catch (quotaErr) {
         console.warn('Map data quota exceeded. Attempting compressed save...', quotaErr);
         try {
           const lightLayers = layers.map(l => ({ id: l.id, name: l.name, visible: l.visible, opacity: l.opacity }));
           const lightStore = { ...toStore, layers: lightLayers };
-          localStorage.setItem(MAP_DATA_KEY, JSON.stringify(lightStore));
+          localStorage.setItem(storageKey, JSON.stringify(lightStore));
         } catch (_) {
           const minimalStore = { ...toStore, drawingData: null, layers: [] };
-          localStorage.setItem(MAP_DATA_KEY, JSON.stringify(minimalStore));
+          localStorage.setItem(storageKey, JSON.stringify(minimalStore));
         }
       }
-      return getMap();
+
+      // Update registry entry
+      try {
+        const reg = getMapRegistry();
+        const existingIdx = reg.findIndex(m => m.id === mapId);
+        if (existingIdx !== -1) {
+          reg[existingIdx] = {
+            ...reg[existingIdx],
+            shape: toStore.shape,
+            width: toStore.width,
+            height: toStore.height,
+            customWidth: toStore.customWidth,
+            customHeight: toStore.customHeight,
+            aspectRatio: toStore.aspectRatio,
+            boundaryShape: toStore.boundaryShape,
+            celestialTheme: toStore.celestialTheme,
+            orbitalRings: toStore.orbitalRings,
+            updatedAt: Date.now()
+          };
+          if (mapData.name) reg[existingIdx].name = mapData.name;
+          if (mapData.tier) reg[existingIdx].tier = mapData.tier;
+          _saveMapRegistry(reg);
+        }
+      } catch {}
+
+      return getMap(mapId);
     } catch (e) {
       console.warn('Unable to persist map data:', e);
       return false;
     }
   }
 
-  function clearMapDrawing() {
+  function clearMapDrawing(targetMapId) {
     try {
-      const current = getMap();
-      saveMap({ ...current, drawingData: null, layers: [] });
+      const activeId = getActiveMapId();
+      const mapId = targetMapId || activeId;
+      const current = getMap(mapId);
+      saveMap({ ...current, drawingData: null, layers: [] }, mapId);
       return true;
     } catch {
       return false;
     }
   }
 
-  function getAllMapRegions() {
+  function getAllMapRegions(filterMapId) {
     try {
       const raw = localStorage.getItem(MAP_REGIONS_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const regions = raw ? JSON.parse(raw) : [];
+      if (filterMapId && filterMapId !== 'all' && filterMapId !== '*') {
+        return regions.filter(r => (r.mapId || 'default') === filterMapId);
+      }
+      return regions;
     } catch {
       return [];
     }
@@ -1172,7 +1612,10 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   }
 
   function saveMapRegion(region) {
-    const regions = getAllMapRegions();
+    const regions = getAllMapRegions('all');
+    if (!region.mapId) {
+      region.mapId = getActiveMapId() || 'default';
+    }
     if (!region.id) {
       region.id = 'reg-' + _uid();
       region.createdAt = Date.now();
@@ -1191,7 +1634,7 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   }
 
   function deleteMapRegion(id) {
-    const regions = getAllMapRegions().filter(r => r.id !== id);
+    const regions = getAllMapRegions('all').filter(r => r.id !== id);
     _saveMapRegions(regions);
   }
 
@@ -1681,6 +2124,28 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     return hex;
   }
 
+  function getAnimatedTheme() {
+    const s = getSettings();
+    if (s && s.animatedTheme) return s.animatedTheme;
+    try {
+      return localStorage.getItem(ANIMATED_THEME_KEY) || 'none';
+    } catch {
+      return 'none';
+    }
+  }
+
+  function setAnimatedTheme(theme) {
+    const validThemes = ['none', 'cosmic-void', 'ethereal-nebula', 'warm-embers', 'midnight-rain'];
+    const valid = validThemes.includes(theme) ? theme : 'none';
+    saveSetting('animatedTheme', valid);
+    try {
+      localStorage.setItem(ANIMATED_THEME_KEY, valid);
+    } catch {
+      // Ignore
+    }
+    return valid;
+  }
+
   function _slugify(text) {
     return String(text || '').toLowerCase().replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-');
   }
@@ -2069,14 +2534,27 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       title: projTitle,
       timestamp: new Date().toISOString(),
       notes,
-      mapPins: getAllMapPins(),
+      mapsRegistry: getMapRegistry(),
+      activeMapId: getActiveMapId(),
+      mapsData: getAllMapsData(),
+      mapPins: getAllMapPins('all'),
       customMapImage: getCustomMapImage(),
+      customImages: (function() {
+        const out = {};
+        const reg = getMapRegistry();
+        reg.forEach(m => {
+          const img = getCustomMapImage(m.id);
+          if (img) out[m.id] = img;
+        });
+        return out;
+      })(),
       timelineEvents: getTimelineEvents(),
       characters: getCharacters(),
       relationships: getRelationships(),
       mapShape: getMapShape(),
-      mapRegions: getAllMapRegions(),
+      mapRegions: getAllMapRegions('all'),
       mapData: getMap(),
+      animatedTheme: getAnimatedTheme(),
       graphNodes: getGraphNodes(),
       graphLinks: getGraphLinks(),
       sections: getAllSections(),
@@ -2179,11 +2657,24 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       noteCounts: stats.noteCounts,
       wordCount: stats.wordCount,
       notes: getAllNotes(),
-      mapPins: getAllMapPins(),
+      mapsRegistry: getMapRegistry(),
+      activeMapId: getActiveMapId(),
+      mapsData: getAllMapsData(),
+      mapPins: getAllMapPins('all'),
       mapShape: getMapShape(),
-      mapRegions: getAllMapRegions(),
+      mapRegions: getAllMapRegions('all'),
       customMapImage: getCustomMapImage(),
+      customImages: (function() {
+        const out = {};
+        const reg = getMapRegistry();
+        reg.forEach(m => {
+          const img = getCustomMapImage(m.id);
+          if (img) out[m.id] = img;
+        });
+        return out;
+      })(),
       mapData: getMap(),
+      animatedTheme: getAnimatedTheme(),
       timelineEvents: getTimelineEvents(),
       characters: getCharacters(),
       relationships: getRelationships(),
@@ -2340,6 +2831,44 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       _saveGraphLinks([]);
       _saveSections([]);
 
+      // Clean up previous map registry and specific map keys
+      try {
+        const prevReg = getMapRegistry();
+        if (Array.isArray(prevReg)) {
+          prevReg.forEach(m => {
+            if (m && m.id) localStorage.removeItem(`lordspey_map_data_${m.id}`);
+          });
+        }
+        localStorage.removeItem(MAPS_REGISTRY_KEY);
+        localStorage.removeItem(ACTIVE_MAP_ID_KEY);
+      } catch {}
+
+      if (Array.isArray(d.mapsRegistry) && d.mapsRegistry.length > 0) {
+        _saveMapRegistry(d.mapsRegistry);
+        if (d.activeMapId) {
+          try { localStorage.setItem(ACTIVE_MAP_ID_KEY, d.activeMapId); } catch {}
+        }
+      }
+      if (d.mapsData && typeof d.mapsData === 'object') {
+        Object.keys(d.mapsData).forEach(mid => {
+          if (d.mapsData[mid]) {
+            try {
+              localStorage.setItem(`lordspey_map_data_${mid}`, JSON.stringify(d.mapsData[mid]));
+            } catch {}
+          }
+        });
+      }
+      if (d.customImages && typeof d.customImages === 'object') {
+        Object.keys(d.customImages).forEach(mid => {
+          if (d.customImages[mid]) {
+            saveCustomMapImage(d.customImages[mid], mid);
+          }
+        });
+      }
+      if (typeof d.animatedTheme === 'string') {
+        setAnimatedTheme(d.animatedTheme);
+      }
+
       const rawNotes = Array.isArray(d.notes) ? d.notes : [];
       const sanitizedNotes = rawNotes
         .filter(n => n && typeof n === 'object')
@@ -2366,7 +2895,10 @@ Confidential author reference sheet for character backstories, plot twists, psyc
           terrain: typeof p.terrain === 'string' ? p.terrain : '',
           pinType: typeof p.pinType === 'string' ? p.pinType : 'citadel',
           icon: typeof p.icon === 'string' ? p.icon : '✦',
-          color: typeof p.color === 'string' ? p.color : '',
+          color: typeof p.color === 'string' ? p.color : (typeof p.pinColor === 'string' ? p.pinColor : ''),
+          pinColor: typeof p.pinColor === 'string' ? p.pinColor : (typeof p.color === 'string' ? p.color : ''),
+          mapId: p.mapId || 'default',
+          subMapId: p.subMapId || null,
           attributes: p.attributes || {},
           noteId: p.noteId || null
         })));
@@ -2385,6 +2917,7 @@ Confidential author reference sheet for character backstories, plot twists, psyc
           fillColor: r.fillColor || 'rgba(239, 68, 68, 0.12)',
           strokeColor: r.strokeColor || '#ef4444',
           description: typeof r.description === 'string' ? r.description : '',
+          mapId: r.mapId || 'default',
           attributes: r.attributes || {}
         })));
       }
@@ -2521,8 +3054,26 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       }
       _saveAll(existingNotes);
 
+      // Merge map registry
+      if (Array.isArray(d.mapsRegistry) && d.mapsRegistry.length > 0) {
+        const curReg = getMapRegistry();
+        const regIds = new Set(curReg.map(m => m.id));
+        d.mapsRegistry.forEach(m => {
+          if (m && m.id && !regIds.has(m.id)) {
+            curReg.push(m);
+            regIds.add(m.id);
+            if (d.mapsData && d.mapsData[m.id]) {
+              try {
+                localStorage.setItem(`lordspey_map_data_${m.id}`, JSON.stringify(d.mapsData[m.id]));
+              } catch {}
+            }
+          }
+        });
+        _saveMapRegistry(curReg);
+      }
+
       // Merge map pins with collision remapping & noteId link repair
-      const existingPins = getAllMapPins().filter(p => p && typeof p === 'object');
+      const existingPins = getAllMapPins('all').filter(p => p && typeof p === 'object');
       const pinIds = new Set(existingPins.map(p => p.id));
       if (Array.isArray(d.mapPins)) {
         for (const p of d.mapPins) {
@@ -2536,6 +3087,11 @@ Confidential author reference sheet for character backstories, plot twists, psyc
             description: typeof p.description === 'string' ? p.description : '',
             terrain: typeof p.terrain === 'string' ? p.terrain : '',
             pinType: typeof p.pinType === 'string' ? p.pinType : 'citadel',
+            icon: typeof p.icon === 'string' ? p.icon : '✦',
+            color: typeof p.color === 'string' ? p.color : (typeof p.pinColor === 'string' ? p.pinColor : ''),
+            pinColor: typeof p.pinColor === 'string' ? p.pinColor : (typeof p.color === 'string' ? p.color : ''),
+            mapId: p.mapId || 'default',
+            subMapId: p.subMapId || null,
             noteId: p.noteId || null
           };
           if (pinIds.has(pinClone.id)) {
@@ -2550,9 +3106,16 @@ Confidential author reference sheet for character backstories, plot twists, psyc
         _saveMapPins(existingPins);
       }
 
-      // Merge custom map image if current doesn't have one
-      if (!getCustomMapImage() && typeof d.customMapImage === 'string' && d.customMapImage) {
-        saveCustomMapImage(d.customMapImage);
+      // Merge custom map images if current map doesn't have one
+      if (d.customImages && typeof d.customImages === 'object') {
+        Object.keys(d.customImages).forEach(mid => {
+          if (d.customImages[mid] && !getCustomMapImage(mid)) {
+            saveCustomMapImage(d.customImages[mid], mid);
+          }
+        });
+      }
+      if (!getCustomMapImage('default') && typeof d.customMapImage === 'string' && d.customMapImage) {
+        saveCustomMapImage(d.customMapImage, 'default');
       }
 
       // Merge custom map drawing & dimensions if current doesn't have one
@@ -2562,8 +3125,6 @@ Confidential author reference sheet for character backstories, plot twists, psyc
         if (!curMap.drawingData && incomingHasCustom) {
           saveMap({
             ...d.mapData,
-            pins: getAllMapPins(),
-            regions: getAllMapRegions(),
             customImage: getCustomMapImage()
           });
         }
@@ -2678,12 +3239,15 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       }
 
       // Merge map regions
-      const existingRegions = getAllMapRegions().filter(r => r && typeof r === 'object');
+      const existingRegions = getAllMapRegions('all').filter(r => r && typeof r === 'object');
       const regionIds = new Set(existingRegions.map(r => r.id));
       if (Array.isArray(d.mapRegions)) {
         for (const reg of d.mapRegions) {
           if (!reg || typeof reg !== 'object') continue;
-          let regClone = { ...reg };
+          let regClone = {
+            ...reg,
+            mapId: reg.mapId || 'default'
+          };
           if (!regClone.id || regionIds.has(regClone.id)) {
             regClone.id = 'reg-' + _uid();
           }
@@ -2931,6 +3495,17 @@ ${note.body || ''}`;
     getMap,
     saveMap,
     clearMapDrawing,
+    // Lord Spey Universe Atlas: Multi-Tier Celestial Cartography & Registry
+    getMapRegistry,
+    getAllMaps: getMapRegistry,
+    getActiveMapId,
+    setActiveMapId,
+    getMapById,
+    saveMapToRegistry,
+    deleteMapFromRegistry,
+    getMapBreadcrumbs,
+    createChildMap,
+    getAllMapsData,
     // Galaxy Graph: Manual Nodes & Custom Connections
     getGraphNodes,
     saveGraphNode,
@@ -2948,5 +3523,7 @@ ${note.body || ''}`;
     setBaseTheme,
     getCustomAccentColor,
     setCustomAccentColor,
+    getAnimatedTheme,
+    setAnimatedTheme,
   };
 })();

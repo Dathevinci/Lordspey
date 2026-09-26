@@ -6859,6 +6859,15 @@ img.map-custom-img[src=""] {
 .map-pin-head.pin-forest { background: #10b981; }
 .map-pin-head.pin-danger { background: #dc2626; }
 
+/* Celestial & Cosmic pin glyphs */
+.map-pin-head.pin-star { background: #fbbf24; box-shadow: 0 0 10px #f59e0b, 0 0 18px rgba(245, 158, 11, 0.45); }
+.map-pin-head.pin-planet { background: #38bdf8; box-shadow: 0 0 8px #0284c7; }
+.map-pin-head.pin-gas_giant { background: #fb923c; box-shadow: 0 0 8px #ea580c; }
+.map-pin-head.pin-station { background: #e2e8f0; border-radius: 2px; box-shadow: 0 0 6px rgba(255, 255, 255, 0.6); }
+.map-pin-head.pin-jump_gate { background: #c084fc; box-shadow: 0 0 10px #9333ea, 0 0 18px rgba(147, 51, 234, 0.4); border-radius: 50%; }
+.map-pin-head.pin-asteroid { background: #94a3b8; box-shadow: 0 0 4px #64748b; }
+.map-pin-head.pin-nebula_cloud { background: #f472b6; box-shadow: 0 0 12px #db2777, 0 0 22px rgba(219, 39, 119, 0.35); }
+
 /* ── Character Codex: Image Upload Dropzone & Portrait ── */
 .char-image-dropzone {
   position: relative;
@@ -7558,6 +7567,328 @@ img.map-custom-img[src=""] {
   }
   .sample-stats-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   Lord Spey Universe Atlas: Multi-Tier Hierarchies & Celestial Themes
+   ══════════════════════════════════════════════════════════════════════ */
+
+.map-atlas-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.map-atlas-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+  margin-top: 1px;
+}
+
+.map-atlas-crumb {
+  cursor: pointer;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--transition);
+}
+
+.map-atlas-crumb:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-color: var(--accent);
+}
+
+.map-atlas-crumb.active {
+  color: var(--accent);
+  font-weight: 600;
+  cursor: default;
+  background: transparent;
+  border-color: transparent;
+}
+
+.map-atlas-crumb-sep {
+  color: var(--text-faint);
+  font-size: 0.72rem;
+  user-select: none;
+}
+
+.badge-atlas {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.badge-atlas.tier-galaxy {
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.badge-atlas.tier-system {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.badge-atlas.tier-world {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.badge-atlas.tier-local {
+  background: rgba(56, 189, 248, 0.18);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.map-atlas-select,
+.map-celestial-select {
+  max-width: 170px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.map-drill-down-btn {
+  background: var(--accent, #ef4444) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: 0 0 10px var(--red-glow-strong);
+  transition: all var(--transition);
+}
+
+.map-drill-down-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.studio-tool-btn[data-tool="hyperlane"] {
+  color: #38bdf8;
+}
+
+.btn-atlas-delete {
+  color: #f87171 !important;
+}
+
+.btn-atlas-delete:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   Ambient Animated Themes System
+   ══════════════════════════════════════════════════════════════════════ */
+
+.ambient-theme-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+body[data-animated-theme]:not([data-animated-theme="none"]) .ambient-theme-container {
+  opacity: 1;
+}
+
+#ambient-theme-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Subtle frosted translucent layout when animated theme is active */
+body[data-animated-theme]:not([data-animated-theme="none"]) {
+  background: #06070a;
+}
+
+body[data-animated-theme]:not([data-animated-theme="none"]) .sidebar {
+  background: rgba(15, 16, 20, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+body[data-animated-theme]:not([data-animated-theme="none"]) .main-content {
+  background: rgba(18, 18, 22, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+body[data-animated-theme]:not([data-animated-theme="none"]) .editor-pane {
+  background: rgba(18, 18, 22, 0.88);
+}
+
+body[data-animated-theme]:not([data-animated-theme="none"]) .note-header-wrap,
+body[data-animated-theme]:not([data-animated-theme="none"]) .editor-toolbar {
+  background: rgba(22, 23, 28, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Light & Sepia theme adaptions for ambient animations */
+body[data-theme="light"][data-animated-theme]:not([data-animated-theme="none"]) .sidebar {
+  background: rgba(248, 247, 244, 0.90);
+}
+
+body[data-theme="light"][data-animated-theme]:not([data-animated-theme="none"]) .main-content,
+body[data-theme="light"][data-animated-theme]:not([data-animated-theme="none"]) .editor-pane {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+body[data-theme="sepia"][data-animated-theme]:not([data-animated-theme="none"]) .sidebar {
+  background: rgba(244, 236, 214, 0.90);
+}
+
+body[data-theme="sepia"][data-animated-theme]:not([data-animated-theme="none"]) .main-content,
+body[data-theme="sepia"][data-animated-theme]:not([data-animated-theme="none"]) .editor-pane {
+  background: rgba(251, 244, 226, 0.88);
+}
+
+/* Settings Animated Theme Cards */
+.animated-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.animated-theme-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+}
+
+.animated-theme-card:hover {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+}
+
+.animated-theme-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 12px var(--red-glow);
+}
+
+.animated-theme-preview {
+  height: 64px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 4px;
+}
+
+.preview-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+}
+
+.preview-none {
+  background: #09090b;
+}
+
+.preview-cosmic-void {
+  background: radial-gradient(circle at 50% 50%, #0d1224 0%, #03050c 100%);
+  background-image:
+    radial-gradient(1.5px 1.5px at 20px 20px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 60px 15px, #38bdf8, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 120px 45px, #fbbf24, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 150px 30px, #ffffff, rgba(0,0,0,0));
+}
+
+.preview-ethereal-nebula {
+  background: linear-gradient(135deg, #0a0618 0%, #160b33 50%, #071728 100%);
+  position: relative;
+}
+
+.preview-ethereal-nebula::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  background: radial-gradient(circle at 40% 60%, rgba(168, 85, 247, 0.45) 0%, transparent 60%),
+              radial-gradient(circle at 75% 35%, rgba(6, 182, 212, 0.35) 0%, transparent 50%);
+  filter: blur(4px);
+}
+
+.preview-warm-embers {
+  background: linear-gradient(180deg, #120907 0%, #080302 100%);
+  position: relative;
+}
+
+.preview-warm-embers::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 30px 45px, #f59e0b, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 80px 25px, #ef4444, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 140px 40px, #fbbf24, rgba(0,0,0,0));
+}
+
+.preview-midnight-rain {
+  background: linear-gradient(180deg, #0b111e 0%, #040810 100%);
+  background-image: repeating-linear-gradient(100deg, transparent, transparent 18px, rgba(56, 189, 248, 0.25) 19px, transparent 20px);
+}
+
+.animated-theme-name {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.animated-theme-desc {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .ambient-theme-container {
+    display: none !important;
+  }
+  .animated-theme-preview::after {
+    animation: none !important;
   }
 }
 
