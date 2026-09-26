@@ -6537,6 +6537,285 @@ img.map-custom-img[src=""] {
   overflow: hidden;
 }
 
+.map-stage[data-shape="ultrawide"] {
+  width: 2100px;
+  height: 900px;
+  border-radius: var(--radius-md);
+}
+
+.map-stage[data-shape="parchment"] {
+  width: 1600px;
+  height: 1200px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 40px rgba(180, 140, 80, 0.15);
+}
+
+.map-stage[data-shape="custom"] {
+  border-radius: var(--radius-md);
+}
+
+/* ── World Map: Studio Paint Layer Canvas ── */
+.map-paint-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.map-stage.paint-mode-active .map-paint-canvas {
+  pointer-events: auto !important;
+  cursor: crosshair;
+}
+
+.map-stage.paint-mode-active .map-regions-svg,
+.map-stage.paint-mode-active .map-pins-container {
+  pointer-events: none;
+}
+
+/* ── Map Studio Floating Toolbar ── */
+.map-studio-toolbar {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(14, 16, 25, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.15);
+  z-index: 25;
+  user-select: none;
+  max-width: 95%;
+  transition: all 0.2s ease;
+}
+
+.map-studio-toolbar.hidden {
+  display: none !important;
+}
+
+.studio-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.studio-sep {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.studio-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.studio-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.studio-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.studio-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.studio-select {
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  height: 26px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+
+.studio-slider {
+  width: 70px;
+  height: 4px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.studio-checkbox-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.studio-palette-section {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.palette-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+  padding: 0;
+}
+
+.palette-swatch:hover {
+  transform: scale(1.2);
+}
+
+.palette-swatch.active {
+  transform: scale(1.25);
+  border-color: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.studio-color-picker {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+}
+
+/* ── Map Layers Panel ── */
+.map-layers-panel {
+  position: absolute;
+  top: 60px;
+  right: 18px;
+  width: 260px;
+  background: rgba(14, 16, 25, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.65);
+  z-index: 26;
+  padding: 12px;
+  user-select: none;
+  animation: fadeIn 0.18s ease;
+}
+
+.map-layers-panel.hidden {
+  display: none !important;
+}
+
+.map-layers-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.layers-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+}
+
+.layers-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.layers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.layer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.78rem;
+  transition: all 0.12s ease;
+}
+
+.layer-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.layer-item.active {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: var(--accent);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.layer-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.layer-item-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layers-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.dimension-preset-pills .dim-preset-btn {
+  font-size: 0.74rem;
+  padding: 4px 10px;
+}
+
 /* ── World Map: Territory Regions SVG Layer ── */
 .map-regions-svg {
   position: absolute;

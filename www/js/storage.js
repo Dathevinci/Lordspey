@@ -368,6 +368,7 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   const GRAPH_LINKS_KEY = 'lordspey_graph_links';
   const SECTIONS_KEY = 'lordspey_sections';
   const BASE_THEME_KEY = 'lordspey_base_theme';
+  const MAP_DATA_KEY = 'lordspey_map_data';
 
   const STARTER_REGIONS = [
     {
@@ -966,6 +967,191 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   function saveMapShape(shape) {
     try {
       localStorage.setItem(MAP_SHAPE_KEY, shape || 'landscape');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // ── Map Studio: Custom Sizing, Dimensions, Drawing & Persistence ──
+
+  function getDimensionsForShape(shape, explicitW, explicitH) {
+    if (shape === 'custom') {
+      const w = (typeof explicitW === 'number' && explicitW >= 100) ? explicitW : 1600;
+      const h = (typeof explicitH === 'number' && explicitH >= 100) ? explicitH : 1000;
+      return { width: w, height: h };
+    }
+    switch (shape) {
+      case 'square':
+        return { width: 1200, height: 1200 };
+      case 'vertical':
+        return { width: 900, height: 1600 };
+      case 'oval':
+        return { width: 1500, height: 1050 };
+      case 'ultrawide':
+        return { width: 2100, height: 900 };
+      case 'parchment':
+        return { width: 1600, height: 1200 };
+      case 'landscape':
+      default:
+        return { width: 1600, height: 1000 };
+    }
+  }
+
+  function getAspectRatioForShape(shape, customW, customH) {
+    switch (shape) {
+      case 'square': return '1:1';
+      case 'vertical': return '9:16';
+      case 'oval': return '10:7';
+      case 'ultrawide': return '21:9';
+      case 'parchment': return '4:3';
+      case 'custom':
+        if (typeof customW === 'number' && typeof customH === 'number' && customW > 0 && customH > 0) {
+          return `${customW}:${customH}`;
+        }
+        return '16:9';
+      case 'landscape':
+      default:
+        return '16:9';
+    }
+  }
+
+  function getMap() {
+    try {
+      const raw = localStorage.getItem(MAP_DATA_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      const shape = parsed.shape || getMapShape() || 'landscape';
+      const dims = getDimensionsForShape(shape, parsed.width, parsed.height);
+      return {
+        shape,
+        width: dims.width,
+        height: dims.height,
+        customWidth: typeof parsed.customWidth === 'number' ? parsed.customWidth : dims.width,
+        customHeight: typeof parsed.customHeight === 'number' ? parsed.customHeight : dims.height,
+        aspectRatio: parsed.aspectRatio || getAspectRatioForShape(shape, dims.width, dims.height),
+        boundaryShape: parsed.boundaryShape || shape,
+        drawingData: parsed.drawingData || null,
+        layers: Array.isArray(parsed.layers) ? parsed.layers : [],
+        customImage: getCustomMapImage(),
+        pins: getAllMapPins(),
+        regions: getAllMapRegions()
+      };
+    } catch {
+      const shape = getMapShape() || 'landscape';
+      const dims = getDimensionsForShape(shape);
+      return {
+        shape,
+        width: dims.width,
+        height: dims.height,
+        customWidth: dims.width,
+        customHeight: dims.height,
+        aspectRatio: '16:9',
+        boundaryShape: shape,
+        drawingData: null,
+        layers: [],
+        customImage: getCustomMapImage(),
+        pins: getAllMapPins(),
+        regions: getAllMapRegions()
+      };
+    }
+  }
+
+  function saveMap(mapData) {
+    try {
+      if (!mapData || typeof mapData !== 'object') return false;
+      const current = getMap();
+      const shape = mapData.shape || current.shape || 'landscape';
+      if (mapData.shape) {
+        saveMapShape(mapData.shape);
+      }
+      if (mapData.customImage !== undefined) {
+        saveCustomMapImage(mapData.customImage);
+      }
+      if (Array.isArray(mapData.pins)) {
+        _saveMapPins(mapData.pins);
+      }
+      if (Array.isArray(mapData.regions)) {
+        _saveMapRegions(mapData.regions);
+      }
+
+      const presetDims = getDimensionsForShape(shape, mapData.width || current.width, mapData.height || current.height);
+      const isPreset = shape !== 'custom';
+
+      let width = typeof mapData.width === 'number' ? mapData.width : (typeof mapData.customWidth === 'number' ? mapData.customWidth : (isPreset && mapData.shape ? presetDims.width : current.width));
+      let height = typeof mapData.height === 'number' ? mapData.height : (typeof mapData.customHeight === 'number' ? mapData.customHeight : (isPreset && mapData.shape ? presetDims.height : current.height));
+      if (isPreset && mapData.shape && typeof mapData.width !== 'number') {
+        width = presetDims.width;
+        height = presetDims.height;
+      }
+      const customWidth = typeof mapData.customWidth === 'number' ? mapData.customWidth : (typeof mapData.width === 'number' ? mapData.width : current.customWidth);
+      const customHeight = typeof mapData.customHeight === 'number' ? mapData.customHeight : (typeof mapData.height === 'number' ? mapData.height : current.customHeight);
+
+      let aspectRatio = mapData.aspectRatio;
+      if (!aspectRatio) {
+        if (shape === 'custom') {
+          if (shape !== current.shape || width !== current.width || height !== current.height || !current.aspectRatio) {
+            aspectRatio = getAspectRatioForShape('custom', width, height);
+          } else {
+            aspectRatio = current.aspectRatio;
+          }
+        } else if (isPreset && mapData.shape) {
+          aspectRatio = getAspectRatioForShape(shape);
+        } else {
+          aspectRatio = current.aspectRatio || getAspectRatioForShape(shape, width, height);
+        }
+      }
+
+      let boundaryShape = mapData.boundaryShape;
+      if (!boundaryShape) {
+        if (current.boundaryShape && current.boundaryShape !== 'custom') {
+          boundaryShape = current.boundaryShape;
+        } else if (shape !== 'custom') {
+          boundaryShape = shape;
+        } else {
+          boundaryShape = 'landscape';
+        }
+      }
+
+      const drawingData = mapData.drawingData !== undefined ? mapData.drawingData : current.drawingData;
+      const layers = Array.isArray(mapData.layers) ? mapData.layers : current.layers;
+
+      const toStore = {
+        shape,
+        width,
+        height,
+        customWidth,
+        customHeight,
+        aspectRatio,
+        boundaryShape,
+        drawingData,
+        layers,
+        updatedAt: Date.now()
+      };
+
+      try {
+        localStorage.setItem(MAP_DATA_KEY, JSON.stringify(toStore));
+      } catch (quotaErr) {
+        console.warn('Map data quota exceeded. Attempting compressed save...', quotaErr);
+        try {
+          const lightLayers = layers.map(l => ({ id: l.id, name: l.name, visible: l.visible, opacity: l.opacity }));
+          const lightStore = { ...toStore, layers: lightLayers };
+          localStorage.setItem(MAP_DATA_KEY, JSON.stringify(lightStore));
+        } catch (_) {
+          const minimalStore = { ...toStore, drawingData: null, layers: [] };
+          localStorage.setItem(MAP_DATA_KEY, JSON.stringify(minimalStore));
+        }
+      }
+      return getMap();
+    } catch (e) {
+      console.warn('Unable to persist map data:', e);
+      return false;
+    }
+  }
+
+  function clearMapDrawing() {
+    try {
+      const current = getMap();
+      saveMap({ ...current, drawingData: null, layers: [] });
       return true;
     } catch {
       return false;
@@ -1746,6 +1932,14 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       const rawNodes = getGraphNodes();
       const rawSections = getAllSections();
       const rawRels = getRelationships();
+      let hasDrawing = false;
+      try {
+        const rawMap = localStorage.getItem(MAP_DATA_KEY);
+        if (rawMap) {
+          const parsed = JSON.parse(rawMap);
+          hasDrawing = !!(parsed && (parsed.drawingData || (Array.isArray(parsed.layers) && parsed.layers.some(l => l && l.dataUrl))));
+        }
+      } catch (_) {}
 
       return (!notes || notes.length === 0) &&
              (!rawPins || rawPins.length === 0) &&
@@ -1755,7 +1949,8 @@ Confidential author reference sheet for character backstories, plot twists, psyc
              (!rawNodes || rawNodes.length === 0) &&
              (!rawSections || rawSections.length === 0) &&
              (!rawRels || rawRels.length === 0) &&
-             !customMap;
+             !customMap &&
+             !hasDrawing;
     } catch {
       return false;
     }
@@ -1764,6 +1959,13 @@ Confidential author reference sheet for character backstories, plot twists, psyc
   function isPristineStarterVault() {
     try {
       if (getCustomMapImage()) return false;
+      try {
+        const rawMap = localStorage.getItem(MAP_DATA_KEY);
+        if (rawMap) {
+          const parsed = JSON.parse(rawMap);
+          if (parsed && (parsed.drawingData || (Array.isArray(parsed.layers) && parsed.layers.some(l => l && l.dataUrl)))) return false;
+        }
+      } catch (_) {}
 
       // 1. Starter Notes
       const notes = (getAllNotes() || []).filter(n => n && typeof n === 'object');
@@ -1874,6 +2076,7 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       relationships: getRelationships(),
       mapShape: getMapShape(),
       mapRegions: getAllMapRegions(),
+      mapData: getMap(),
       graphNodes: getGraphNodes(),
       graphLinks: getGraphLinks(),
       sections: getAllSections(),
@@ -1888,7 +2091,11 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     } catch (e) {
       console.warn('Unable to persist full backup snapshot to localStorage (quota may be exceeded). Trying light snapshot without custom map image...', e);
       try {
-        const lightSnapshot = { ...snapshot, customMapImage: null };
+        const lightSnapshot = {
+          ...snapshot,
+          customMapImage: null,
+          mapData: snapshot.mapData ? { ...snapshot.mapData, drawingData: null, layers: [] } : null
+        };
         localStorage.setItem(BACKUP_KEY, JSON.stringify(lightSnapshot));
         persisted = true;
       } catch (e2) {
@@ -1976,6 +2183,7 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       mapShape: getMapShape(),
       mapRegions: getAllMapRegions(),
       customMapImage: getCustomMapImage(),
+      mapData: getMap(),
       timelineEvents: getTimelineEvents(),
       characters: getCharacters(),
       relationships: getRelationships(),
@@ -2105,6 +2313,8 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       sectionsCount: sections.length,
       mapShape: typeof d.mapShape === 'string' ? d.mapShape : 'landscape',
       hasCustomMap: typeof d.customMapImage === 'string' && !!d.customMapImage,
+      hasDrawing: !!((d.mapData && d.mapData.drawingData) || (typeof d.drawingData === 'string' && d.drawingData)),
+      mapData: (d.mapData && typeof d.mapData === 'object') ? d.mapData : null,
       isSpey: !!val.isSpey,
       raw: d
     };
@@ -2121,6 +2331,7 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       clearAllNotes();
       _saveMapPins([]);
       clearCustomMapImage();
+      clearMapDrawing();
       _saveMapRegions([]);
       _saveTimelineEvents([]);
       _saveCharacters([]);
@@ -2218,6 +2429,13 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       }
       if (typeof d.customMapImage === 'string' && d.customMapImage) {
         saveCustomMapImage(d.customMapImage);
+      }
+      if (d.mapData && typeof d.mapData === 'object') {
+        saveMap(d.mapData);
+      } else if (typeof d.drawingData === 'string') {
+        saveMap({ drawingData: d.drawingData, shape: d.mapShape || 'landscape' });
+      } else if (typeof d.mapShape === 'string') {
+        saveMap({ shape: d.mapShape });
       }
       if (Array.isArray(d.timelineEvents)) {
         _saveTimelineEvents(d.timelineEvents.filter(e => e && typeof e === 'object').map(e => ({
@@ -2335,6 +2553,25 @@ Confidential author reference sheet for character backstories, plot twists, psyc
       // Merge custom map image if current doesn't have one
       if (!getCustomMapImage() && typeof d.customMapImage === 'string' && d.customMapImage) {
         saveCustomMapImage(d.customMapImage);
+      }
+
+      // Merge custom map drawing & dimensions if current doesn't have one
+      if (d.mapData && typeof d.mapData === 'object') {
+        const curMap = getMap();
+        const incomingHasCustom = d.mapData.drawingData || d.mapData.shape !== 'landscape' || (typeof d.mapData.width === 'number' && d.mapData.width !== 1600);
+        if (!curMap.drawingData && incomingHasCustom) {
+          saveMap({
+            ...d.mapData,
+            pins: getAllMapPins(),
+            regions: getAllMapRegions(),
+            customImage: getCustomMapImage()
+          });
+        }
+      } else if (typeof d.drawingData === 'string') {
+        const curMap = getMap();
+        if (!curMap.drawingData) {
+          saveMap({ drawingData: d.drawingData });
+        }
       }
 
       // Merge timeline events with collision remapping & noteId link repair
@@ -2688,6 +2925,12 @@ ${note.body || ''}`;
     getMapRegions: getAllMapRegions,
     saveMapRegion,
     deleteMapRegion,
+    // Map Studio: Custom Dimensions, Sizing, Drawing & Persistence
+    getDimensionsForShape,
+    getAspectRatioForShape,
+    getMap,
+    saveMap,
+    clearMapDrawing,
     // Galaxy Graph: Manual Nodes & Custom Connections
     getGraphNodes,
     saveGraphNode,

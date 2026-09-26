@@ -716,7 +716,7 @@
   </div>
 
   <!-- ───────── World Map & Pin Codex Modal ───────── -->
-  <div id="map-modal" class="modal-overlay map-overlay hidden">
+  <div id="map-modal" class="modal-overlay map-overlay hidden" data-subview="map">
     <div class="map-dialog">
       <div class="map-header">
         <div class="map-title-group">
@@ -750,13 +750,25 @@
               <option value="square">Square (1:1)</option>
               <option value="vertical">Vertical (9:16)</option>
               <option value="oval">Oval Realm</option>
+              <option value="ultrawide">Ultrawide (21:9)</option>
+              <option value="parchment">Classic Parchment (4:3)</option>
+              <option value="custom">Custom Dimensions…</option>
             </select>
+            <button id="btn-map-dimensions" class="btn btn-sm btn-ghost" title="Custom Canvas Dimensions & Sizing">
+              <span>📐 Dimensions</span>
+            </button>
+            <button id="btn-map-paint-mode" class="btn btn-sm btn-ghost" title="Toggle Map Drawing & Painting Studio">
+              <span>🎨 Paint Studio</span>
+            </button>
             <button id="btn-map-draw-region" class="btn btn-sm btn-ghost" title="Draw territory border or political zone">
               <span>Draw Region</span>
             </button>
             <button id="btn-map-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="World Map Guide">Guide</button>
             <button id="btn-map-drop-pin" class="btn btn-sm btn-primary" title="Click to enter pin drop mode or place a pin">
               <span>+ Add Pin</span>
+            </button>
+            <button id="btn-map-export-png" class="btn btn-sm btn-ghost" title="Export Map to High-Res PNG Image">
+              <span>📥 Export</span>
             </button>
             <label class="btn btn-sm btn-ghost map-upload-label" title="Upload custom map image">
               <span>Upload Map</span>
@@ -784,8 +796,107 @@
           <button id="btn-map-cancel-drop" class="btn btn-xs btn-ghost">Cancel</button>
         </div>
 
+        <!-- Map Studio Floating Toolbar (Photoshop for Maps) -->
+        <div id="map-studio-toolbar" class="map-studio-toolbar hidden" role="toolbar" aria-label="Map Studio Tools">
+          <div class="studio-section studio-tools-section">
+            <button type="button" class="studio-btn studio-tool-btn active" data-tool="brush" title="Brush (Freeform Stroke)">🖌️ Brush</button>
+            <button type="button" class="studio-btn studio-tool-btn" data-tool="pencil" title="Pencil (Fine Detail Line)">✏️ Pencil</button>
+            <button type="button" class="studio-btn studio-tool-btn" data-tool="terrain" title="Terrain Sculpting (Mountains, Forests, Hills)">⛰️ Terrain</button>
+            <button type="button" class="studio-btn studio-tool-btn" data-tool="landmass" title="Coastline & Landmass (Fractal Jagged Edge)">🏝️ Coast</button>
+            <button type="button" class="studio-btn studio-tool-btn" data-tool="shape" title="Geometric Shapes (Rect, Ellipse, Line, Polygon)">⬡ Shapes</button>
+            <button type="button" class="studio-btn studio-tool-btn" data-tool="fill" title="Fill Bucket (Flood Fill Ocean / Land)">🪣 Fill</button>
+            <button type="button" class="studio-btn studio-tool-btn" data-tool="eraser" title="Eraser">🧹 Eraser</button>
+          </div>
+
+          <div class="studio-sep"></div>
+
+          <!-- Dynamic Terrain Tool Sub-options -->
+          <div id="studio-terrain-options" class="studio-section studio-sub-options hidden">
+            <label for="studio-terrain-type" class="studio-label">Terrain:</label>
+            <select id="studio-terrain-type" class="form-select form-select-xs studio-select">
+              <option value="mountains">Mountains</option>
+              <option value="hills">Rolling Hills</option>
+              <option value="forest">Forest / Trees</option>
+              <option value="rivers">Winding River</option>
+              <option value="waves">Ocean Waves</option>
+            </select>
+          </div>
+
+          <!-- Dynamic Shape Tool Sub-options -->
+          <div id="studio-shape-options" class="studio-section studio-sub-options hidden">
+            <label for="studio-shape-type" class="studio-label">Shape:</label>
+            <select id="studio-shape-type" class="form-select form-select-xs studio-select">
+              <option value="rect">Rectangle</option>
+              <option value="ellipse">Circle / Ellipse</option>
+              <option value="line">Straight Line</option>
+              <option value="polygon">Custom Polygon</option>
+            </select>
+            <label class="studio-checkbox-label">
+              <input type="checkbox" id="studio-shape-fill" /> Fill
+            </label>
+          </div>
+
+          <div class="studio-sep"></div>
+
+          <!-- Stroke Size & Opacity -->
+          <div class="studio-section studio-prop-section">
+            <label for="studio-brush-size" class="studio-label">Size: <span id="studio-brush-size-val">12</span>px</label>
+            <input type="range" id="studio-brush-size" min="1" max="100" value="12" class="studio-slider" />
+          </div>
+
+          <div class="studio-section studio-prop-section">
+            <label for="studio-brush-opacity" class="studio-label">Opacity: <span id="studio-brush-opacity-val">100</span>%</label>
+            <input type="range" id="studio-brush-opacity" min="5" max="100" value="100" class="studio-slider" />
+          </div>
+
+          <div class="studio-sep"></div>
+
+          <!-- Color Palette -->
+          <div class="studio-section studio-palette-section" title="Fantasy Cartography Palette">
+            <button type="button" class="palette-swatch active" data-color="#111827" style="background:#111827;" title="Obsidian Ink"></button>
+            <button type="button" class="palette-swatch" data-color="#0b1d3a" style="background:#0b1d3a;" title="Abyssal Ocean"></button>
+            <button type="button" class="palette-swatch" data-color="#214e8c" style="background:#214e8c;" title="Coastal Blue"></button>
+            <button type="button" class="palette-swatch" data-color="#e9d8a6" style="background:#e9d8a6;" title="Parchment Land"></button>
+            <button type="button" class="palette-swatch" data-color="#2d6a4f" style="background:#2d6a4f;" title="Wild Forest"></button>
+            <button type="button" class="palette-swatch" data-color="#6c584c" style="background:#6c584c;" title="Stone Mountain"></button>
+            <button type="button" class="palette-swatch" data-color="#f8fafc" style="background:#f8fafc;" title="Glacier Snow"></button>
+            <button type="button" class="palette-swatch" data-color="#dc2626" style="background:#dc2626;" title="Crimson Caldera"></button>
+            <button type="button" class="palette-swatch" data-color="#d97706" style="background:#d97706;" title="Astrolabe Gold"></button>
+            <input type="color" id="studio-custom-color" value="#111827" title="Custom Hex Color" class="studio-color-picker" />
+          </div>
+
+          <div class="studio-sep"></div>
+
+          <!-- History & Layers & Actions -->
+          <div class="studio-section studio-action-section">
+            <button type="button" id="btn-studio-undo" class="icon-btn btn-xs" title="Undo (Ctrl+Z)" disabled>↩</button>
+            <button type="button" id="btn-studio-redo" class="icon-btn btn-xs" title="Redo (Ctrl+Y)" disabled>↪</button>
+            <button type="button" id="btn-studio-layers" class="btn btn-xs btn-ghost" title="Layers Management">📑 Layers (<span id="studio-layer-count">1</span>)</button>
+            <button type="button" id="btn-studio-clear" class="btn btn-xs btn-ghost" title="Clear Drawing Layer">Clear</button>
+            <button type="button" id="btn-studio-bake" class="btn btn-xs btn-ghost" title="Bake drawing to background map">Bake</button>
+            <button type="button" id="btn-studio-done" class="btn btn-xs btn-primary" title="Finish Studio Session">Done</button>
+          </div>
+        </div>
+
+        <!-- Map Layers Panel -->
+        <div id="map-layers-panel" class="map-layers-panel hidden">
+          <div class="map-layers-header">
+            <span class="layers-title font-cinzel">Map Layers</span>
+            <div class="layers-actions">
+              <button type="button" id="btn-add-layer" class="btn btn-xs btn-primary">+ Add Layer</button>
+              <button type="button" id="btn-close-layers" class="icon-btn btn-xs" title="Close Layers">✕</button>
+            </div>
+          </div>
+          <div class="layers-list" id="map-layers-list"></div>
+          <div class="layers-footer">
+            <label for="layer-opacity-slider" class="studio-label">Active Layer Opacity: <span id="layer-opacity-val">100</span>%</label>
+            <input type="range" id="layer-opacity-slider" min="5" max="100" value="100" class="studio-slider" />
+          </div>
+        </div>
+
         <div class="map-stage" id="map-stage" data-shape="landscape">
           <canvas id="map-canvas" width="1600" height="1000"></canvas>
+          <canvas id="map-paint-canvas" class="map-paint-canvas" width="1600" height="1000"></canvas>
           <svg id="map-regions-svg" class="map-regions-svg" viewBox="0 0 1600 1000" preserveAspectRatio="none"></svg>
           <div id="map-pins-container" class="map-pins-container"></div>
         </div>
@@ -883,6 +994,51 @@
       <div class="modal-actions">
         <button id="btn-map-pin-cancel" class="btn btn-ghost">Cancel</button>
         <button id="btn-map-pin-save" class="btn btn-primary">Place Pin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── World Map Dimensions & Sizing Modal ───────── -->
+  <div id="map-dimensions-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="map-dim-title">
+    <div class="modal" style="max-width: 500px;">
+      <h3 class="modal-title font-cinzel" id="map-dim-title">Canvas Dimensions &amp; Shape</h3>
+      <p class="modal-subtitle" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Customize the exact canvas size, aspect ratio, and boundary geometry for your world map.</p>
+
+      <div class="modal-field">
+        <label>Aspect Ratio &amp; Geometry Preset</label>
+        <div class="dimension-preset-pills" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
+          <button type="button" class="filter-pill dim-preset-btn active" data-w="1600" data-h="1000" data-shape="landscape">Landscape 16:9 (1600×1000)</button>
+          <button type="button" class="filter-pill dim-preset-btn" data-w="1200" data-h="1200" data-shape="square">Square 1:1 (1200×1200)</button>
+          <button type="button" class="filter-pill dim-preset-btn" data-w="900" data-h="1600" data-shape="vertical">Vertical 9:16 (900×1600)</button>
+          <button type="button" class="filter-pill dim-preset-btn" data-w="1500" data-h="1050" data-shape="oval">Oval Realm (1500×1050)</button>
+          <button type="button" class="filter-pill dim-preset-btn" data-w="2100" data-h="900" data-shape="ultrawide">Ultrawide 21:9 (2100×900)</button>
+          <button type="button" class="filter-pill dim-preset-btn" data-w="1600" data-h="1200" data-shape="parchment">Classic Parchment 4:3 (1600×1200)</button>
+        </div>
+      </div>
+
+      <div class="modal-field-row" style="display: flex; gap: 12px;">
+        <div class="modal-field" style="flex: 1;">
+          <label for="map-dim-width">Canvas Width (px)</label>
+          <input type="number" id="map-dim-width" min="600" max="4000" step="50" value="1600" />
+        </div>
+        <div class="modal-field" style="flex: 1;">
+          <label for="map-dim-height">Canvas Height (px)</label>
+          <input type="number" id="map-dim-height" min="600" max="4000" step="50" value="1000" />
+        </div>
+      </div>
+
+      <div class="modal-field">
+        <label for="map-dim-shape-frame">Boundary Shape Frame</label>
+        <select id="map-dim-shape-frame">
+          <option value="landscape" selected>Rectangular / Landscape</option>
+          <option value="oval">Oval Realm / Circular Vignette</option>
+          <option value="parchment">Antique Deckled Parchment</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" id="btn-map-dim-cancel" class="btn btn-ghost">Cancel</button>
+        <button type="button" id="btn-map-dim-apply" class="btn btn-primary">Apply Dimensions</button>
       </div>
     </div>
   </div>

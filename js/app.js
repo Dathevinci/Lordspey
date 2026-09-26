@@ -19,6 +19,7 @@
     '#preview-pane': '#preview-pane, #note-preview, .preview-pane',
     '.split-view': '.split-view, .split-mode',
     '.focus-mode': '.focus-mode, .zen-mode',
+    '#subview-map': '#map-modal, #subview-map, [data-subview="map"]',
   };
 
   const $ = (s, ctx = document) => {
@@ -156,6 +157,42 @@
   const btnMapRegionDetailClose  = $('#btn-map-region-detail-close');
   const btnMapRegionDetailEdit   = $('#btn-map-region-detail-edit');
   const btnMapRegionDetailDelete = $('#btn-map-region-detail-delete');
+
+  // Map Studio & Custom Sizing Elements
+  const mapPaintCanvas         = $('#map-paint-canvas');
+  const btnMapDimensions       = $('#btn-map-dimensions');
+  const btnMapPaintMode        = $('#btn-map-paint-mode');
+  const btnMapExportPng        = $('#btn-map-export-png');
+  const mapStudioToolbar       = $('#map-studio-toolbar');
+  const mapLayersPanel         = $('#map-layers-panel');
+  const btnStudioLayers        = $('#btn-studio-layers');
+  const btnCloseLayers         = $('#btn-close-layers');
+  const btnAddLayer            = $('#btn-add-layer');
+  const mapLayersList          = $('#map-layers-list');
+  const layerOpacitySlider     = $('#layer-opacity-slider');
+  const layerOpacityVal        = $('#layer-opacity-val');
+  const studioBrushSize        = $('#studio-brush-size');
+  const studioBrushSizeVal     = $('#studio-brush-size-val');
+  const studioBrushOpacity     = $('#studio-brush-opacity');
+  const studioBrushOpacityVal  = $('#studio-brush-opacity-val');
+  const studioTerrainOptions   = $('#studio-terrain-options');
+  const studioTerrainType      = $('#studio-terrain-type');
+  const studioShapeOptions     = $('#studio-shape-options');
+  const studioShapeType        = $('#studio-shape-type');
+  const studioShapeFill        = $('#studio-shape-fill');
+  const studioCustomColor      = $('#studio-custom-color');
+  const btnStudioUndo          = $('#btn-studio-undo');
+  const btnStudioRedo          = $('#btn-studio-redo');
+  const btnStudioClear         = $('#btn-studio-clear');
+  const btnStudioBake          = $('#btn-studio-bake');
+  const btnStudioDone          = $('#btn-studio-done');
+  const studioLayerCount       = $('#studio-layer-count');
+  const mapDimensionsModal     = $('#map-dimensions-modal');
+  const mapDimWidth            = $('#map-dim-width');
+  const mapDimHeight           = $('#map-dim-height');
+  const mapDimShapeFrame       = $('#map-dim-shape-frame');
+  const btnMapDimCancel        = $('#btn-map-dim-cancel');
+  const btnMapDimApply         = $('#btn-map-dim-apply');
 
   // 4. Galaxy Graph: Manual Nodes & Custom Connections
   const btnGraphAddNode       = $('#btn-graph-add-node');
@@ -627,6 +664,26 @@
   let mapTouchDist           = 0;
   let mapTouchZoom           = 1;
   let pendingPinClick        = { x: 50, y: 50 };
+
+  // Map Studio State (Photoshop for Maps)
+  let isMapStudioActive      = false;
+  let isSpacePressed         = false;
+  let studioCurrentTool      = 'brush';
+  let studioBrushColor       = '#111827';
+  let studioBrushRadius      = 12;
+  let studioBrushAlpha       = 1.0;
+  let studioTerrainStyle     = 'mountains';
+  let studioShapeKind        = 'rect';
+  let studioShapeShouldFill  = false;
+  let isStudioDrawing        = false;
+  let studioStartPos         = { x: 0, y: 0 };
+  let studioPrevPos          = { x: 0, y: 0 };
+  let studioPolygonPoints    = [];
+  let mapStudioLayers        = [];
+  let activeStudioLayerId    = null;
+  let studioUndoStack        = [];
+  let studioRedoStack        = [];
+  const MAX_STUDIO_UNDO_DEPTH = 25;
 
   let timelineMode           = 'rail';
   let timelineFilter         = 'all';
@@ -5999,6 +6056,7 @@
   function initWorldbuildingSystems() {
     initMapControls();
     initMapShapeAndRegions();
+    initMapStudio();
     initTimelineControls();
     initCodexControls();
     initCodexImageUpload();
@@ -6044,7 +6102,11 @@
     if (btnMapResetImg) {
       btnMapResetImg.addEventListener('click', () => {
         Storage.clearCustomMapImage();
+        if (Storage.clearMapDrawing) Storage.clearMapDrawing();
         clearMapImageElement();
+        if (typeof clearActiveLayer === 'function') {
+          clearActiveLayer();
+        }
         renderDefaultMap();
         toast('Reset to default cartography map', 'info');
       });
@@ -6228,6 +6290,15 @@
       mapPinPreview.style.display = 'none';
     }
 
+    const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+    const shape = curMap.shape || (Storage.getMapShape ? Storage.getMapShape() : 'landscape') || 'landscape';
+    if (typeof setMapCanvasShape === 'function') {
+      setMapCanvasShape(shape, curMap.width, curMap.height, curMap.boundaryShape);
+    }
+    if (mapShapeSelect) {
+      mapShapeSelect.value = shape;
+    }
+
     resetMapCamera();
 
     const customImg = Storage.getCustomMapImage();
@@ -6240,6 +6311,10 @@
 
     renderMapPins();
     renderMapRegions();
+
+    if (typeof renderCompositeLayers === 'function') {
+      renderCompositeLayers();
+    }
   }
 
   function closeMapView() {
@@ -6251,6 +6326,11 @@
       mapPinPreview.style.display = 'none';
     }
     if (mapTutorialModal) mapTutorialModal.classList.add('hidden');
+    if (mapDimensionsModal) mapDimensionsModal.classList.add('hidden');
+    if (mapLayersPanel) mapLayersPanel.classList.add('hidden');
+    if (isMapStudioActive && typeof toggleMapStudio === 'function') {
+      toggleMapStudio(false);
+    }
     isMapPlacementMode = false;
     updateMapPlacementUI();
   }
@@ -6258,10 +6338,12 @@
   function resetMapCamera() {
     if (!mapViewport || !mapStage) return;
     const vpRect = mapViewport.getBoundingClientRect ? mapViewport.getBoundingClientRect() : { width: 1000, height: 700 };
-    const scale = Math.min((vpRect.width - 40) / 1600, (vpRect.height - 40) / 1000, 1);
+    const curW = mapCanvas ? (mapCanvas.width || 1600) : 1600;
+    const curH = mapCanvas ? (mapCanvas.height || 1000) : 1000;
+    const scale = Math.min((vpRect.width - 40) / curW, (vpRect.height - 40) / curH, 1);
     mapCamera.zoom = Math.max(0.3, scale);
-    mapCamera.x = (vpRect.width - 1600 * mapCamera.zoom) / 2;
-    mapCamera.y = (vpRect.height - 1000 * mapCamera.zoom) / 2;
+    mapCamera.x = (vpRect.width - curW * mapCamera.zoom) / 2;
+    mapCamera.y = (vpRect.height - curH * mapCamera.zoom) / 2;
     applyMapTransform();
   }
 
@@ -6318,17 +6400,15 @@
     const ctx = mapCanvas.getContext('2d');
     if (!ctx) return;
 
-    const w = 1600;
-    const h = 1000;
-    mapCanvas.width = w;
-    mapCanvas.height = h;
+    const w = (mapCanvas && mapCanvas.width) ? mapCanvas.width : 1600;
+    const h = (mapCanvas && mapCanvas.height) ? mapCanvas.height : 1000;
 
     const isLight = currentBaseTheme === 'light';
     const isSepia = currentBaseTheme === 'sepia';
 
     // Background cosmic ocean / parchment sea
     if (ctx.createRadialGradient) {
-      const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, 900);
+      const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, Math.max(w, h) * 0.6);
       if (isLight) {
         bgGrad.addColorStop(0, '#f8fafc');
         bgGrad.addColorStop(0.6, '#edf2f7');
@@ -6376,15 +6456,18 @@
     }
     if (ctx.setLineDash) ctx.setLineDash([]);
 
-    // Outer border
+    // Outer border & Cartographic Features (proportional scaling to fit any canvas aspect ratio & dimensions)
+    if (ctx.save) ctx.save();
+    if (ctx.scale) ctx.scale(w / 1600, h / 1000);
+
     ctx.strokeStyle = mapGlowColor;
     ctx.lineWidth = 2;
-    if (ctx.strokeRect) ctx.strokeRect(20, 20, w - 40, h - 40);
+    if (ctx.strokeRect) ctx.strokeRect(20, 20, 1600 - 40, 1000 - 40);
     ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.08)' : isSepia ? 'rgba(90, 60, 30, 0.12)' : 'rgba(255, 255, 255, 0.08)';
-    if (ctx.strokeRect) ctx.strokeRect(28, 28, w - 56, h - 56);
+    if (ctx.strokeRect) ctx.strokeRect(28, 28, 1600 - 56, 1000 - 56);
 
     // Decorative corner diamond runes
-    const corners = [[20, 20], [w - 20, 20], [20, h - 20], [w - 20, h - 20]];
+    const corners = [[20, 20], [1600 - 20, 20], [20, 1000 - 20], [1600 - 20, 1000 - 20]];
     ctx.fillStyle = mapAccentColor;
     corners.forEach(([cx, cy]) => {
       ctx.beginPath();
@@ -6532,6 +6615,7 @@
       ctx.fillText('THE BLEEDING CHASM', 720, 620);
       ctx.fillText('SUNLESS ARCHIPELAGO', 780, 920);
     }
+    if (ctx.restore) ctx.restore();
     if (ctx.restore) ctx.restore();
   }
 
@@ -6695,6 +6779,14 @@
   }
 
   function onMapMouseDown(e) {
+    if (isMapStudioActive) {
+      if (e.button === 1 || e.spaceKey || isSpacePressed) {
+        isMapPanning = true;
+        mapPanStart = { x: e.clientX - mapCamera.x, y: e.clientY - mapCamera.y };
+        if (mapViewport) mapViewport.classList.add('panning');
+      }
+      return;
+    }
     if (e.button !== undefined && e.button !== 0) return;
     if (isMapPlacementMode) {
       return;
@@ -8233,22 +8325,34 @@
 
   // ── 3. World Map Shapes & Territory Regions ──
   function initMapShapeAndRegions() {
-    const savedShape = (Storage.getMapShape ? Storage.getMapShape() : 'landscape') || 'landscape';
+    const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+    const savedShape = curMap.shape || (Storage.getMapShape ? Storage.getMapShape() : 'landscape') || 'landscape';
     if (mapShapeSelect) {
       mapShapeSelect.value = savedShape;
       mapShapeSelect.addEventListener('change', () => {
         const shape = mapShapeSelect.value;
-        setMapCanvasShape(shape);
-        if (Storage.saveMapShape) Storage.saveMapShape(shape);
+        if (shape === 'custom') {
+          openMapDimensionsModal();
+        } else {
+          setMapCanvasShape(shape);
+          if (Storage.saveMapShape) Storage.saveMapShape(shape);
+          if (Storage.saveMap) Storage.saveMap({ shape });
+        }
       });
     }
-    setMapCanvasShape(savedShape);
+
+    if (savedShape === 'custom') {
+      setMapCanvasShape('custom', curMap.width, curMap.height, curMap.boundaryShape);
+    } else {
+      setMapCanvasShape(savedShape);
+    }
 
     if (btnMapDrawRegion) {
       btnMapDrawRegion.addEventListener('click', () => {
         isMapRegionDrawingMode = !isMapRegionDrawingMode;
         currentMapRegionPoints = [];
         if (isMapRegionDrawingMode) {
+          if (isMapStudioActive) toggleMapStudio(false);
           btnMapDrawRegion.classList.add('active');
           btnMapDrawRegion.classList.remove('btn-ghost');
           btnMapDrawRegion.classList.add('btn-primary');
@@ -8288,9 +8392,10 @@
     renderMapRegions();
   }
 
-  function setMapCanvasShape(shape) {
+  function setMapCanvasShape(shape, customW, customH, boundaryFrame) {
     if (!mapStage) return;
-    const validShape = ['landscape', 'square', 'vertical', 'oval'].includes(shape) ? shape : 'landscape';
+    const validShapes = ['landscape', 'square', 'vertical', 'oval', 'ultrawide', 'parchment', 'custom'];
+    const validShape = validShapes.includes(shape) ? shape : 'landscape';
     mapStage.dataset.shape = validShape;
     let w = 1600;
     let h = 1000;
@@ -8300,6 +8405,36 @@
       w = 900; h = 1600;
     } else if (validShape === 'oval') {
       w = 1500; h = 1050;
+    } else if (validShape === 'ultrawide') {
+      w = 2100; h = 900;
+    } else if (validShape === 'parchment') {
+      w = 1600; h = 1200;
+    } else if (validShape === 'custom') {
+      w = (typeof customW === 'number' && customW >= 100) ? customW : 1600;
+      h = (typeof customH === 'number' && customH >= 100) ? customH : 1000;
+      mapStage.style.width = `${w}px`;
+      mapStage.style.height = `${h}px`;
+      if (boundaryFrame === 'oval') {
+        mapStage.style.borderRadius = '50%';
+        mapStage.style.boxShadow = '0 0 60px rgba(0, 0, 0, 0.7), inset 0 0 50px rgba(0, 0, 0, 0.4)';
+        mapStage.style.overflow = 'hidden';
+      } else if (boundaryFrame === 'parchment') {
+        mapStage.style.borderRadius = 'var(--radius-lg, 12px)';
+        mapStage.style.boxShadow = '0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 40px rgba(180, 140, 80, 0.15)';
+        mapStage.style.overflow = '';
+      } else {
+        mapStage.style.borderRadius = 'var(--radius-md, 8px)';
+        mapStage.style.boxShadow = '';
+        mapStage.style.overflow = '';
+      }
+    }
+
+    if (validShape !== 'custom') {
+      mapStage.style.width = '';
+      mapStage.style.height = '';
+      mapStage.style.borderRadius = '';
+      mapStage.style.boxShadow = '';
+      mapStage.style.overflow = '';
     }
 
     if (mapCanvas) {
@@ -8310,8 +8445,16 @@
       mapRegionsSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
     }
 
+    if (typeof resizeDrawingCanvas === 'function') {
+      resizeDrawingCanvas(w, h);
+    }
+
     if (mapModal && !mapModal.classList.contains('hidden') && typeof document.createElement === 'function' && mapCanvas && typeof mapCanvas.getContext === 'function') {
-      if (!Storage.getCustomMapImage || !Storage.getCustomMapImage()) {
+      const customImg = Storage.getCustomMapImage ? Storage.getCustomMapImage() : null;
+      if (customImg && typeof customImg === 'string' && customImg.trim().length > 0) {
+        loadMapImage(customImg);
+      } else {
+        clearMapImageElement();
         renderDefaultMap();
       }
       renderMapRegions();
@@ -8508,6 +8651,1696 @@
       mapModalNoteSelect.innerHTML = `<option value="">-- No linked note (standalone pin) --</option>` +
         notes.map(n => `<option value="${n.id}" ${n.id === pin.noteId ? 'selected' : ''}>${escText(n.title)} (${n.category})</option>`).join('');
     }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // ── 3B. Map Studio: Creative Freedom, Custom Dimensions & Painting Tools ──
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  function ensurePaintCanvas() {
+    if (!mapPaintCanvas) return;
+    const curW = mapCanvas ? (mapCanvas.width || 1600) : 1600;
+    const curH = mapCanvas ? (mapCanvas.height || 1000) : 1000;
+    if (mapPaintCanvas.width !== curW) mapPaintCanvas.width = curW;
+    if (mapPaintCanvas.height !== curH) mapPaintCanvas.height = curH;
+  }
+
+  function createLayerCanvas(w, h) {
+    if (typeof document === 'undefined' || typeof document.createElement !== 'function') return null;
+    try {
+      const c = document.createElement('canvas');
+      c.width = w || (mapCanvas ? mapCanvas.width : 1600);
+      c.height = h || (mapCanvas ? mapCanvas.height : 1000);
+      return c;
+    } catch {
+      return null;
+    }
+  }
+
+  function initMapLayers() {
+    ensurePaintCanvas();
+    const w = mapPaintCanvas ? mapPaintCanvas.width : 1600;
+    const h = mapPaintCanvas ? mapPaintCanvas.height : 1000;
+    const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+
+    mapStudioLayers = [];
+
+    if (Array.isArray(curMap.layers) && curMap.layers.length > 0) {
+      curMap.layers.forEach((l, idx) => {
+        const c = createLayerCanvas(w, h);
+        if (c && l.dataUrl && typeof Image !== 'undefined') {
+          const img = new Image();
+          img.onload = () => {
+            if (c && typeof c.getContext === 'function') {
+              const ctx = c.getContext('2d');
+              if (ctx && typeof ctx.drawImage === 'function') {
+                ctx.drawImage(img, 0, 0);
+                renderCompositeLayers();
+              }
+            }
+          };
+          img.src = l.dataUrl;
+        }
+        mapStudioLayers.push({
+          id: l.id || `layer_${idx + 1}`,
+          name: l.name || `Layer ${idx + 1}`,
+          visible: l.visible !== false,
+          opacity: typeof l.opacity === 'number' ? l.opacity : 1.0,
+          canvas: c
+        });
+      });
+    } else if (curMap.drawingData && typeof Image !== 'undefined') {
+      const c = createLayerCanvas(w, h);
+      if (c) {
+        const img = new Image();
+        img.onload = () => {
+          if (c && typeof c.getContext === 'function') {
+            const ctx = c.getContext('2d');
+            if (ctx && typeof ctx.drawImage === 'function') {
+              ctx.drawImage(img, 0, 0);
+              renderCompositeLayers();
+            }
+          }
+        };
+        img.src = curMap.drawingData;
+      }
+      mapStudioLayers.push({
+        id: 'layer_1',
+        name: 'Landmass & Geography',
+        visible: true,
+        opacity: 1.0,
+        canvas: c
+      });
+    } else {
+      mapStudioLayers.push({
+        id: 'layer_1',
+        name: 'Base Landmass',
+        visible: true,
+        opacity: 1.0,
+        canvas: createLayerCanvas(w, h)
+      });
+    }
+
+    activeStudioLayerId = mapStudioLayers[0] ? mapStudioLayers[0].id : null;
+    renderCompositeLayers();
+    renderLayersPanel();
+    updateUndoRedoButtons();
+  }
+
+  function getActiveStudioLayer() {
+    if (!mapStudioLayers || mapStudioLayers.length === 0) return null;
+    return mapStudioLayers.find(l => l.id === activeStudioLayerId) || mapStudioLayers[0];
+  }
+
+  function getActiveLayerContext() {
+    const layer = getActiveStudioLayer();
+    if (!layer || !layer.canvas || typeof layer.canvas.getContext !== 'function') return null;
+    return layer.canvas.getContext('2d');
+  }
+
+  function renderCompositeLayers() {
+    if (!mapPaintCanvas || typeof mapPaintCanvas.getContext !== 'function') return;
+    const ctx = mapPaintCanvas.getContext('2d');
+    if (!ctx) return;
+    if (typeof ctx.clearRect === 'function') {
+      ctx.clearRect(0, 0, mapPaintCanvas.width, mapPaintCanvas.height);
+    }
+
+    if (!Array.isArray(mapStudioLayers)) return;
+
+    for (const layer of mapStudioLayers) {
+      if (!layer.visible || !layer.canvas) continue;
+      if (typeof ctx.save === 'function') ctx.save();
+      ctx.globalAlpha = typeof layer.opacity === 'number' ? layer.opacity : 1.0;
+      if (typeof ctx.drawImage === 'function') {
+        ctx.drawImage(layer.canvas, 0, 0);
+      }
+      if (typeof ctx.restore === 'function') ctx.restore();
+    }
+  }
+
+  function saveUndoSnapshot() {
+    if (studioUndoStack.length >= MAX_STUDIO_UNDO_DEPTH) {
+      studioUndoStack.shift();
+    }
+    const snapshot = mapStudioLayers.map(l => {
+      let imgData = null;
+      if (l.canvas && typeof l.canvas.getContext === 'function') {
+        const ctx = l.canvas.getContext('2d');
+        if (ctx && typeof ctx.getImageData === 'function') {
+          try {
+            imgData = ctx.getImageData(0, 0, l.canvas.width, l.canvas.height);
+          } catch (_) {}
+        }
+      }
+      return {
+        id: l.id,
+        name: l.name,
+        visible: l.visible,
+        opacity: l.opacity,
+        imageData: imgData,
+        dataUrl: (l.canvas && typeof l.canvas.toDataURL === 'function') ? l.canvas.toDataURL() : null
+      };
+    });
+    studioUndoStack.push({
+      activeLayerId: activeStudioLayerId,
+      layers: snapshot
+    });
+    studioRedoStack = [];
+    updateUndoRedoButtons();
+  }
+
+  function undoStudioStroke() {
+    if (studioUndoStack.length === 0) return;
+    studioPolygonPoints = [];
+    const currentSnapshot = mapStudioLayers.map(l => {
+      let imgData = null;
+      if (l.canvas && typeof l.canvas.getContext === 'function') {
+        const ctx = l.canvas.getContext('2d');
+        if (ctx && typeof ctx.getImageData === 'function') {
+          try {
+            imgData = ctx.getImageData(0, 0, l.canvas.width, l.canvas.height);
+          } catch (_) {}
+        }
+      }
+      return {
+        id: l.id,
+        name: l.name,
+        visible: l.visible,
+        opacity: l.opacity,
+        imageData: imgData,
+        dataUrl: (l.canvas && typeof l.canvas.toDataURL === 'function') ? l.canvas.toDataURL() : null
+      };
+    });
+    studioRedoStack.push({
+      activeLayerId: activeStudioLayerId,
+      layers: currentSnapshot
+    });
+
+    const prevState = studioUndoStack.pop();
+    restoreStudioState(prevState);
+    updateUndoRedoButtons();
+    persistStudioDrawing();
+  }
+
+  function redoStudioStroke() {
+    if (studioRedoStack.length === 0) return;
+    studioPolygonPoints = [];
+    const currentSnapshot = mapStudioLayers.map(l => {
+      let imgData = null;
+      if (l.canvas && typeof l.canvas.getContext === 'function') {
+        const ctx = l.canvas.getContext('2d');
+        if (ctx && typeof ctx.getImageData === 'function') {
+          try {
+            imgData = ctx.getImageData(0, 0, l.canvas.width, l.canvas.height);
+          } catch (_) {}
+        }
+      }
+      return {
+        id: l.id,
+        name: l.name,
+        visible: l.visible,
+        opacity: l.opacity,
+        imageData: imgData,
+        dataUrl: (l.canvas && typeof l.canvas.toDataURL === 'function') ? l.canvas.toDataURL() : null
+      };
+    });
+    studioUndoStack.push({
+      activeLayerId: activeStudioLayerId,
+      layers: currentSnapshot
+    });
+
+    const nextState = studioRedoStack.pop();
+    restoreStudioState(nextState);
+    updateUndoRedoButtons();
+    persistStudioDrawing();
+  }
+
+  function restoreStudioState(state) {
+    if (!state || !Array.isArray(state.layers)) return;
+    const w = mapPaintCanvas ? mapPaintCanvas.width : 1600;
+    const h = mapPaintCanvas ? mapPaintCanvas.height : 1000;
+    mapStudioLayers = state.layers.map(sl => {
+      const c = createLayerCanvas(w, h);
+      if (c && typeof c.getContext === 'function') {
+        const ctx = c.getContext('2d');
+        if (ctx && sl.imageData && typeof ctx.putImageData === 'function') {
+          try {
+            ctx.putImageData(sl.imageData, 0, 0);
+          } catch (_) {}
+        } else if (ctx && sl.dataUrl && typeof Image !== 'undefined') {
+          const img = new Image();
+          img.onload = () => {
+            if (ctx && typeof ctx.drawImage === 'function') {
+              ctx.drawImage(img, 0, 0);
+              renderCompositeLayers();
+            }
+          };
+          img.src = sl.dataUrl;
+        }
+      }
+      return {
+        id: sl.id,
+        name: sl.name,
+        visible: sl.visible !== false,
+        opacity: typeof sl.opacity === 'number' ? sl.opacity : 1.0,
+        canvas: c
+      };
+    });
+    activeStudioLayerId = state.activeLayerId || (mapStudioLayers[0] && mapStudioLayers[0].id);
+    renderCompositeLayers();
+    renderLayersPanel();
+  }
+
+  function updateUndoRedoButtons() {
+    if (btnStudioUndo) {
+      btnStudioUndo.disabled = studioUndoStack.length === 0;
+    }
+    if (btnStudioRedo) {
+      btnStudioRedo.disabled = studioRedoStack.length === 0;
+    }
+  }
+
+  function persistStudioDrawing() {
+    if (!mapPaintCanvas) return;
+    try {
+      const drawingData = (typeof mapPaintCanvas.toDataURL === 'function') ? mapPaintCanvas.toDataURL() : null;
+      const serializedLayers = mapStudioLayers.map(l => ({
+        id: l.id,
+        name: l.name,
+        visible: l.visible,
+        opacity: l.opacity,
+        dataUrl: (l.canvas && typeof l.canvas.toDataURL === 'function') ? l.canvas.toDataURL() : null
+      }));
+      if (Storage.saveMap) {
+        Storage.saveMap({
+          drawingData,
+          layers: serializedLayers
+        });
+      }
+    } catch (err) {
+      console.warn('Map Studio: Could not persist drawing', err);
+    }
+  }
+
+  function resizeDrawingCanvas(newW, newH) {
+    if (!mapPaintCanvas) return;
+    const oldW = mapPaintCanvas.width || 1600;
+    const oldH = mapPaintCanvas.height || 1000;
+    if (oldW === newW && oldH === newH) return;
+
+    mapPaintCanvas.width = newW;
+    mapPaintCanvas.height = newH;
+
+    if (mapStudioLayers && mapStudioLayers.length > 0) {
+      mapStudioLayers.forEach(layer => {
+        if (!layer.canvas) return;
+        const temp = createLayerCanvas(oldW, oldH);
+        if (temp && typeof temp.getContext === 'function' && typeof layer.canvas.getContext === 'function') {
+          const tctx = temp.getContext('2d');
+          if (tctx && typeof tctx.drawImage === 'function') {
+            tctx.drawImage(layer.canvas, 0, 0);
+          }
+          layer.canvas.width = newW;
+          layer.canvas.height = newH;
+          const lctx = layer.canvas.getContext('2d');
+          if (lctx && typeof lctx.drawImage === 'function') {
+            lctx.drawImage(temp, 0, 0);
+          }
+        } else {
+          layer.canvas.width = newW;
+          layer.canvas.height = newH;
+        }
+      });
+    }
+    renderCompositeLayers();
+    persistStudioDrawing();
+  }
+
+  function getCanvasCoordinates(e) {
+    const target = mapPaintCanvas || mapStage;
+    if (!target) return { x: 0, y: 0 };
+    const rect = (target.getBoundingClientRect && typeof target.getBoundingClientRect === 'function')
+      ? target.getBoundingClientRect()
+      : { left: 0, top: 0, width: 1600, height: 1000 };
+    const touch = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+    const clientX = e.clientX !== undefined ? e.clientX : (touch ? touch.clientX : 0);
+    const clientY = e.clientY !== undefined ? e.clientY : (touch ? touch.clientY : 0);
+    const w = mapPaintCanvas ? (mapPaintCanvas.width || 1600) : 1600;
+    const h = mapPaintCanvas ? (mapPaintCanvas.height || 1000) : 1000;
+    const rectW = rect.width || 1;
+    const rectH = rect.height || 1;
+    const x = Math.max(0, Math.min(w, ((clientX - rect.left) / rectW) * w));
+    const y = Math.max(0, Math.min(h, ((clientY - rect.top) / rectH) * h));
+    return { x, y };
+  }
+
+  function handleStudioPointerDown(e) {
+    if (!isMapStudioActive) return;
+    if (e.button === 1 || e.spaceKey || isSpacePressed) return;
+    if (e.button !== undefined && e.button !== 0) return;
+
+    if (e.preventDefault && typeof e.preventDefault === 'function') e.preventDefault();
+    if (e.stopPropagation && typeof e.stopPropagation === 'function') e.stopPropagation();
+
+    const pos = getCanvasCoordinates(e);
+
+    if (studioCurrentTool === 'fill') {
+      saveUndoSnapshot();
+      floodFillAtPoint(pos.x, pos.y);
+      persistStudioDrawing();
+      renderCompositeLayers();
+      return;
+    }
+
+    if (studioCurrentTool === 'shape' && studioShapeKind === 'polygon') {
+      if (studioPolygonPoints.length === 0) {
+        saveUndoSnapshot();
+      } else if (studioPolygonPoints.length >= 3) {
+        const start = studioPolygonPoints[0];
+        const dist = Math.hypot(pos.x - start.x, pos.y - start.y);
+        if (dist < 20) {
+          finishPolygonDrawing();
+          return;
+        }
+      }
+      studioPolygonPoints.push(pos);
+      renderPolygonPreview(pos);
+      return;
+    }
+
+    isStudioDrawing = true;
+    studioStartPos = { x: pos.x, y: pos.y };
+    studioPrevPos = { x: pos.x, y: pos.y };
+    saveUndoSnapshot();
+
+    if (studioCurrentTool === 'terrain') {
+      stampTerrainFeature(pos);
+      renderCompositeLayers();
+    } else if (studioCurrentTool === 'brush') {
+      drawBrushStroke(pos, pos);
+      renderCompositeLayers();
+    } else if (studioCurrentTool === 'pencil') {
+      drawPencilStroke(pos, pos);
+      renderCompositeLayers();
+    } else if (studioCurrentTool === 'eraser') {
+      drawEraserStroke(pos, pos);
+      renderCompositeLayers();
+    } else if (studioCurrentTool === 'landmass') {
+      drawLandmassStroke(pos, pos);
+      renderCompositeLayers();
+    }
+  }
+
+  function handleStudioPointerMove(e) {
+    if (!isMapStudioActive) return;
+
+    if (studioCurrentTool === 'shape' && studioShapeKind === 'polygon') {
+      if (studioPolygonPoints.length > 0) {
+        const pos = getCanvasCoordinates(e);
+        renderPolygonPreview(pos);
+      }
+      return;
+    }
+
+    if (!isStudioDrawing) return;
+    if (e.preventDefault && typeof e.preventDefault === 'function') e.preventDefault();
+
+    const pos = getCanvasCoordinates(e);
+
+    if (studioCurrentTool === 'shape') {
+      renderShapeLivePreview(studioStartPos, pos);
+      return;
+    }
+
+    if (studioCurrentTool === 'terrain') {
+      const d = Math.hypot(pos.x - studioPrevPos.x, pos.y - studioPrevPos.y);
+      const spacing = Math.max(16, studioBrushRadius * 1.5);
+      if (d >= spacing) {
+        stampTerrainFeature(pos, studioPrevPos);
+        studioPrevPos = pos;
+        renderCompositeLayers();
+      }
+      return;
+    }
+
+    if (studioCurrentTool === 'brush') {
+      drawBrushStroke(studioPrevPos, pos);
+      studioPrevPos = pos;
+      renderCompositeLayers();
+    } else if (studioCurrentTool === 'pencil') {
+      drawPencilStroke(studioPrevPos, pos);
+      studioPrevPos = pos;
+      renderCompositeLayers();
+    } else if (studioCurrentTool === 'eraser') {
+      drawEraserStroke(studioPrevPos, pos);
+      studioPrevPos = pos;
+      renderCompositeLayers();
+    } else if (studioCurrentTool === 'landmass') {
+      drawLandmassStroke(studioPrevPos, pos);
+      studioPrevPos = pos;
+      renderCompositeLayers();
+    }
+  }
+
+  function handleStudioPointerUp(e) {
+    if (!isMapStudioActive) return;
+    if (!isStudioDrawing) return;
+    isStudioDrawing = false;
+
+    const pos = getCanvasCoordinates(e);
+
+    if (studioCurrentTool === 'shape' && studioShapeKind !== 'polygon') {
+      commitShape(studioStartPos, pos);
+    }
+
+    renderCompositeLayers();
+    persistStudioDrawing();
+  }
+
+  function drawBrushStroke(p1, p2) {
+    const ctx = getActiveLayerContext();
+    if (!ctx) return;
+    if (typeof ctx.save === 'function') ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = studioBrushColor;
+    ctx.fillStyle = studioBrushColor;
+    ctx.lineWidth = studioBrushRadius;
+    ctx.globalAlpha = studioBrushAlpha;
+    if (typeof ctx.beginPath === 'function') {
+      ctx.beginPath();
+      if (p1.x === p2.x && p1.y === p2.y) {
+        if (typeof ctx.arc === 'function') {
+          ctx.arc(p1.x, p1.y, Math.max(1, studioBrushRadius / 2), 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x + 0.01, p2.y);
+          ctx.stroke();
+        }
+      } else {
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+      }
+    }
+    if (typeof ctx.restore === 'function') ctx.restore();
+  }
+
+  function drawPencilStroke(p1, p2) {
+    const ctx = getActiveLayerContext();
+    if (!ctx) return;
+    if (typeof ctx.save === 'function') ctx.save();
+    ctx.lineCap = 'butt';
+    ctx.lineJoin = 'miter';
+    ctx.strokeStyle = studioBrushColor;
+    ctx.fillStyle = studioBrushColor;
+    ctx.lineWidth = Math.min(2, Math.max(1, Math.round(studioBrushRadius / 6)));
+    ctx.globalAlpha = studioBrushAlpha;
+    if (typeof ctx.beginPath === 'function') {
+      ctx.beginPath();
+      if (p1.x === p2.x && p1.y === p2.y) {
+        if (typeof ctx.fillRect === 'function') {
+          ctx.fillRect(Math.floor(p1.x), Math.floor(p1.y), 1, 1);
+        } else {
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x + 0.01, p2.y);
+          ctx.stroke();
+        }
+      } else {
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+      }
+    }
+    if (typeof ctx.restore === 'function') ctx.restore();
+  }
+
+  function drawEraserStroke(p1, p2) {
+    const ctx = getActiveLayerContext();
+    if (!ctx) return;
+    if (typeof ctx.save === 'function') ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(0,0,0,1)';
+    ctx.fillStyle = 'rgba(0,0,0,1)';
+    ctx.lineWidth = studioBrushRadius * 1.5;
+    if (typeof ctx.beginPath === 'function') {
+      ctx.beginPath();
+      if (p1.x === p2.x && p1.y === p2.y) {
+        if (typeof ctx.arc === 'function') {
+          ctx.arc(p1.x, p1.y, Math.max(1, (studioBrushRadius * 1.5) / 2), 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x + 0.01, p2.y);
+          ctx.stroke();
+        }
+      } else {
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+      }
+    }
+    if (typeof ctx.restore === 'function') ctx.restore();
+  }
+
+  function drawLandmassStroke(p1, p2) {
+    const ctx = getActiveLayerContext();
+    if (!ctx) return;
+    const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+    if (dist < 2) return;
+    const segments = Math.max(1, Math.floor(dist / 14));
+    const dx = (p2.x - p1.x) / segments;
+    const dy = (p2.y - p1.y) / segments;
+    const perpX = -dy;
+    const perpY = dx;
+    const len = Math.hypot(perpX, perpY) || 1;
+    const nx = perpX / len;
+    const ny = perpY / len;
+
+    if (typeof ctx.save === 'function') ctx.save();
+    ctx.strokeStyle = studioBrushColor;
+    ctx.lineWidth = Math.max(2, Math.round(studioBrushRadius / 2));
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.globalAlpha = studioBrushAlpha;
+
+    if (typeof ctx.beginPath === 'function') {
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      let curX = p1.x;
+      let curY = p1.y;
+      for (let i = 1; i <= segments; i++) {
+        const targetX = p1.x + dx * i;
+        const targetY = p1.y + dy * i;
+        if (i < segments) {
+          const jitter = (Math.random() - 0.5) * studioBrushRadius * 0.8;
+          curX = targetX + nx * jitter;
+          curY = targetY + ny * jitter;
+          ctx.lineTo(curX, curY);
+        } else {
+          ctx.lineTo(p2.x, p2.y);
+        }
+      }
+      ctx.stroke();
+    }
+    if (typeof ctx.restore === 'function') ctx.restore();
+  }
+
+  function stampMountain(ctx, x, y, size) {
+    const w = size * 1.6;
+    const h = size * 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, y - h);
+    ctx.lineTo(x + w / 2, y);
+    ctx.lineTo(x - w / 2, y);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x, y - h);
+    if (typeof ctx.quadraticCurveTo === 'function') {
+      ctx.quadraticCurveTo(x + w * 0.08, y - h * 0.4, x + w * 0.12, y);
+    } else {
+      ctx.lineTo(x + w * 0.12, y);
+    }
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.15, y - h * 0.4);
+    ctx.lineTo(x + w * 0.35, y);
+    ctx.stroke();
+  }
+
+  function stampHill(ctx, x, y, size) {
+    const r = size * 0.9;
+    ctx.beginPath();
+    if (typeof ctx.arc === 'function') {
+      ctx.arc(x, y, r, Math.PI, 0, false);
+    }
+    ctx.stroke();
+
+    ctx.beginPath();
+    if (typeof ctx.arc === 'function') {
+      ctx.arc(x - r * 0.2, y - r * 0.2, r * 0.45, Math.PI * 0.9, 0, false);
+    }
+    ctx.stroke();
+  }
+
+  function stampTree(ctx, x, y, size) {
+    const h = size * 1.6;
+    const w = size * 0.9;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + h * 0.25);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x, y - h);
+    ctx.lineTo(x + w * 0.35, y - h * 0.5);
+    ctx.lineTo(x + w * 0.15, y - h * 0.5);
+    ctx.lineTo(x + w * 0.5, y);
+    ctx.lineTo(x - w * 0.5, y);
+    ctx.lineTo(x - w * 0.15, y - h * 0.5);
+    ctx.lineTo(x - w * 0.35, y - h * 0.5);
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  function stampRiver(ctx, x, y, size, prev) {
+    ctx.lineWidth = Math.max(2, size * 0.5);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    if (prev) {
+      const midX = (prev.x + x) / 2 + (Math.random() - 0.5) * size;
+      const midY = (prev.y + y) / 2 + (Math.random() - 0.5) * size;
+      if (typeof ctx.quadraticCurveTo === 'function') {
+        ctx.moveTo(prev.x, prev.y);
+        ctx.quadraticCurveTo(midX, midY, x, y);
+      } else {
+        ctx.moveTo(prev.x, prev.y);
+        ctx.lineTo(x, y);
+      }
+    } else {
+      ctx.moveTo(x - size, y);
+      if (typeof ctx.bezierCurveTo === 'function') {
+        ctx.bezierCurveTo(x - size * 0.4, y - size * 0.5, x + size * 0.4, y + size * 0.5, x + size, y);
+      } else {
+        ctx.lineTo(x + size, y);
+      }
+    }
+    ctx.stroke();
+  }
+
+  function stampWave(ctx, x, y, size) {
+    const w = size * 1.4;
+    ctx.lineWidth = Math.max(1.5, size * 0.15);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x - w / 2, y);
+    if (typeof ctx.bezierCurveTo === 'function') {
+      ctx.bezierCurveTo(x - w * 0.25, y - size * 0.4, x, y + size * 0.2, x + w / 2, y - size * 0.1);
+    } else {
+      ctx.lineTo(x + w / 2, y);
+    }
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x - w * 0.3, y + size * 0.45);
+    if (typeof ctx.bezierCurveTo === 'function') {
+      ctx.bezierCurveTo(x - w * 0.1, y + size * 0.2, x + w * 0.1, y + size * 0.5, x + w * 0.35, y + size * 0.35);
+    } else {
+      ctx.lineTo(x + w * 0.35, y + size * 0.35);
+    }
+    ctx.stroke();
+  }
+
+  function stampTerrainFeature(pos, prevPos) {
+    const ctx = getActiveLayerContext();
+    if (!ctx) return;
+    if (typeof ctx.save === 'function') ctx.save();
+    ctx.strokeStyle = studioBrushColor;
+    ctx.fillStyle = studioBrushColor;
+    ctx.lineWidth = Math.max(1.5, Math.round(studioBrushRadius / 6));
+    ctx.globalAlpha = studioBrushAlpha;
+
+    if (studioTerrainStyle === 'mountains') {
+      stampMountain(ctx, pos.x, pos.y, studioBrushRadius);
+    } else if (studioTerrainStyle === 'hills') {
+      stampHill(ctx, pos.x, pos.y, studioBrushRadius);
+    } else if (studioTerrainStyle === 'forest') {
+      stampTree(ctx, pos.x, pos.y, studioBrushRadius);
+    } else if (studioTerrainStyle === 'rivers') {
+      stampRiver(ctx, pos.x, pos.y, studioBrushRadius, prevPos);
+    } else if (studioTerrainStyle === 'waves') {
+      stampWave(ctx, pos.x, pos.y, studioBrushRadius);
+    }
+    if (typeof ctx.restore === 'function') ctx.restore();
+  }
+
+  function drawShapePath(ctx, kind, p1, p2, shouldFill) {
+    if (typeof ctx.beginPath === 'function') ctx.beginPath();
+    if (kind === 'rect') {
+      const x = Math.min(p1.x, p2.x);
+      const y = Math.min(p1.y, p2.y);
+      const w = Math.abs(p2.x - p1.x);
+      const h = Math.abs(p2.y - p1.y);
+      if (typeof ctx.rect === 'function') {
+        ctx.rect(x, y, w, h);
+      }
+    } else if (kind === 'ellipse') {
+      const rx = Math.abs(p2.x - p1.x) / 2;
+      const ry = Math.abs(p2.y - p1.y) / 2;
+      const cx = Math.min(p1.x, p2.x) + rx;
+      const cy = Math.min(p1.y, p2.y) + ry;
+      if (rx > 0 && ry > 0) {
+        if (typeof ctx.ellipse === 'function') {
+          ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        } else if (typeof ctx.arc === 'function') {
+          ctx.arc(cx, cy, Math.max(rx, ry), 0, Math.PI * 2);
+        }
+      }
+    } else if (kind === 'line') {
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+    }
+    if (shouldFill && kind !== 'line' && typeof ctx.fill === 'function') {
+      ctx.fill();
+    }
+    if (typeof ctx.stroke === 'function') {
+      ctx.stroke();
+    }
+  }
+
+  function renderShapeLivePreview(p1, p2) {
+    renderCompositeLayers();
+    if (!mapPaintCanvas || typeof mapPaintCanvas.getContext !== 'function') return;
+    const ctx = mapPaintCanvas.getContext('2d');
+    if (!ctx) return;
+    if (typeof ctx.save === 'function') ctx.save();
+    ctx.strokeStyle = studioBrushColor;
+    ctx.fillStyle = studioBrushColor;
+    ctx.lineWidth = studioBrushRadius;
+    ctx.globalAlpha = studioBrushAlpha;
+    drawShapePath(ctx, studioShapeKind, p1, p2, studioShapeShouldFill);
+    if (typeof ctx.restore === 'function') ctx.restore();
+  }
+
+  function commitShape(p1, p2) {
+    const ctx = getActiveLayerContext();
+    if (!ctx) return;
+    if (typeof ctx.save === 'function') ctx.save();
+    ctx.strokeStyle = studioBrushColor;
+    ctx.fillStyle = studioBrushColor;
+    ctx.lineWidth = studioBrushRadius;
+    ctx.globalAlpha = studioBrushAlpha;
+    drawShapePath(ctx, studioShapeKind, p1, p2, studioShapeShouldFill);
+    if (typeof ctx.restore === 'function') ctx.restore();
+  }
+
+  function renderPolygonPreview(curPos) {
+    renderCompositeLayers();
+    if (!mapPaintCanvas || typeof mapPaintCanvas.getContext !== 'function') return;
+    const ctx = mapPaintCanvas.getContext('2d');
+    if (!ctx || studioPolygonPoints.length === 0) return;
+    if (typeof ctx.save === 'function') ctx.save();
+    ctx.strokeStyle = studioBrushColor;
+    ctx.lineWidth = studioBrushRadius;
+    ctx.globalAlpha = studioBrushAlpha;
+    if (typeof ctx.beginPath === 'function') {
+      ctx.beginPath();
+      ctx.moveTo(studioPolygonPoints[0].x, studioPolygonPoints[0].y);
+      for (let i = 1; i < studioPolygonPoints.length; i++) {
+        ctx.lineTo(studioPolygonPoints[i].x, studioPolygonPoints[i].y);
+      }
+      if (curPos) {
+        ctx.lineTo(curPos.x, curPos.y);
+      }
+      ctx.stroke();
+    }
+
+    if (typeof ctx.arc === 'function') {
+      ctx.fillStyle = '#ef4444';
+      studioPolygonPoints.forEach((pt, idx) => {
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, idx === 0 ? 6 : 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+    if (typeof ctx.restore === 'function') ctx.restore();
+  }
+
+  function finishPolygonDrawing() {
+    if (studioPolygonPoints.length >= 3) {
+      const ctx = getActiveLayerContext();
+      if (ctx) {
+        if (typeof ctx.save === 'function') ctx.save();
+        ctx.strokeStyle = studioBrushColor;
+        ctx.fillStyle = studioBrushColor;
+        ctx.lineWidth = studioBrushRadius;
+        ctx.globalAlpha = studioBrushAlpha;
+        if (typeof ctx.beginPath === 'function') {
+          ctx.beginPath();
+          ctx.moveTo(studioPolygonPoints[0].x, studioPolygonPoints[0].y);
+          for (let i = 1; i < studioPolygonPoints.length; i++) {
+            ctx.lineTo(studioPolygonPoints[i].x, studioPolygonPoints[i].y);
+          }
+          ctx.closePath();
+          if (studioShapeShouldFill && typeof ctx.fill === 'function') {
+            ctx.fill();
+          }
+          ctx.stroke();
+        }
+        if (typeof ctx.restore === 'function') ctx.restore();
+      }
+      toast(`Polygon completed with ${studioPolygonPoints.length} vertices`, 'success');
+    }
+    studioPolygonPoints = [];
+    renderCompositeLayers();
+    persistStudioDrawing();
+  }
+
+  function parseHexColor(hex, alpha) {
+    let c = (hex || '#000000').replace('#', '');
+    if (c.length === 3) {
+      c = c.split('').map(ch => ch + ch).join('');
+    }
+    const num = parseInt(c, 16) || 0;
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    const a = Math.round((typeof alpha === 'number' ? alpha : 1) * 255);
+    return { r, g, b, a };
+  }
+
+  function colorDistance(r1, g1, b1, a1, r2, g2, b2, a2) {
+    return Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2) + Math.abs(a1 - a2);
+  }
+
+  function colorsMatch(r1, g1, b1, a1, r2, g2, b2, a2) {
+    return r1 === r2 && g1 === g2 && b1 === b2 && a1 === a2;
+  }
+
+  function floodFillAtPoint(startX, startY) {
+    const ctx = getActiveLayerContext();
+    const layer = getActiveStudioLayer();
+    if (!ctx || !layer || !layer.canvas) return;
+    if (typeof ctx.getImageData !== 'function' || typeof ctx.putImageData !== 'function') return;
+
+    const w = layer.canvas.width;
+    const h = layer.canvas.height;
+    const x0 = Math.floor(startX);
+    const y0 = Math.floor(startY);
+    if (x0 < 0 || x0 >= w || y0 < 0 || y0 >= h) return;
+
+    let imgData;
+    try {
+      imgData = ctx.getImageData(0, 0, w, h);
+    } catch {
+      return;
+    }
+    if (!imgData || !imgData.data) return;
+
+    const data = imgData.data;
+    const targetOffset = (y0 * w + x0) * 4;
+    const tR = data[targetOffset];
+    const tG = data[targetOffset + 1];
+    const tB = data[targetOffset + 2];
+    const tA = data[targetOffset + 3];
+
+    const fillColor = parseHexColor(studioBrushColor, studioBrushAlpha);
+    if (colorsMatch(tR, tG, tB, tA, fillColor.r, fillColor.g, fillColor.b, fillColor.a)) {
+      return;
+    }
+
+    const queue = [y0 * w + x0];
+    const visited = new Uint8Array(w * h);
+    visited[y0 * w + x0] = 1;
+
+    let pixelsChanged = 0;
+    const maxPixels = w * h;
+
+    while (queue.length > 0 && pixelsChanged < maxPixels) {
+      const p = queue.pop();
+      const cx = p % w;
+      const cy = (p / w) | 0;
+      const idx = p * 4;
+
+      data[idx] = fillColor.r;
+      data[idx + 1] = fillColor.g;
+      data[idx + 2] = fillColor.b;
+      data[idx + 3] = fillColor.a;
+      pixelsChanged++;
+
+      if (cx + 1 < w) {
+        const ni = p + 1;
+        if (!visited[ni]) {
+          visited[ni] = 1;
+          const no = ni * 4;
+          if (colorDistance(data[no], data[no + 1], data[no + 2], data[no + 3], tR, tG, tB, tA) < 32) {
+            queue.push(ni);
+          }
+        }
+      }
+      if (cx - 1 >= 0) {
+        const ni = p - 1;
+        if (!visited[ni]) {
+          visited[ni] = 1;
+          const no = ni * 4;
+          if (colorDistance(data[no], data[no + 1], data[no + 2], data[no + 3], tR, tG, tB, tA) < 32) {
+            queue.push(ni);
+          }
+        }
+      }
+      if (cy + 1 < h) {
+        const ni = p + w;
+        if (!visited[ni]) {
+          visited[ni] = 1;
+          const no = ni * 4;
+          if (colorDistance(data[no], data[no + 1], data[no + 2], data[no + 3], tR, tG, tB, tA) < 32) {
+            queue.push(ni);
+          }
+        }
+      }
+      if (cy - 1 >= 0) {
+        const ni = p - w;
+        if (!visited[ni]) {
+          visited[ni] = 1;
+          const no = ni * 4;
+          if (colorDistance(data[no], data[no + 1], data[no + 2], data[no + 3], tR, tG, tB, tA) < 32) {
+            queue.push(ni);
+          }
+        }
+      }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+  }
+
+  function addNewMapLayer(customName) {
+    const layerId = `layer_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const layerNum = mapStudioLayers.length + 1;
+    const w = mapPaintCanvas ? mapPaintCanvas.width : 1600;
+    const h = mapPaintCanvas ? mapPaintCanvas.height : 1000;
+    const newLayer = {
+      id: layerId,
+      name: customName || `Layer ${layerNum}`,
+      visible: true,
+      opacity: 1.0,
+      canvas: createLayerCanvas(w, h)
+    };
+    saveUndoSnapshot();
+    mapStudioLayers.push(newLayer);
+    activeStudioLayerId = layerId;
+    renderLayersPanel();
+    renderCompositeLayers();
+    persistStudioDrawing();
+    toast(`Created ${newLayer.name}`, 'info');
+  }
+
+  function deleteMapLayer(layerId) {
+    if (mapStudioLayers.length <= 1) {
+      toast('Cannot delete the last layer', 'warning');
+      return;
+    }
+    saveUndoSnapshot();
+    mapStudioLayers = mapStudioLayers.filter(l => l.id !== layerId);
+    if (activeStudioLayerId === layerId) {
+      activeStudioLayerId = mapStudioLayers[mapStudioLayers.length - 1].id;
+    }
+    renderLayersPanel();
+    renderCompositeLayers();
+    persistStudioDrawing();
+    toast('Layer deleted', 'info');
+  }
+
+  function clearActiveLayer() {
+    const layer = getActiveStudioLayer();
+    if (!layer || !layer.canvas || typeof layer.canvas.getContext !== 'function') return;
+    saveUndoSnapshot();
+    const ctx = layer.canvas.getContext('2d');
+    if (ctx && typeof ctx.clearRect === 'function') {
+      ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
+    }
+    renderCompositeLayers();
+    persistStudioDrawing();
+    toast(`Cleared ${layer.name}`, 'info');
+  }
+
+  function renderLayersPanel() {
+    if (studioLayerCount) {
+      studioLayerCount.textContent = String(mapStudioLayers.length);
+    }
+    if (!mapLayersList || typeof document === 'undefined' || typeof document.createElement !== 'function') return;
+    mapLayersList.innerHTML = '';
+
+    for (let i = mapStudioLayers.length - 1; i >= 0; i--) {
+      const layer = mapStudioLayers[i];
+      const isAct = layer.id === activeStudioLayerId;
+      const item = document.createElement('div');
+      item.className = `layer-item ${isAct ? 'active' : ''}`;
+      item.dataset.layerId = layer.id;
+
+      const visBtn = document.createElement('button');
+      visBtn.type = 'button';
+      visBtn.className = 'icon-btn btn-xs btn-toggle-vis';
+      visBtn.title = layer.visible ? 'Hide Layer' : 'Show Layer';
+      visBtn.textContent = layer.visible ? '👁️' : '🕶️';
+      if (typeof visBtn.addEventListener === 'function') {
+        visBtn.addEventListener('click', (e) => {
+          if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+          layer.visible = !layer.visible;
+          renderCompositeLayers();
+          renderLayersPanel();
+          persistStudioDrawing();
+        });
+      }
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'layer-name';
+      nameSpan.title = 'Click to activate';
+      nameSpan.textContent = layer.name || 'Layer';
+
+      if (typeof item.appendChild === 'function') {
+        item.appendChild(visBtn);
+        item.appendChild(nameSpan);
+      }
+
+      if (mapStudioLayers.length > 1) {
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'icon-btn btn-xs btn-delete-layer';
+        delBtn.title = 'Delete Layer';
+        delBtn.textContent = '✕';
+        if (typeof delBtn.addEventListener === 'function') {
+          delBtn.addEventListener('click', (e) => {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            deleteMapLayer(layer.id);
+          });
+        }
+        if (typeof item.appendChild === 'function') {
+          item.appendChild(delBtn);
+        }
+      }
+
+      if (typeof item.addEventListener === 'function') {
+        item.addEventListener('click', () => {
+          activeStudioLayerId = layer.id;
+          if (layerOpacitySlider) {
+            layerOpacitySlider.value = Math.round((typeof layer.opacity === 'number' ? layer.opacity : 1) * 100);
+          }
+          renderLayersPanel();
+        });
+      }
+
+      mapLayersList.appendChild(item);
+    }
+
+    const act = getActiveStudioLayer();
+    if (act && layerOpacitySlider) {
+      const op = Math.round((typeof act.opacity === 'number' ? act.opacity : 1) * 100);
+      layerOpacitySlider.value = op;
+      if (layerOpacityVal) layerOpacityVal.textContent = String(op);
+    }
+  }
+
+  function bakeDrawingToBaseMap() {
+    if (!mapCanvas || typeof mapCanvas.getContext !== 'function') return;
+    const baseCtx = mapCanvas.getContext('2d');
+    if (!baseCtx) return;
+
+    const w = mapCanvas.width || 1600;
+    const h = mapCanvas.height || 1000;
+
+    // If an uploaded custom map image element is currently displayed, draw it onto mapCanvas first
+    const customImgEl = (typeof document !== 'undefined' && document.getElementById) ? document.getElementById('map-custom-img') : mapCustomImg;
+    if (customImgEl && !customImgEl.classList.contains('hidden') && customImgEl.style.display !== 'none') {
+      try {
+        if (typeof baseCtx.drawImage === 'function') {
+          baseCtx.drawImage(customImgEl, 0, 0, w, h);
+        }
+      } catch (err) {
+        console.warn('Map Studio: Could not draw custom image to base canvas', err);
+      }
+    }
+
+    for (const layer of mapStudioLayers) {
+      if (!layer.visible || !layer.canvas) continue;
+      if (typeof baseCtx.save === 'function') baseCtx.save();
+      baseCtx.globalAlpha = typeof layer.opacity === 'number' ? layer.opacity : 1.0;
+      if (typeof baseCtx.drawImage === 'function') {
+        baseCtx.drawImage(layer.canvas, 0, 0);
+      }
+      if (typeof baseCtx.restore === 'function') baseCtx.restore();
+    }
+
+    try {
+      if (typeof mapCanvas.toDataURL === 'function') {
+        const bakedDataUrl = mapCanvas.toDataURL();
+        if (Storage.saveCustomMapImage) Storage.saveCustomMapImage(bakedDataUrl);
+      }
+      if (Storage.clearMapDrawing) Storage.clearMapDrawing();
+    } catch (err) {
+      console.warn('Map Studio: Could not bake image', err);
+    }
+
+    // Unhide base map canvas and hide custom img element since drawing is baked into canvas
+    if (mapCanvas) {
+      mapCanvas.style.display = 'block';
+      mapCanvas.classList.remove('hidden');
+    }
+    if (customImgEl) {
+      customImgEl.style.display = 'none';
+      customImgEl.classList.add('hidden');
+    }
+
+    mapStudioLayers.forEach(l => {
+      if (l.canvas && typeof l.canvas.getContext === 'function') {
+        const c = l.canvas.getContext('2d');
+        if (c && typeof c.clearRect === 'function') {
+          c.clearRect(0, 0, l.canvas.width, l.canvas.height);
+        }
+      }
+    });
+    studioUndoStack = [];
+    studioRedoStack = [];
+    updateUndoRedoButtons();
+    renderCompositeLayers();
+    renderLayersPanel();
+    toast('Drawing successfully baked into base cartography canvas!', 'success');
+  }
+
+  function exportMapAsPng() {
+    if (typeof document === 'undefined' || typeof document.createElement !== 'function') return;
+    const w = mapCanvas ? (mapCanvas.width || 1600) : 1600;
+    const h = mapCanvas ? (mapCanvas.height || 1000) : 1000;
+
+    let expCanvas;
+    try {
+      expCanvas = document.createElement('canvas');
+      expCanvas.width = w;
+      expCanvas.height = h;
+    } catch {
+      return;
+    }
+    const ctx = (expCanvas && typeof expCanvas.getContext === 'function') ? expCanvas.getContext('2d') : null;
+    if (!ctx) return;
+
+    // 1. Draw base canvas or custom image element
+    const customImgEl = (typeof document !== 'undefined' && document.getElementById) ? document.getElementById('map-custom-img') : mapCustomImg;
+    let customImgDrawn = false;
+    if (customImgEl && !customImgEl.classList.contains('hidden') && customImgEl.style.display !== 'none') {
+      try {
+        if (typeof ctx.drawImage === 'function') {
+          ctx.drawImage(customImgEl, 0, 0, w, h);
+          customImgDrawn = true;
+        }
+      } catch (_) {}
+    }
+    if (!customImgDrawn && mapCanvas && typeof ctx.drawImage === 'function') {
+      ctx.drawImage(mapCanvas, 0, 0, w, h);
+    }
+
+    // 2. Draw paint layers composite
+    if (mapPaintCanvas && typeof ctx.drawImage === 'function') {
+      ctx.drawImage(mapPaintCanvas, 0, 0, w, h);
+    }
+
+    const scale = Math.max(0.6, Math.min(3.0, w / 1600));
+
+    // 3. Render territory regions
+    const regions = Storage.getAllMapRegions ? Storage.getAllMapRegions() : [];
+    const regFontSize = Math.round(14 * scale);
+    regions.forEach(reg => {
+      if (typeof ctx.save === 'function') ctx.save();
+      ctx.strokeStyle = reg.color || '#ef4444';
+      ctx.fillStyle = reg.color || '#ef4444';
+      ctx.lineWidth = Math.max(1.5, Math.round(2 * scale));
+      if (reg.shape === 'circle') {
+        const center = (reg.points && reg.points[0]) || { x: 50, y: 50 };
+        const cx = (center.x / 100) * w;
+        const cy = (center.y / 100) * h;
+        const r = (reg.radius || 90) * scale;
+        ctx.globalAlpha = 0.22;
+        if (typeof ctx.beginPath === 'function' && typeof ctx.arc === 'function') {
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 0.85;
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1.0;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${regFontSize}px Cinzel, serif`;
+        ctx.textAlign = 'center';
+        if (typeof ctx.fillText === 'function') {
+          ctx.fillText(reg.name || 'Territory', cx, cy);
+        }
+      } else {
+        const points = (reg.points && reg.points.length >= 3) ? reg.points : [
+          { x: 30, y: 30 }, { x: 45, y: 25 }, { x: 50, y: 40 }, { x: 35, y: 45 }
+        ];
+        ctx.globalAlpha = 0.22;
+        if (typeof ctx.beginPath === 'function') {
+          ctx.beginPath();
+          ctx.moveTo((points[0].x / 100) * w, (points[0].y / 100) * h);
+          for (let i = 1; i < points.length; i++) {
+            ctx.lineTo((points[i].x / 100) * w, (points[i].y / 100) * h);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = 0.85;
+          ctx.stroke();
+        }
+        const avgX = (points.reduce((s, p) => s + p.x, 0) / points.length) * (w / 100);
+        const avgY = (points.reduce((s, p) => s + p.y, 0) / points.length) * (h / 100);
+        ctx.globalAlpha = 1.0;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${regFontSize}px Cinzel, serif`;
+        ctx.textAlign = 'center';
+        if (typeof ctx.fillText === 'function') {
+          ctx.fillText(reg.name || 'Territory', avgX, avgY);
+        }
+      }
+      if (typeof ctx.restore === 'function') ctx.restore();
+    });
+
+    // 4. Render map pins
+    const pins = Storage.getAllMapPins ? Storage.getAllMapPins() : [];
+    const pinRadius = Math.round(6 * scale);
+    const pinFontSize = Math.round(12 * scale);
+    pins.forEach(pin => {
+      const px = (pin.x / 100) * w;
+      const py = (pin.y / 100) * h;
+      const col = pin.pinColor || '#ef4444';
+      if (typeof ctx.save === 'function') ctx.save();
+      ctx.fillStyle = col;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = Math.max(1.5, Math.round(2 * scale));
+      if (typeof ctx.beginPath === 'function' && typeof ctx.arc === 'function') {
+        ctx.beginPath();
+        ctx.arc(px, py, pinRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.font = `${pinFontSize}px Inter, sans-serif`;
+      const text = pin.title || 'Landmark';
+      const metrics = (typeof ctx.measureText === 'function') ? ctx.measureText(text) : { width: 40 * scale };
+      const pad = Math.round(6 * scale);
+      const boxH = Math.round(18 * scale);
+      if (typeof ctx.fillRect === 'function') {
+        ctx.fillRect(px - metrics.width / 2 - pad, py + Math.round(8 * scale), metrics.width + pad * 2, boxH);
+      }
+      ctx.fillStyle = '#e2e8f0';
+      ctx.textAlign = 'center';
+      if (typeof ctx.fillText === 'function') {
+        ctx.fillText(text, px, py + Math.round(21 * scale));
+      }
+      if (typeof ctx.restore === 'function') ctx.restore();
+    });
+
+    // 5. Trigger download
+    try {
+      if (typeof expCanvas.toDataURL === 'function') {
+        const dataUrl = expCanvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `lordspey-world-map-${Date.now()}.png`;
+        if (typeof document.body !== 'undefined' && typeof document.body.appendChild === 'function') {
+          document.body.appendChild(a);
+          if (typeof a.click === 'function') a.click();
+          document.body.removeChild(a);
+        } else if (typeof a.click === 'function') {
+          a.click();
+        }
+        toast('World map exported successfully as PNG!', 'success');
+      }
+    } catch (err) {
+      console.error('Map Studio: Export error', err);
+      toast('Could not export map to PNG', 'error');
+    }
+  }
+
+  function openMapDimensionsModal() {
+    if (!mapDimensionsModal) return;
+    mapDimensionsModal.classList.remove('hidden');
+
+    const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+    const curW = curMap.width || (mapCanvas ? mapCanvas.width : 1600);
+    const curH = curMap.height || (mapCanvas ? mapCanvas.height : 1000);
+    const curShape = curMap.shape || 'landscape';
+    const curFrame = curMap.boundaryShape || curShape;
+
+    if (mapDimWidth) mapDimWidth.value = curW;
+    if (mapDimHeight) mapDimHeight.value = curH;
+    if (mapDimShapeFrame) {
+      mapDimShapeFrame.value = ['landscape', 'oval', 'parchment'].includes(curFrame) ? curFrame : 'landscape';
+    }
+
+    const presetBtns = $$('.dim-preset-btn', mapDimensionsModal);
+    presetBtns.forEach(btn => {
+      const bw = parseInt(btn.dataset.w, 10);
+      const bh = parseInt(btn.dataset.h, 10);
+      const bshape = btn.dataset.shape;
+      if (bw === curW && bh === curH && (bshape === curShape || curShape === 'custom')) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  function applyCustomMapDimensions() {
+    if (!mapDimWidth || !mapDimHeight) return;
+    let w = parseInt(mapDimWidth.value, 10);
+    let h = parseInt(mapDimHeight.value, 10);
+    if (isNaN(w) || w < 200) w = 1600;
+    if (isNaN(h) || h < 200) h = 1000;
+    if (w > 5000) w = 5000;
+    if (h > 5000) h = 5000;
+
+    const frame = (mapDimShapeFrame && mapDimShapeFrame.value) || 'landscape';
+    let chosenShape = 'custom';
+    if (w === 1600 && h === 1000) chosenShape = 'landscape';
+    else if (w === 1200 && h === 1200) chosenShape = 'square';
+    else if (w === 900 && h === 1600) chosenShape = 'vertical';
+    else if (w === 1500 && h === 1050) chosenShape = 'oval';
+    else if (w === 2100 && h === 900) chosenShape = 'ultrawide';
+    else if (w === 1600 && h === 1200) chosenShape = 'parchment';
+
+    if (mapShapeSelect) {
+      mapShapeSelect.value = chosenShape;
+    }
+
+    setMapCanvasShape(chosenShape, w, h, frame);
+
+    if (Storage.saveMap) {
+      Storage.saveMap({
+        shape: chosenShape,
+        width: w,
+        height: h,
+        customWidth: w,
+        customHeight: h,
+        boundaryShape: frame,
+        aspectRatio: `${w}:${h}`
+      });
+    }
+
+    if (mapDimensionsModal) mapDimensionsModal.classList.add('hidden');
+    resetMapCamera();
+    toast(`Map dimensions updated: ${w} × ${h}px`, 'success');
+  }
+
+  function toggleMapStudio(forceState) {
+    const nextState = typeof forceState === 'boolean' ? forceState : !isMapStudioActive;
+    isMapStudioActive = nextState;
+
+    if (isMapStudioActive) {
+      if (isMapPlacementMode) {
+        isMapPlacementMode = false;
+        updateMapPlacementUI();
+      }
+      if (isMapRegionDrawingMode) {
+        isMapRegionDrawingMode = false;
+        if (btnMapDrawRegion) {
+          btnMapDrawRegion.classList.remove('active', 'btn-primary');
+          btnMapDrawRegion.classList.add('btn-ghost');
+          btnMapDrawRegion.textContent = 'Draw Region';
+        }
+      }
+
+      if (btnMapPaintMode) {
+        btnMapPaintMode.classList.add('active', 'btn-primary');
+        btnMapPaintMode.classList.remove('btn-ghost');
+      }
+      if (mapStudioToolbar) mapStudioToolbar.classList.remove('hidden');
+      if (mapStage) mapStage.classList.add('paint-mode-active');
+
+      ensurePaintCanvas();
+      if (!mapStudioLayers || mapStudioLayers.length === 0) {
+        initMapLayers();
+      }
+      toast('Map Paint Studio activated. Create and paint your custom map!', 'info');
+    } else {
+      if (btnMapPaintMode) {
+        btnMapPaintMode.classList.remove('active', 'btn-primary');
+        btnMapPaintMode.classList.add('btn-ghost');
+      }
+      if (mapStudioToolbar) mapStudioToolbar.classList.add('hidden');
+      if (mapLayersPanel) mapLayersPanel.classList.add('hidden');
+      if (mapStage) mapStage.classList.remove('paint-mode-active');
+
+      if (studioPolygonPoints && studioPolygonPoints.length > 0) {
+        finishPolygonDrawing();
+      }
+      persistStudioDrawing();
+    }
+  }
+
+  function initMapStudio() {
+    // 1. Tool Selection Buttons
+    const toolBtns = $$('.studio-tool-btn', mapStudioToolbar);
+    toolBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        toolBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        studioCurrentTool = btn.dataset.tool || 'brush';
+
+        if (studioCurrentTool === 'terrain') {
+          if (studioTerrainOptions) studioTerrainOptions.classList.remove('hidden');
+          if (studioShapeOptions) studioShapeOptions.classList.add('hidden');
+        } else if (studioCurrentTool === 'shape') {
+          if (studioShapeOptions) studioShapeOptions.classList.remove('hidden');
+          if (studioTerrainOptions) studioTerrainOptions.classList.add('hidden');
+        } else {
+          if (studioTerrainOptions) studioTerrainOptions.classList.add('hidden');
+          if (studioShapeOptions) studioShapeOptions.classList.add('hidden');
+        }
+
+        if (studioCurrentTool !== 'shape' && studioPolygonPoints.length > 0) {
+          finishPolygonDrawing();
+        }
+      });
+    });
+
+    // 2. Sub-options
+    if (studioTerrainType) {
+      studioTerrainType.addEventListener('change', () => {
+        studioTerrainStyle = studioTerrainType.value;
+      });
+    }
+
+    if (studioShapeType) {
+      studioShapeType.addEventListener('change', () => {
+        if (studioShapeKind === 'polygon' && studioShapeType.value !== 'polygon' && studioPolygonPoints.length > 0) {
+          finishPolygonDrawing();
+        }
+        studioShapeKind = studioShapeType.value;
+      });
+    }
+
+    if (studioShapeFill) {
+      studioShapeFill.addEventListener('change', () => {
+        studioShapeShouldFill = !!studioShapeFill.checked;
+      });
+    }
+
+    // 3. Brush Size & Opacity Sliders
+    if (studioBrushSize) {
+      studioBrushSize.addEventListener('input', () => {
+        studioBrushRadius = parseInt(studioBrushSize.value, 10) || 12;
+        if (studioBrushSizeVal) studioBrushSizeVal.textContent = String(studioBrushRadius);
+      });
+    }
+
+    if (studioBrushOpacity) {
+      studioBrushOpacity.addEventListener('input', () => {
+        const op = parseInt(studioBrushOpacity.value, 10) || 100;
+        studioBrushAlpha = op / 100;
+        if (studioBrushOpacityVal) studioBrushOpacityVal.textContent = String(op);
+      });
+    }
+
+    // 4. Color Palette & Custom Color Picker
+    const swatches = $$('.palette-swatch', mapStudioToolbar);
+    swatches.forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        swatches.forEach(s => s.classList.remove('active'));
+        swatch.classList.add('active');
+        studioBrushColor = swatch.dataset.color || '#111827';
+        if (studioCustomColor) studioCustomColor.value = studioBrushColor;
+      });
+    });
+
+    if (studioCustomColor) {
+      const handleCustomColor = () => {
+        studioBrushColor = studioCustomColor.value;
+        swatches.forEach(s => s.classList.remove('active'));
+      };
+      studioCustomColor.addEventListener('input', handleCustomColor);
+      studioCustomColor.addEventListener('change', handleCustomColor);
+    }
+
+    // 5. Studio Action Buttons
+    if (btnMapPaintMode) {
+      btnMapPaintMode.addEventListener('click', () => toggleMapStudio());
+    }
+
+    if (btnStudioDone) {
+      btnStudioDone.addEventListener('click', () => toggleMapStudio(false));
+    }
+
+    if (btnStudioUndo) {
+      btnStudioUndo.addEventListener('click', undoStudioStroke);
+    }
+
+    if (btnStudioRedo) {
+      btnStudioRedo.addEventListener('click', redoStudioStroke);
+    }
+
+    if (btnStudioClear) {
+      btnStudioClear.addEventListener('click', clearActiveLayer);
+    }
+
+    if (btnStudioBake) {
+      btnStudioBake.addEventListener('click', bakeDrawingToBaseMap);
+    }
+
+    if (btnMapExportPng) {
+      btnMapExportPng.addEventListener('click', exportMapAsPng);
+    }
+
+    // 6. Layers Management UI
+    if (btnStudioLayers) {
+      btnStudioLayers.addEventListener('click', () => {
+        if (!mapLayersPanel) return;
+        mapLayersPanel.classList.toggle('hidden');
+      });
+    }
+
+    if (btnCloseLayers) {
+      btnCloseLayers.addEventListener('click', () => {
+        if (mapLayersPanel) mapLayersPanel.classList.add('hidden');
+      });
+    }
+
+    if (btnAddLayer) {
+      btnAddLayer.addEventListener('click', () => addNewMapLayer());
+    }
+
+    if (layerOpacitySlider) {
+      layerOpacitySlider.addEventListener('input', () => {
+        const act = getActiveStudioLayer();
+        const op = parseInt(layerOpacitySlider.value, 10) || 100;
+        if (layerOpacityVal) layerOpacityVal.textContent = String(op);
+        if (act) {
+          act.opacity = op / 100;
+          renderCompositeLayers();
+          persistStudioDrawing();
+        }
+      });
+    }
+
+    // 7. Dimensions Modal
+    if (btnMapDimensions) {
+      btnMapDimensions.addEventListener('click', openMapDimensionsModal);
+    }
+
+    if (btnMapDimCancel) {
+      btnMapDimCancel.addEventListener('click', () => {
+        if (mapDimensionsModal) mapDimensionsModal.classList.add('hidden');
+        const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+        if (mapShapeSelect && curMap.shape) {
+          mapShapeSelect.value = curMap.shape;
+        }
+      });
+    }
+
+    if (btnMapDimApply) {
+      btnMapDimApply.addEventListener('click', applyCustomMapDimensions);
+    }
+
+    const dimPresetBtns = $$('.dim-preset-btn', mapDimensionsModal);
+    dimPresetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        dimPresetBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const w = parseInt(btn.dataset.w, 10);
+        const h = parseInt(btn.dataset.h, 10);
+        const shape = btn.dataset.shape;
+        if (mapDimWidth && w) mapDimWidth.value = w;
+        if (mapDimHeight && h) mapDimHeight.value = h;
+        if (mapDimShapeFrame) {
+          if (shape === 'oval') mapDimShapeFrame.value = 'oval';
+          else if (shape === 'parchment') mapDimShapeFrame.value = 'parchment';
+          else mapDimShapeFrame.value = 'landscape';
+        }
+      });
+    });
+
+    // 8. Paint Canvas Pointer Events
+    if (mapPaintCanvas && typeof mapPaintCanvas.addEventListener === 'function') {
+      mapPaintCanvas.addEventListener('mousedown', handleStudioPointerDown);
+      mapPaintCanvas.addEventListener('mousemove', handleStudioPointerMove);
+      mapPaintCanvas.addEventListener('mouseup', handleStudioPointerUp);
+      mapPaintCanvas.addEventListener('touchstart', handleStudioPointerDown, { passive: false });
+      mapPaintCanvas.addEventListener('touchmove', handleStudioPointerMove, { passive: false });
+      mapPaintCanvas.addEventListener('touchend', handleStudioPointerUp);
+      mapPaintCanvas.addEventListener('dblclick', () => {
+        if (studioCurrentTool === 'shape' && studioShapeKind === 'polygon') {
+          finishPolygonDrawing();
+        }
+      });
+    }
+
+    // 9. Viewport double click for polygon finish
+    if (mapViewport && typeof mapViewport.addEventListener === 'function') {
+      mapViewport.addEventListener('dblclick', (e) => {
+        if (isMapStudioActive && studioCurrentTool === 'shape' && studioShapeKind === 'polygon') {
+          if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+          finishPolygonDrawing();
+        }
+      });
+    }
+
+    // 10. Global Shortcuts (Undo/Redo & Spacebar pan)
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      window.addEventListener('mouseup', handleStudioPointerUp);
+      window.addEventListener('touchend', handleStudioPointerUp);
+
+      window.addEventListener('keydown', (e) => {
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) {
+          return;
+        }
+        if (e.code === 'Space') {
+          isSpacePressed = true;
+        }
+        if (!isMapStudioActive) return;
+
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+          if (e.preventDefault) e.preventDefault();
+          if (e.shiftKey) {
+            redoStudioStroke();
+          } else {
+            undoStudioStroke();
+          }
+        } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || e.key === 'Y')) {
+          if (e.preventDefault) e.preventDefault();
+          redoStudioStroke();
+        } else if (e.key === 'Enter') {
+          if (studioCurrentTool === 'shape' && studioShapeKind === 'polygon') {
+            finishPolygonDrawing();
+          }
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (e.code === 'Space') {
+          isSpacePressed = false;
+        }
+      });
+
+      // Expose Studio functions on window for external triggers and test suites
+      window.setMapCanvasShape = setMapCanvasShape;
+      window.toggleMapStudio = toggleMapStudio;
+      window.exportMapAsPng = exportMapAsPng;
+      window.renderCompositeLayers = renderCompositeLayers;
+      window.applyCustomMapDimensions = applyCustomMapDimensions;
+      window.openMapDimensionsModal = openMapDimensionsModal;
+      window.addNewMapLayer = addNewMapLayer;
+      window.deleteMapLayer = deleteMapLayer;
+      window.undoStudioStroke = undoStudioStroke;
+      window.redoStudioStroke = redoStudioStroke;
+      window.clearActiveLayer = clearActiveLayer;
+      window.bakeDrawingToBaseMap = bakeDrawingToBaseMap;
+    }
+
+    // Initialize layers
+    initMapLayers();
   }
 
   // ── 4. Galaxy Graph: Manual Nodes & Custom Connections ──
