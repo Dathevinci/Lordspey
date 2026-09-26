@@ -1,4 +1,4 @@
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 const assert = require('assert');
 
 console.log('--- Running Inkwell Markdown & Wiki-Link Test Suite ---');

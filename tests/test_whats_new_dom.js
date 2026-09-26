@@ -15,7 +15,7 @@ global.localStorage = {
   clear: () => { for (const k of Object.keys(mockLocalStorage)) delete mockLocalStorage[k]; }
 };
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 let backupCallCount = 0;
 const originalCreateBackup = Storage.createBackup;
@@ -25,10 +25,10 @@ Storage.createBackup = function() {
 };
 global.Storage = Storage;
 
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 global.Markdown = Markdown;
 
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 function createMockElement(id = '', tag = 'div') {
   const classes = new Set();
@@ -145,7 +145,7 @@ global.document = mockDocument;
 global.navigator = mockWindow.navigator;
 
 // Load app.js
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 eval(`(function() { ${appCode}; })()`);
 
 console.log('--- 1. Testing What\'s New Modal Opening & Rendering ---');

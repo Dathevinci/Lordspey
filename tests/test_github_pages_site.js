@@ -5,7 +5,7 @@ const { execSync } = require('child_process');
 
 console.log('=== RUNNING LORD SPEY GITHUB PAGES & WEBSITE TEST SUITE ===\n');
 
-const rootDir = __dirname;
+const rootDir = path.resolve(__dirname, '..');
 const docsDir = path.join(rootDir, 'docs');
 const docsIndexFile = path.join(docsDir, 'index.html');
 const docsCssFile = path.join(docsDir, 'css', 'landing.css');

@@ -24,7 +24,7 @@ global.localStorage = {
   clear: () => { Object.keys(mockLocalStorage).forEach(k => delete mockLocalStorage[k]); }
 };
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
@@ -379,7 +379,7 @@ global.requestAnimationFrame = global.window.requestAnimationFrame;
 global.cancelAnimationFrame = global.window.cancelAnimationFrame;
 
 // Load app.js
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 eval(`(function() {\n${appCode}\n})()`);
 
 console.log('✓ app.js successfully initialized in test environment with Map Studio');

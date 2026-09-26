@@ -4,7 +4,7 @@ const path = require('path');
 
 console.log('=== RUNNING LORD SPEY ANDROID & MOBILE TEST SUITE ===\n');
 
-const rootDir = path.resolve(__dirname);
+const rootDir = path.resolve(__dirname, '..');
 
 // 1. Android Manifest Verification
 const manifestPath = path.join(rootDir, 'android/app/src/main/AndroidManifest.xml');

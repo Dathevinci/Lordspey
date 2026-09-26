@@ -1,5 +1,5 @@
 const assert = require('assert');
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 
 console.log('--- Testing Extended Markdown Suite ---');
 

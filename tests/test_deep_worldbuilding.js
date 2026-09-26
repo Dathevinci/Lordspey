@@ -14,11 +14,11 @@ global.localStorage = {
 };
 
 // 2. Load Storage and Markdown
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 global.Markdown = Markdown;
 
 // ==========================================
@@ -483,7 +483,7 @@ global.requestAnimationFrame = global.window.requestAnimationFrame;
 global.cancelAnimationFrame = global.window.cancelAnimationFrame;
 
 // Evaluate app.js
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 eval(`(function() {\n${appCode}\n})()`);
 console.log('✓ app.js successfully initialized in test environment with all worldbuilding listeners');
 

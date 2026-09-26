@@ -21,15 +21,15 @@ global.confirm = () => true;
 global.alert = () => {};
 
 // Load Markdown and Storage
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 global.Markdown = Markdown;
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
 // Load real index.html to extract all element IDs
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 function createMockElement(id = '', tag = 'div') {
   const classes = new Set();
@@ -184,7 +184,7 @@ global.document = {
 };
 
 // Evaluate app.js
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 eval(`(function() { ${appCode}; })()`);
 
 console.log('✓ Mock DOM and application controller initialized successfully\n');

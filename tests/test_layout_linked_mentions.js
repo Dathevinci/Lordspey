@@ -6,7 +6,7 @@ console.log('=== RUNNING LORD SPEY LINKED MENTIONS LAYOUT & ISOLATION TEST SUITE
 
 // 1. Verify HTML Structure & Placement
 console.log('--- 1. Verifying HTML Hierarchy & Document Flow ---');
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 assert(htmlContent.includes('id="linked-mentions"'), 'index.html must contain #linked-mentions container');
 assert(htmlContent.includes('id="backlinks-panel"'), 'index.html must contain #backlinks-panel');
@@ -31,7 +31,7 @@ console.log('✓ HTML document flow and container hierarchy verified: #linked-me
 
 // 2. Verify CSS Layout Rules & Isolation
 console.log('\n--- 2. Verifying CSS Layout Isolation & Typography Flow ---');
-const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
+const cssContent = fs.readFileSync(path.join(__dirname, '..', 'css/style.css'), 'utf8');
 
 // Verify .editor-scroll-container flex layout & single scrollbar
 assert(cssContent.includes('.editor-scroll-container {'), 'Missing .editor-scroll-container in css/style.css');
@@ -76,11 +76,11 @@ global.localStorage = {
   clear: () => { for (const k of Object.keys(mockStorage)) delete mockStorage[k]; }
 };
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 global.Markdown = Markdown;
 
 // Verify Collision in Preview Mode with Chapter I
@@ -265,7 +265,7 @@ global.window = {
 };
 
 // Evaluate app.js
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 eval(appCode);
 
 // Verify aliases

@@ -15,15 +15,15 @@ global.localStorage = {
   clear: () => { for (const k of Object.keys(mockLocalStorage)) delete mockLocalStorage[k]; }
 };
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 global.Markdown = Markdown;
 
 // 2. Load Real HTML File and Parse Element IDs
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 function createMockElement(id = '', tag = 'div') {
   const classes = new Set();
@@ -197,7 +197,7 @@ global.document = {
 };
 
 // 3. Evaluate app.js
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 eval(`(function() {\n${appCode}\n})()`);
 
 console.log('--- 1. Simulating Click on Sidebar Footer Gear Button ---');

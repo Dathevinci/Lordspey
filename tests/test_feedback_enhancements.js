@@ -13,12 +13,12 @@ global.localStorage = {
   clear: () => { for (const k of Object.keys(mockLocalStorage)) delete mockLocalStorage[k]; }
 };
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const cssContent = fs.readFileSync(path.join(__dirname, '..', 'css/style.css'), 'utf8');
 
 // ── 1. Customizable Themes & Writing Focus Mode ──
 console.log('--- 1. Customizable App Themes & Writing Focus Mode ---');

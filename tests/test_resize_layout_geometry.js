@@ -6,7 +6,7 @@ console.log('=== RUNNING LORD SPEY RESIZE LAYOUT GEOMETRY & TAB SIZE TEST SUITE 
 
 // 1. Verify HTML Markup & Selectors
 console.log('--- 1. Verifying HTML Markup & Selectors ---');
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 // Check required alias targets in HTML
 assert(htmlContent.includes('id="editor-toolbar-wrap"'), 'index.html must contain id="editor-toolbar-wrap"');
@@ -25,7 +25,7 @@ console.log('✓ HTML markup verified for editor headers, toolbars, preview pane
 
 // 2. Verify CSS Responsive Rules & Layout Geometry Isolation
 console.log('\n--- 2. Verifying CSS Responsive Geometry & Isolation ---');
-const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
+const cssContent = fs.readFileSync(path.join(__dirname, '..', 'css/style.css'), 'utf8');
 
 // Toolbar & Header flex-shrink: 0 and z-indices
 assert(cssContent.includes('#editor-toolbar-wrap') || cssContent.includes('.editor-toolbar'), 'CSS must style editor-toolbar-wrap');
@@ -59,11 +59,11 @@ global.localStorage = {
   clear: () => { for (const k in mockStorage) delete mockStorage[k]; }
 };
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 global.Markdown = Markdown;
 
 function createMockElement(id = '', tag = 'div', extraClasses = []) {
@@ -181,7 +181,7 @@ global.window = mockWindow;
 global.document = mockDocument;
 global.navigator = mockWindow.navigator;
 
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 eval(`(function() { ${appCode}; })()`);
 
 // Test alias resolution

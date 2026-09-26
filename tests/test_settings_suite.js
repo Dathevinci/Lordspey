@@ -15,16 +15,16 @@ global.localStorage = {
   clear: () => { for (const k of Object.keys(mockLocalStorage)) delete mockLocalStorage[k]; }
 };
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 global.Markdown = Markdown;
 
 // 2. Structural HTML Verification
 console.log('--- 1. Sidebar Footer & Settings Modal HTML Verification ---');
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 // Assert sidebar footer only exposes New Note and Settings Gear
 const footerStart = htmlContent.indexOf('class="sidebar-footer"');
@@ -310,7 +310,7 @@ global.document = {
   }
 };
 
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 eval(`(function() {\n${appCode}\n})()`);
 console.log('✓ app.js successfully evaluated with full Settings integration');
 

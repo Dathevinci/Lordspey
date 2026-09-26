@@ -6,8 +6,8 @@ console.log('=== RUNNING LORD SPEY NEW NOTE & DROPDOWN ACTION FIX TEST SUITE ===
 
 // 1. Structural Markup & CSS Verification
 console.log('--- 1. Structural Markup & CSS Verification ---');
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const cssContent = fs.readFileSync(path.join(__dirname, '..', 'css/style.css'), 'utf8');
 
 // Assert sidebar footer buttons and dropdown
 assert(htmlContent.includes('id="btn-new-note"'), 'Missing btn-new-note in index.html');
@@ -47,11 +47,11 @@ global.localStorage = {
   clear: () => { for (const k of Object.keys(mockLocalStorage)) delete mockLocalStorage[k]; }
 };
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 global.Markdown = Markdown;
 
 function createMockElement(id = '', tag = 'div') {
@@ -209,7 +209,7 @@ global.window = {
 };
 
 // Evaluate app.js
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 eval(appCode);
 
 const btnNewNote = elementsMap['btn-new-note'];

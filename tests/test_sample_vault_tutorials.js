@@ -14,11 +14,11 @@ global.localStorage = {
 };
 
 // Load Storage & Markdown
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 global.Markdown = Markdown;
 
 // Test 1: Starter Vault Initialization & Verification
@@ -128,7 +128,7 @@ console.log(`✓ 4 Character dossiers verified with aliases, psychological profi
 
 // Test 6: HTML Markup & Button Verification
 console.log('\n--- 6. Verifying HTML Markup for Tutorials & Empty States ---');
-const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const indexHtml = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 assert(indexHtml.includes('id="menu-empty-section"'), 'index.html must contain #menu-empty-section');
 assert(indexHtml.includes('id="menu-empty-btn-sample"'), 'index.html must contain #menu-empty-btn-sample');
 assert(indexHtml.includes('id="menu-empty-btn-guide"'), 'index.html must contain #menu-empty-btn-guide');

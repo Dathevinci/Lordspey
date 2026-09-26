@@ -21,7 +21,7 @@ const requiredAssets = [
 ];
 
 requiredAssets.forEach(relPath => {
-  const fullPath = path.join(__dirname, relPath);
+  const fullPath = path.join(__dirname, '..', relPath);
   assert(fs.existsSync(fullPath), `Required asset file missing: ${relPath}`);
   const stat = fs.statSync(fullPath);
   assert(stat.size > 1000, `Asset file is unexpectedly small (${stat.size} bytes): ${relPath}`);
@@ -30,7 +30,7 @@ console.log('✓ All 11 raven logo, icon, and favicon assets exist with valid no
 
 // 2. Package.json Configuration Verification
 console.log('--- 2. Package.json Configuration Verification ---');
-const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
+const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
 assert(['1.1.0', '1.1.1', '1.1.2', '1.1.3', '1.1.4', '1.1.5'].includes(pkg.version), 'package.json version must be valid');
 assert.strictEqual(pkg.build?.win?.icon, 'assets/icon.ico', 'build.win.icon must be configured to assets/icon.ico');
 assert(pkg.build?.files?.includes('assets/**/*'), 'build.files must include assets/**/*');
@@ -38,7 +38,7 @@ console.log('✓ package.json v' + pkg.version + ', build.win.icon, and assets/*
 
 // 3. HTML Markup & UI Logo Integration Verification
 console.log('--- 3. HTML Markup & UI Logo Verification ---');
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 // Favicons
 assert(htmlContent.includes('<link rel="icon" type="image/png" href="assets/icon.png" />'), 'Missing png favicon link');
@@ -98,7 +98,7 @@ console.log('✓ Update modal and banner markup verified');
 
 // 6. CSS Styles Verification
 console.log('--- 6. CSS Stylesheet Verification ---');
-const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
+const cssContent = fs.readFileSync(path.join(__dirname, '..', 'css/style.css'), 'utf8');
 assert(cssContent.includes('.logo-raven-img'), 'Missing .logo-raven-img in css/style.css');
 assert(cssContent.includes('.menu-emblem-raven-img'), 'Missing .menu-emblem-raven-img in css/style.css');
 assert(cssContent.includes('.settings-update-row'), 'Missing .settings-update-row in css/style.css');
@@ -110,13 +110,13 @@ console.log('✓ CSS stylesheet verified for logo, emblem, settings update row, 
 
 // 7. Electron Main Process & Preload Bridge Verification
 console.log('--- 7. Electron Main Process & Preload Bridge Verification ---');
-const electronCode = fs.readFileSync(path.join(__dirname, 'electron-main.js'), 'utf8');
+const electronCode = fs.readFileSync(path.join(__dirname, '..', 'electron-main.js'), 'utf8');
 assert(electronCode.includes('checkForUpdatesInMain'), 'Missing checkForUpdatesInMain in electron-main.js');
 assert(electronCode.includes('https://api.github.com/repos/Dathevinci/Lordspey/releases/latest'), 'Missing GitHub release endpoint in electron-main.js');
 assert(electronCode.includes("'assets', 'icon.png'") || electronCode.includes("assets/icon.png"), 'Missing window icon configuration in electron-main.js');
 assert(electronCode.includes('preload.js'), 'Missing preload script reference in electron-main.js');
-assert(fs.existsSync(path.join(__dirname, 'preload.js')), 'Missing preload.js file');
-const preloadCode = fs.readFileSync(path.join(__dirname, 'preload.js'), 'utf8');
+assert(fs.existsSync(path.join(__dirname, '..', 'preload.js')), 'Missing preload.js file');
+const preloadCode = fs.readFileSync(path.join(__dirname, '..', 'preload.js'), 'utf8');
 assert(preloadCode.includes('checkForUpdates'), 'Missing checkForUpdates in preload.js');
 assert(pkg.build?.files?.includes('preload.js'), 'package.json build.files must include preload.js');
 console.log('✓ electron-main.js window icon, preload script, and update checking logic verified');
@@ -152,7 +152,7 @@ console.log('✓ compareSemver verified across equal, higher, lower, v-prefixed,
 
 // 9. Update Result Handler & Error Reporting Verification
 console.log('--- 9. Update Result Handler & Error Reporting Verification ---');
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 assert(appCode.includes('isCheckingUpdates'), 'Missing isCheckingUpdates debounce guard in app.js');
 assert(appCode.includes('btnVault.disabled = true'), 'Vault update button must disable during check');
 assert(appCode.includes('btnGuides.disabled = true'), 'Guides update button must disable during check');

@@ -7,8 +7,8 @@ const path = require('path');
 
   // 1. Structural Markup & CSS Verification
   console.log('--- 1. Structural Markup & CSS Verification ---');
-  const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-  const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
+  const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const cssContent = fs.readFileSync(path.join(__dirname, '..', 'css/style.css'), 'utf8');
 
   // Top Update Notification Banner
   assert(htmlContent.includes('id="update-banner"'), 'Missing id="update-banner" in index.html');
@@ -76,11 +76,11 @@ const path = require('path');
     clear: () => { for (const k of Object.keys(mockLocalStorage)) delete mockLocalStorage[k]; }
   };
 
-  const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+  const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
   const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
   global.Storage = Storage;
 
-  const Markdown = require('./js/markdown.js');
+  const Markdown = require('../js/markdown.js');
   global.Markdown = Markdown;
 
   function createMockElement(id = '', tag = 'div') {
@@ -206,7 +206,7 @@ const path = require('path');
   global.toast = (msg, type) => { lastToast = { msg, type }; };
 
   // Evaluate app.js
-  const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+  const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
   eval(`(function() { ${appCode}; })()`);
 
   assert(typeof window.showLordSpeyUpdateNotification === 'function', 'showLordSpeyUpdateNotification must be exported');

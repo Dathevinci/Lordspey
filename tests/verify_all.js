@@ -14,7 +14,7 @@ const files = [
 ];
 
 for (const f of files) {
-  const p = path.join(__dirname, f);
+  const p = path.join(__dirname, '..', f);
   assert(fs.existsSync(p), `Missing file: ${f}`);
   const stat = fs.statSync(p);
   assert(stat.size > 0, `Empty file: ${f}`);
@@ -22,7 +22,7 @@ for (const f of files) {
 }
 
 // 2. Test Markdown rendering & Wiki-links
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 const mdSample = `# Chapter 1
 Testing wiki link [[Lore of Magic|Arcana]] and task:
 - [x] Finished setup
@@ -43,7 +43,7 @@ global.localStorage = {
   clear: () => { for (const k of Object.keys(mockLocalStorage)) delete mockLocalStorage[k]; }
 };
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 
 // Confirm clean slate: by default 0 notes exist!
@@ -58,7 +58,7 @@ assert.strictEqual(Storage.getAllNotes().length, 1);
 console.log('✓ Note creation verified');
 
 // 4. Verify index.html contains Lord Spey branding, clean Main Menu, & Tutorial
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 assert(htmlContent.includes('Lord Spey'), 'Lord Spey branding missing in index.html');
 assert(htmlContent.includes('LORD SPEY'), 'Lord Spey title missing in main menu');
 assert(htmlContent.includes('id="main-menu"'), 'Missing #main-menu in index.html');
@@ -122,7 +122,7 @@ assert(!introSplashSection.includes('intro-title'), 'Intro splash must not conta
 assert(!introSplashSection.includes('intro-branding'), 'Intro splash must not contain intro-branding');
 assert(!introSplashSection.includes('LORD SPEY'), 'Intro splash must not contain text title LORD SPEY');
 
-const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
+const cssContent = fs.readFileSync(path.join(__dirname, '..', 'css/style.css'), 'utf8');
 assert(cssContent.includes('.sidebar-tools-dock'), 'Missing .sidebar-tools-dock in css/style.css');
 assert(cssContent.includes('.tool-dock-btn'), 'Missing .tool-dock-btn in css/style.css');
 assert(cssContent.includes('.tool-dock-btn[data-tooltip]::before'), 'Missing micro-tooltip ::before in css/style.css');
@@ -139,7 +139,7 @@ assert(!cssContent.includes('introTitleReveal'), 'Stale introTitleReveal keyfram
 assert(!cssContent.includes('introGemBloom'), 'Stale introGemBloom keyframe must not exist in css/style.css');
 assert(!cssContent.includes('filter: blur(2px)'), 'Harsh full-screen GPU blur penalty detected in intro-fade-out');
 
-const jsContent = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const jsContent = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 assert(jsContent.includes('dismissIntroSplash'), 'Missing dismissIntroSplash in js/app.js');
 assert(jsContent.includes('playIntroSplash'), 'Missing playIntroSplash in js/app.js');
 assert(jsContent.includes('dismissTimer'), 'Missing dismissTimer tracking to prevent leaking dismissal in js/app.js');

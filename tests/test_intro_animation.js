@@ -7,10 +7,10 @@ const path = require('path');
 
 console.log('--- Testing Cinematic Crimson Star Intro Animation Suite ---');
 
-const cssContent = fs.readFileSync(path.join(__dirname, 'css/style.css'), 'utf8');
-const wwwCssContent = fs.readFileSync(path.join(__dirname, 'www/css/style.css'), 'utf8');
-const jsContent = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const cssContent = fs.readFileSync(path.join(__dirname, '..', 'css/style.css'), 'utf8');
+const wwwCssContent = fs.readFileSync(path.join(__dirname, '..', 'www/css/style.css'), 'utf8');
+const jsContent = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 // 1. Keyframe structural validation (10 active intro keyframes for clean star stage)
 const requiredKeyframes = [

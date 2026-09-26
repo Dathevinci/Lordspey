@@ -15,11 +15,11 @@ global.localStorage = {
   clear: () => { for (const k of Object.keys(mockLocalStorage)) delete mockLocalStorage[k]; }
 };
 
-const storageCode = fs.readFileSync(path.join(__dirname, 'js/storage.js'), 'utf8');
+const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js/storage.js'), 'utf8');
 const Storage = eval(`(function() { ${storageCode}; return Storage; })()`);
 global.Storage = Storage;
 
-const Markdown = require('./js/markdown.js');
+const Markdown = require('../js/markdown.js');
 global.Markdown = Markdown;
 
 // ──────────────────────────────────────────
@@ -448,7 +448,7 @@ global.document = {
   }
 };
 
-const appCode = fs.readFileSync(path.join(__dirname, 'js/app.js'), 'utf8');
+const appCode = fs.readFileSync(path.join(__dirname, '..', 'js/app.js'), 'utf8');
 eval(`(function() { ${appCode}; })()`);
 
 // Test Export buttons trigger exportSpeyPackage
@@ -521,7 +521,7 @@ console.log('✓ UI integration, event triggers, modals, drag-drop & settings ve
 console.log('--- 7. Desktop & Mobile Configuration Verification ---');
 
 // package.json file associations
-const pkgJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
+const pkgJson = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
 assert(pkgJson.build, 'package.json must contain build configuration');
 assert(Array.isArray(pkgJson.build.fileAssociations), 'build must specify fileAssociations array');
 const speyAssoc = pkgJson.build.fileAssociations.find(a => a.ext === 'spey');
@@ -529,7 +529,7 @@ assert(speyAssoc, 'fileAssociations must register "spey" extension');
 assert.strictEqual(speyAssoc.mimeType, 'application/x-lord-spey');
 
 // electron-main.js single instance & argv handling
-const electronMain = fs.readFileSync(path.join(__dirname, 'electron-main.js'), 'utf8');
+const electronMain = fs.readFileSync(path.join(__dirname, '..', 'electron-main.js'), 'utf8');
 assert(electronMain.includes('requestSingleInstanceLock'), 'electron-main must request single instance lock');
 assert(electronMain.includes('findSpeyArg'), 'electron-main must parse spey arguments');
 assert(electronMain.includes('sendSpeyFileToWindow'), 'electron-main must send spey payload to window');
@@ -544,7 +544,7 @@ assert.strictEqual(findSpeyArgFn(['-v', 'test.json']), 'test.json', 'findSpeyArg
 assert.strictEqual(findSpeyArgFn(['--flag', 'unrelated.txt']), null, 'findSpeyArg must ignore non-spey files');
 
 // AndroidManifest.xml intent filters
-const manifest = fs.readFileSync(path.join(__dirname, 'android/app/src/main/AndroidManifest.xml'), 'utf8');
+const manifest = fs.readFileSync(path.join(__dirname, '..', 'android/app/src/main/AndroidManifest.xml'), 'utf8');
 assert(manifest.includes('android:pathPattern=".*\\\\.spey"') || manifest.includes('.spey'), 'AndroidManifest must register .spey path pattern');
 assert(manifest.includes('android:mimeType="application/x-lord-spey"'), 'AndroidManifest must register application/x-lord-spey mime type');
 
