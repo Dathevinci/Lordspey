@@ -82,25 +82,31 @@
       <!-- ───────── Interactive Showcase / Apple Window Mockup ───────── -->
       <div class="showcase-container">
         
-        <!-- Segmented Control Tabs -->
+        <!-- Segmented Control Tabs with Apple SF-Symbols style vector icons -->
         <div class="showcase-tabs" role="tablist" aria-label="Feature showcase switcher">
-          <button class="showcase-tab active" data-pane="pane-manuscript" role="tab" aria-selected="true">
-            <span>✍️</span> Manuscript Canvas
+          <button class="showcase-tab active" data-pane="pane-manuscript" role="tab" id="tab-manuscript" aria-controls="pane-manuscript" aria-selected="true" tabindex="0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span>Manuscript Canvas</span>
           </button>
-          <button class="showcase-tab" data-pane="pane-atlas" role="tab" aria-selected="false">
-            <span>🗺️</span> Universe Atlas
+          <button class="showcase-tab" data-pane="pane-atlas" role="tab" id="tab-atlas" aria-controls="pane-atlas" aria-selected="false" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            <span>Universe Atlas</span>
           </button>
-          <button class="showcase-tab" data-pane="pane-map" role="tab" aria-selected="false">
-            <span>🎨</span> Map Studio
+          <button class="showcase-tab" data-pane="pane-map" role="tab" id="tab-map" aria-controls="pane-map" aria-selected="false" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+            <span>Map Studio</span>
           </button>
-          <button class="showcase-tab" data-pane="pane-graph" role="tab" aria-selected="false">
-            <span>🕸️</span> Cosmos Lore Graph
+          <button class="showcase-tab" data-pane="pane-graph" role="tab" id="tab-graph" aria-controls="pane-graph" aria-selected="false" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span>Cosmos Lore Graph</span>
           </button>
-          <button class="showcase-tab" data-pane="pane-codex" role="tab" aria-selected="false">
-            <span>📖</span> Entity Codex
+          <button class="showcase-tab" data-pane="pane-codex" role="tab" id="tab-codex" aria-controls="pane-codex" aria-selected="false" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Entity Codex</span>
           </button>
-          <button class="showcase-tab" data-pane="pane-timeline" role="tab" aria-selected="false">
-            <span>⏳</span> Chronicle Timeline
+          <button class="showcase-tab" data-pane="pane-timeline" role="tab" id="tab-timeline" aria-controls="pane-timeline" aria-selected="false" tabindex="-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Chronicle Timeline</span>
           </button>
         </div>
 
@@ -109,16 +115,16 @@
           <!-- Window Titlebar with Traffic Lights -->
           <div class="mockup-header">
             <div class="mockup-dots">
-              <span class="mockup-dot mockup-dot-red"></span>
-              <span class="mockup-dot mockup-dot-yellow"></span>
-              <span class="mockup-dot mockup-dot-green"></span>
+              <span class="mockup-dot mockup-dot-red" title="Close"></span>
+              <span class="mockup-dot mockup-dot-yellow" title="Minimize"></span>
+              <span class="mockup-dot mockup-dot-green" title="Zoom"></span>
             </div>
             <span class="mockup-title" id="mockup-window-title">lord-spey — chapter-04-the-hollow-crown.md</span>
             <div class="mockup-meta" id="mockup-window-meta">1,842 words • 100% offline</div>
           </div>
 
           <!-- PANE 1: Manuscript Canvas -->
-          <div class="showcase-pane active" id="pane-manuscript">
+          <div class="showcase-pane active" id="pane-manuscript" role="tabpanel" aria-labelledby="tab-manuscript">
             <div class="mockup-content">
               <!-- Mock Sidebar -->
               <div class="mockup-sidebar">
@@ -127,19 +133,19 @@
                 <div class="mockup-sidebar-item active"><span>📄</span> Ch 4: The Hollow Crown</div>
                 <div class="mockup-sidebar-item"><span>📄</span> Ch 5: Ashen Shoreline</div>
                 <div class="mockup-sidebar-title" style="margin-top: 18px;">World Codex</div>
-                <div class="mockup-sidebar-item"><span>⚔️</span> Lord Corvus Vane</div>
-                <div class="mockup-sidebar-item"><span>🗺️</span> The Iron Reach (Map)</div>
-                <div class="mockup-sidebar-item"><span>⏳</span> The Obsidian Concordat</div>
+                <div class="mockup-sidebar-item" data-switch-pane="pane-codex"><span>⚔️</span> Lord Corvus Vane</div>
+                <div class="mockup-sidebar-item" data-switch-pane="pane-map"><span>🗺️</span> The Iron Reach (Map)</div>
+                <div class="mockup-sidebar-item" data-switch-pane="pane-timeline"><span>⏳</span> The Obsidian Concordat</div>
               </div>
               
               <!-- Mock Writing Canvas -->
               <div class="mockup-editor">
                 <h2 class="mockup-editor-heading">Chapter IV: The Hollow Crown</h2>
                 <p class="mockup-editor-text">
-                  The wind came off the Blackreach shelf smelling of salt and ancient pine. Corvus paused at the ridge crest, resting his gauntleted hand on the saddle pommel as the iron spires of <span class="mockup-wiki-link">[[Kaelen Keep]]</span> broke through the low autumn fog.
+                  The wind came off the Blackreach shelf smelling of salt and ancient pine. Corvus paused at the ridge crest, resting his gauntleted hand on the saddle pommel as the iron spires of <span class="mockup-wiki-link" data-switch-pane="pane-atlas" title="Jump to Universe Atlas">[[Kaelen Keep]]</span> broke through the low autumn fog.
                 </p>
                 <p class="mockup-editor-text">
-                  Three centuries had passed since the <span class="mockup-wiki-link">[[Obsidian Concordat]]</span> sealed the southern gates, yet the ramparts stood unbowed, their dark granite veins glinting beneath the pale morning light.
+                  Three centuries had passed since the <span class="mockup-wiki-link" data-switch-pane="pane-timeline" title="Jump to Chronicle Timeline">[[Obsidian Concordat]]</span> sealed the southern gates, yet the ramparts stood unbowed, their dark granite veins glinting beneath the pale morning light.
                 </p>
                 <div class="mockup-editor-break">* * *</div>
                 <p class="mockup-editor-text">
@@ -150,12 +156,12 @@
               <!-- Mock Inspector Drawer -->
               <div class="mockup-drawer">
                 <div class="mockup-sidebar-title">Linked Lore Dossiers</div>
-                <div class="mockup-drawer-card">
+                <div class="mockup-drawer-card" data-switch-pane="pane-codex" style="cursor: pointer;">
                   <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">[[Kaelen Keep]]</div>
                   <p style="font-size: 0.74rem; color: var(--text-secondary); line-height: 1.45;">Ancestral stronghold of House Vane, perched on the Blackreach precipice.</p>
                 </div>
                 
-                <div class="mockup-drawer-card">
+                <div class="mockup-drawer-card" data-switch-pane="pane-timeline" style="cursor: pointer;">
                   <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">[[Obsidian Concordat]]</div>
                   <p style="font-size: 0.74rem; color: var(--text-secondary); line-height: 1.45;">Historical treaty ratified during Era of Ash, Year 412.</p>
                 </div>
@@ -164,7 +170,7 @@
           </div>
 
           <!-- PANE 2: Universe Atlas -->
-          <div class="showcase-pane" id="pane-atlas">
+          <div class="showcase-pane" id="pane-atlas" role="tabpanel" aria-labelledby="tab-atlas">
             <div class="atlas-mock-view">
               <div class="atlas-breadcrumbs-bar">
                 <span>Milky Way</span>
@@ -175,29 +181,82 @@
                 <span>›</span>
                 <span class="active">Reach IV (World Surface)</span>
               </div>
+
+              <!-- Celestial Radar View with Star Core & Concentric Planetary Orbit Rings -->
+              <div class="atlas-system-radar">
+                <svg width="100%" height="100%" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Radial Solar Core -->
+                  <defs>
+                    <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#fff5cc" stop-opacity="1"/>
+                      <stop offset="35%" stop-color="#ffb833" stop-opacity="0.8"/>
+                      <stop offset="70%" stop-color="#ff7700" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#ff5500" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="planetGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#5ac8fa"/>
+                      <stop offset="100%" stop-color="#007aff"/>
+                    </radialGradient>
+                  </defs>
+                  
+                  <!-- Concentric Orbital Guide Rings -->
+                  <circle cx="300" cy="100" r="45" stroke="rgba(255, 255, 255, 0.12)" stroke-dasharray="3 3"/>
+                  <circle cx="300" cy="100" r="90" stroke="rgba(255, 255, 255, 0.18)" stroke-dasharray="4 4"/>
+                  <circle cx="300" cy="100" r="140" stroke="rgba(255, 255, 255, 0.12)" stroke-dasharray="4 4"/>
+                  <circle cx="300" cy="100" r="190" stroke="rgba(255, 255, 255, 0.08)" stroke-dasharray="4 4"/>
+                  
+                  <!-- Hyperlane Vector -->
+                  <path d="M 60 160 Q 200 130 300 100 T 540 40" stroke="rgba(50, 173, 230, 0.25)" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+                  <!-- Central Star -->
+                  <circle cx="300" cy="100" r="26" fill="url(#starGlow)"/>
+                  <circle cx="300" cy="100" r="9" fill="#ffffff"/>
+                  <text x="300" y="125" text-anchor="middle" fill="rgba(255, 255, 255, 0.7)" font-size="10" font-family="-apple-system, sans-serif">Eridani Core</text>
+
+                  <!-- Inner Planet (Orbit 1) -->
+                  <circle cx="340" cy="80" r="4" fill="#ff9500"/>
+                  <text x="350" y="82" fill="rgba(255, 255, 255, 0.6)" font-size="9" font-family="-apple-system, sans-serif">Reach I</text>
+
+                  <!-- Primary Focus World: Reach IV (Orbit 2) -->
+                  <circle cx="225" cy="65" r="9" fill="url(#planetGlow)"/>
+                  <circle cx="225" cy="65" r="12" stroke="#5ac8fa" stroke-width="1" stroke-opacity="0.8"/>
+                  <text x="225" y="48" text-anchor="middle" fill="#5ac8fa" font-weight="600" font-size="11" font-family="-apple-system, sans-serif">Reach IV (Primary)</text>
+
+                  <!-- Outer Station (Orbit 3) -->
+                  <circle cx="410" cy="150" r="5" fill="#30d158"/>
+                  <text x="422" y="153" fill="rgba(255, 255, 255, 0.6)" font-size="9" font-family="-apple-system, sans-serif">Starlight Outpost</text>
+
+                  <!-- Gas Giant (Orbit 4) -->
+                  <circle cx="120" cy="130" r="7" fill="#af52de"/>
+                  <text x="134" y="133" fill="rgba(255, 255, 255, 0.6)" font-size="9" font-family="-apple-system, sans-serif">Vesper Prime</text>
+                </svg>
+              </div>
+
+              <!-- 4 Hierarchical Tiers -->
               <div class="atlas-grid-tiers">
-                <div class="atlas-tier-card">
+                <div class="atlas-tier-card" data-tier="galaxy">
                   <div class="atlas-tier-icon">🌌</div>
                   <div class="atlas-tier-title">Galaxy / Sector</div>
                   <div class="atlas-tier-desc">Macro celestial territories, hyperspace lanes, and astral domain boundaries.</div>
                 </div>
-                <div class="atlas-tier-card">
+                <div class="atlas-tier-card" data-tier="system">
                   <div class="atlas-tier-icon">☀️</div>
                   <div class="atlas-tier-title">Star System</div>
                   <div class="atlas-tier-desc">Luminous radial solar cores with concentric planetary orbital guide rings.</div>
                 </div>
-                <div class="atlas-tier-card" style="border-color: rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.06);">
+                <div class="atlas-tier-card active" data-tier="world">
                   <div class="atlas-tier-icon">🪐</div>
                   <div class="atlas-tier-title">World Surface</div>
                   <div class="atlas-tier-desc">Planetary cartography, continents, sovereign borders, and geographical biomes.</div>
                 </div>
-                <div class="atlas-tier-card">
+                <div class="atlas-tier-card" data-tier="local">
                   <div class="atlas-tier-icon">🏛️</div>
                   <div class="atlas-tier-title">Local / Station</div>
                   <div class="atlas-tier-desc">Architectural deckplans, citadel floorplans, battle arenas, and city districts.</div>
                 </div>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-subtle); font-size: 0.8rem; color: var(--text-muted);">
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-subtle); font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; gap: 8px;">
                 <span>Ambient Backdrop: Cosmic Starfield (Real-Time Animated Canvas)</span>
                 <span>Seamless Breadcrumb Drill-Down</span>
               </div>
@@ -205,62 +264,151 @@
           </div>
 
           <!-- PANE 3: Map Studio -->
-          <div class="showcase-pane" id="pane-map">
+          <div class="showcase-pane" id="pane-map" role="tabpanel" aria-labelledby="tab-map">
             <div class="carto-mock-view">
               <div class="carto-toolbar">
                 <div class="carto-tools">
-                  <span class="active">🖌️ Ink Brush</span>
-                  <span>✏️ Pencil</span>
-                  <span>🏝️ Fractal Coastlines</span>
-                  <span>⛰️ Mountain Stamps</span>
-                  <span>🌲 Ancient Forests</span>
-                  <span>🪣 Flood Fill</span>
-                  <span>◻️ Shapes</span>
+                  <button class="carto-tool-btn active">🖌️ Ink Brush</button>
+                  <button class="carto-tool-btn">✏️ Pencil</button>
+                  <button class="carto-tool-btn">🏝️ Coastlines</button>
+                  <button class="carto-tool-btn">⛰️ Mountains</button>
+                  <button class="carto-tool-btn">🌲 Forests</button>
+                  <button class="carto-tool-btn">🪣 Flood Fill</button>
+                  <button class="carto-tool-btn">◻️ Shapes</button>
                 </div>
                 <div style="font-family: var(--font-mono); color: var(--text-muted); font-size: 0.74rem;">
-                  2400 × 1000 px • 3 Layers
+                  2400 × 1000 px • 3 Layers • Oval Vignette
                 </div>
               </div>
+
               <div class="carto-canvas">
-                <div class="carto-canvas-oval">
-                  <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); letter-spacing: 0.04em;">THE IRON REACH</div>
-                  <div style="font-size: 0.78rem; color: var(--text-secondary);">Oval Vignette • High-DPI Cartography Canvas</div>
-                  <div style="display: flex; gap: 8px; margin-top: 6px;">
-                    <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 980px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle);">⛰️ Frostspire Mountains</span>
-                    <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 980px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle);">🏰 Kaelen Keep</span>
-                  </div>
-                </div>
+                <!-- Rich SVG Fantasy Map Illustration -->
+                <svg class="carto-svg-map" viewBox="0 0 720 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Oval Boundary Frame -->
+                  <ellipse cx="360" cy="150" rx="330" ry="135" fill="rgba(18, 22, 32, 0.8)" stroke="rgba(255, 255, 255, 0.18)" stroke-width="1.5" stroke-dasharray="6 4"/>
+                  
+                  <!-- Ocean Contours -->
+                  <path d="M 80 150 Q 140 110 210 135 T 380 120 T 520 160 T 640 140" stroke="rgba(255, 255, 255, 0.06)" stroke-width="1.2"/>
+                  <path d="M 90 170 Q 170 140 240 160 T 420 145 T 560 190 T 630 165" stroke="rgba(255, 255, 255, 0.04)" stroke-width="1"/>
+
+                  <!-- Main Continent Coastline -->
+                  <path d="M 120 170 C 140 110, 180 80, 240 75 C 310 70, 340 100, 390 90 C 450 78, 510 105, 550 135 C 585 160, 560 210, 510 225 C 430 250, 380 205, 330 215 C 270 230, 210 220, 160 205 Z" 
+                        fill="rgba(32, 38, 52, 0.7)" stroke="rgba(255, 255, 255, 0.28)" stroke-width="2"/>
+                  
+                  <!-- Mountain Peaks (Frostspire Range) -->
+                  <g stroke="rgba(255, 255, 255, 0.55)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="rgba(255, 255, 255, 0.08)">
+                    <!-- Peak 1 -->
+                    <polygon points="260,140 275,108 290,140"/>
+                    <line x1="275" y1="108" x2="272" y2="140"/>
+                    <!-- Peak 2 -->
+                    <polygon points="285,145 305,100 325,145"/>
+                    <line x1="305" y1="100" x2="302" y2="145"/>
+                    <!-- Peak 3 -->
+                    <polygon points="320,142 338,112 355,142"/>
+                    <line x1="338" y1="112" x2="335" y2="142"/>
+                    <!-- Peak 4 -->
+                    <polygon points="350,148 370,118 390,148"/>
+                    <line x1="370" y1="118" x2="368" y2="148"/>
+                  </g>
+
+                  <!-- Pine Forest Clusters -->
+                  <g fill="rgba(48, 209, 88, 0.45)" stroke="rgba(48, 209, 88, 0.8)" stroke-width="0.8">
+                    <polygon points="200,165 206,150 212,165"/>
+                    <polygon points="210,170 216,155 222,170"/>
+                    <polygon points="220,166 226,151 232,166"/>
+                    <polygon points="420,175 426,160 432,175"/>
+                    <polygon points="430,178 436,163 442,178"/>
+                  </g>
+
+                  <!-- Territory Boundary Line -->
+                  <path d="M 230 78 Q 280 120 330 150 T 430 180" stroke="rgba(226, 176, 74, 0.7)" stroke-width="1.5" stroke-dasharray="5 3"/>
+
+                  <!-- City / Fortress Pin: Kaelen Keep -->
+                  <g>
+                    <circle cx="305" cy="98" r="6" fill="#c53b3b" stroke="#ffffff" stroke-width="1.5"/>
+                    <rect x="250" y="70" width="110" height="20" rx="4" fill="rgba(12, 14, 18, 0.85)" stroke="rgba(255, 255, 255, 0.2)"/>
+                    <text x="305" y="84" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="600" font-family="-apple-system, sans-serif">🏰 Kaelen Keep</text>
+                  </g>
+
+                  <!-- Bay Pin: Blackreach Bay -->
+                  <g>
+                    <circle cx="480" cy="140" r="5" fill="#32ade6" stroke="#ffffff" stroke-width="1.2"/>
+                    <text x="492" y="144" fill="#a1a1a6" font-size="9" font-family="-apple-system, sans-serif">⚓ Blackreach Bay</text>
+                  </g>
+
+                  <!-- Map Title Callout -->
+                  <text x="360" y="45" text-anchor="middle" fill="#f5f5f7" font-size="13" font-weight="700" letter-spacing="0.12em" font-family="-apple-system, sans-serif">THE IRON REACH</text>
+                  <text x="360" y="60" text-anchor="middle" fill="#86868b" font-size="9" letter-spacing="0.05em" font-family="-apple-system, sans-serif">High-DPI Cartography Canvas • Scale 1:50,000</text>
+
+                  <!-- Compass Rose -->
+                  <g transform="translate(620, 80)">
+                    <circle cx="0" cy="0" r="16" stroke="rgba(255, 255, 255, 0.2)" stroke-width="0.8"/>
+                    <polygon points="0,-14 3,-3 0,0 -3,-3" fill="#ffffff"/>
+                    <polygon points="0,14 3,3 0,0 -3,3" fill="rgba(255, 255, 255, 0.3)"/>
+                    <polygon points="14,0 3,3 0,0 3,-3" fill="rgba(255, 255, 255, 0.3)"/>
+                    <polygon points="-14,0 -3,3 0,0 -3,-3" fill="rgba(255, 255, 255, 0.3)"/>
+                    <text x="0" y="-18" text-anchor="middle" fill="#ffffff" font-size="8" font-weight="bold">N</text>
+                  </g>
+                </svg>
               </div>
             </div>
           </div>
 
           <!-- PANE 4: Cosmos Lore Graph -->
-          <div class="showcase-pane" id="pane-graph">
+          <div class="showcase-pane" id="pane-graph" role="tabpanel" aria-labelledby="tab-graph">
             <div class="graph-mock-view">
+              <!-- SVG Bidirectional Connection Lines -->
+              <svg class="graph-svg-connections" viewBox="0 0 800 420" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="400" y1="210" x2="220" y2="90" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <line x1="400" y1="210" x2="600" y2="100" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <line x1="400" y1="210" x2="160" y2="210" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <line x1="400" y1="210" x2="640" y2="220" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <line x1="400" y1="210" x2="240" y2="330" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <line x1="400" y1="210" x2="580" y2="330" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <!-- Cross-connections between satellite nodes -->
+                <line x1="220" y1="90" x2="600" y2="100" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1"/>
+                <line x1="240" y1="330" x2="580" y2="330" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1"/>
+              </svg>
+
               <!-- Center Hub -->
-              <div class="graph-center-node">Lord Corvus Vane</div>
-              <!-- Orbiting Nodes -->
-              <div class="graph-orbit-node" style="top: 50px; left: 140px;">Obsidian Concordat</div>
-              <div class="graph-orbit-node" style="top: 70px; right: 150px;">Kaelen Keep (Fortress)</div>
-              <div class="graph-orbit-node" style="bottom: 70px; left: 160px;">Chapter IV: The Hollow Crown</div>
-              <div class="graph-orbit-node" style="bottom: 60px; right: 160px;">The Frost Guard Faction</div>
-              <div class="graph-orbit-node" style="top: 170px; left: 60px;">House Vane Bloodline</div>
-              <div class="graph-orbit-node" style="top: 160px; right: 70px;">Blackreach Shelf</div>
+              <div class="graph-center-node" title="Focus Character Node">
+                <span>⚔️</span> Lord Corvus Vane
+              </div>
+
+              <!-- Orbiting Nodes with Responsive Coordinates -->
+              <div class="graph-orbit-node" style="top: 18%; left: 16%;" data-switch-pane="pane-timeline">
+                <span>📜</span> Obsidian Concordat
+              </div>
+              <div class="graph-orbit-node" style="top: 20%; right: 15%;" data-switch-pane="pane-atlas">
+                <span>🏰</span> Kaelen Keep (Fortress)
+              </div>
+              <div class="graph-orbit-node" style="top: 48%; left: 6%;" data-switch-pane="pane-manuscript">
+                <span>📄</span> Ch 4: The Hollow Crown
+              </div>
+              <div class="graph-orbit-node" style="top: 50%; right: 7%;">
+                <span>🛡️</span> The Frost Guard Faction
+              </div>
+              <div class="graph-orbit-node" style="bottom: 18%; left: 18%;">
+                <span>👑</span> House Vane Bloodline
+              </div>
+              <div class="graph-orbit-node" style="bottom: 18%; right: 18%;" data-switch-pane="pane-map">
+                <span>🗺️</span> Blackreach Shelf
+              </div>
             </div>
           </div>
 
           <!-- PANE 5: Entity Codex -->
-          <div class="showcase-pane" id="pane-codex">
+          <div class="showcase-pane" id="pane-codex" role="tabpanel" aria-labelledby="tab-codex">
             <div class="mockup-content">
               <div class="mockup-sidebar">
                 <div class="mockup-sidebar-title">Dossier Index</div>
                 <div class="mockup-sidebar-item active"><span>⚔️</span> Lord Corvus Vane</div>
                 <div class="mockup-sidebar-item"><span>👑</span> Lady Mireille</div>
-                <div class="mockup-sidebar-item"><span>📜</span> Obsidian Concordat</div>
+                <div class="mockup-sidebar-item" data-switch-pane="pane-timeline"><span>📜</span> Obsidian Concordat</div>
                 <div class="mockup-sidebar-item"><span>🗡️</span> Frostfall Scepter</div>
               </div>
               <div class="mockup-editor">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px;">
                   <h2 class="mockup-editor-heading" style="margin-bottom: 0;">Lord Corvus Vane</h2>
                   <span style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--text-muted);">Character Dossier</span>
                 </div>
@@ -289,8 +437,8 @@
           </div>
 
           <!-- PANE 6: Chronicle Timeline -->
-          <div class="showcase-pane" id="pane-timeline">
-            <div style="padding: 34px; display: flex; flex-direction: column; gap: 20px;">
+          <div class="showcase-pane" id="pane-timeline" role="tabpanel" aria-labelledby="tab-timeline">
+            <div style="padding: 34px; display: flex; flex-direction: column; gap: 20px; background: rgba(10, 12, 16, 0.95);">
               <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">Chronological Narrative Eras</div>
               <div style="display: flex; flex-direction: column; gap: 12px;">
                 <div style="display: flex; gap: 16px; align-items: center; padding: 14px 18px; border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle);">
@@ -541,7 +689,7 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span>Download Installer (.exe)</span>
           </a>
-          <a href="https://github.com/Dathevinci/Lordspey/releases/download/v1.2.0/Lord.Spey.1.2.0.exe" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 14px; text-decoration: underline; text-underline-offset: 3px;">
+          <a href="https://github.com/Dathevinci/Lordspey/releases/download/v1.2.0/Lord.Spey.1.2.0.exe" class="download-alt-link">
             Or get Portable Standalone .exe (No install)
           </a>
         </div>
@@ -560,7 +708,7 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span>Download APK (.apk)</span>
           </a>
-          <a href="https://github.com/Dathevinci/Lordspey/releases/download/v1.2.0/app-debug.apk" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 14px; text-decoration: underline; text-underline-offset: 3px;">
+          <a href="https://github.com/Dathevinci/Lordspey/releases/download/v1.2.0/app-debug.apk" class="download-alt-link">
             Alternative Debug APK Package
           </a>
         </div>
@@ -605,11 +753,11 @@
     </div>
   </footer>
 
-  <!-- ───────── Interactive Showcase Logic ───────── -->
+  <!-- ───────── Interactive Showcase Logic & Accessibility ───────── -->
   <script>
     (function() {
-      const tabs = document.querySelectorAll('.showcase-tab');
-      const panes = document.querySelectorAll('.showcase-pane');
+      const tabs = Array.from(document.querySelectorAll('.showcase-tab'));
+      const panes = Array.from(document.querySelectorAll('.showcase-pane'));
       const windowTitle = document.getElementById('mockup-window-title');
       const windowMeta = document.getElementById('mockup-window-meta');
 
@@ -622,30 +770,93 @@
         'pane-timeline': { title: 'lord-spey — Chronicle Timeline Plotter', meta: '3 Eras • 18 Milestones' }
       };
 
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          const targetPaneId = tab.getAttribute('data-pane');
-          if (!targetPaneId) return;
+      function activateTab(tab) {
+        if (!tab) return;
+        const targetPaneId = tab.getAttribute('data-pane');
+        if (!targetPaneId) return;
 
-          tabs.forEach(t => {
-            t.classList.remove('active');
-            t.setAttribute('aria-selected', 'false');
-          });
-          panes.forEach(p => p.classList.remove('active'));
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+          t.setAttribute('tabindex', '-1');
+        });
+        panes.forEach(p => p.classList.remove('active'));
 
-          tab.classList.add('active');
-          tab.setAttribute('aria-selected', 'true');
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        tab.setAttribute('tabindex', '0');
+        tab.focus();
 
-          const activePane = document.getElementById(targetPaneId);
-          if (activePane) {
-            activePane.classList.add('active');
+        const activePane = document.getElementById(targetPaneId);
+        if (activePane) {
+          activePane.classList.add('active');
+        }
+
+        if (titles[targetPaneId] && windowTitle && windowMeta) {
+          windowTitle.textContent = titles[targetPaneId].title;
+          windowMeta.textContent = titles[targetPaneId].meta;
+        }
+      }
+
+      // Tab click events
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activateTab(tab));
+
+        // Keyboard navigation (Arrow keys, Home, End)
+        tab.addEventListener('keydown', (e) => {
+          let nextIndex = null;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            nextIndex = (index + 1) % tabs.length;
+          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            nextIndex = (index - 1 + tabs.length) % tabs.length;
+          } else if (e.key === 'Home') {
+            nextIndex = 0;
+          } else if (e.key === 'End') {
+            nextIndex = tabs.length - 1;
           }
-
-          if (titles[targetPaneId] && windowTitle && windowMeta) {
-            windowTitle.textContent = titles[targetPaneId].title;
-            windowMeta.textContent = titles[targetPaneId].meta;
+          if (nextIndex !== null) {
+            e.preventDefault();
+            activateTab(tabs[nextIndex]);
           }
         });
+      });
+
+      // Interactive internal jump links (e.g., clicking [[Wiki-Links]] in manuscript)
+      document.querySelectorAll('[data-switch-pane]').forEach(el => {
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetPaneId = el.getAttribute('data-switch-pane');
+          const targetTab = tabs.find(t => t.getAttribute('data-pane') === targetPaneId);
+          if (targetTab) {
+            activateTab(targetTab);
+            const showcaseSection = document.querySelector('.showcase-container');
+            if (showcaseSection) {
+              showcaseSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+          }
+        });
+      });
+
+      // Atlas tier card selection
+      document.querySelectorAll('.atlas-tier-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.atlas-tier-card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+        });
+      });
+
+      // Cartography tool button selection
+      document.querySelectorAll('.carto-tool-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.carto-tool-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+
+      // Graph node interactivity
+      document.querySelectorAll('.graph-orbit-node').forEach(node => {
+        node.addEventListener('mouseenter', () => node.classList.add('highlighted'));
+        node.addEventListener('mouseleave', () => node.classList.remove('highlighted'));
       });
     })();
   </script>
