@@ -4,7 +4,7 @@
 
 [![Website](https://img.shields.io/badge/website-dathevinci.github.io%2FLordspey-111116?style=for-the-badge&logo=github)](https://dathevinci.github.io/Lordspey/)
 [![Launch Web App](https://img.shields.io/badge/launch-web%20app-ef4444?style=for-the-badge)](https://dathevinci.github.io/Lordspey/app/)
-[![Release](https://img.shields.io/badge/release-v2.0.0-111116?style=for-the-badge)](https://github.com/Dathevinci/Lordspey/releases/tag/v2.0.0)
+[![Release](https://img.shields.io/badge/release-v2.1.2-111116?style=for-the-badge)](https://github.com/Dathevinci/Lordspey/releases/tag/v2.1.2)
 [![License](https://img.shields.io/badge/license-MIT-111116?style=for-the-badge)](LICENSE)
 
 ---

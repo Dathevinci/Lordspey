@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '2.0.0';
+  const APP_VERSION = '2.1.2';
   const UPDATE_API_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
 
   const ALIAS_SELECTORS = {
@@ -1349,6 +1349,24 @@
 
     showMainMenu();
 
+    // Version 2.1.2 Celebration Launch Announcement ("We finally made it to Version 2.1.2!")
+    // Ensures zero overlay stacking on launch: shows only the clean v2.1.2 release popup once.
+    try {
+      if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_v2_1_2_seen')) {
+        localStorage.setItem('lordspey_v2_1_2_seen', 'true');
+        localStorage.setItem('lordspey_v2_seen', 'true');
+        localStorage.setItem('lordspey_tutorial_seen', 'true');
+        isInitialTutorialHandled = true;
+        if (tutorialTimer) {
+          clearTimeout(tutorialTimer);
+          tutorialTimer = null;
+        }
+        setTimeout(() => {
+          openWhatsNewModal();
+        }, 400);
+      }
+    } catch (_) {}
+
     // Check startup intro skip preference
     const skipIntroPref = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_skip_intro') === 'true') ||
                           (Storage.getSettings() && Storage.getSettings().skipIntro === true);
@@ -1369,7 +1387,7 @@
       introTimer = setTimeout(dismissIntroSplash, 2500);
     } else {
       isIntroActive = false;
-      // Launch tutorial on first visit
+      // Launch tutorial on first visit if not already handled
       if (!isInitialTutorialHandled && typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_tutorial_seen')) {
         isInitialTutorialHandled = true;
         if (tutorialTimer) clearTimeout(tutorialTimer);
@@ -1379,16 +1397,6 @@
         }, 400);
       }
     }
-
-    // Version 2.0 Celebration Launch Announcement ("We finally made it to Version 2.0!")
-    try {
-      if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_v2_seen')) {
-        localStorage.setItem('lordspey_v2_seen', 'true');
-        setTimeout(() => {
-          openWhatsNewModal();
-        }, 1000);
-      }
-    } catch (_) {}
   }
 
   // ── Cinematic Intro Splash Screen ──
@@ -1715,9 +1723,21 @@
       if (btnRibbonVault) btnRibbonVault.classList.remove('active');
     });
 
-    // ── Obsidian Activity Ribbon (v2.0) ──
+    // ── Obsidian Activity Ribbon (v2.1.2) ──
     if (btnRibbonVault) {
       btnRibbonVault.addEventListener('click', () => {
+        const anyViewOpen = (graphModal && !graphModal.classList.contains('hidden')) ||
+                            (mapModal && !mapModal.classList.contains('hidden')) ||
+                            (timelineModal && !timelineModal.classList.contains('hidden')) ||
+                            (codexModal && !codexModal.classList.contains('hidden'));
+        if (anyViewOpen) {
+          setActiveWorkspaceView('vault');
+          if (sidebar && sidebar.classList.contains('collapsed')) {
+            sidebar.classList.remove('collapsed');
+            btnRibbonVault.classList.add('active');
+          }
+          return;
+        }
         if (sidebar) {
           sidebar.classList.toggle('collapsed');
           const isCollapsed = sidebar.classList.contains('collapsed');
@@ -1732,21 +1752,39 @@
       btnRibbonSearch.addEventListener('click', openQuickSwitcher);
     }
     if (btnRibbonGraph) {
-      btnRibbonGraph.addEventListener('click', openGraphView);
+      btnRibbonGraph.addEventListener('click', () => {
+        if (graphModal && !graphModal.classList.contains('hidden')) {
+          closeGraphView();
+        } else {
+          openGraphView();
+        }
+      });
     }
     if (btnRibbonMap) {
       btnRibbonMap.addEventListener('click', () => {
-        if (typeof openMapStudio === 'function') openMapStudio();
+        if (mapModal && !mapModal.classList.contains('hidden')) {
+          closeMapView();
+        } else {
+          openMapView();
+        }
       });
     }
     if (btnRibbonTimeline) {
       btnRibbonTimeline.addEventListener('click', () => {
-        if (typeof openChronologyView === 'function') openChronologyView();
+        if (timelineModal && !timelineModal.classList.contains('hidden')) {
+          closeTimelineView();
+        } else {
+          openTimelineView();
+        }
       });
     }
     if (btnRibbonCodex) {
       btnRibbonCodex.addEventListener('click', () => {
-        if (typeof openCodexModal === 'function') openCodexModal();
+        if (codexModal && !codexModal.classList.contains('hidden')) {
+          closeCodexView();
+        } else {
+          openCodexView();
+        }
       });
     }
     if (btnRibbonSprint) {
@@ -5168,7 +5206,27 @@
     graphCanvas.addEventListener('wheel', onCanvasWheel, { passive: false });
   }
 
+  function setActiveWorkspaceView(viewName) {
+    if (viewName !== 'graph' && graphModal && !graphModal.classList.contains('hidden')) {
+      closeGraphView();
+    }
+    if (viewName !== 'map' && mapModal && !mapModal.classList.contains('hidden')) {
+      closeMapView();
+    }
+    if (viewName !== 'timeline' && timelineModal && !timelineModal.classList.contains('hidden')) {
+      closeTimelineView();
+    }
+    if (viewName !== 'codex' && codexModal && !codexModal.classList.contains('hidden')) {
+      closeCodexView();
+    }
+    if (btnRibbonGraph) btnRibbonGraph.classList.toggle('active', viewName === 'graph');
+    if (btnRibbonMap) btnRibbonMap.classList.toggle('active', viewName === 'map');
+    if (btnRibbonTimeline) btnRibbonTimeline.classList.toggle('active', viewName === 'timeline');
+    if (btnRibbonCodex) btnRibbonCodex.classList.toggle('active', viewName === 'codex');
+  }
+
   function openGraphView() {
+    setActiveWorkspaceView('graph');
     graphModal.classList.remove('hidden');
     resizeCanvas();
     const rect = graphCanvas.parentElement.getBoundingClientRect();
@@ -5188,6 +5246,7 @@
 
   function closeGraphView() {
     graphModal.classList.add('hidden');
+    if (btnRibbonGraph) btnRibbonGraph.classList.remove('active');
     if (graphAnimationId) {
       cancelAnimationFrame(graphAnimationId);
       graphAnimationId = null;
@@ -6648,6 +6707,7 @@
 
   function openMapView() {
     if (!mapModal) return;
+    setActiveWorkspaceView('map');
     mapModal.classList.remove('hidden');
     isMapPlacementMode = false;
     updateMapPlacementUI();
@@ -6688,6 +6748,7 @@
   function closeMapView() {
     if (!mapModal) return;
     mapModal.classList.add('hidden');
+    if (btnRibbonMap) btnRibbonMap.classList.remove('active');
     if (mapPinModal) mapPinModal.classList.add('hidden');
     if (atlasMapModal) atlasMapModal.classList.add('hidden');
     isAtlasMapModalOpen = false;
@@ -6768,7 +6829,7 @@
 
     // 5. Celestial Theme Dropdown
     if (mapCelestialThemeSelect) {
-      mapCelestialThemeSelect.value = curMap.celestialTheme || (curTier === 'galaxy' || curTier === 'system' ? 'cosmic-void' : 'standard-parchment');
+      mapCelestialThemeSelect.value = curMap.celestialTheme || 'cosmic-void';
     }
 
     // 6. Segmented Tier Controls (v2.0)
@@ -6996,7 +7057,7 @@
     const activeMapId = (Storage.getActiveMapId ? Storage.getActiveMapId() : null) || 'default';
     const curMap = (Storage.getMap ? Storage.getMap(activeMapId) : null) || {};
     const curTier = curMap.tier || 'world';
-    const celestialTheme = curMap.celestialTheme || (curTier === 'galaxy' || curTier === 'system' ? 'cosmic-void' : 'standard-parchment');
+    const celestialTheme = curMap.celestialTheme || 'cosmic-void';
     const isCosmic = celestialTheme === 'cosmic-void' || celestialTheme === 'nebula' || curTier === 'galaxy' || curTier === 'system';
 
     if (isCosmic) {
@@ -7027,24 +7088,22 @@
       }
       ctx.globalAlpha = 1.0;
 
-      // Interstellar Nebula clouds (if nebula theme or galaxy tier)
-      if (celestialTheme === 'nebula' || curTier === 'galaxy') {
-        const nebulae = [
-          { x: w * 0.35, y: h * 0.45, r: 260, color: 'rgba(168, 85, 247, 0.15)' },
-          { x: w * 0.65, y: h * 0.55, r: 300, color: 'rgba(56, 189, 248, 0.14)' },
-          { x: w * 0.5, y: h * 0.35, r: 220, color: 'rgba(236, 72, 153, 0.12)' }
-        ];
-        nebulae.forEach(c => {
-          if (typeof ctx.createRadialGradient === 'function') {
-            const ng = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r);
-            ng.addColorStop(0, c.color);
-            ng.addColorStop(0.6, c.color.replace(/[\d\.]+\)$/, '0.04)'));
-            ng.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = ng;
-            if (typeof ctx.fillRect === 'function') ctx.fillRect(c.x - c.r, c.y - c.r, c.r * 2, c.r * 2);
-          }
-        });
-      }
+      // Interstellar Nebula clouds
+      const nebulae = [
+        { x: w * 0.35, y: h * 0.45, r: 280, color: 'rgba(168, 85, 247, 0.14)' },
+        { x: w * 0.65, y: h * 0.55, r: 320, color: 'rgba(56, 189, 248, 0.13)' },
+        { x: w * 0.5, y: h * 0.35, r: 240, color: 'rgba(236, 72, 153, 0.10)' }
+      ];
+      nebulae.forEach(c => {
+        if (typeof ctx.createRadialGradient === 'function') {
+          const ng = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r);
+          ng.addColorStop(0, c.color);
+          ng.addColorStop(0.6, c.color.replace(/[\d\.]+\)$/, '0.03)'));
+          ng.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = ng;
+          if (typeof ctx.fillRect === 'function') ctx.fillRect(c.x - c.r, c.y - c.r, c.r * 2, c.r * 2);
+        }
+      });
 
       // Orbital Guide Rings (if star system or orbital rings enabled)
       const showOrbitalRings = curMap.orbitalRings !== undefined ? curMap.orbitalRings : (curTier === 'system');
@@ -7095,22 +7154,20 @@
         }
       }
 
-      // Galactic Nucleus & Sectors (if galaxy tier)
-      if (curTier === 'galaxy') {
-        const cx = w / 2;
-        const cy = h / 2;
+      // Universal Sector Grid & Coordinates (for galaxy or default cosmic canvas)
+      if (curTier !== 'system') {
         if (typeof ctx.createRadialGradient === 'function') {
           const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 140);
-          coreGlow.addColorStop(0, '#ffffff');
-          coreGlow.addColorStop(0.2, 'rgba(216, 180, 254, 0.85)');
-          coreGlow.addColorStop(0.5, 'rgba(147, 51, 234, 0.3)');
+          coreGlow.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+          coreGlow.addColorStop(0.2, 'rgba(167, 139, 250, 0.45)');
+          coreGlow.addColorStop(0.5, 'rgba(56, 189, 248, 0.16)');
           coreGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
           ctx.fillStyle = coreGlow;
           if (typeof ctx.fillRect === 'function') ctx.fillRect(cx - 140, cy - 140, 280, 280);
         }
 
         // Galactic Sector Grid & Coordinates
-        ctx.strokeStyle = 'rgba(168, 85, 247, 0.18)';
+        ctx.strokeStyle = 'rgba(168, 85, 247, 0.16)';
         ctx.lineWidth = 1;
         if (ctx.setLineDash) ctx.setLineDash([4, 6]);
 
@@ -7136,7 +7193,7 @@
         // Sector Quadrant Names
         if (typeof ctx.fillText === 'function') {
           ctx.font = "bold 10px 'JetBrains Mono', monospace";
-          ctx.fillStyle = 'rgba(192, 132, 252, 0.45)';
+          ctx.fillStyle = 'rgba(192, 132, 252, 0.42)';
           ctx.textAlign = 'left';
           ctx.fillText('SECTOR ALPHA [COREWARD]', cx + 18, 50);
           ctx.fillText('SECTOR BETA [SPINWARD]', cx + 18, cy + 24);
@@ -7145,21 +7202,21 @@
           ctx.fillText('SECTOR DELTA [TRAILING]', cx - 18, cy + 24);
 
           ctx.font = "bold 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-          ctx.fillStyle = 'rgba(233, 213, 255, 0.9)';
+          ctx.fillStyle = 'rgba(233, 213, 255, 0.78)';
           ctx.textAlign = 'center';
-          ctx.fillText('GALACTIC NUCLEUS', cx, cy + 34);
+          ctx.fillText((curMap.title && curMap.title !== 'The Known Realm') ? curMap.title.toUpperCase() : 'UNIVERSE NEXUS', cx, cy + 34);
 
           // Distance scale in parsecs / light-years
           ctx.textAlign = 'left';
           ctx.font = "10px 'JetBrains Mono', monospace";
-          ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
-          ctx.fillText('SCALE: 1 GRID = 25,000 LIGHT YEARS', 30, h - 35);
+          ctx.fillStyle = 'rgba(148, 163, 184, 0.55)';
+          ctx.fillText('UNIVERSE ATLAS · PLACE GALAXIES, STAR SYSTEMS, WORLDS & REALMS', 30, h - 35);
         }
       }
 
       // Outer cosmic border
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.28)';
+      ctx.lineWidth = 1.5;
       if (typeof ctx.strokeRect === 'function') ctx.strokeRect(20, 20, w - 40, h - 40);
       return;
     }
@@ -7167,7 +7224,7 @@
     const isLight = currentBaseTheme === 'light';
     const isSepia = currentBaseTheme === 'sepia';
 
-    // Background cosmic ocean / parchment sea
+    // Clean blank Cartographic / Planetary Surface Grid (zero premade fake continents)
     if (ctx.createRadialGradient) {
       const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, Math.max(w, h) * 0.6);
       if (isLight) {
@@ -7179,13 +7236,13 @@
         bgGrad.addColorStop(0.6, '#f3e5c8');
         bgGrad.addColorStop(1, '#e8d5b5');
       } else {
-        bgGrad.addColorStop(0, '#0a0d16');
-        bgGrad.addColorStop(0.6, '#06070c');
-        bgGrad.addColorStop(1, '#020306');
+        bgGrad.addColorStop(0, '#0c0f18');
+        bgGrad.addColorStop(0.6, '#080a10');
+        bgGrad.addColorStop(1, '#05060a');
       }
       ctx.fillStyle = bgGrad;
     } else {
-      ctx.fillStyle = isLight ? '#edf2f7' : isSepia ? '#f3e5c8' : '#06070c';
+      ctx.fillStyle = isLight ? '#edf2f7' : isSepia ? '#f3e5c8' : '#080a10';
     }
     if (typeof ctx.fillRect === 'function') {
       ctx.fillRect(0, 0, w, h);
@@ -7193,13 +7250,10 @@
 
     const mapTheme = ACCENT_THEMES[currentAccentTheme] || ACCENT_THEMES['crimson'];
     const mapAccentColor = mapTheme.accent;
-    const mapGlowColor = mapTheme.redGlowStrong || 'rgba(239, 68, 68, 0.5)';
-    const continentFill = isLight ? '#ffffff' : isSepia ? '#fdf8ee' : '#12141e';
-    const islandFill = isLight ? '#f1f5f9' : isSepia ? '#f5ebd2' : '#141724';
-    const mountainColor = isLight ? 'rgba(71, 85, 105, 0.45)' : isSepia ? 'rgba(92, 70, 50, 0.45)' : 'rgba(255, 255, 255, 0.25)';
+    const mapGlowColor = mapTheme.redGlowStrong || 'rgba(139, 92, 246, 0.45)';
 
-    // Coordinate grid lines
-    ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.05)' : isSepia ? 'rgba(90, 60, 30, 0.08)' : (mapTheme.redGlow || 'rgba(239, 68, 68, 0.07)');
+    // Coordinate graticule grid lines
+    ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.05)' : isSepia ? 'rgba(90, 60, 30, 0.08)' : 'rgba(255, 255, 255, 0.05)';
     ctx.lineWidth = 1;
     if (ctx.setLineDash) ctx.setLineDash([4, 6]);
 
@@ -7217,164 +7271,62 @@
     }
     if (ctx.setLineDash) ctx.setLineDash([]);
 
-    // Outer border & Cartographic Features (proportional scaling to fit any canvas aspect ratio & dimensions)
+    // Outer border & Astrolabe (proportional scaling to fit any canvas aspect ratio & dimensions)
     if (ctx.save) ctx.save();
     if (ctx.scale) ctx.scale(w / 1600, h / 1000);
 
     ctx.strokeStyle = mapGlowColor;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.5;
     if (ctx.strokeRect) ctx.strokeRect(20, 20, 1600 - 40, 1000 - 40);
     ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.08)' : isSepia ? 'rgba(90, 60, 30, 0.12)' : 'rgba(255, 255, 255, 0.08)';
     if (ctx.strokeRect) ctx.strokeRect(28, 28, 1600 - 56, 1000 - 56);
 
-    // Decorative corner diamond runes
+    // Decorative corner markers
     const corners = [[20, 20], [1600 - 20, 20], [20, 1000 - 20], [1600 - 20, 1000 - 20]];
     ctx.fillStyle = mapAccentColor;
     corners.forEach(([cx, cy]) => {
       ctx.beginPath();
-      ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    // Western Continent: The Ashen Highlands
-    if (ctx.save) ctx.save();
-    ctx.fillStyle = continentFill;
-    ctx.strokeStyle = mapAccentColor;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(140, 320);
-    if (ctx.bezierCurveTo) {
-      ctx.bezierCurveTo(220, 180, 480, 160, 560, 280);
-      ctx.bezierCurveTo(620, 360, 680, 440, 640, 560);
-      ctx.bezierCurveTo(580, 680, 520, 840, 340, 860);
-      ctx.bezierCurveTo(180, 870, 120, 720, 180, 580);
-      ctx.bezierCurveTo(200, 520, 120, 420, 140, 320);
-    } else {
-      ctx.lineTo(560, 280);
-      ctx.lineTo(640, 560);
-      ctx.lineTo(340, 860);
-      ctx.lineTo(180, 580);
-    }
-    if (ctx.closePath) ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    if (ctx.restore) ctx.restore();
-
-    // Eastern Continent: The Starfall Expanse
-    if (ctx.save) ctx.save();
-    ctx.fillStyle = continentFill;
-    ctx.strokeStyle = mapAccentColor;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(960, 240);
-    if (ctx.bezierCurveTo) {
-      ctx.bezierCurveTo(1120, 140, 1380, 160, 1460, 300);
-      ctx.bezierCurveTo(1520, 420, 1480, 640, 1380, 740);
-      ctx.bezierCurveTo(1240, 840, 1040, 780, 940, 660);
-      ctx.bezierCurveTo(860, 540, 840, 340, 960, 240);
-    } else {
-      ctx.lineTo(1460, 300);
-      ctx.lineTo(1380, 740);
-      ctx.lineTo(940, 660);
-    }
-    if (ctx.closePath) ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    if (ctx.restore) ctx.restore();
-
-    // Central Mountain Divide (The Obsidian Ridge)
-    ctx.strokeStyle = mountainColor;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    const ridgePoints = [
-      [360, 260], [420, 240], [480, 280], [530, 330],
-      [570, 410], [600, 490], [580, 570], [520, 640],
-      [440, 720], [380, 760]
-    ];
-    ridgePoints.forEach(([px, py], i) => {
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-      ctx.moveTo(px, py);
-      ctx.lineTo(px - 6, py + 12);
-      ctx.moveTo(px, py);
-      ctx.lineTo(px + 6, py + 12);
-    });
-    ctx.stroke();
-
-    // The Bleeding Chasm (rift)
-    if (ctx.save) ctx.save();
-    ctx.strokeStyle = mapAccentColor;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(600, 510);
-    ctx.lineTo(650, 560);
-    ctx.lineTo(630, 610);
-    ctx.lineTo(710, 680);
-    ctx.lineTo(760, 720);
-    ctx.stroke();
-    if (ctx.restore) ctx.restore();
-
-    // Southern Archipelago
-    const islands = [
-      [720, 820, 28], [790, 860, 22], [850, 840, 18], [680, 890, 14]
-    ];
-    ctx.fillStyle = islandFill;
-    ctx.strokeStyle = mapGlowColor;
-    ctx.lineWidth = 1.5;
-    islands.forEach(([ix, iy, r]) => {
-      ctx.beginPath();
-      ctx.arc(ix, iy, r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-    });
-
-    // Compass Rose / Astrolabe at (1440, 850)
-    const astrolabeX = 1440;
-    const astrolabeY = 850;
+    // Compass Rose / Astrolabe at (1460, 860)
+    const astrolabeX = 1460;
+    const astrolabeY = 860;
     if (ctx.save) ctx.save();
     ctx.strokeStyle = mapGlowColor;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(astrolabeX, astrolabeY, 54, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.arc(astrolabeX, astrolabeY, 44, 0, Math.PI * 2);
     ctx.stroke();
 
     for (let a = 0; a < 8; a++) {
       const angle = (a * Math.PI) / 4;
-      const len = a % 2 === 0 ? 50 : 32;
-      ctx.fillStyle = a % 2 === 0 ? mapAccentColor : 'rgba(255, 255, 255, 0.4)';
+      const len = a % 2 === 0 ? 40 : 24;
+      ctx.fillStyle = a % 2 === 0 ? mapAccentColor : 'rgba(255, 255, 255, 0.35)';
       ctx.beginPath();
       ctx.moveTo(astrolabeX, astrolabeY);
-      ctx.lineTo(astrolabeX + Math.cos(angle - 0.15) * 14, astrolabeY + Math.sin(angle - 0.15) * 14);
+      ctx.lineTo(astrolabeX + Math.cos(angle - 0.15) * 10, astrolabeY + Math.sin(angle - 0.15) * 10);
       ctx.lineTo(astrolabeX + Math.cos(angle) * len, astrolabeY + Math.sin(angle) * len);
-      ctx.lineTo(astrolabeX + Math.cos(angle + 0.15) * 14, astrolabeY + Math.sin(angle + 0.15) * 14);
+      ctx.lineTo(astrolabeX + Math.cos(angle + 0.15) * 10, astrolabeY + Math.sin(angle + 0.15) * 10);
       if (ctx.closePath) ctx.closePath();
       ctx.fill();
     }
 
     if (typeof ctx.fillText === 'function') {
-      ctx.font = "bold 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-      ctx.fillStyle = '#fff';
+      ctx.font = "bold 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      ctx.fillStyle = isLight ? '#334155' : isSepia ? '#5c4028' : 'rgba(255, 255, 255, 0.75)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('N', astrolabeX, astrolabeY - 66);
-      ctx.fillText('S', astrolabeX, astrolabeY + 66);
-      ctx.fillText('E', astrolabeX + 66, astrolabeY);
-      ctx.fillText('W', astrolabeX - 66, astrolabeY);
+      ctx.fillText('N', astrolabeX, astrolabeY - 54);
+      ctx.fillText('S', astrolabeX, astrolabeY + 54);
+      ctx.fillText('E', astrolabeX + 54, astrolabeY);
+      ctx.fillText('W', astrolabeX - 54, astrolabeY);
 
-      // Geographical Titles
-      ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-      ctx.fillText('THE ASHEN HIGHLANDS', 370, 390);
-      ctx.fillText('THE OBSIDIAN GATE PASS', 560, 470);
-      ctx.fillText('THE STARFALL EXPANSE', 1180, 480);
-      ctx.fillText('THE TWILIGHT SEA', 800, 360);
-      ctx.font = "500 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.6)';
-      ctx.fillText('THE BLEEDING CHASM', 720, 620);
-      ctx.fillText('SUNLESS ARCHIPELAGO', 780, 920);
+      ctx.textAlign = 'left';
+      ctx.font = "10px 'JetBrains Mono', monospace";
+      ctx.fillStyle = isLight ? 'rgba(51, 65, 85, 0.5)' : isSepia ? 'rgba(92, 64, 40, 0.5)' : 'rgba(148, 163, 184, 0.45)';
+      ctx.fillText(`${(curMap.title || 'PLANETARY REALM').toUpperCase()} · CARTOGRAPHIC CANVAS`, 42, 955);
     }
     if (ctx.restore) ctx.restore();
     if (ctx.restore) ctx.restore();
@@ -7389,13 +7341,8 @@
     const query = (mapPinSearch && typeof mapPinSearch.value === 'string') ? mapPinSearch.value.trim().toLowerCase() : '';
 
     const mapEmptyPrompt = $('#map-empty-prompt');
-    const allRegions = Storage.getAllMapRegions ? Storage.getAllMapRegions(activeMapId) : [];
     if (mapEmptyPrompt) {
-      if (allPins.length === 0 && allRegions.length === 0) {
-        mapEmptyPrompt.classList.remove('hidden');
-      } else {
-        mapEmptyPrompt.classList.add('hidden');
-      }
+      mapEmptyPrompt.classList.add('hidden');
     }
 
     const filtered = allPins.filter(pin => {
@@ -7963,6 +7910,7 @@
 
   function openTimelineView() {
     if (!timelineModal) return;
+    setActiveWorkspaceView('timeline');
     timelineModal.classList.remove('hidden');
     renderTimeline();
   }
@@ -7970,6 +7918,7 @@
   function closeTimelineView() {
     if (!timelineModal) return;
     timelineModal.classList.add('hidden');
+    if (btnRibbonTimeline) btnRibbonTimeline.classList.remove('active');
     if (timelineEventModal) timelineEventModal.classList.add('hidden');
     if (timelineTutorialModal) timelineTutorialModal.classList.add('hidden');
   }
@@ -8473,6 +8422,7 @@
 
   function openCodexView() {
     if (!codexModal) return;
+    setActiveWorkspaceView('codex');
     codexModal.classList.remove('hidden');
     if (codexCharPreview) {
       codexCharPreview.classList.add('hidden');
@@ -8484,6 +8434,7 @@
   function closeCodexView() {
     if (!codexModal) return;
     codexModal.classList.add('hidden');
+    if (btnRibbonCodex) btnRibbonCodex.classList.remove('active');
     if (codexCharModal) codexCharModal.classList.add('hidden');
     if (codexRelModal) codexRelModal.classList.add('hidden');
     if (codexCharPreview) {
@@ -12439,16 +12390,14 @@
   function renderWhatsNewHtml(features = WHATS_NEW_V110_FEATURES) {
     return `
       <div class="whats-new-intro" style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
-        <strong>We finally made it to Version 2.0!</strong> A monumental release delivering an authentic Obsidian-grade interface, Universe Starcharts, and buttery-smooth interactions:
+        <strong>We finally made it to Version 2.1.2!</strong> A unified Obsidian-style workspace with docked views (zero overlay clutter), Universe-first starcharts, and fluid 60fps responsiveness:
       </div>
       <div class="whats-new-v111-patch" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px;">
-        <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-primary); margin-bottom: 6px;">v2.0.0 Obsidian Interface &amp; Universe Atlas</div>
+        <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-primary); margin-bottom: 6px;">v2.1.2 Obsidian Workspace &amp; Universe Atlas</div>
         <ul style="font-size: 0.82rem; color: var(--text-secondary); margin: 0; padding-left: 18px; line-height: 1.5;">
-          <li><strong>Obsidian-Style Activity Ribbon:</strong> Docked left navigation ribbon providing 1-click access to Vault File Tree, Search, Galaxy Graph, Universe Starcharts, Timelines, Codex, and Settings.</li>
-          <li><strong>Workspace Document Tabs:</strong> Elegant tabbed workspace displaying the active document title, close button (Esc), new note, reading mode toggle, and split view.</li>
-          <li><strong>Obsidian Status Bar:</strong> Bottom telemetry displaying live word count, character count, reading time, active document name, backlinks count, and editor status.</li>
-          <li><strong>Universe Starcharts &amp; Cosmic Atlas:</strong> Complete authorial freedom to map entire universes (galaxies, star systems with concentric planetary orbits, hyperlanes, and jump gates) instead of simple country maps. Includes 1-click Universe Template.</li>
-          <li><strong>Fluid 60fps Experience:</strong> Optimized transitions with hardware-accelerated cubic-bezier curves for silky smooth drawer slides, modal reveals, and canvas zoom.</li>
+          <li><strong>Docked Obsidian Workspace Views (Zero Overlay Slop):</strong> Galaxy Graph, Universe Atlas, Chronology Timeline, and Character Codex dock flush into the workspace pane right next to the 40px Activity Ribbon—no floating modal popups or stacked backdrops.</li>
+          <li><strong>Universe-First Cartography:</strong> Replaced hardcoded country maps with a blank Universe &amp; Cosmic Starchart canvas where authors map their own galaxies, star systems, planetary orbits, and realms. Includes 1-click Universe Generator &amp; Quick Biomes.</li>
+          <li><strong>Obsidian Activity Ribbon &amp; Status Bar:</strong> Instant 1-click switching between Vault Explorer, Graph, Universe Atlas, Timeline, and Codex with live word/character/backlink telemetry.</li>
         </ul>
       </div>
       <div class="whats-new-grid">
@@ -12607,17 +12556,17 @@
     const downloadIcon = $('#btn-download-update-icon');
     const githubLink = $('#btn-view-release-github');
 
-    if (badgeEl) badgeEl.textContent = `WHAT'S NEW IN v${APP_VERSION} — VERSION 2.0`;
-    if (titleEl) titleEl.textContent = `We finally made it to Version 2.0!`;
+    if (badgeEl) badgeEl.textContent = `WHAT'S NEW IN v${APP_VERSION} — VERSION 2.1.2`;
+    if (titleEl) titleEl.textContent = `We finally made it to Version 2.1.2!`;
     if (curVerChip) curVerChip.textContent = `Installed: v${APP_VERSION}`;
     if (arrowEl) arrowEl.textContent = '✦';
     if (newVerChip) {
       newVerChip.textContent = `Latest Edition ✓`;
       newVerChip.className = 'update-version-chip update-chip-installed';
     }
-    if (notesHeadingEl) notesHeadingEl.textContent = `We finally made it to Version 2.0! — Release Highlights`;
+    if (notesHeadingEl) notesHeadingEl.textContent = `We finally made it to Version 2.1.2! — Release Highlights`;
     if (guaranteeEl) {
-      guaranteeEl.innerHTML = `<strong>We finally made it to Version 2.0!</strong> Built for serious novelists, worldbuilders, and story architects. All manuscript drafts, vault lore, world maps, characters, and settings are active and safeguarded.`;
+      guaranteeEl.innerHTML = `<strong>We finally made it to Version 2.1.2!</strong> Built for serious novelists, worldbuilders, and story architects. All manuscript drafts, vault lore, universe maps, characters, and settings are active and safeguarded.`;
     }
     if (dismissBtn) {
       dismissBtn.textContent = 'Close';

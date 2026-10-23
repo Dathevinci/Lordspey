@@ -16,22 +16,22 @@ const assert = require('assert');
 
 console.log('=== RUNNING LORD SPEY v2.0 OBSIDIAN UI & UNIVERSE ATLAS SUITE ===\n');
 
-// 1. Version 2.0 Configuration
-console.log('--- 1. Version 2.0 Configuration Across Ecosystem ---');
+// 1. Version 2.1.2 Configuration
+console.log('--- 1. Version 2.1.2 Configuration Across Ecosystem ---');
 const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
-assert.strictEqual(pkg.version, '2.0.0', 'package.json must be 2.0.0');
+assert.strictEqual(pkg.version, '2.1.2', 'package.json must be 2.1.2');
 
 const gradleContent = fs.readFileSync(path.join(__dirname, '..', 'android', 'app', 'build.gradle'), 'utf8');
-assert(gradleContent.includes('versionCode 200'), 'build.gradle must have versionCode 200');
-assert(gradleContent.includes('versionName "2.0.0"'), 'build.gradle must have versionName "2.0.0"');
+assert(gradleContent.includes('versionCode 212'), 'build.gradle must have versionCode 212');
+assert(gradleContent.includes('versionName "2.1.2"'), 'build.gradle must have versionName "2.1.2"');
 
 const appJsRaw = fs.readFileSync(path.join(__dirname, '..', 'js', 'app.js'), 'utf8');
-assert(appJsRaw.includes("const APP_VERSION = '2.0.0'"), 'js/app.js APP_VERSION must be 2.0.0');
+assert(appJsRaw.includes("const APP_VERSION = '2.1.2'"), 'js/app.js APP_VERSION must be 2.1.2');
 
 const indexHtml = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-assert(indexHtml.includes('css/style.css?v=2.0.0'), 'index.html style.css link must have ?v=2.0.0');
-assert(indexHtml.includes('js/app.js?v=2.0.0'), 'index.html app.js link must have ?v=2.0.0');
-console.log('✓ v2.0.0 synchronized across package.json, build.gradle, app.js, and index.html');
+assert(indexHtml.includes('css/style.css?v=2.1.2'), 'index.html style.css link must have ?v=2.1.2');
+assert(indexHtml.includes('js/app.js?v=2.1.2'), 'index.html app.js link must have ?v=2.1.2');
+console.log('✓ v2.1.2 synchronized across package.json, build.gradle, app.js, and index.html');
 
 // 2. Obsidian Activity Ribbon Markup & Controls
 console.log('--- 2. Obsidian Activity Ribbon Markup & Controls ---');
@@ -69,8 +69,8 @@ assert(indexHtml.includes('id="sb-backlink-count"'), 'Missing sb-backlink-count 
 assert(indexHtml.includes('id="sb-mode"'), 'Missing sb-mode in status-bar');
 assert(indexHtml.includes('id="sb-save-status"'), 'Missing sb-save-status in status-bar');
 assert(indexHtml.includes('id="sb-version"'), 'Missing sb-version in status-bar');
-assert(indexHtml.includes('v2.0.0'), 'Status bar must display v2.0.0');
-console.log('✓ Obsidian Status Bar verified with live metrics, backlinks, mode, and v2.0.0 badge');
+assert(indexHtml.includes('v2.1.2'), 'Status bar must display v2.1.2');
+console.log('✓ Obsidian Status Bar verified with live metrics, backlinks, mode, and v2.1.2 badge');
 
 // 5. Universe Starchart & Mapping Controls
 console.log('--- 5. Universe Starchart & Mapping Controls ---');
@@ -95,11 +95,14 @@ assert(styleCss.includes('.map-tier-segmented'), 'style.css must style .map-tier
 assert(styleCss.includes('cubic-bezier(0.16, 1, 0.3, 1)'), 'style.css must include fluid 60fps cubic-bezier curves');
 console.log('✓ Obsidian interface styling and fluid transitions verified');
 
-// 7. Version 2.0 Celebration Modal
-console.log('--- 7. Version 2.0 Celebration Launch Announcement ---');
-assert(appJsRaw.includes('We finally made it to Version 2.0!'), 'app.js must proclaim "We finally made it to Version 2.0!"');
-assert(appJsRaw.includes('lordspey_v2_seen'), 'app.js must check lordspey_v2_seen for auto-popup on launch');
-console.log('✓ "We finally made it to Version 2.0!" celebration popup verified');
+// 7. Version 2.1.2 Celebration Modal & Docked Non-Overlay Architecture
+console.log('--- 7. Version 2.1.2 Celebration Launch Announcement & Docked Workspace ---');
+assert(appJsRaw.includes('We finally made it to Version 2.1.2!'), 'app.js must proclaim "We finally made it to Version 2.1.2!"');
+assert(appJsRaw.includes('lordspey_v2_1_2_seen'), 'app.js must check lordspey_v2_1_2_seen for auto-popup on launch');
+assert(appJsRaw.includes('function setActiveWorkspaceView(viewName)'), 'app.js must implement setActiveWorkspaceView for non-overlay docked navigation');
+assert(!appJsRaw.includes('THE ASHEN HIGHLANDS'), 'Default map must not hardcode fake country continents');
+assert(appJsRaw.includes('UNIVERSE NEXUS'), 'Default map must render Universe Starchart scale');
+console.log('✓ "We finally made it to Version 2.1.2!" celebration popup & docked Obsidian views verified');
 
 // 8. Storage Universe Starchart Execution Test
 console.log('--- 8. Storage Universe Starchart Functional Test ---');

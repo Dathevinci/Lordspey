@@ -8443,7 +8443,7 @@ body[data-theme="sepia"][data-animated-theme]:not([data-animated-theme="none"]) 
 }
 
 /* ══════════════════════════════════════════════════════
-   FLUID HARDWARE-ACCELERATED TRANSITIONS (v2.0)
+   FLUID HARDWARE-ACCELERATED TRANSITIONS (v2.0 / v2.1.2)
    ══════════════════════════════════════════════════════ */
 .sidebar,
 .drawer,
@@ -8452,6 +8452,87 @@ body[data-theme="sepia"][data-animated-theme]:not([data-animated-theme="none"]) 
   transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
   will-change: transform, opacity;
 }
+
+/* ══════════════════════════════════════════════════════
+   OBSIDIAN DOCKED WORKSPACE VIEWS — ZERO OVERLAY SLOP (v2.1.2)
+   Converts Graph, Universe Atlas, Timeline & Codex from
+   floating modal popups into full-bleed docked Obsidian
+   workspace panes flush next to the 40px Activity Ribbon.
+   ══════════════════════════════════════════════════════ */
+.graph-overlay,
+.map-overlay,
+.timeline-overlay,
+.codex-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 40px !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: calc(100vw - 40px) !important;
+  height: 100vh !important;
+  padding: 0 !important;
+  background: var(--bg-primary) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  z-index: 65 !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+}
+
+.graph-dialog,
+.map-dialog,
+.timeline-dialog,
+.codex-dialog {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  background: var(--bg-primary) !important;
+}
+
+@media (max-width: 600px) {
+  .graph-overlay,
+  .map-overlay,
+  .timeline-overlay,
+  .codex-overlay {
+    left: 0 !important;
+    width: 100vw !important;
+  }
+}
+
+/* Pure Obsidian Vault File Tree: hide duplicate sidebar tool dock (Activity Ribbon handles all view switching) */
+.sidebar .sidebar-tools-section {
+  display: none;
+}
+
+/* Matte Obsidian Dashboard & Workspace Surfaces */
+.main-menu {
+  background: var(--bg-primary);
+}
+
+.menu-card,
+.menu-wb-card,
+.menu-spey-banner {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: none !important;
+  transition: background 150ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 150ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.menu-card:hover,
+.menu-wb-card:hover {
+  background: var(--bg-hover) !important;
+  border-color: var(--border) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18) !important;
+}
+
 
 
 

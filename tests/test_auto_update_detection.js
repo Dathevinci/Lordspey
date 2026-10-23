@@ -231,23 +231,23 @@ const path = require('path');
   assert(dashboardBadge.classList.contains('hidden'), 'Dashboard badge must start hidden');
   assert(dashboardIndicator.classList.contains('hidden'), 'Dashboard update indicator must start hidden');
 
-  // Trigger update notification with newer release v2.1.0
+  // Trigger update notification with newer release v2.2.0
   window.showLordSpeyUpdateNotification({
-    tag_name: 'v2.1.0',
-    latestVersion: '2.1.0',
-    name: 'Lord Spey v2.1.0',
-    body: '### What\'s New in v2.1.0\n- Dynamic update notifications\n- Automated backup guarantee',
-    html_url: 'https://github.com/Dathevinci/Lordspey/releases/tag/v2.1.0'
+    tag_name: 'v2.2.0',
+    latestVersion: '2.2.0',
+    name: 'Lord Spey v2.2.0',
+    body: '### What\'s New in v2.2.0\n- Dynamic update notifications\n- Automated backup guarantee',
+    html_url: 'https://github.com/Dathevinci/Lordspey/releases/tag/v2.2.0'
   });
 
   assert(!banner.classList.contains('hidden'), 'Update banner must become visible');
-  assert.strictEqual(bannerVer.textContent, 'v2.1.0', 'Update banner must show latest version tag');
+  assert.strictEqual(bannerVer.textContent, 'v2.2.0', 'Update banner must show latest version tag');
   assert(!sidebarBadge.classList.contains('hidden'), 'Sidebar gear badge must become visible');
   assert(!dashboardBadge.classList.contains('hidden'), 'Dashboard settings badge must become visible');
   assert(!dashboardIndicator.classList.contains('hidden'), 'Dashboard update indicator button must become visible');
-  assert.strictEqual(dashboardUpdateText.textContent, 'Update to v2.1.0', 'Dashboard indicator text must show update target');
+  assert.strictEqual(dashboardUpdateText.textContent, 'Update to v2.2.0', 'Dashboard indicator text must show update target');
   assert(btnGear.classList.contains('has-update'), 'Sidebar gear button must have .has-update class');
-  console.log('✓ Banner, sidebar gear badge, and dashboard indicators successfully display new version v2.1.0');
+  console.log('✓ Banner, sidebar gear badge, and dashboard indicators successfully display new version v2.2.0');
 
   // 5. Testing Banner Interaction: [Update Now] opens #modal-update
   console.log('--- 5. Testing [Update Now] Banner Click & Modal Opening ---');
@@ -259,7 +259,7 @@ const path = require('path');
   assert(!sidebarBadge.classList.contains('hidden'), 'Sidebar badge must stay visible while update is pending');
 
   const newVerChip = getOrCreateElement('update-new-version-chip');
-  assert(newVerChip.textContent.includes('v2.1.0'), 'Version chip must display new version');
+  assert(newVerChip.textContent.includes('v2.2.0'), 'Version chip must display new version');
   window.closeLordSpeyUpdateModal();
   assert(modalUpdate.classList.contains('hidden'), 'Modal must close cleanly');
   console.log('✓ [Update Now] button opens update modal and transitions state cleanly');
@@ -275,7 +275,7 @@ const path = require('path');
   // 7. Testing Banner Dismissal Preserving Subtle Badges
   console.log('--- 7. Testing Banner Dismissal Preserving Subtle Badges ---');
   // Show banner again
-  window.showLordSpeyUpdateNotification({ tag_name: 'v2.1.0', latestVersion: '2.1.0' });
+  window.showLordSpeyUpdateNotification({ tag_name: 'v2.2.0', latestVersion: '2.2.0' });
   assert(!banner.classList.contains('hidden'));
 
   const btnBannerDismiss = getOrCreateElement('btn-banner-dismiss-update');
@@ -290,8 +290,8 @@ const path = require('path');
   const checkTimestamp = Date.now();
   mockLocalStorage['lordspey_last_update_check'] = String(checkTimestamp);
   mockLocalStorage['lordspey_cached_release'] = JSON.stringify({
-    tag_name: 'v2.1.0',
-    latestVersion: 'v2.1.0',
+    tag_name: 'v2.2.0',
+    latestVersion: 'v2.2.0',
     hasUpdate: true
   });
 
@@ -299,14 +299,14 @@ const path = require('path');
   let fetchCalled = false;
   global.fetch = async () => {
     fetchCalled = true;
-    return { ok: true, json: async () => ({ tag_name: 'v2.1.0' }) };
+    return { ok: true, json: async () => ({ tag_name: 'v2.2.0' }) };
   };
 
   const result = await window.checkLordSpeyUpdates(false);
   assert.strictEqual(fetchCalled, false, 'Fetch must not be called when recent check is cached within 15 minutes');
   assert.strictEqual(result.cached, true, 'Result must indicate cached response');
   assert.strictEqual(result.hasUpdate, true, 'Result must report hasUpdate from cache');
-  assert.strictEqual(bannerVer.textContent, 'v2.1.0', 'Banner must display cached v2.1.0 version');
+  assert.strictEqual(bannerVer.textContent, 'v2.2.0', 'Banner must display cached v2.2.0 version');
   // Rate-limiting check when no cached release is in localStorage
   delete mockLocalStorage['lordspey_cached_release'];
   mockLocalStorage['lordspey_last_update_check'] = String(Date.now() - 60000); // 1 minute ago

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=2.0.0" />
+  <link rel="stylesheet" href="css/style.css?v=2.1.2" />
 </head>
 <body>
   <!-- ───────── Ambient Animated Theme Backdrop ───────── -->
@@ -317,16 +317,16 @@
           <button type="button" id="dashboard-btn-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="Lord Spey Guided Walkthrough">Guided Walkthrough</button>
         </div>
         <div class="menu-wb-grid">
-          <button class="menu-wb-card" id="dashboard-btn-map" title="Interactive World Map & Pin Placement (Ctrl+M)">
+          <button class="menu-wb-card" id="dashboard-btn-map" title="Interactive Universe Atlas, Star Systems &amp; World Maps (Ctrl+M)">
             <div class="menu-wb-icon cat-world">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
             </div>
             <div class="menu-wb-body">
               <div class="menu-wb-title-row">
-                <span class="menu-wb-title font-cinzel">World Map</span>
+                <span class="menu-wb-title font-cinzel">Universe Atlas</span>
                 <kbd class="shortcut-pill">Ctrl+M</kbd>
               </div>
-              <p class="menu-wb-desc">Cartographic canvas, spatial landmarks &amp; custom fantasy maps</p>
+              <p class="menu-wb-desc">Map your entire universe, galaxies, star systems, planetary orbits &amp; worlds</p>
             </div>
           </button>
 
@@ -377,9 +377,9 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export (.spey)
         </button>
-        <button class="menu-sec-btn" id="menu-btn-whats-new" title="What's New in v2.0.0">
+        <button class="menu-sec-btn" id="menu-btn-whats-new" title="What's New in v2.1.2">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          What's New (v2.0.0)
+          What's New (v2.1.2)
         </button>
         <button class="menu-sec-btn" id="menu-btn-open-spey" title="Open .spey Project">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -715,7 +715,7 @@
           <span class="status-sep">·</span>
           <span id="sb-save-status" class="status-item status-saved">● Saved</span>
           <span class="status-sep">·</span>
-          <span id="sb-version" class="status-item status-version font-mono">v2.0.0</span>
+          <span id="sb-version" class="status-item status-version font-mono">v2.1.2</span>
         </div>
       </footer>
     </div>
@@ -850,6 +850,9 @@
             <button id="btn-atlas-new-map" class="btn btn-sm btn-ghost" title="Create child sub-map or sibling star system / world map">
               <span>🌌 + Sub-Map</span>
             </button>
+            <button type="button" id="btn-generate-universe-map" class="btn btn-sm btn-ghost btn-universe-template" title="Populate Complete Universe Starchart with Star Systems, Planetary Bodies &amp; Hyperlanes">
+              <span>🌌 Universe Template</span>
+            </button>
             <button id="btn-atlas-delete-map" class="btn btn-sm btn-ghost btn-atlas-delete hidden" title="Delete current realm map from Atlas">
               <span>🗑️ Delete Map</span>
             </button>
@@ -936,9 +939,6 @@
                 </div>
                 <button type="button" id="btn-map-orbital-rings" class="dropdown-action-btn" title="Toggle Concentric Celestial Orbital Rings">
                   <span>🪐 Toggle Celestial Orbit Rings</span>
-                </button>
-                <button type="button" id="btn-generate-universe-map" class="dropdown-action-btn btn-universe-template" title="Populate Complete Universe Starchart with Star Systems, Planetary Bodies &amp; Hyperlanes">
-                  <span>🌌 Generate Universe Starchart</span>
                 </button>
                 <button type="button" id="btn-map-draw-region" class="dropdown-action-btn" title="Draw territory border or political zone">
                   <span>🗺️ Draw Political Region / Territory</span>
@@ -2217,11 +2217,11 @@
               <div class="settings-action-row settings-update-row">
                 <div class="settings-version-tag">
                   <span class="version-label">Current Version:</span>
-                  <span class="version-badge" id="settings-vault-version-display">v2.0.0</span>
+                  <span class="version-badge" id="settings-vault-version-display">v2.1.2</span>
                 </div>
-                <button type="button" id="settings-btn-whats-new-vault" class="btn btn-primary" title="View new UI features and changelog in v2.0.0">
+                <button type="button" id="settings-btn-whats-new-vault" class="btn btn-primary" title="View new UI features and changelog in v2.1.2">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                  What's New in v2.0.0
+                  What's New in v2.1.2
                 </button>
                 <button type="button" id="settings-btn-check-update-vault" class="btn btn-secondary">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
@@ -2615,11 +2615,11 @@
               <div class="settings-action-row settings-update-row">
                 <div class="settings-version-tag">
                   <span class="version-label">Current Version:</span>
-                  <span class="version-badge" id="settings-guides-version-display">v2.0.0</span>
+                  <span class="version-badge" id="settings-guides-version-display">v2.1.2</span>
                 </div>
-                <button type="button" id="settings-btn-whats-new-guides" class="btn btn-primary" title="View new UI features and changelog in v2.0.0">
+                <button type="button" id="settings-btn-whats-new-guides" class="btn btn-primary" title="View new UI features and changelog in v2.1.2">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                  What's New in v2.0.0
+                  What's New in v2.1.2
                 </button>
                 <button type="button" id="settings-btn-check-update-guides" class="btn btn-secondary">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
@@ -2677,7 +2677,7 @@
   </div>
 
   <!-- ───────── Cinematic Crimson Star Intro / Splash ───────── -->
-  <div id="intro-splash" class="intro-splash intro-animating" role="dialog" aria-modal="true" aria-label="Lord Spey Intro">
+  <div id="intro-splash" class="intro-splash hidden" role="dialog" aria-modal="true" aria-label="Lord Spey Intro">
     <div class="intro-bg-ambient"></div>
     <div class="intro-stars-field"></div>
     <div class="intro-container">
@@ -2943,7 +2943,7 @@
   <div id="update-banner" class="update-banner hidden" role="alert">
     <div class="update-banner-content">
       <img src="assets/icon.png" alt="Raven Logo" class="update-banner-logo" />
-      <span class="update-banner-text"><strong>A new version of Lord Spey (<span id="update-banner-version">v2.0.0</span>) is ready!</strong></span>
+      <span class="update-banner-text"><strong>A new version of Lord Spey (<span id="update-banner-version">v2.1.2</span>) is ready!</strong></span>
       <button type="button" id="btn-banner-view-update" class="btn btn-sm btn-primary">Update Now</button>
       <button type="button" id="btn-banner-dismiss-update" class="icon-btn update-banner-close" title="Dismiss">✕</button>
     </div>
@@ -2980,9 +2980,9 @@
       <div class="modal-body update-modal-body">
         <div class="update-hero-banner" id="update-hero-banner">
           <div class="update-version-row">
-            <span class="update-version-chip update-chip-current" id="update-current-version-chip">Installed: v2.0.0</span>
+            <span class="update-version-chip update-chip-current" id="update-current-version-chip">Installed: v2.1.2</span>
             <span class="update-arrow" id="update-version-arrow">→</span>
-            <span class="update-version-chip update-chip-new" id="update-new-version-chip">New: v2.0.0</span>
+            <span class="update-version-chip update-chip-new" id="update-new-version-chip">New: v2.1.2</span>
           </div>
           <p class="update-guarantee" id="update-guarantee">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -3014,8 +3014,8 @@
   <!-- Toast container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <script src="js/storage.js?v=2.0.0"></script>
-  <script src="js/markdown.js?v=2.0.0"></script>
-  <script src="js/app.js?v=2.0.0"></script>
+  <script src="js/storage.js?v=2.1.2"></script>
+  <script src="js/markdown.js?v=2.1.2"></script>
+  <script src="js/app.js?v=2.1.2"></script>
 </body>
 </html>
