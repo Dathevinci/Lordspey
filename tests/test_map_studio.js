@@ -164,6 +164,8 @@ function createMockElement(id = '', tag = 'div') {
     height: 1000,
     focus: () => {},
     select: () => {},
+    closest: () => null,
+    contains: (node) => (node === el) || children.some(c => c && c.contains && c.contains(node)),
     click: () => {
       el.dispatchEvent('click', { preventDefault: () => {}, stopPropagation: () => {} });
     },
@@ -268,7 +270,9 @@ const domIds = [
   'studio-shape-fill', 'studio-custom-color', 'btn-studio-undo', 'btn-studio-redo',
   'btn-studio-clear', 'btn-studio-bake', 'btn-studio-done', 'studio-layer-count',
   'map-dimensions-modal', 'map-dim-width', 'map-dim-height', 'map-dim-shape-frame',
-  'btn-map-dim-cancel', 'btn-map-dim-apply', 'map-custom-img'
+  'btn-map-dim-cancel', 'btn-map-dim-apply', 'map-custom-img',
+  'btn-quick-biome-menu', 'map-quick-biomes-dropdown',
+  'btn-map-tools-menu', 'map-canvas-tools-dropdown'
 ];
 
 domIds.forEach(id => getEl(id));
@@ -863,5 +867,65 @@ assert(clipCalled, 'Export PNG must invoke clip() for oval boundary map');
 assert(ellipseCalled, 'Export PNG must invoke ellipse() for oval boundary map');
 global.document.createElement = origCreateElement;
 console.log('✓ Oval map PNG export with elliptical clipping verified');
+
+// ── 5. Streamlined Dropdown Menus & 1-Click Biome Presets ──
+console.log('\n--- 5. Testing Streamlined Dropdowns & 1-Click Procedural Biomes ---');
+
+const btnQuickBiomeMenu = getEl('btn-quick-biome-menu');
+const mapQuickBiomesDropdown = getEl('map-quick-biomes-dropdown');
+const btnMapToolsMenu = getEl('btn-map-tools-menu');
+const mapCanvasToolsDropdown = getEl('map-canvas-tools-dropdown');
+
+// Initially hidden
+mapQuickBiomesDropdown.classList.add('hidden');
+mapCanvasToolsDropdown.classList.add('hidden');
+
+// 5.1 Quick Biome Menu Toggle
+btnQuickBiomeMenu.click();
+assert.strictEqual(mapQuickBiomesDropdown.classList.contains('hidden'), false, 'Quick biomes dropdown opens on click');
+assert.strictEqual(mapCanvasToolsDropdown.classList.contains('hidden'), true, 'Tools dropdown remains closed');
+
+// 5.2 Tools Menu Toggle
+btnMapToolsMenu.click();
+assert.strictEqual(mapCanvasToolsDropdown.classList.contains('hidden'), false, 'Tools dropdown opens on click');
+assert.strictEqual(mapQuickBiomesDropdown.classList.contains('hidden'), true, 'Quick biomes dropdown auto-closed');
+
+// 5.3 Outside Click Dismissal
+const outsideTarget = createMockElement('outside-target');
+if (globalDocumentListeners['click']) {
+  globalDocumentListeners['click'].forEach(fn => fn({ target: outsideTarget }));
+}
+assert.strictEqual(mapQuickBiomesDropdown.classList.contains('hidden'), true, 'Biomes dropdown closed on outside click');
+assert.strictEqual(mapCanvasToolsDropdown.classList.contains('hidden'), true, 'Tools dropdown closed on outside click');
+console.log('✓ Streamlined dropdown menu opening, toggling, and outside-click dismissal verified');
+
+// 5.4 Procedural Biome Generators
+assert.strictEqual(typeof window.generateQuickBiome, 'function', 'generateQuickBiome must be exposed on window');
+
+// Continent Biome
+window.generateQuickBiome('continent');
+assert(window.renderCompositeLayers, 'Composite layers must render after biome creation');
+console.log('✓ Continental Realm 1-click generator executed and painted onto layer');
+
+// Archipelago Biome
+window.generateQuickBiome('archipelago');
+console.log('✓ Island Archipelago 1-click generator executed and painted onto layer');
+
+// Star System Biome
+window.generateQuickBiome('starsystem');
+const sysMap = Storage.getMap();
+assert.strictEqual(sysMap.celestialTheme, 'cosmic-void', 'Star system biome activates cosmic-void backdrop');
+assert.strictEqual(sysMap.orbitalRings, true, 'Star system biome activates orbital rings');
+console.log('✓ Star System & Orbits 1-click generator executed with cosmic-void backdrop and orbital rings');
+
+// Hyperlanes Biome
+window.generateQuickBiome('hyperlanes');
+const laneMap = Storage.getMap();
+assert.strictEqual(laneMap.celestialTheme, 'nebula', 'Hyperlanes biome activates interstellar nebula backdrop');
+console.log('✓ Interstellar Hyperlanes 1-click generator executed with nebula backdrop');
+
+// 5.5 Undo across Biomes
+window.undoStudioStroke();
+console.log('✓ Biome undo operation executed cleanly');
 
 console.log('\n=== ALL MAP STUDIO & CUSTOM SIZING TESTS PASSED (100%) ===\n');

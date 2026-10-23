@@ -6503,6 +6503,65 @@
       });
     }
 
+    // Streamlined Map Dropdowns: Quick Biomes & Options
+    const btnQuickBiomeMenu = $('#btn-quick-biome-menu');
+    const mapQuickBiomesDropdown = $('#map-quick-biomes-dropdown');
+    const btnMapToolsMenu = $('#btn-map-tools-menu');
+    const mapCanvasToolsDropdown = $('#map-canvas-tools-dropdown');
+
+    const closeAllMapDropdowns = () => {
+      if (mapQuickBiomesDropdown) mapQuickBiomesDropdown.classList.add('hidden');
+      if (mapCanvasToolsDropdown) mapCanvasToolsDropdown.classList.add('hidden');
+    };
+
+    if (btnQuickBiomeMenu) {
+      btnQuickBiomeMenu.addEventListener('click', (e) => {
+        if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (mapCanvasToolsDropdown) mapCanvasToolsDropdown.classList.add('hidden');
+        if (mapQuickBiomesDropdown) mapQuickBiomesDropdown.classList.toggle('hidden');
+      });
+    }
+
+    if (btnMapToolsMenu) {
+      btnMapToolsMenu.addEventListener('click', (e) => {
+        if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (mapQuickBiomesDropdown) mapQuickBiomesDropdown.classList.add('hidden');
+        if (mapCanvasToolsDropdown) mapCanvasToolsDropdown.classList.toggle('hidden');
+      });
+    }
+
+    // Auto-close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e || !e.target) return;
+      if (btnQuickBiomeMenu && typeof btnQuickBiomeMenu.contains === 'function' && btnQuickBiomeMenu.contains(e.target)) return;
+      if (mapQuickBiomesDropdown && typeof mapQuickBiomesDropdown.contains === 'function' && mapQuickBiomesDropdown.contains(e.target)) return;
+      if (btnMapToolsMenu && typeof btnMapToolsMenu.contains === 'function' && btnMapToolsMenu.contains(e.target)) return;
+      if (mapCanvasToolsDropdown && typeof mapCanvasToolsDropdown.contains === 'function' && mapCanvasToolsDropdown.contains(e.target)) return;
+      closeAllMapDropdowns();
+    });
+
+    // Close dropdowns when selecting an action button inside options dropdown
+    if (mapCanvasToolsDropdown) {
+      mapCanvasToolsDropdown.addEventListener('click', (e) => {
+        if (!e || !e.target) return;
+        if (e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION' || e.target.tagName === 'INPUT') return;
+        closeAllMapDropdowns();
+      });
+    }
+
+    // Biome Preset selection
+    if (mapQuickBiomesDropdown) {
+      $$('[data-biome]', mapQuickBiomesDropdown).forEach(btn => {
+        btn.addEventListener('click', () => {
+          const biomeType = btn.dataset.biome;
+          closeAllMapDropdowns();
+          if (typeof generateQuickBiome === 'function') {
+            generateQuickBiome(biomeType);
+          }
+        });
+      });
+    }
+
     // Map viewport pan & click interactions
     if (mapViewport) {
       mapViewport.addEventListener('mousedown', onMapMouseDown);
@@ -7003,7 +7062,7 @@
             if (typeof ctx.stroke === 'function') ctx.stroke();
           }
           if (typeof ctx.fillText === 'function') {
-            ctx.font = "9px 'Cinzel', serif";
+            ctx.font = "9px 'JetBrains Mono', monospace";
             ctx.fillStyle = 'rgba(147, 197, 253, 0.4)';
             ctx.fillText(`ORBIT ${idx + 1} (${r * 2} AU)`, cx + r - 12, cy - 6);
           }
@@ -7029,7 +7088,7 @@
           if (typeof ctx.fill === 'function') ctx.fill();
         }
         if (typeof ctx.fillText === 'function') {
-          ctx.font = "bold 11px 'Cinzel', serif";
+          ctx.font = "bold 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
           ctx.fillStyle = '#fef08a';
           ctx.textAlign = 'center';
           ctx.fillText('STELLAR CORE', cx, cy + 28);
@@ -7085,7 +7144,7 @@
           ctx.fillText('SECTOR GAMMA [RIMWARD]', cx - 18, 50);
           ctx.fillText('SECTOR DELTA [TRAILING]', cx - 18, cy + 24);
 
-          ctx.font = "bold 12px 'Cinzel', serif";
+          ctx.font = "bold 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
           ctx.fillStyle = 'rgba(233, 213, 255, 0.9)';
           ctx.textAlign = 'center';
           ctx.fillText('GALACTIC NUCLEUS', cx, cy + 34);
@@ -7296,7 +7355,7 @@
     }
 
     if (typeof ctx.fillText === 'function') {
-      ctx.font = "bold 13px 'Cinzel', serif";
+      ctx.font = "bold 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -7306,13 +7365,13 @@
       ctx.fillText('W', astrolabeX - 66, astrolabeY);
 
       // Geographical Titles
-      ctx.font = "14px 'Cinzel', serif";
+      ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
       ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
       ctx.fillText('THE ASHEN HIGHLANDS', 370, 390);
       ctx.fillText('THE OBSIDIAN GATE PASS', 560, 470);
       ctx.fillText('THE STARFALL EXPANSE', 1180, 480);
       ctx.fillText('THE TWILIGHT SEA', 800, 360);
-      ctx.font = "11px 'Cinzel', serif";
+      ctx.font = "500 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
       ctx.fillStyle = 'rgba(239, 68, 68, 0.6)';
       ctx.fillText('THE BLEEDING CHASM', 720, 620);
       ctx.fillText('SUNLESS ARCHIPELAGO', 780, 920);
@@ -8680,13 +8739,13 @@
       ctx.stroke();
 
       if (typeof ctx.fillText === 'function') {
-        ctx.font = "bold 16px 'Cinzel', serif";
+        ctx.font = "bold 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
         ctx.fillStyle = (isLightBase || isSepiaBase) ? codexAccentColor : '#fff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText((n.char.name || 'C').charAt(0), n.x, n.y);
 
-        ctx.font = "12px sans-serif";
+        ctx.font = "500 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
         ctx.fillStyle = isLightBase ? '#111827' : isSepiaBase ? '#2d241e' : (isHovered ? '#fff' : '#cbd5e1');
         ctx.fillText(n.char.name, n.x, n.y + n.r + 16);
       }
@@ -10882,7 +10941,7 @@
         }
         ctx.globalAlpha = 1.0;
         ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${regFontSize}px Cinzel, serif`;
+        ctx.font = `bold ${regFontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
         ctx.textAlign = 'center';
         if (typeof ctx.fillText === 'function') {
           ctx.fillText(reg.name || 'Territory', cx, cy);
@@ -10907,7 +10966,7 @@
         const avgY = (points.reduce((s, p) => s + p.y, 0) / points.length) * (h / 100);
         ctx.globalAlpha = 1.0;
         ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${regFontSize}px Cinzel, serif`;
+        ctx.font = `bold ${regFontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
         ctx.textAlign = 'center';
         if (typeof ctx.fillText === 'function') {
           ctx.fillText(reg.name || 'Territory', avgX, avgY);
@@ -11381,10 +11440,399 @@
       window.redoStudioStroke = redoStudioStroke;
       window.clearActiveLayer = clearActiveLayer;
       window.bakeDrawingToBaseMap = bakeDrawingToBaseMap;
+      window.generateQuickBiome = generateQuickBiome;
     }
 
     // Initialize layers
     initMapLayers();
+  }
+
+  // ── Quick Procedural Biome Generator ──
+  function generateQuickBiome(biomeType) {
+    if (!isMapStudioActive) {
+      toggleMapStudio(true);
+    }
+    saveUndoSnapshot();
+
+    const layer = getActiveStudioLayer();
+    if (!layer || !layer.canvas || typeof layer.canvas.getContext !== 'function') return;
+    const ctx = layer.canvas.getContext('2d');
+    if (!ctx) return;
+
+    const w = layer.canvas.width || 1600;
+    const h = layer.canvas.height || 1000;
+
+    if (biomeType === 'continent') {
+      // 1. Continental Realm: Twin continents, mountain ranges, lush forests, winding rivers
+      ctx.save();
+      ctx.fillStyle = currentBaseTheme === 'light' ? '#334155' : (currentBaseTheme === 'sepia' ? '#4a3b2c' : '#1e2433');
+      ctx.strokeStyle = currentBaseTheme === 'light' ? '#0284c7' : '#38bdf8';
+      ctx.lineWidth = 3;
+
+      // Draw organic western continent with capes and bays
+      const westNodes = [
+        [0.12 * w, 0.22 * h], [0.24 * w, 0.16 * h], [0.38 * w, 0.20 * h],
+        [0.44 * w, 0.32 * h], [0.41 * w, 0.48 * h], [0.46 * w, 0.62 * h],
+        [0.40 * w, 0.82 * h], [0.28 * w, 0.86 * h], [0.18 * w, 0.74 * h],
+        [0.10 * w, 0.60 * h], [0.15 * w, 0.44 * h], [0.08 * w, 0.34 * h]
+      ];
+      ctx.beginPath();
+      ctx.moveTo(westNodes[0][0], westNodes[0][1]);
+      for (let i = 1; i < westNodes.length; i++) {
+        const prev = westNodes[i - 1];
+        const curr = westNodes[i];
+        const midX = (prev[0] + curr[0]) / 2 + ((i % 2 === 0 ? 1 : -1) * 12);
+        const midY = (prev[1] + curr[1]) / 2 + ((i % 3 === 0 ? 1 : -1) * 12);
+        ctx.quadraticCurveTo(midX, midY, curr[0], curr[1]);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Right continent (Eastern subcontinent)
+      const eastNodes = [
+        [0.58 * w, 0.26 * h], [0.72 * w, 0.18 * h], [0.86 * w, 0.24 * h],
+        [0.92 * w, 0.40 * h], [0.88 * w, 0.60 * h], [0.78 * w, 0.76 * h],
+        [0.64 * w, 0.72 * h], [0.55 * w, 0.54 * h], [0.60 * w, 0.38 * h]
+      ];
+      ctx.beginPath();
+      ctx.moveTo(eastNodes[0][0], eastNodes[0][1]);
+      for (let i = 1; i < eastNodes.length; i++) {
+        const prev = eastNodes[i - 1];
+        const curr = eastNodes[i];
+        const midX = (prev[0] + curr[0]) / 2 + ((i % 2 === 0 ? -1 : 1) * 14);
+        const midY = (prev[1] + curr[1]) / 2 + ((i % 3 === 0 ? -1 : 1) * 14);
+        ctx.quadraticCurveTo(midX, midY, curr[0], curr[1]);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Coastal shallow reef accents
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+      ctx.lineWidth = 1.5;
+      if (ctx.setLineDash) ctx.setLineDash([4, 5]);
+      ctx.beginPath();
+      ctx.arc(0.26 * w, 0.50 * h, 0.24 * Math.min(w, h), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0.74 * w, 0.48 * h, 0.22 * Math.min(w, h), 0, Math.PI * 2);
+      ctx.stroke();
+      if (ctx.setLineDash) ctx.setLineDash([]);
+
+      // Mountain ranges on western spine
+      ctx.fillStyle = '#64748b';
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      const mtnBaseX = 0.26 * w;
+      for (let j = 0; j < 7; j++) {
+        const mx = mtnBaseX + (j % 2 === 0 ? 12 : -10);
+        const my = (0.28 + j * 0.07) * h;
+        const mw = 22;
+        const mh = 26;
+        ctx.beginPath();
+        ctx.moveTo(mx - mw, my + mh);
+        ctx.lineTo(mx, my);
+        ctx.lineTo(mx + mw, my + mh);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // Mountain ranges on eastern continent
+      const mtnEastX = 0.72 * w;
+      for (let j = 0; j < 6; j++) {
+        const mx = mtnEastX + (j % 2 === 0 ? -14 : 10);
+        const my = (0.32 + j * 0.065) * h;
+        const mw = 20;
+        const mh = 24;
+        ctx.beginPath();
+        ctx.moveTo(mx - mw, my + mh);
+        ctx.lineTo(mx, my);
+        ctx.lineTo(mx + mw, my + mh);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // Forest clusters
+      ctx.fillStyle = '#22c55e';
+      const forestSpots = [
+        [0.34 * w, 0.35 * h], [0.36 * w, 0.40 * h], [0.32 * w, 0.58 * h],
+        [0.22 * w, 0.68 * h], [0.80 * w, 0.36 * h], [0.78 * w, 0.44 * h],
+        [0.66 * w, 0.62 * h]
+      ];
+      forestSpots.forEach(([fx, fy]) => {
+        for (let k = 0; k < 4; k++) {
+          ctx.beginPath();
+          ctx.arc(fx + (k * 7) - 10, fy + ((k % 2) * 5) - 3, 8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // River arteries
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0.26 * w, 0.42 * h);
+      ctx.bezierCurveTo(0.32 * w, 0.46 * h, 0.36 * w, 0.44 * h, 0.42 * w, 0.48 * h);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0.72 * w, 0.45 * h);
+      ctx.bezierCurveTo(0.66 * w, 0.48 * h, 0.62 * w, 0.46 * h, 0.56 * w, 0.52 * h);
+      ctx.stroke();
+
+      ctx.restore();
+      toast('🌍 Continental Realm generated', 'success');
+
+    } else if (biomeType === 'archipelago') {
+      // 2. Island Archipelago: Scattered tropical atolls, island chains & coral bays
+      ctx.save();
+      const islandColor = currentBaseTheme === 'light' ? '#334155' : (currentBaseTheme === 'sepia' ? '#4a3b2c' : '#1e2433');
+      const reefColor = 'rgba(56, 189, 248, 0.35)';
+
+      const islands = [];
+      // Arc 1 (Northwest to Southeast)
+      for (let i = 0; i < 14; i++) {
+        const t = i / 13;
+        const ix = (0.15 + t * 0.70) * w + (Math.sin(t * Math.PI * 2) * 45);
+        const iy = (0.22 + t * 0.58) * h + (Math.cos(t * Math.PI) * 35);
+        const ir = 14 + (Math.sin(i * 1.7) * 9);
+        islands.push({ x: ix, y: iy, r: Math.max(8, ir) });
+      }
+      // Arc 2 (Southern scatter)
+      for (let i = 0; i < 9; i++) {
+        const t = i / 8;
+        const ix = (0.28 + t * 0.50) * w + (Math.cos(i * 2.1) * 30);
+        const iy = (0.62 + t * 0.22) * h + (Math.sin(i * 1.5) * 25);
+        const ir = 11 + (Math.cos(i * 1.9) * 7);
+        islands.push({ x: ix, y: iy, r: Math.max(6, ir) });
+      }
+
+      // Draw shallow coral reef halos
+      ctx.strokeStyle = reefColor;
+      ctx.lineWidth = 2;
+      islands.forEach(isl => {
+        ctx.beginPath();
+        ctx.arc(isl.x, isl.y, isl.r + 9, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // Draw islands
+      ctx.fillStyle = islandColor;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.5;
+      islands.forEach((isl, idx) => {
+        ctx.beginPath();
+        const pts = 8;
+        for (let p = 0; p < pts; p++) {
+          const angle = (p / pts) * Math.PI * 2;
+          const rad = isl.r + (((idx + p) % 3 === 0 ? 3 : -2));
+          const px = isl.x + Math.cos(angle) * rad;
+          const py = isl.y + Math.sin(angle) * rad;
+          if (p === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Lush center dot
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath();
+        ctx.arc(isl.x, isl.y, Math.max(2, isl.r * 0.4), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = islandColor;
+      });
+
+      ctx.restore();
+      toast('🏝️ Island Archipelago generated', 'success');
+
+    } else if (biomeType === 'starsystem') {
+      // 3. Star System & Orbits: Stellar core with corona, 5 orbital rings, planets & asteroid belt
+      ctx.save();
+      const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+      curMap.celestialTheme = 'cosmic-void';
+      curMap.orbitalRings = true;
+      if (Storage.saveMap) Storage.saveMap(curMap);
+      if (mapCelestialThemeSelect) mapCelestialThemeSelect.value = 'cosmic-void';
+      renderDefaultMap();
+
+      const cx = w / 2;
+      const cy = h / 2;
+
+      const orbits = [
+        { r: 90, name: 'Hermes Inner Track', planetColor: '#fdba74', pr: 7, angle: 0.4 },
+        { r: 170, name: 'Terra Habitable Orbit', planetColor: '#38bdf8', pr: 10, angle: 1.8, clouds: true },
+        { r: 260, name: 'Ares Red Basin', planetColor: '#f87171', pr: 8, angle: 3.4 },
+        { r: 380, name: 'Zeus Gas Giant', planetColor: '#fbbf24', pr: 18, angle: 5.1, rings: true },
+        { r: 520, name: 'Chronos Ice Titan', planetColor: '#a7f3d0', pr: 12, angle: 2.6 }
+      ];
+
+      // Draw dashed orbit tracks
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+      ctx.lineWidth = 1;
+      if (ctx.setLineDash) ctx.setLineDash([5, 6]);
+      orbits.forEach(orb => {
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, orb.r, orb.r * 0.65, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+      if (ctx.setLineDash) ctx.setLineDash([]);
+
+      // Asteroid belt between Mars and Jupiter
+      ctx.fillStyle = 'rgba(203, 213, 225, 0.7)';
+      for (let a = 0; a < 60; a++) {
+        const theta = (a / 60) * Math.PI * 2 + (a * 0.1);
+        const dist = 315 + ((a * 17) % 25) - 12;
+        const ax = cx + Math.cos(theta) * dist;
+        const ay = cy + Math.sin(theta) * (dist * 0.65);
+        ctx.beginPath();
+        ctx.arc(ax, ay, ((a % 3 === 0) ? 2 : 1), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Draw Stellar Sun in center
+      if (ctx.createRadialGradient) {
+        const sunGrad = ctx.createRadialGradient(cx, cy, 5, cx, cy, 55);
+        sunGrad.addColorStop(0, '#ffffff');
+        sunGrad.addColorStop(0.25, '#fef08a');
+        sunGrad.addColorStop(0.65, 'rgba(245, 158, 11, 0.5)');
+        sunGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        ctx.fillStyle = sunGrad;
+        ctx.fillRect(cx - 55, cy - 55, 110, 110);
+      }
+      ctx.fillStyle = '#fffbeb';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw Planets on orbits
+      orbits.forEach(orb => {
+        const px = cx + Math.cos(orb.angle) * orb.r;
+        const py = cy + Math.sin(orb.angle) * (orb.r * 0.65);
+
+        // Planetary body
+        ctx.fillStyle = orb.planetColor;
+        ctx.beginPath();
+        ctx.arc(px, py, orb.pr, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rings for gas giant
+        if (orb.rings) {
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.7)';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.ellipse(px, py, orb.pr * 2.2, orb.pr * 0.7, 0.35, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Atmosphere glow
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(px, py, orb.pr + 2, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      ctx.restore();
+      toast('☀️ Star System & Orbital Paths generated', 'success');
+
+    } else if (biomeType === 'hyperlanes') {
+      // 4. Interstellar Hyperlanes: Cosmic jump gates & star cluster transit routes
+      ctx.save();
+      const curMap = (Storage.getMap ? Storage.getMap() : null) || {};
+      curMap.celestialTheme = 'nebula';
+      if (Storage.saveMap) Storage.saveMap(curMap);
+      if (mapCelestialThemeSelect) mapCelestialThemeSelect.value = 'nebula';
+      renderDefaultMap();
+
+      const gates = [
+        { id: 'ALPHA', name: 'Nexus Prime [Alpha]', x: 0.50 * w, y: 0.48 * h, color: '#38bdf8' },
+        { id: 'SOLAR', name: 'Solar Gate [01]', x: 0.22 * w, y: 0.30 * h, color: '#fef08a' },
+        { id: 'CYGNUS', name: 'Cygnus Port [02]', x: 0.34 * w, y: 0.72 * h, color: '#a855f7' },
+        { id: 'ORION', name: 'Orion Relay [03]', x: 0.78 * w, y: 0.28 * h, color: '#38bdf8' },
+        { id: 'VEGA', name: 'Vega Terminal [04]', x: 0.70 * w, y: 0.76 * h, color: '#34d399' },
+        { id: 'CORE', name: 'Galactic Core [05]', x: 0.86 * w, y: 0.58 * h, color: '#ec4899' },
+        { id: 'RIM', name: 'Outer Rim [06]', x: 0.12 * w, y: 0.64 * h, color: '#fb923c' }
+      ];
+
+      const routes = [
+        [0, 1], [0, 2], [0, 3], [0, 4], [0, 5],
+        [1, 6], [2, 6], [3, 5], [4, 5], [2, 4]
+      ];
+
+      ctx.lineCap = 'round';
+      // Outer glow
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+      ctx.lineWidth = 6;
+      routes.forEach(([fromIdx, toIdx]) => {
+        const from = gates[fromIdx];
+        const to = gates[toIdx];
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y);
+        ctx.stroke();
+      });
+
+      // Core hyperlane stroke
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      routes.forEach(([fromIdx, toIdx]) => {
+        const from = gates[fromIdx];
+        const to = gates[toIdx];
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y);
+        ctx.stroke();
+      });
+
+      // Dashed transit pulse line
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      if (ctx.setLineDash) ctx.setLineDash([6, 10]);
+      routes.forEach(([fromIdx, toIdx]) => {
+        const from = gates[fromIdx];
+        const to = gates[toIdx];
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y);
+        ctx.stroke();
+      });
+      if (ctx.setLineDash) ctx.setLineDash([]);
+
+      // Draw Jump Gate Nexus Icons & Labels
+      gates.forEach(gate => {
+        ctx.fillStyle = gate.color;
+        ctx.globalAlpha = 0.2;
+        ctx.beginPath();
+        ctx.arc(gate.x, gate.y, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+
+        ctx.strokeStyle = gate.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(gate.x, gate.y, 11, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(gate.x, gate.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = "10px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.textAlign = 'center';
+        ctx.fillText(gate.name, gate.x, gate.y + 24);
+      });
+
+      ctx.restore();
+      toast('⚡ Interstellar Hyperlanes generated', 'success');
+    }
+
+    renderCompositeLayers();
+    persistStudioDrawing();
   }
 
   // ── 4. Galaxy Graph: Manual Nodes & Custom Connections ──

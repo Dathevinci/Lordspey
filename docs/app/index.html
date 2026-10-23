@@ -844,9 +844,6 @@
               <button type="button" class="tier-seg-btn active" id="tier-btn-world" data-map-tier="world" title="Planetary Surface World Map">🪐 Planetary World</button>
               <button type="button" class="tier-seg-btn" id="tier-btn-local" data-map-tier="local" title="Regional Realm, Citadel or Station">🏰 Realm / Citadel</button>
             </div>
-            <button id="btn-generate-universe-map" class="btn btn-sm btn-ghost btn-universe-template" title="Populate Complete Universe Starchart with Star Systems, Planetary Bodies &amp; Hyperlanes">
-              <span>✨ Universe Template</span>
-            </button>
             <select id="map-atlas-select" class="form-select form-select-sm map-atlas-select" title="Universe Atlas: Switch Celestial Map &amp; Tier">
               <option value="default">🌍 Known Realm (World)</option>
             </select>
@@ -856,46 +853,115 @@
             <button id="btn-atlas-delete-map" class="btn btn-sm btn-ghost btn-atlas-delete hidden" title="Delete current realm map from Atlas">
               <span>🗑️ Delete Map</span>
             </button>
-            <button id="btn-map-orbital-rings" class="btn btn-sm btn-ghost" title="Toggle Concentric Celestial Orbital Rings">
-              <span>🪐 Orbit Rings</span>
-            </button>
-            <select id="map-celestial-theme-select" class="form-select form-select-sm map-celestial-select" title="Celestial Backdrop Theme">
-              <option value="standard-parchment">📜 Ancient Parchment</option>
-              <option value="cosmic-void">🌌 Cosmic Void</option>
-              <option value="nebula">✨ Interstellar Nebula</option>
-            </select>
-            <select id="map-shape-select" class="form-select form-select-sm map-shape-select" title="Canvas Geography Shape">
-              <option value="landscape" selected>Landscape (16:9)</option>
-              <option value="square">Square (1:1)</option>
-              <option value="vertical">Vertical (9:16)</option>
-              <option value="oval">Oval Realm</option>
-              <option value="ultrawide">Ultrawide (21:9)</option>
-              <option value="parchment">Classic Parchment (4:3)</option>
-              <option value="custom">Custom Dimensions…</option>
-            </select>
-            <button id="btn-map-dimensions" class="btn btn-sm btn-ghost" title="Custom Canvas Dimensions & Sizing">
-              <span>📐 Dimensions</span>
+
+            <div class="map-header-divider"></div>
+
+            <button id="btn-map-drop-pin" class="btn btn-sm btn-primary" title="Click to enter pin drop mode or place a pin">
+              <span>+ Add Pin</span>
             </button>
             <button id="btn-map-paint-mode" class="btn btn-sm btn-ghost" title="Toggle Map Drawing & Painting Studio">
               <span>🎨 Paint Studio</span>
             </button>
-            <button id="btn-map-draw-region" class="btn btn-sm btn-ghost" title="Draw territory border or political zone">
-              <span>Draw Region</span>
-            </button>
-            <button id="btn-map-tutorial" class="btn btn-sm btn-ghost wb-tutorial-btn" title="World Map Guide">Guide</button>
-            <button id="btn-map-drop-pin" class="btn btn-sm btn-primary" title="Click to enter pin drop mode or place a pin">
-              <span>+ Add Pin</span>
-            </button>
-            <button id="btn-map-export-png" class="btn btn-sm btn-ghost" title="Export Map to High-Res PNG Image">
-              <span>📥 Export</span>
-            </button>
-            <label class="btn btn-sm btn-ghost map-upload-label" title="Upload custom map image">
-              <span>Upload Map</span>
-              <input type="file" id="map-file-input" accept="image/*" hidden />
-            </label>
-            <button id="btn-map-reset-img" class="btn btn-sm btn-ghost" title="Reset to default cartography canvas">
-              Reset Map
-            </button>
+
+            <!-- Quick Presets Dropdown Container -->
+            <div class="map-dropdown-container">
+              <button type="button" id="btn-quick-biome-menu" class="btn btn-sm btn-ghost" title="Instant 1-Click Biome &amp; Map Generators">
+                <span>✨ Quick Presets ▾</span>
+              </button>
+              <div id="map-quick-biomes-dropdown" class="map-floating-dropdown hidden">
+                <div class="dropdown-header">1-Click Biome Generators</div>
+                <button type="button" class="dropdown-item" data-biome="continent">
+                  <span class="dropdown-item-icon">🌍</span>
+                  <div class="dropdown-item-text">
+                    <div class="dropdown-item-title">Continental Realm</div>
+                    <div class="dropdown-item-sub">Twin continents, coastlines &amp; mountains</div>
+                  </div>
+                </button>
+                <button type="button" class="dropdown-item" data-biome="archipelago">
+                  <span class="dropdown-item-icon">🏝️</span>
+                  <div class="dropdown-item-text">
+                    <div class="dropdown-item-title">Island Archipelago</div>
+                    <div class="dropdown-item-sub">Tropical atolls &amp; coastal lagoons</div>
+                  </div>
+                </button>
+                <button type="button" class="dropdown-item" data-biome="starsystem">
+                  <span class="dropdown-item-icon">☀️</span>
+                  <div class="dropdown-item-text">
+                    <div class="dropdown-item-title">Star System &amp; Orbits</div>
+                    <div class="dropdown-item-sub">Central sun &amp; planetary orbits</div>
+                  </div>
+                </button>
+                <button type="button" class="dropdown-item" data-biome="hyperlanes">
+                  <span class="dropdown-item-icon">⚡</span>
+                  <div class="dropdown-item-text">
+                    <div class="dropdown-item-title">Interstellar Hyperlanes</div>
+                    <div class="dropdown-item-sub">Cosmic gates &amp; star cluster routes</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Canvas Tools & Options Dropdown Container -->
+            <div class="map-dropdown-container">
+              <button type="button" id="btn-map-tools-menu" class="btn btn-sm btn-ghost" title="Canvas Dimensions, Themes, Regions, Upload &amp; Export">
+                <span>⚙️ Options ▾</span>
+              </button>
+              <div id="map-canvas-tools-dropdown" class="map-floating-dropdown map-tools-dropdown hidden">
+                <div class="dropdown-header">Canvas Sizing &amp; Geometry</div>
+                <div class="dropdown-field">
+                  <label for="map-shape-select">Aspect Ratio:</label>
+                  <select id="map-shape-select" class="form-select form-select-xs map-shape-select" title="Canvas Geography Shape">
+                    <option value="landscape" selected>Landscape (16:9)</option>
+                    <option value="square">Square (1:1)</option>
+                    <option value="vertical">Vertical (9:16)</option>
+                    <option value="oval">Oval Realm</option>
+                    <option value="ultrawide">Ultrawide (21:9)</option>
+                    <option value="parchment">Classic Parchment (4:3)</option>
+                    <option value="custom">Custom Dimensions…</option>
+                  </select>
+                </div>
+                <button type="button" id="btn-map-dimensions" class="dropdown-action-btn" title="Custom Canvas Dimensions &amp; Sizing">
+                  <span>📐 Custom Dimensions…</span>
+                </button>
+
+                <div class="dropdown-sep"></div>
+                <div class="dropdown-header">Cartography &amp; Celestial Features</div>
+                <div class="dropdown-field">
+                  <label for="map-celestial-theme-select">Backdrop Theme:</label>
+                  <select id="map-celestial-theme-select" class="form-select form-select-xs map-celestial-select" title="Celestial Backdrop Theme">
+                    <option value="standard-parchment">📜 Ancient Parchment</option>
+                    <option value="cosmic-void">🌌 Cosmic Void</option>
+                    <option value="nebula">✨ Interstellar Nebula</option>
+                  </select>
+                </div>
+                <button type="button" id="btn-map-orbital-rings" class="dropdown-action-btn" title="Toggle Concentric Celestial Orbital Rings">
+                  <span>🪐 Toggle Celestial Orbit Rings</span>
+                </button>
+                <button type="button" id="btn-generate-universe-map" class="dropdown-action-btn btn-universe-template" title="Populate Complete Universe Starchart with Star Systems, Planetary Bodies &amp; Hyperlanes">
+                  <span>🌌 Generate Universe Starchart</span>
+                </button>
+                <button type="button" id="btn-map-draw-region" class="dropdown-action-btn" title="Draw territory border or political zone">
+                  <span>🗺️ Draw Political Region / Territory</span>
+                </button>
+
+                <div class="dropdown-sep"></div>
+                <div class="dropdown-header">File Operations</div>
+                <label class="dropdown-action-btn map-upload-label" title="Upload custom map image">
+                  <span>📁 Upload Custom Map Image</span>
+                  <input type="file" id="map-file-input" accept="image/*" hidden />
+                </label>
+                <button type="button" id="btn-map-export-png" class="dropdown-action-btn" title="Export Map to High-Res PNG Image">
+                  <span>📥 Export Map Image (PNG)</span>
+                </button>
+                <button type="button" id="btn-map-reset-img" class="dropdown-action-btn btn-danger-text" title="Reset to default cartography canvas">
+                  <span>🔄 Reset Canvas Map</span>
+                </button>
+                <button type="button" id="btn-map-tutorial" class="dropdown-action-btn wb-tutorial-btn" title="World Map Guide">
+                  <span>❓ Guided Cartography Guide</span>
+                </button>
+              </div>
+            </div>
+
             <div class="map-zoom-cluster" title="Map Zoom Controls">
               <button id="btn-map-zoom-in" class="icon-btn btn-xs" title="Zoom in (+)">＋</button>
               <button id="btn-map-zoom-out" class="icon-btn btn-xs" title="Zoom out (-)">－</button>

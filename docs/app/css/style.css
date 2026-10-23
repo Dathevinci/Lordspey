@@ -293,10 +293,11 @@ body {
 
 /* ── Typography Utility ── */
 .font-cinzel {
-  font-family: 'Cinzel', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
+  letter-spacing: -0.015em;
 }
 .font-playfair {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
 }
 .font-lora {
   font-family: 'Lora', Georgia, serif;
@@ -504,14 +505,14 @@ body {
 }
 
 .logo {
-  font-family: 'Cinzel', serif;
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
   color: var(--text-primary);
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  letter-spacing: 0.08em;
+  letter-spacing: -0.015em;
   white-space: nowrap;
   user-select: none;
   text-decoration: none;
@@ -538,9 +539,9 @@ body {
 }
 
 .logo-text {
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
-  letter-spacing: 0.09em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.015em;
   color: var(--text-primary);
   white-space: nowrap;
   font-size: 1.05rem;
@@ -1029,10 +1030,10 @@ body {
 }
 
 .menu-title {
-  font-family: 'Cinzel', serif;
-  font-size: 2.4rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
+  font-size: 2.2rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: -0.025em;
   color: var(--text-primary);
   margin-bottom: 8px;
 }
@@ -1825,10 +1826,11 @@ body {
 .editor-preview h2,
 .editor-preview h3,
 .editor-preview h4 {
-  font-family: 'Cinzel', 'Playfair Display', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
   color: var(--text-primary);
   margin: 1.6em 0 0.6em;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.015em;
+  font-weight: 600;
 }
 .editor-preview h1 {
   font-size: 1.85rem;
@@ -2647,14 +2649,14 @@ body.focus-mode .format-bar:hover {
   color: var(--text-faint);
 }
 .graph-location-title {
-  font-family: 'Cinzel', serif;
-  font-size: 0.95rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
 }
 .graph-location-meta {
   font-size: 0.72rem;
@@ -2940,9 +2942,10 @@ body.focus-mode .format-bar:hover {
 }
 .metric-num {
   display: block;
-  font-family: 'Cinzel', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
   font-size: 1.35rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   margin-bottom: 4px;
 }
@@ -3023,11 +3026,11 @@ body.focus-mode .format-bar:hover {
 }
 
 .modal-title {
-  font-family: 'Cinzel', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
   font-size: 1.15rem;
   font-weight: 600;
   margin-bottom: 16px;
-  letter-spacing: 0.03em;
+  letter-spacing: -0.015em;
 }
 
 .modal-text {
@@ -3198,9 +3201,10 @@ body.focus-mode .format-bar:hover {
   border-bottom: 1px solid var(--border-subtle);
 }
 .outline-title {
-  font-family: 'Cinzel', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
   font-size: 0.8rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -4203,28 +4207,45 @@ body.focus-mode .format-bar:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 26px;
+  padding: 10px 18px;
   border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-secondary);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  flex-wrap: wrap;
-  gap: 14px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  gap: 12px;
+  flex-wrap: nowrap;
+  min-height: 52px;
+  z-index: 40;
 }
 .map-title-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
 }
-.map-title-group h3 {
-  font-family: 'Cinzel', serif;
-  font-size: 1.15rem;
+.map-atlas-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.map-atlas-title-wrap h3 {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+  font-size: 0.95rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
+  margin: 0;
+  white-space: nowrap;
+}
+.map-atlas-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
 }
 .map-stats {
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   display: flex;
   align-items: center;
@@ -4233,12 +4254,15 @@ body.focus-mode .format-bar:hover {
   background: var(--bg-tertiary);
   border-radius: 12px;
   border: 1px solid var(--border-subtle);
+  white-space: nowrap;
 }
 .map-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
+  flex: 1;
+  justify-content: flex-end;
 }
 .map-search-wrap, .timeline-search-wrap, .codex-search-wrap {
   position: relative;
@@ -4251,33 +4275,153 @@ body.focus-mode .format-bar:hover {
   border-radius: 20px;
   color: var(--text-primary);
   font-size: 0.8rem;
-  padding: 6px 12px 6px 30px;
-  width: 140px;
+  padding: 5px 12px 5px 28px;
+  width: 125px;
   transition: width 200ms ease, border-color 200ms ease, background 200ms ease;
 }
 .map-search-wrap input:focus, .timeline-search-wrap input:focus, .codex-search-wrap input:focus {
-  width: 180px;
+  width: 160px;
   background: var(--bg-primary);
-  border-color: var(--red-500);
+  border-color: var(--accent);
   outline: none;
-  box-shadow: 0 0 0 2px var(--red-glow);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 .map-search-wrap .search-icon, .timeline-search-wrap .search-icon, .codex-search-wrap .search-icon {
   position: absolute;
-  left: 10px;
+  left: 9px;
   color: var(--text-muted);
   pointer-events: none;
 }
 .map-filter-tags, .timeline-filter-tags, .codex-filter-tags {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
 }
 .map-action-btns {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: nowrap;
 }
+.map-header-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* Floating Dropdowns for Options & Quick Biomes */
+.map-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.map-floating-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  background: rgba(22, 22, 28, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  padding: 8px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  user-select: none;
+  animation: fadeIn 150ms ease;
+}
+
+.map-floating-dropdown.hidden {
+  display: none !important;
+}
+
+.map-tools-dropdown {
+  min-width: 280px;
+}
+
+.dropdown-header {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  padding: 4px 8px 2px;
+}
+
+.dropdown-sep {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 0;
+}
+
+.dropdown-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px;
+}
+
+.dropdown-field label {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.dropdown-action-btn,
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.dropdown-action-btn:hover,
+.dropdown-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.dropdown-action-btn.btn-danger-text:hover {
+  color: var(--red-400);
+}
+
+.dropdown-item-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.dropdown-item-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item-title {
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+}
+
+.dropdown-item-sub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
 .map-zoom-cluster {
   display: inline-flex;
   align-items: center;
@@ -4566,10 +4710,10 @@ img.map-custom-img[src=""] {
   gap: 12px;
 }
 .timeline-title-group h3 {
-  font-family: 'Cinzel', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
   font-size: 1.15rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: -0.015em;
   color: var(--text-primary);
 }
 .timeline-stats {
@@ -4638,9 +4782,10 @@ img.map-custom-img[src=""] {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 4px 14px;
-  font-family: 'Cinzel', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
   font-size: 0.75rem;
-  letter-spacing: 0.05em;
+  letter-spacing: -0.01em;
+  font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
 }
@@ -4715,11 +4860,11 @@ img.map-custom-img[src=""] {
   margin-bottom: 6px;
 }
 .timeline-card-year {
-  font-family: 'Cinzel', serif;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.74rem;
-  font-weight: 700;
+  font-weight: 600;
   color: #ef4444;
-  letter-spacing: 0.04em;
+  letter-spacing: -0.01em;
 }
 .timeline-card-title {
   font-size: 0.9rem;
@@ -4811,9 +4956,10 @@ img.map-custom-img[src=""] {
   border: 1px solid var(--border);
   padding: 5px 16px;
   border-radius: 20px;
-  font-family: 'Cinzel', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
   font-size: 0.8rem;
-  letter-spacing: 0.06em;
+  letter-spacing: -0.01em;
+  font-weight: 500;
   color: var(--text-primary);
   box-shadow: var(--shadow-sm);
 }
@@ -4889,10 +5035,10 @@ img.map-custom-img[src=""] {
   gap: 12px;
 }
 .codex-title-group h3 {
-  font-family: 'Cinzel', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
   font-size: 1.15rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: -0.015em;
   color: var(--text-primary);
 }
 .codex-stats {
@@ -4954,8 +5100,8 @@ img.map-custom-img[src=""] {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+  font-weight: 600;
   font-size: 1.1rem;
   color: var(--text-primary);
   flex-shrink: 0;
@@ -4965,9 +5111,10 @@ img.map-custom-img[src=""] {
   min-width: 0;
 }
 .codex-card-name {
-  font-family: 'Cinzel', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
   font-size: 1.05rem;
   font-weight: 600;
+  letter-spacing: -0.015em;
   color: var(--text-primary);
   margin: 0 0 4px 0;
   white-space: nowrap;
@@ -5309,11 +5456,11 @@ img.map-custom-img[src=""] {
 }
 .menu-wb-badge {
   font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: #ef4444;
   text-transform: uppercase;
-  font-family: 'Cinzel', serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
 }
 .menu-wb-hint {
   font-size: 0.75rem;
@@ -6600,7 +6747,7 @@ img.map-custom-img[src=""] {
   pointer-events: none;
 }
 
-/* ── Map Studio Floating Toolbar ── */
+/* ── Map Studio Floating Toolbar (Minimalist Pill Dock) ── */
 .map-studio-toolbar {
   position: absolute;
   top: 14px;
@@ -6608,23 +6755,37 @@ img.map-custom-img[src=""] {
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 6px 14px;
-  background: rgba(14, 16, 25, 0.95);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  flex-wrap: nowrap;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(18, 18, 24, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border);
-  border-radius: 30px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.15);
+  border-radius: 36px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.12);
   z-index: 25;
   user-select: none;
-  max-width: 95%;
-  transition: all 0.2s ease;
+  max-width: 96%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-studio-toolbar::-webkit-scrollbar {
+  display: none;
 }
 
 .map-studio-toolbar.hidden {
   display: none !important;
+}
+
+.studio-sub-options {
+  background: var(--bg-tertiary);
+  padding: 3px 8px;
+  border-radius: 18px;
+  border: 1px solid var(--border-subtle);
+  animation: fadeIn 0.15s ease;
 }
 
 .studio-section {
@@ -6865,9 +7026,10 @@ img.map-custom-img[src=""] {
 }
 
 .map-region-label {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: -0.01em;
   fill: #ffffff;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
   pointer-events: none;
