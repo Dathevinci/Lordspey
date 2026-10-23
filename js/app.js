@@ -5010,21 +5010,21 @@
       }
     }
     const map = {
-      chapter: `rgba(239, 68, 68, ${alpha})`,
-      lore: `rgba(249, 115, 22, ${alpha})`,
-      world: `rgba(168, 85, 247, ${alpha})`,
+      chapter: `rgba(167, 139, 250, ${alpha})`,
+      lore: `rgba(56, 189, 248, ${alpha})`,
+      world: `rgba(52, 211, 153, ${alpha})`,
       draft: `rgba(148, 163, 184, ${alpha})`,
     };
-    return map[cat] || `rgba(239, 68, 68, ${alpha})`;
+    return map[cat] || `rgba(167, 139, 250, ${alpha})`;
   }
 
   CATEGORY_META = {
     chapter: {
       key: 'chapter',
       name: 'Chapters',
-      color: (ACCENT_THEMES[currentAccentTheme] && ACCENT_THEMES[currentAccentTheme].accent) || '#ef4444',
-      halo: (ACCENT_THEMES[currentAccentTheme] && ACCENT_THEMES[currentAccentTheme].accent) || '#ef4444',
-      glow: (ACCENT_THEMES[currentAccentTheme] && ACCENT_THEMES[currentAccentTheme].redGlowStrong) || 'rgba(239, 68, 68, 0.45)',
+      color: (ACCENT_THEMES[currentAccentTheme] && ACCENT_THEMES[currentAccentTheme].accent) || '#a78bfa',
+      halo: (ACCENT_THEMES[currentAccentTheme] && ACCENT_THEMES[currentAccentTheme].accent) || '#a78bfa',
+      glow: 'rgba(167, 139, 250, 0.25)',
       core: '#ffffff',
       icon: '●',
       angle: -3 * Math.PI / 4,
@@ -5032,9 +5032,9 @@
     lore: {
       key: 'lore',
       name: 'Lore',
-      color: '#f97316',
-      halo: '#f97316',
-      glow: 'rgba(249, 115, 22, 0.45)',
+      color: '#38bdf8',
+      halo: '#38bdf8',
+      glow: 'rgba(56, 189, 248, 0.25)',
       core: '#ffffff',
       icon: '●',
       angle: -Math.PI / 4,
@@ -5042,9 +5042,9 @@
     world: {
       key: 'world',
       name: 'World Building',
-      color: '#a855f7',
-      halo: '#a855f7',
-      glow: 'rgba(168, 85, 247, 0.45)',
+      color: '#34d399',
+      halo: '#34d399',
+      glow: 'rgba(52, 211, 153, 0.25)',
       core: '#ffffff',
       icon: '●',
       angle: Math.PI / 4,
@@ -5054,7 +5054,7 @@
       name: 'Drafts',
       color: '#94a3b8',
       halo: '#94a3b8',
-      glow: 'rgba(148, 163, 184, 0.45)',
+      glow: 'rgba(148, 163, 184, 0.25)',
       core: '#ffffff',
       icon: '●',
       angle: 3 * Math.PI / 4,
@@ -5534,12 +5534,12 @@
       }
     }
 
-    // 4. Calculate dynamic radii based on connectivity
+    // 4. Calculate dynamic radii based on connectivity (Obsidian-scale)
     for (const node of graphNodes) {
       if (node.isHub) {
-        node.radius = Math.min(30, 22 + (node.nodeCount || 0) * 1.5);
+        node.radius = Math.max(18, Math.min(28, 18 + (node.nodeCount || 0) * 1.2));
       } else {
-        node.radius = Math.min(18, 9 + (node.connections || 0) * 1.5);
+        node.radius = Math.max(7, Math.min(17, 7 + Math.sqrt(node.connections || 0) * 2.2));
       }
     }
 
@@ -5707,44 +5707,6 @@
       n.hoverProgress += (targetHover - n.hoverProgress) * 0.20;
     }
 
-    // Update shooting star streak
-    if (!shootingStar.active) {
-      shootingStar.nextSpawn--;
-      if (shootingStar.nextSpawn <= 0) {
-        shootingStar.active = true;
-        shootingStar.life = 0;
-        shootingStar.maxLife = Math.floor(Math.random() * 30 + 35);
-        shootingStar.x = (Math.random() - 0.5) * 1600;
-        shootingStar.y = (Math.random() - 0.5) * 1200 - 300;
-        const angle = Math.PI / 4 + (Math.random() - 0.5) * 0.4;
-        const speed = Math.random() * 8 + 9;
-        shootingStar.vx = Math.cos(angle) * speed;
-        shootingStar.vy = Math.sin(angle) * speed;
-        shootingStar.length = Math.random() * 60 + 50;
-        shootingStar.alpha = 0;
-      }
-    } else {
-      shootingStar.life++;
-      shootingStar.x += shootingStar.vx;
-      shootingStar.y += shootingStar.vy;
-      const progress = shootingStar.life / shootingStar.maxLife;
-      shootingStar.alpha = Math.sin(progress * Math.PI) * 0.75;
-      if (shootingStar.life >= shootingStar.maxLife) {
-        shootingStar.active = false;
-        shootingStar.nextSpawn = Math.floor(Math.random() * 250 + 200);
-      }
-    }
-
-    // Dynamic drifting stardust particles simulation
-    for (const dust of cosmicDust) {
-      dust.x += dust.vx;
-      dust.y += dust.vy;
-      if (dust.x < -1400) dust.x = 1400;
-      if (dust.x > 1400) dust.x = -1400;
-      if (dust.y < -1400) dust.y = 1400;
-      if (dust.y > 1400) dust.y = -1400;
-    }
-
     // Smooth Camera Lerp & Pan Inertia
     if (!isPanning) {
       if (Math.abs(panInertia.x) > 0.05 || Math.abs(panInertia.y) > 0.05) {
@@ -5769,339 +5731,138 @@
     ctx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
     ctx.scale(dpr, dpr);
 
-    // 1. Cosmic Starfield, Nebula & Stardust Backdrop
-    ctx.save();
-    ctx.translate(camera.x * 0.2 + w / 2, camera.y * 0.2 + h / 2);
-    ctx.scale(camera.zoom * 0.8, camera.zoom * 0.8);
-
-    const nebPulse = Math.sin(galaxyTime * 0.8) * 16;
-    const nebulaGrad = ctx.createRadialGradient(0, 0, 40, 0, 0, 520 + nebPulse);
-    nebulaGrad.addColorStop(0, 'rgba(220, 38, 38, 0.13)');
-    nebulaGrad.addColorStop(0.35, 'rgba(168, 85, 247, 0.08)');
-    nebulaGrad.addColorStop(0.7, 'rgba(249, 115, 22, 0.04)');
-    nebulaGrad.addColorStop(1, 'rgba(8, 8, 12, 0)');
-    ctx.fillStyle = nebulaGrad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 520 + nebPulse, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Twinkling stars
-    for (const star of bgStars) {
-      const twinkle = Math.sin(galaxyTime * star.twinkleSpeed * 50 + star.phase);
-      const curAlpha = Math.max(0.1, star.alpha + twinkle * 0.3);
-      ctx.fillStyle = `rgba(255, 255, 255, ${curAlpha})`;
-      ctx.beginPath();
-      ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Dynamic drifting stardust particles with fluid motion trails
-    for (const dust of cosmicDust) {
-      const pulse = Math.sin(galaxyTime * dust.pulseRate * 60 + dust.phase);
-      const alpha = Math.max(0.08, dust.baseAlpha + pulse * 0.15);
-
-      let colorRgba = `rgba(255, 255, 255, ${alpha})`;
-      let trailRgba = `rgba(255, 255, 255, ${alpha * 0.35})`;
-      if (dust.colorType === 'crimson') {
-        colorRgba = `rgba(239, 68, 68, ${alpha * 0.95})`;
-        trailRgba = `rgba(239, 68, 68, ${alpha * 0.35})`;
-      } else if (dust.colorType === 'violet') {
-        colorRgba = `rgba(168, 85, 247, ${alpha * 0.9})`;
-        trailRgba = `rgba(168, 85, 247, ${alpha * 0.3})`;
+    // 1. Clean Obsidian Canvas Dot Grid (pans and zooms with camera)
+    const dotSpacing = 32 * camera.zoom;
+    if (dotSpacing >= 14 && dotSpacing <= 100) {
+      const offsetX = ((camera.x % dotSpacing) + dotSpacing) % dotSpacing;
+      const offsetY = ((camera.y % dotSpacing) + dotSpacing) % dotSpacing;
+      const isLight = currentBaseTheme === 'light';
+      const isSepia = currentBaseTheme === 'sepia';
+      ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.06)' : isSepia ? 'rgba(90, 60, 30, 0.08)' : 'rgba(255, 255, 255, 0.05)';
+      const dotR = Math.max(0.6, Math.min(1.2, 0.75 * camera.zoom));
+      for (let gx = offsetX; gx < w; gx += dotSpacing) {
+        for (let gy = offsetY; gy < h; gy += dotSpacing) {
+          ctx.beginPath();
+          ctx.arc(gx, gy, dotR, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
-
-      // Gentle stardust particle trail
-      ctx.beginPath();
-      ctx.moveTo(dust.x - dust.vx * 14, dust.y - dust.vy * 14);
-      ctx.lineTo(dust.x, dust.y);
-      ctx.strokeStyle = trailRgba;
-      ctx.lineWidth = Math.max(0.6, dust.radius * 0.8);
-      ctx.stroke();
-
-      // Particle head
-      ctx.fillStyle = colorRgba;
-      ctx.beginPath();
-      ctx.arc(dust.x, dust.y, dust.radius, 0, Math.PI * 2);
-      ctx.fill();
     }
-
-    // Shooting star / cosmic photon streak with glowing tail
-    if (shootingStar.active && shootingStar.alpha > 0.01) {
-      ctx.save();
-      const tailX = shootingStar.x - (shootingStar.vx / 12) * shootingStar.length;
-      const tailY = shootingStar.y - (shootingStar.vy / 12) * shootingStar.length;
-
-      // Outer luminous streak
-      ctx.beginPath();
-      ctx.moveTo(tailX, tailY);
-      ctx.lineTo(shootingStar.x, shootingStar.y);
-      ctx.strokeStyle = `rgba(239, 68, 68, ${shootingStar.alpha * 0.45})`;
-      ctx.lineWidth = 3.2;
-      ctx.stroke();
-
-      // Inner white beam
-      ctx.beginPath();
-      ctx.moveTo(tailX, tailY);
-      ctx.lineTo(shootingStar.x, shootingStar.y);
-      ctx.strokeStyle = `rgba(255, 245, 245, ${shootingStar.alpha * 0.9})`;
-      ctx.lineWidth = 1.6;
-      ctx.stroke();
-
-      // Head starlight
-      ctx.beginPath();
-      ctx.arc(shootingStar.x, shootingStar.y, 2.2, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1, shootingStar.alpha * 1.3)})`;
-      ctx.fill();
-      ctx.restore();
-    }
-
-    ctx.restore();
 
     // 2. Camera Transform for graph elements
+    ctx.save();
     ctx.translate(camera.x, camera.y);
     ctx.scale(camera.zoom, camera.zoom);
 
-    const centerX = w / 2;
-    const centerY = h / 2;
+    // Identify connected nodes if hovering (Obsidian neighborhood highlight)
+    const isHoverActive = Boolean(hoveredNode);
+    const connectedNodeSet = new Set();
+    const connectedEdgeSet = new Set();
 
-    // Core Radiant Flare
-    const coreGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 160);
-    const corePulse = Math.sin(galaxyTime * 2) * 0.04 + 0.12;
-    coreGrad.addColorStop(0, `rgba(239, 68, 68, ${corePulse + 0.08})`);
-    coreGrad.addColorStop(0.4, `rgba(249, 115, 22, ${corePulse})`);
-    coreGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.fillStyle = coreGrad;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, 160, 0, Math.PI * 2);
-    ctx.fill();
+    if (hoveredNode) {
+      connectedNodeSet.add(hoveredNode);
+      for (const e of graphEdges) {
+        const isConn = (
+          e.source === hoveredNode ||
+          e.target === hoveredNode ||
+          (hoveredNode.isHub && (e.source.hubRef === hoveredNode || e.target.hubRef === hoveredNode || (e.isHierarchy && e.category === hoveredNode.category)))
+        );
+        if (isConn) {
+          connectedEdgeSet.add(e);
+          connectedNodeSet.add(e.source);
+          connectedNodeSet.add(e.target);
+        }
+      }
+    }
 
-    // Galactic Accretion Rings (Dual rings with subtle counter-rotation)
-    ctx.save();
-    ctx.translate(centerX, centerY);
-    ctx.rotate(galaxyTime * 0.15);
-    ctx.strokeStyle = 'rgba(239, 68, 68, 0.12)';
-    ctx.lineWidth = 1.1;
-    ctx.setLineDash([8, 14]);
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 180, 75, 0, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.rotate(-galaxyTime * 0.22);
-    ctx.strokeStyle = 'rgba(168, 85, 247, 0.08)';
-    ctx.lineWidth = 0.9;
-    ctx.setLineDash([6, 18]);
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 240, 100, Math.PI / 6, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-
-    // 3. Draw Category Sub-branch Hierarchy Edges
+    // 3. Draw Edges (Hierarchy sub-branches, Wiki cross-links, Manual custom links)
     for (const e of graphEdges) {
-      if (!e.isHierarchy) continue;
-      const meta = CATEGORY_META[e.category] || CATEGORY_META.chapter;
-      const isConnected = hoveredNode && (
-        e.source === hoveredNode ||
-        e.target === hoveredNode ||
-        (hoveredNode.isHub && hoveredNode.category === e.category)
-      );
+      const isConn = connectedEdgeSet.has(e);
+      let edgeAlpha;
+      if (isHoverActive) {
+        edgeAlpha = isConn ? 0.90 : 0.06;
+      } else {
+        edgeAlpha = e.isHierarchy ? 0.22 : 0.15;
+      }
 
-      // Hierarchy link line with subtle energy flow pulse
-      const edgePulse = Math.sin(galaxyTime * 2.5 + (e.flowProgress || 0) * Math.PI * 2) * 0.15 + 0.85;
+      let strokeColor;
+      if (isConn) {
+        strokeColor = e.color || (e.category ? (CATEGORY_META[e.category] ? CATEGORY_META[e.category].halo : '#ffffff') : '#ffffff');
+      } else if (e.isHierarchy) {
+        strokeColor = getCategoryRgba(e.category, edgeAlpha);
+      } else if (e.isWiki) {
+        strokeColor = `rgba(255, 255, 255, ${edgeAlpha})`;
+      } else {
+        strokeColor = e.color ? e.color : `rgba(161, 161, 170, ${edgeAlpha})`;
+      }
+
       ctx.save();
       ctx.beginPath();
       ctx.moveTo(e.source.x, e.source.y);
       ctx.lineTo(e.target.x, e.target.y);
-      ctx.strokeStyle = isConnected ? meta.halo : meta.glow;
-      ctx.lineWidth = isConnected ? 2.6 : 1.3 * edgePulse;
-      if (isConnected) {
-        ctx.shadowColor = meta.halo;
-        ctx.shadowBlur = 8;
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = isConn ? 1.8 : 1.0;
+
+      if (e.isWiki && !isConn) {
+        ctx.setLineDash([3, 4]);
+      } else if (e.isManualLink) {
+        ctx.setLineDash([4, 4]);
       }
+
       ctx.stroke();
       ctx.restore();
 
-      // Fluid dual photon stream along the branch with accurate category colors
-      const p1 = e.flowProgress || 0;
-      const p2 = (p1 + 0.5) % 1;
-
-      const drawPhoton = (prog) => {
-        const pAlpha = Math.sin(prog * Math.PI);
-        if (pAlpha <= 0.01) return;
-
-        const fx = e.source.x + (e.target.x - e.source.x) * prog;
-        const fy = e.source.y + (e.target.y - e.source.y) * prog;
-
-        // Tail trail
-        const trailProg = Math.max(0, prog - 0.06);
-        const tx = e.source.x + (e.target.x - e.source.x) * trailProg;
-        const ty = e.source.y + (e.target.y - e.source.y) * trailProg;
-
-        ctx.beginPath();
-        ctx.moveTo(tx, ty);
-        ctx.lineTo(fx, fy);
-        ctx.strokeStyle = isConnected
-          ? `rgba(255, 255, 255, ${pAlpha * 0.95})`
-          : getCategoryRgba(e.category, pAlpha * 0.85);
-        ctx.lineWidth = isConnected ? 2.6 : 1.8;
-        ctx.stroke();
-
-        // Photon head
-        ctx.beginPath();
-        ctx.arc(fx, fy, isConnected ? 3.0 : 2.0, 0, Math.PI * 2);
-        ctx.fillStyle = isConnected ? '#ffffff' : meta.halo;
-        ctx.fill();
-      };
-
-      drawPhoton(p1);
-      drawPhoton(p2);
-    }
-
-    // 4. Draw Wiki-link Cross Connections
-    for (const e of graphEdges) {
-      if (!e.isWiki) continue;
-      const isConnected = hoveredNode && (e.source === hoveredNode || e.target === hoveredNode);
-
-      // Constellation line with animated dash offset
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(e.source.x, e.source.y);
-      ctx.lineTo(e.target.x, e.target.y);
-      ctx.strokeStyle = isConnected
-        ? 'rgba(255, 255, 255, 0.95)'
-        : 'rgba(239, 68, 68, 0.28)';
-      ctx.lineWidth = isConnected ? 2.4 : 1.2;
-      ctx.setLineDash([4, 6]);
-      ctx.lineDashOffset = -galaxyTime * 16;
-      if (isConnected) {
-        ctx.shadowColor = 'rgba(239, 68, 68, 0.85)';
-        ctx.shadowBlur = 9;
-      }
-      ctx.stroke();
-      ctx.restore();
-
-      // Dual traveling photon pulses
-      const wp1 = e.photonPulse || 0;
-      const wp2 = (wp1 + 0.5) % 1;
-
-      const drawWikiPhoton = (prog) => {
-        const pAlpha = Math.sin(prog * Math.PI);
-        if (pAlpha <= 0.01) return;
-
-        const px = e.source.x + (e.target.x - e.source.x) * prog;
-        const py = e.source.y + (e.target.y - e.source.y) * prog;
-
-        // Tail
-        const trailProg = Math.max(0, prog - 0.06);
-        const tx = e.source.x + (e.target.x - e.source.x) * trailProg;
-        const ty = e.source.y + (e.target.y - e.source.y) * trailProg;
-
-        ctx.beginPath();
-        ctx.moveTo(tx, ty);
-        ctx.lineTo(px, py);
-        ctx.strokeStyle = isConnected
-          ? `rgba(255, 255, 255, ${pAlpha * 0.92})`
-          : `rgba(248, 113, 113, ${pAlpha * 0.75})`;
-        ctx.lineWidth = isConnected ? 2.8 : 1.8;
-        ctx.stroke();
-
-        // Photon head
-        ctx.beginPath();
-        ctx.arc(px, py, isConnected ? 3.4 : 2.2, 0, Math.PI * 2);
-        ctx.fillStyle = isConnected ? '#ffffff' : 'rgba(248, 113, 113, 0.95)';
-        ctx.fill();
-      };
-
-      drawWikiPhoton(wp1);
-      drawWikiPhoton(wp2);
-    }
-
-    // 4b. Draw Manual Custom Entity Links
-    for (const e of graphEdges) {
-      if (!e.isManualLink) continue;
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(e.source.x, e.source.y);
-      ctx.lineTo(e.target.x, e.target.y);
-      ctx.strokeStyle = e.color || '#818cf8';
-      ctx.lineWidth = 2.2;
-      ctx.setLineDash([5, 5]);
-      ctx.lineDashOffset = -galaxyTime * 12;
-      ctx.stroke();
-
-      if (e.label && typeof ctx.fillText === 'function') {
+      // Manual edge label
+      if (e.isManualLink && e.label && (!isHoverActive || isConn)) {
         const midX = (e.source.x + e.target.x) / 2;
         const midY = (e.source.y + e.target.y) / 2;
-        ctx.font = '500 10px "Inter", sans-serif';
-        ctx.fillStyle = '#ffffff';
+        ctx.save();
+        ctx.font = '500 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
+        ctx.fillStyle = isConn ? '#ffffff' : 'rgba(200, 200, 210, 0.7)';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(e.label, midX, midY - 6);
+        ctx.restore();
       }
-      ctx.restore();
     }
 
-    // 5. Draw Category Hub Nodes
+    // 4. Draw Category Hub Nodes
     for (const n of graphNodes) {
       if (!n.isHub) continue;
       const meta = CATEGORY_META[n.category] || CATEGORY_META.chapter;
       const isHovered = n === hoveredNode;
+      const isConn = !isHoverActive || connectedNodeSet.has(n);
+      const nodeAlpha = isConn ? 1.0 : 0.12;
 
-      // Outer animated dashed orbital halo with dynamic rotation & breathing
       ctx.save();
-      ctx.beginPath();
-      const ringPulse = Math.sin(galaxyTime * 2.2 + n.pulseOffset) * 2.5;
-      const hubHaloR = n.radius + 8 + ringPulse + (n.hoverProgress || 0) * 4;
-      ctx.arc(n.x, n.y, hubHaloR, 0, Math.PI * 2);
-      ctx.strokeStyle = isHovered ? '#ffffff' : meta.halo;
-      ctx.lineWidth = isHovered ? 2.2 : 1.3;
-      ctx.setLineDash([4, 5]);
-      ctx.lineDashOffset = -galaxyTime * 14;
-      ctx.stroke();
-      ctx.restore();
+      ctx.globalAlpha = nodeAlpha;
 
-      // Atmospheric Coronal Shockwaves / Multi-wave Breathing
-      for (let wIdx = 0; wIdx < 2; wIdx++) {
-        const wavePhase = (galaxyTime * 0.35 + n.pulseOffset + wIdx * 0.5) % 1;
-        const waveRadius = n.radius + 6 + wavePhase * 26;
-        const waveAlpha = Math.sin(wavePhase * Math.PI) * 0.32;
-        if (waveAlpha > 0.02) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(n.x, n.y, waveRadius, 0, Math.PI * 2);
-          ctx.strokeStyle = isHovered
-            ? `rgba(255, 255, 255, ${waveAlpha * 1.1})`
-            : getCategoryRgba(n.category, waveAlpha);
-          ctx.lineWidth = 1.0;
-          ctx.stroke();
-          ctx.restore();
-        }
+      const baseR = n.radius + (n.hoverProgress || 0) * 3;
+
+      // Outer focus ring on hover
+      if (isHovered) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, baseR + 5, 0, Math.PI * 2);
+        ctx.strokeStyle = meta.halo;
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
       }
 
-      // Corona radiant flare
-      const coronaRadius = n.radius * 2.9 + Math.sin(galaxyTime * 1.8 + n.pulseOffset) * 3;
-      const corona = ctx.createRadialGradient(n.x, n.y, n.radius * 0.35, n.x, n.y, coronaRadius);
-      corona.addColorStop(0, meta.glow);
-      corona.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = corona;
+      // Solid Category Hub disc
       ctx.beginPath();
-      ctx.arc(n.x, n.y, coronaRadius, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Solid central core
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
-      ctx.fillStyle = isHovered ? meta.halo : 'rgba(20, 20, 26, 0.96)';
+      ctx.arc(n.x, n.y, baseR, 0, Math.PI * 2);
+      ctx.fillStyle = isHovered ? meta.halo : 'rgba(28, 28, 35, 0.96)';
       ctx.fill();
       ctx.strokeStyle = meta.halo;
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2.0;
       ctx.stroke();
 
-      // Hub icon symbol
-      ctx.fillStyle = isHovered ? '#ffffff' : meta.halo;
-      ctx.font = '600 13px "Cinzel", serif';
+      // Hub Category Initial
+      ctx.font = '700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(meta.icon || '●', n.x, n.y);
+      ctx.fillStyle = isHovered ? '#ffffff' : meta.halo;
+      ctx.fillText(meta.name.charAt(0), n.x, n.y);
 
       // Hub Category Title Badge
       const titleText = meta.name.toUpperCase();
@@ -6110,19 +5871,19 @@
         : meta.key === 'world' ? (n.nodeCount === 1 ? '1 location' : `${n.nodeCount} locations`)
         : (n.nodeCount === 1 ? '1 draft' : `${n.nodeCount} drafts`);
 
-      ctx.font = '700 11px "Cinzel", serif';
+      ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
       const textWidth = ctx.measureText(titleText).width;
       const pillW = Math.max(textWidth + 24, 90);
       n.hitWidth = pillW;
       const pillH = 22;
       const pillX = n.x - pillW / 2;
-      const pillY = n.y + n.radius + 10;
+      const pillY = n.y + baseR + 8;
 
-      ctx.fillStyle = 'rgba(12, 12, 16, 0.92)';
-      ctx.strokeStyle = isHovered ? '#ffffff' : meta.halo;
+      ctx.fillStyle = 'rgba(18, 18, 22, 0.92)';
+      ctx.strokeStyle = isHovered ? meta.halo : 'rgba(255, 255, 255, 0.14)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      drawRoundRect(ctx, pillX, pillY, pillW, pillH, 11);
+      drawRoundRect(ctx, pillX, pillY, pillW, pillH, 6);
       ctx.fill();
       ctx.stroke();
 
@@ -6132,128 +5893,76 @@
       ctx.fillText(titleText, n.x, pillY + pillH / 2);
 
       // Sub-text count
-      ctx.font = '500 9px "Inter", sans-serif';
-      ctx.fillStyle = 'rgba(161, 161, 170, 0.9)';
+      ctx.font = '500 9.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
+      ctx.fillStyle = 'rgba(161, 161, 170, 0.85)';
       ctx.fillText(countLabel, n.x, pillY + pillH + 11);
+
+      ctx.restore();
     }
 
-    // 6. Draw Note & Manual Entity Nodes
+    // 5. Draw Note & Manual Entity Nodes (Obsidian Solid Circular Dots)
     for (const n of graphNodes) {
       if (n.isHub) continue;
 
+      const isHovered = n === hoveredNode;
+      const isCurrentActive = n.id === activeNoteId;
+      const isConn = !isHoverActive || connectedNodeSet.has(n);
+      const nodeAlpha = isConn ? 1.0 : 0.12;
+
+      ctx.save();
+      ctx.globalAlpha = nodeAlpha;
+
+      const baseR = n.radius + (n.hoverProgress || 0) * 2.5;
+
       if (n.isManualEntity) {
-        const isHovered = n === hoveredNode;
         const entColor = n.color || '#38bdf8';
-        ctx.save();
         ctx.beginPath();
-
-        if (n.type === 'theme') {
-          // Diamond shape
-          ctx.moveTo(n.x, n.y - n.radius - 4);
-          ctx.lineTo(n.x + n.radius + 4, n.y);
-          ctx.lineTo(n.x, n.y + n.radius + 4);
-          ctx.lineTo(n.x - n.radius - 4, n.y);
-          ctx.closePath();
-        } else if (n.type === 'arc') {
-          // Arc rings
-          ctx.arc(n.x, n.y, n.radius + 3, 0, Math.PI * 2);
-        } else if (n.type === 'faction') {
-          // Shield shape
-          ctx.moveTo(n.x - n.radius, n.y - n.radius);
-          ctx.lineTo(n.x + n.radius, n.y - n.radius);
-          ctx.lineTo(n.x + n.radius, n.y);
-          ctx.lineTo(n.x, n.y + n.radius + 4);
-          ctx.lineTo(n.x - n.radius, n.y);
-          ctx.closePath();
-        } else {
-          // Concept star / burst
-          ctx.arc(n.x, n.y, n.radius + 2, 0, Math.PI * 2);
-        }
-
+        ctx.arc(n.x, n.y, baseR, 0, Math.PI * 2);
         ctx.fillStyle = isHovered ? '#ffffff' : entColor;
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = isHovered ? 2.5 : 1.5;
+        ctx.lineWidth = isHovered ? 2.0 : 1.2;
         ctx.stroke();
 
-        // Label
-        if (typeof ctx.fillText === 'function') {
-          ctx.font = '600 11px "Cinzel", serif';
-          ctx.fillStyle = '#ffffff';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'top';
-          ctx.fillText(n.title, n.x, n.y + n.radius + 8);
+        ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(n.title, n.x, n.y + baseR + 8);
 
-          ctx.font = '500 9px "Inter", sans-serif';
-          ctx.fillStyle = entColor;
-          ctx.fillText((n.type || 'concept').toUpperCase(), n.x, n.y + n.radius + 23);
-        }
+        ctx.font = '500 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
+        ctx.fillStyle = entColor;
+        ctx.fillText((n.type || 'concept').toUpperCase(), n.x, n.y + baseR + 23);
+
         ctx.restore();
         continue;
       }
+
       const meta = CATEGORY_META[n.category] || CATEGORY_META.chapter;
-      const isHovered = n === hoveredNode;
-      const isCurrentActive = n.id === activeNoteId;
+      const nodeColor = meta.halo || meta.color;
 
-      // Atmospheric breathing
-      const bPhase = galaxyTime * 2.8 + n.pulseOffset;
-      const breathing = (Math.sin(bPhase) * 0.7 + Math.sin(bPhase * 0.5) * 0.3) * 2.2;
-      const baseR = n.radius + (n.hoverProgress || 0) * 3.5;
-
-      // Corona Flare
-      const coronaR = Math.max((baseR * 2.6 + breathing) * (1 + (n.hoverProgress || 0) * 0.25), baseR * 0.35 + 2);
-      const corona = ctx.createRadialGradient(n.x, n.y, baseR * 0.35, n.x, n.y, coronaR);
-      corona.addColorStop(0, meta.glow);
-      corona.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = corona;
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, coronaR, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Gentle radiant coronal pulse ring for connected nodes
-      const starWavePhase = (galaxyTime * 0.4 + n.pulseOffset) % 1;
-      const starWaveAlpha = Math.sin(starWavePhase * Math.PI) * (0.15 + (n.hoverProgress || 0) * 0.35);
-      if (starWaveAlpha > 0.02) {
+      // Active Note or Hover Outer Focus Ring (Clean Obsidian ring)
+      if (isHovered || isCurrentActive) {
         ctx.beginPath();
-        ctx.arc(n.x, n.y, baseR + 3 + starWavePhase * 14, 0, Math.PI * 2);
-        ctx.strokeStyle = isHovered || isCurrentActive
-          ? `rgba(255, 255, 255, ${starWaveAlpha})`
-          : getCategoryRgba(n.category, starWaveAlpha);
-        ctx.lineWidth = 1;
+        ctx.arc(n.x, n.y, baseR + 3.5, 0, Math.PI * 2);
+        ctx.strokeStyle = isHovered ? '#ffffff' : nodeColor;
+        ctx.lineWidth = 1.5;
         ctx.stroke();
       }
 
-      // Radiant pulse ring on hover
-      if ((n.hoverProgress || 0) > 0.1) {
-        const hoverWaveR = baseR + 5 + (1 - n.hoverProgress) * 6;
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, hoverWaveR, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${n.hoverProgress * 0.45})`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      // Outer Ring
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, baseR + 2, 0, Math.PI * 2);
-      ctx.strokeStyle = isHovered || isCurrentActive ? '#ffffff' : meta.halo;
-      ctx.lineWidth = isHovered || isCurrentActive ? 2.5 : 1.4;
-      ctx.stroke();
-
-      // Star Center
+      // Solid Node Dot (Obsidian Signature)
       ctx.beginPath();
       ctx.arc(n.x, n.y, baseR, 0, Math.PI * 2);
-      ctx.fillStyle = isHovered || isCurrentActive ? '#ffffff' : meta.halo;
+      ctx.fillStyle = isHovered ? '#ffffff' : nodeColor;
       ctx.fill();
 
-      // Pure White Starlight Core
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, baseR * 0.42, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
-      ctx.fill();
+      // Subtle edge definition
+      ctx.strokeStyle = isHovered ? nodeColor : 'rgba(0, 0, 0, 0.35)';
+      ctx.lineWidth = 1.0;
+      ctx.stroke();
 
       // Note Title Label
-      ctx.font = `${isHovered ? '600' : '400'} 11px "Cinzel", serif`;
+      ctx.font = `${isHovered ? '600' : '500'} 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
 
@@ -6261,15 +5970,15 @@
       const titleW = ctx.measureText(displayTitle).width;
 
       // Drop shadow backing for crisp legibility
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.88)';
-      ctx.fillText(displayTitle, n.x + 1, n.y + baseR + 10);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+      ctx.fillText(displayTitle, n.x + 1, n.y + baseR + 9);
 
-      ctx.fillStyle = isHovered || isCurrentActive ? '#ffffff' : 'rgba(244, 244, 246, 0.9)';
-      ctx.fillText(displayTitle, n.x, n.y + baseR + 9);
+      ctx.fillStyle = isHovered || isCurrentActive ? '#ffffff' : 'rgba(235, 235, 240, 0.92)';
+      ctx.fillText(displayTitle, n.x, n.y + baseR + 8);
 
       // Sub-branch Location Badge (e.g. "Chapters › Act 1")
       const branchLabel = `${meta.name} › ${n.subBranch}`;
-      ctx.font = '500 9px "Inter", sans-serif';
+      ctx.font = '500 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
       const bWidth = ctx.measureText(branchLabel).width;
       const bPillW = bWidth + 14;
       const bPillH = 15;
@@ -6278,11 +5987,11 @@
 
       n.hitWidth = Math.max(titleW, bPillW);
 
-      ctx.fillStyle = 'rgba(15, 15, 20, 0.88)';
-      ctx.strokeStyle = isHovered ? meta.halo : 'rgba(80, 80, 95, 0.4)';
+      ctx.fillStyle = 'rgba(18, 18, 24, 0.88)';
+      ctx.strokeStyle = isHovered ? meta.halo : 'rgba(255, 255, 255, 0.12)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      drawRoundRect(ctx, bPillX, bPillY, bPillW, bPillH, 7);
+      drawRoundRect(ctx, bPillX, bPillY, bPillW, bPillH, 4);
       ctx.fill();
       ctx.stroke();
 
@@ -6290,9 +5999,12 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(branchLabel, n.x, bPillY + bPillH / 2);
+
+      ctx.restore();
     }
 
-    ctx.restore();
+    ctx.restore(); // camera
+    ctx.restore(); // root
   }
 
   function getTransformedMousePos(e) {
