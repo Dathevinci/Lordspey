@@ -7892,4 +7892,379 @@ body[data-theme="sepia"][data-animated-theme]:not([data-animated-theme="none"]) 
   }
 }
 
+/* ══════════════════════════════════════════════════════
+   OBSIDIAN ACTIVITY RIBBON & WORKSPACE INTERFACE (v2.0)
+   ══════════════════════════════════════════════════════ */
+.activity-ribbon {
+  width: 44px;
+  min-width: 44px;
+  height: 100vh;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  z-index: 12;
+  user-select: none;
+  flex-shrink: 0;
+  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+}
+
+.ribbon-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.ribbon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  outline: none;
+  padding: 0;
+}
+
+.ribbon-btn svg {
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.ribbon-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.ribbon-btn:active {
+  transform: scale(0.94);
+}
+
+.ribbon-btn.active {
+  background: var(--bg-surface);
+  color: var(--accent);
+  border-color: var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.ribbon-btn.active::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Hide ribbon on small mobile screens to preserve layout */
+@media (max-width: 600px) {
+  .activity-ribbon {
+    display: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   OBSIDIAN WORKSPACE TABS BAR (v2.0)
+   ══════════════════════════════════════════════════════ */
+.workspace-tabs-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 12px 0 8px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  user-select: none;
+  flex-shrink: 0;
+  z-index: 8;
+}
+
+.workspace-tabs-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  height: 100%;
+}
+.workspace-tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+.workspace-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 220px;
+  min-width: 110px;
+  height: 28px;
+  padding: 0 8px 0 10px;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.workspace-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.workspace-tab.active {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.tab-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.tab-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tab-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  cursor: pointer;
+  padding: 0;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.tab-close-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.tab-new-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm, 6px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.tab-new-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.workspace-tab-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.tab-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.tab-action-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ══════════════════════════════════════════════════════
+   OBSIDIAN WORKSPACE BOTTOM STATUS BAR (v2.0)
+   ══════════════════════════════════════════════════════ */
+.workspace-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  min-height: 26px;
+  padding: 0 16px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  user-select: none;
+  flex-shrink: 0;
+  z-index: 8;
+  letter-spacing: 0.01em;
+}
+
+.status-bar-left,
+.status-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-bar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 300px;
+}
+
+.status-item {
+  color: var(--text-tertiary);
+  transition: color 150ms ease;
+}
+
+.status-item:hover {
+  color: var(--text-secondary);
+}
+
+.status-sep {
+  opacity: 0.4;
+  font-size: 0.7rem;
+}
+
+.status-saved {
+  color: #10b981 !important; /* Emerald clean dot */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-saving {
+  color: #f59e0b !important;
+}
+
+.status-version {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .status-bar-center {
+    display: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   UNIVERSE STARCHART & MAP TIER CONTROLS (v2.0)
+   ══════════════════════════════════════════════════════ */
+.map-tier-segmented {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  padding: 2px;
+  gap: 2px;
+}
+
+.tier-seg-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 500;
+  padding: 4px 9px;
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.tier-seg-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.tier-seg-btn.active {
+  background: var(--bg-surface);
+  color: var(--accent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  font-weight: 600;
+}
+
+.btn-universe-template {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: var(--radius-md, 8px);
+  padding: 4px 10px;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-universe-template:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Cosmic Starchart Canvas Accents */
+.canvas-backdrop-galaxy {
+  background: radial-gradient(circle at center, #111827 0%, #06090e 100%) !important;
+}
+
+.canvas-backdrop-system {
+  background: radial-gradient(circle at center, #0f172a 0%, #030712 100%) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   FLUID HARDWARE-ACCELERATED TRANSITIONS (v2.0)
+   ══════════════════════════════════════════════════════ */
+.sidebar,
+.drawer,
+.modal-card,
+.modal-overlay {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity;
+}
+
+
 

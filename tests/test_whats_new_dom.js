@@ -166,10 +166,10 @@ assert(modalUpdate.classList.contains('hidden'));
 // Test opening via window export
 window.openLordSpeyWhatsNewModal();
 assert(!modalUpdate.classList.contains('hidden'), 'modal-update must be visible after openLordSpeyWhatsNewModal');
-assert(badgeEl.textContent.includes("WHAT'S NEW"), 'Badge must indicate What\'s New');
-assert(curVerChip.textContent.includes('v1.1.0') || curVerChip.textContent.includes('v1.1.1') || curVerChip.textContent.includes('v1.1.2') || curVerChip.textContent.includes('v1.1.3') || curVerChip.textContent.includes('v1.1.4') || curVerChip.textContent.includes('v1.1.5') || curVerChip.textContent.includes('v1.2.0'), 'Current version chip must show valid version');
+assert(badgeEl.textContent.includes("WHAT'S NEW") || badgeEl.textContent.includes("VERSION 2.0"), 'Badge must indicate What\'s New');
+assert(curVerChip.textContent.includes('v1.1.0') || curVerChip.textContent.includes('v1.1.1') || curVerChip.textContent.includes('v1.1.2') || curVerChip.textContent.includes('v1.1.3') || curVerChip.textContent.includes('v1.1.4') || curVerChip.textContent.includes('v1.1.5') || curVerChip.textContent.includes('v1.2.0') || curVerChip.textContent.includes('v2.0.0'), 'Current version chip must show valid version');
 assert.strictEqual(arrowEl.textContent, '✦');
-assert(newVerChip.textContent.includes('Latest Edition'), 'New version chip must show Latest Edition');
+assert(newVerChip.textContent.includes('Latest Edition') || newVerChip.textContent.includes('Version 2.0'), 'New version chip must show Latest Edition');
 assert.strictEqual(downloadText.textContent, 'Explore Features');
 assert(notesEl.innerHTML.includes('whats-new-grid'), 'Notes must contain whats-new-grid');
 assert(notesEl.innerHTML.includes('Official Raven Brand Logo'), 'Notes must include raven logo feature');
@@ -227,7 +227,7 @@ const btnBannerView = getOrCreateElement('btn-banner-view-update');
 assert(updateBanner.classList.contains('hidden'));
 btnTestVault.click();
 assert(!updateBanner.classList.contains('hidden'), 'Banner must be visible after Test Notification click');
-assert(bannerVer.textContent.includes('v1.2.0') || bannerVer.textContent.includes('v1.3.0'), 'Banner must show preview version');
+assert(bannerVer.textContent.includes('v1.2.0') || bannerVer.textContent.includes('v1.3.0') || bannerVer.textContent.includes('v2.0.0') || bannerVer.textContent.includes('v2.1.0'), 'Banner must show preview version');
 
 // Now click Update Now from banner
 btnBannerView.click();

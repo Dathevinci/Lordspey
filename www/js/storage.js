@@ -1330,6 +1330,144 @@ Confidential author reference sheet for character backstories, plot twists, psyc
     });
   }
 
+  function generateUniverseStarchartTemplate() {
+    const galaxy = saveMapToRegistry({
+      id: 'universe-root',
+      name: 'The Known Universe — Andromeda Expanse',
+      title: 'The Known Universe — Andromeda Expanse',
+      tier: 'galaxy',
+      parentMapId: null,
+      shape: 'ultrawide',
+      celestialTheme: 'cosmic-void',
+      description: 'The galactic core, outer rim sectors, and interstellar hyperlanes.'
+    });
+
+    const solSys = saveMapToRegistry({
+      id: 'sys-solitude',
+      name: 'Solitude Binary System',
+      title: 'Solitude Binary System',
+      tier: 'system',
+      parentMapId: galaxy.id,
+      shape: 'square',
+      celestialTheme: 'cosmic-void',
+      orbitalRings: true,
+      description: 'A thriving binary star system with 5 planetary orbits.'
+    });
+
+    const vesperSys = saveMapToRegistry({
+      id: 'sys-vespera',
+      name: 'Vespera Red Dwarf System',
+      title: 'Vespera Red Dwarf System',
+      tier: 'system',
+      parentMapId: galaxy.id,
+      shape: 'square',
+      celestialTheme: 'cosmic-void',
+      orbitalRings: true,
+      description: 'A resource-rich frontier system orbiting a crimson flare star.'
+    });
+
+    const aethelgard = saveMapToRegistry({
+      id: 'world-aethelgard',
+      name: 'Aethelgard Prime (Habitable World)',
+      title: 'Aethelgard Prime (Habitable World)',
+      tier: 'world',
+      parentMapId: solSys.id,
+      shape: 'landscape',
+      celestialTheme: 'standard-parchment',
+      description: 'The jewel of the Solitude system, with continents and ocean basins.'
+    });
+
+    saveMapPin({
+      id: 'pin-star-solitude',
+      mapId: galaxy.id,
+      x: 36,
+      y: 45,
+      title: 'Solitude Binary System',
+      category: 'world',
+      pinType: 'star',
+      pinColor: '#facc15',
+      subMapId: solSys.id,
+      description: 'Major hub star system. Connects to the Core Hyperlane.'
+    });
+
+    saveMapPin({
+      id: 'pin-star-vespera',
+      mapId: galaxy.id,
+      x: 64,
+      y: 52,
+      title: 'Vespera Red Dwarf System',
+      category: 'world',
+      pinType: 'star',
+      pinColor: '#ef4444',
+      subMapId: vesperSys.id,
+      description: 'Frontier mining system on the edge of the Outer Rim.'
+    });
+
+    saveMapPin({
+      id: 'pin-jumpgate-nexus',
+      mapId: galaxy.id,
+      x: 50,
+      y: 35,
+      title: 'Apex Interstellar Jump Gate',
+      category: 'world',
+      pinType: 'jump_gate',
+      pinColor: '#38bdf8',
+      description: 'Relic warp conduit permitting instantaneous transit across quadrants.'
+    });
+
+    saveMapPin({
+      id: 'pin-planet-aethelgard',
+      mapId: solSys.id,
+      x: 58,
+      y: 50,
+      title: 'Aethelgard Prime',
+      category: 'world',
+      pinType: 'planet',
+      pinColor: '#38bdf8',
+      subMapId: aethelgard.id,
+      description: 'Orbit 2: Habitable continental world with biosphere and ocean basins.'
+    });
+
+    saveMapPin({
+      id: 'pin-planet-gasgiant',
+      mapId: solSys.id,
+      x: 72,
+      y: 48,
+      title: 'Onyx Gas Giant & Moons',
+      category: 'world',
+      pinType: 'gas_giant',
+      pinColor: '#c084fc',
+      description: 'Orbit 4: Massive storm giant with 14 icy moons and plasma harvesters.'
+    });
+
+    saveMapPin({
+      id: 'pin-station-citadel',
+      mapId: solSys.id,
+      x: 44,
+      y: 54,
+      title: 'Orbital Citadel Aegis',
+      category: 'world',
+      pinType: 'station',
+      pinColor: '#f59e0b',
+      description: 'Deep space defense hub at Lagrange point L2.'
+    });
+
+    saveMapPin({
+      id: 'pin-aethelgard-capital',
+      mapId: aethelgard.id,
+      x: 35,
+      y: 40,
+      title: 'Solaris Spire Capital',
+      category: 'world',
+      pinType: 'citadel',
+      pinColor: '#ef4444',
+      description: 'The metropolis seat of the Planetary Council.'
+    });
+
+    setActiveMapId(galaxy.id);
+    return galaxy;
+  }
+
   function getAllMapsData() {
     const reg = getMapRegistry();
     const store = {};
@@ -3505,6 +3643,7 @@ ${note.body || ''}`;
     deleteMapFromRegistry,
     getMapBreadcrumbs,
     createChildMap,
+    generateUniverseStarchartTemplate,
     getAllMapsData,
     // Galaxy Graph: Manual Nodes & Custom Connections
     getGraphNodes,

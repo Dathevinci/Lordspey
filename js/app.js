@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '1.2.0';
+  const APP_VERSION = '2.0.0';
   const UPDATE_API_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
 
   const ALIAS_SELECTORS = {
@@ -78,6 +78,38 @@
   const goalProgress    = $('#goal-progress');
   const goalFill        = $('#goal-fill');
   const goalModal       = $('#goal-modal');
+
+  // ── Obsidian Activity Ribbon (v2.0) ──
+  const activityRibbon       = $('#activity-ribbon');
+  const btnRibbonVault       = $('#btn-ribbon-vault');
+  const btnRibbonSearch      = $('#btn-ribbon-search');
+  const btnRibbonGraph       = $('#btn-ribbon-graph');
+  const btnRibbonMap         = $('#btn-ribbon-map');
+  const btnRibbonTimeline    = $('#btn-ribbon-timeline');
+  const btnRibbonCodex       = $('#btn-ribbon-codex');
+  const btnRibbonSprint      = $('#btn-ribbon-sprint');
+  const btnRibbonHelp        = $('#btn-ribbon-help');
+  const btnRibbonSettings    = $('#btn-ribbon-settings');
+
+  // ── Obsidian Workspace Tabs Bar (v2.0) ──
+  const workspaceTabsBar     = $('#workspace-tabs-bar');
+  const activeTabTitle       = $('#active-tab-title');
+  const btnTabClose          = $('#btn-tab-close');
+  const btnTabNew            = $('#btn-tab-new');
+  const btnTabReadingMode    = $('#btn-tab-reading-mode');
+  const btnTabSplit          = $('#btn-tab-split');
+  const btnTabOutline        = $('#btn-tab-outline');
+
+  // ── Obsidian Workspace Status Bar (v2.0) ──
+  const workspaceStatusBar   = $('#workspace-status-bar');
+  const sbWordCount          = $('#sb-word-count');
+  const sbCharCount          = $('#sb-char-count');
+  const sbReadTime           = $('#sb-read-time');
+  const sbDocName            = $('#sb-doc-name');
+  const sbBacklinkCount      = $('#sb-backlink-count');
+  const sbMode               = $('#sb-mode');
+  const sbSaveStatus         = $('#sb-save-status');
+  const sbVersion            = $('#sb-version');
   const inputWordGoal   = $('#input-word-goal');
   const inputSprintMin  = $('#input-sprint-minutes');
   const btnSaveGoal     = $('#btn-save-goal');
@@ -1347,6 +1379,16 @@
         }, 400);
       }
     }
+
+    // Version 2.0 Celebration Launch Announcement ("We finally made it to Version 2.0!")
+    try {
+      if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_v2_seen')) {
+        localStorage.setItem('lordspey_v2_seen', 'true');
+        setTimeout(() => {
+          openWhatsNewModal();
+        }, 1000);
+      }
+    } catch (_) {}
   }
 
   // ── Cinematic Intro Splash Screen ──
@@ -1660,9 +1702,86 @@
 
     // Sidebar actions
     btnTutorialSidebar.addEventListener('click', () => openTutorial(0));
-    sidebarToggle.addEventListener('click', () => sidebar.classList.add('collapsed'));
-    sidebarExpand.addEventListener('click', () => sidebar.classList.remove('collapsed'));
-    sidebarBackdrop.addEventListener('click', () => sidebar.classList.add('collapsed'));
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.add('collapsed');
+      if (btnRibbonVault) btnRibbonVault.classList.remove('active');
+    });
+    sidebarExpand.addEventListener('click', () => {
+      sidebar.classList.remove('collapsed');
+      if (btnRibbonVault) btnRibbonVault.classList.add('active');
+    });
+    sidebarBackdrop.addEventListener('click', () => {
+      sidebar.classList.add('collapsed');
+      if (btnRibbonVault) btnRibbonVault.classList.remove('active');
+    });
+
+    // ── Obsidian Activity Ribbon (v2.0) ──
+    if (btnRibbonVault) {
+      btnRibbonVault.addEventListener('click', () => {
+        if (sidebar) {
+          sidebar.classList.toggle('collapsed');
+          const isCollapsed = sidebar.classList.contains('collapsed');
+          btnRibbonVault.classList.toggle('active', !isCollapsed);
+          if (typeof Storage !== 'undefined' && typeof Storage.saveSetting === 'function') {
+            Storage.saveSetting('sidebarCollapsed', isCollapsed);
+          }
+        }
+      });
+    }
+    if (btnRibbonSearch) {
+      btnRibbonSearch.addEventListener('click', openQuickSwitcher);
+    }
+    if (btnRibbonGraph) {
+      btnRibbonGraph.addEventListener('click', openGraphView);
+    }
+    if (btnRibbonMap) {
+      btnRibbonMap.addEventListener('click', () => {
+        if (typeof openMapStudio === 'function') openMapStudio();
+      });
+    }
+    if (btnRibbonTimeline) {
+      btnRibbonTimeline.addEventListener('click', () => {
+        if (typeof openChronologyView === 'function') openChronologyView();
+      });
+    }
+    if (btnRibbonCodex) {
+      btnRibbonCodex.addEventListener('click', () => {
+        if (typeof openCodexModal === 'function') openCodexModal();
+      });
+    }
+    if (btnRibbonSprint) {
+      btnRibbonSprint.addEventListener('click', () => {
+        if (typeof openGoalModal === 'function') openGoalModal();
+      });
+    }
+    if (btnRibbonHelp) {
+      btnRibbonHelp.addEventListener('click', () => openTutorial(0));
+    }
+    if (btnRibbonSettings) {
+      btnRibbonSettings.addEventListener('click', () => {
+        if (typeof openProjectSettingsModal === 'function') openProjectSettingsModal();
+      });
+    }
+
+    // ── Obsidian Workspace Tabs Bar (v2.0) ──
+    if (btnTabClose) {
+      btnTabClose.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showMainMenu();
+      });
+    }
+    if (btnTabNew) {
+      btnTabNew.addEventListener('click', openNewNoteModal);
+    }
+    if (btnTabReadingMode) {
+      btnTabReadingMode.addEventListener('click', togglePreview);
+    }
+    if (btnTabSplit) {
+      btnTabSplit.addEventListener('click', toggleSplitView);
+    }
+    if (btnTabOutline) {
+      btnTabOutline.addEventListener('click', toggleOutline);
+    }
 
     // Android Hardware & Gesture Back Button Support
     window.handleAndroidBack = handleBackOrEscape;
@@ -2144,7 +2263,12 @@
     }
 
     // Editor inputs → auto-save & metrics & outline
-    noteTitle.addEventListener('input', scheduleSave);
+    noteTitle.addEventListener('input', () => {
+      const val = noteTitle.value.trim() || 'Untitled Note';
+      if (activeTabTitle) activeTabTitle.textContent = val;
+      if (sbDocName) sbDocName.textContent = val;
+      scheduleSave();
+    });
     noteBody.addEventListener('input', () => {
       adjustNoteBodyHeight();
       updateMetrics();
@@ -2590,6 +2714,9 @@
     noteCategory.value = note.category;
     noteBody.value = note.body;
 
+    if (activeTabTitle) activeTabTitle.textContent = note.title || 'Untitled Note';
+    if (sbDocName) sbDocName.textContent = note.title || 'Untitled Note';
+
     updateMetrics();
     adjustNoteBodyHeight();
     showEditor();
@@ -2643,6 +2770,10 @@
   function scheduleSave() {
     saveStatus.textContent = 'Saving…';
     saveStatus.className = 'meta-info save-status saving';
+    if (sbSaveStatus) {
+      sbSaveStatus.textContent = '● Saving…';
+      sbSaveStatus.className = 'status-item status-saving';
+    }
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveNow, 350);
   }
@@ -2657,6 +2788,10 @@
     });
     saveStatus.textContent = 'Saved';
     saveStatus.className = 'meta-info save-status saved';
+    if (sbSaveStatus) {
+      sbSaveStatus.textContent = '● Saved';
+      sbSaveStatus.className = 'status-item status-saved';
+    }
     renderSidebar(searchInput.value.trim());
     updateBacklinks();
     if (previewMode || splitMode) {
@@ -2841,6 +2976,16 @@
     // Refresh Detailed Manuscript Stats if modal is open
     if (metricsModal && !metricsModal.classList.contains('hidden')) {
       renderDetailedMetrics();
+    }
+
+    // Obsidian Workspace Status Bar Sync (v2.0)
+    if (sbWordCount) sbWordCount.textContent = `${words} words`;
+    if (sbCharCount) sbCharCount.textContent = `${text.length} characters`;
+    if (sbReadTime) sbReadTime.textContent = words > 0 ? `~${mins} min read` : '0 min read';
+    if (sbDocName) sbDocName.textContent = (noteTitle && noteTitle.value.trim()) || 'Untitled Note';
+    if (activeTabTitle) activeTabTitle.textContent = (noteTitle && noteTitle.value.trim()) || 'Untitled Note';
+    if (sbMode) {
+      sbMode.textContent = splitMode ? 'Split View' : (previewMode ? 'Reading View' : 'Live Preview');
     }
   }
 
@@ -3780,6 +3925,7 @@
     if (!activeNoteId) {
       backlinksList.innerHTML = '';
       backlinksCount.textContent = '0';
+      if (sbBacklinkCount) sbBacklinkCount.textContent = '0 backlinks';
       return;
     }
     const current = Storage.getNote(activeNoteId);
@@ -3787,6 +3933,7 @@
 
     const backlinks = Storage.getBacklinks(current.title);
     backlinksCount.textContent = backlinks.length;
+    if (sbBacklinkCount) sbBacklinkCount.textContent = `${backlinks.length} backlink${backlinks.length !== 1 ? 's' : ''}`;
 
     if (backlinks.length === 0) {
       backlinksList.innerHTML = `
@@ -6583,6 +6730,31 @@
       btnAtlasDeleteMap.addEventListener('click', deleteAtlasMap);
     }
 
+    // Universe Starchart & Tier Segmented Controls (v2.0)
+    $$('.tier-seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTier = btn.dataset.mapTier;
+        const allMaps = Storage.getMapRegistry ? Storage.getMapRegistry() : [];
+        const match = allMaps.find(m => m.tier === targetTier);
+        if (match) {
+          switchAtlasMap(match.id);
+        } else {
+          openAtlasMapModal({ tier: targetTier, parentMapId: Storage.getActiveMapId ? Storage.getActiveMapId() : 'default' });
+        }
+      });
+    });
+
+    const btnUniverseTemplate = $('#btn-generate-universe-map');
+    if (btnUniverseTemplate) {
+      btnUniverseTemplate.addEventListener('click', () => {
+        if (typeof Storage.generateUniverseStarchartTemplate === 'function') {
+          const rootGalaxy = Storage.generateUniverseStarchartTemplate();
+          switchAtlasMap(rootGalaxy.id);
+          toast('✨ Universe Starchart generated: Andromeda Expanse with Star Systems & Habitable Worlds', 'success');
+        }
+      });
+    }
+
     if (btnAtlasModalCancel) {
       btnAtlasModalCancel.addEventListener('click', closeAtlasMapModal);
     }
@@ -6828,7 +7000,12 @@
       mapCelestialThemeSelect.value = curMap.celestialTheme || (curTier === 'galaxy' || curTier === 'system' ? 'cosmic-void' : 'standard-parchment');
     }
 
-    // 6. Delete Map Button (only for non-root realm maps)
+    // 6. Segmented Tier Controls (v2.0)
+    $$('.tier-seg-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mapTier === curTier);
+    });
+
+    // 7. Delete Map Button (only for non-root realm maps)
     if (btnAtlasDeleteMap) {
       if (activeMapId !== 'default') {
         btnAtlasDeleteMap.style.display = 'inline-flex';
@@ -7147,24 +7324,65 @@
         }
       }
 
-      // Galactic Nucleus (if galaxy tier)
+      // Galactic Nucleus & Sectors (if galaxy tier)
       if (curTier === 'galaxy') {
         const cx = w / 2;
         const cy = h / 2;
         if (typeof ctx.createRadialGradient === 'function') {
-          const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 120);
+          const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 140);
           coreGlow.addColorStop(0, '#ffffff');
-          coreGlow.addColorStop(0.2, 'rgba(216, 180, 254, 0.8)');
-          coreGlow.addColorStop(0.6, 'rgba(147, 51, 234, 0.25)');
+          coreGlow.addColorStop(0.2, 'rgba(216, 180, 254, 0.85)');
+          coreGlow.addColorStop(0.5, 'rgba(147, 51, 234, 0.3)');
           coreGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
           ctx.fillStyle = coreGlow;
-          if (typeof ctx.fillRect === 'function') ctx.fillRect(cx - 120, cy - 120, 240, 240);
+          if (typeof ctx.fillRect === 'function') ctx.fillRect(cx - 140, cy - 140, 280, 280);
         }
+
+        // Galactic Sector Grid & Coordinates
+        ctx.strokeStyle = 'rgba(168, 85, 247, 0.18)';
+        ctx.lineWidth = 1;
+        if (ctx.setLineDash) ctx.setLineDash([4, 6]);
+
+        // Crosshairs dividing quadrants
+        if (typeof ctx.beginPath === 'function') {
+          ctx.beginPath();
+          ctx.moveTo(cx, 40); ctx.lineTo(cx, h - 40);
+          ctx.moveTo(40, cy); ctx.lineTo(w - 40, cy);
+          ctx.stroke();
+        }
+
+        // Sector Range Rings
+        const sectorRadii = [180, 360, 560];
+        sectorRadii.forEach(r => {
+          if (typeof ctx.beginPath === 'function') {
+            ctx.beginPath();
+            if (typeof ctx.arc === 'function') ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        });
+        if (ctx.setLineDash) ctx.setLineDash([]);
+
+        // Sector Quadrant Names
         if (typeof ctx.fillText === 'function') {
+          ctx.font = "bold 10px 'JetBrains Mono', monospace";
+          ctx.fillStyle = 'rgba(192, 132, 252, 0.45)';
+          ctx.textAlign = 'left';
+          ctx.fillText('SECTOR ALPHA [COREWARD]', cx + 18, 50);
+          ctx.fillText('SECTOR BETA [SPINWARD]', cx + 18, cy + 24);
+          ctx.textAlign = 'right';
+          ctx.fillText('SECTOR GAMMA [RIMWARD]', cx - 18, 50);
+          ctx.fillText('SECTOR DELTA [TRAILING]', cx - 18, cy + 24);
+
           ctx.font = "bold 12px 'Cinzel', serif";
-          ctx.fillStyle = 'rgba(216, 180, 254, 0.7)';
+          ctx.fillStyle = 'rgba(233, 213, 255, 0.9)';
           ctx.textAlign = 'center';
           ctx.fillText('GALACTIC NUCLEUS', cx, cy + 34);
+
+          // Distance scale in parsecs / light-years
+          ctx.textAlign = 'left';
+          ctx.font = "10px 'JetBrains Mono', monospace";
+          ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
+          ctx.fillText('SCALE: 1 GRID = 25,000 LIGHT YEARS', 30, h - 35);
         }
       }
 
@@ -12061,16 +12279,16 @@
   function renderWhatsNewHtml(features = WHATS_NEW_V110_FEATURES) {
     return `
       <div class="whats-new-intro" style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
-        Welcome to <strong>Lord Spey v${APP_VERSION}</strong>. This flagship release introduces the multi-tier Lord Spey Universe Atlas, celestial cartography tools, and immersive ambient animated themes:
+        <strong>We finally made it to Version 2.0!</strong> A monumental release delivering an authentic Obsidian-grade interface, Universe Starcharts, and buttery-smooth interactions:
       </div>
-      <div class="whats-new-v111-patch" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px;">
-        <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px;">v1.2.0 Universe Atlas &amp; Ambient Animated Themes</div>
-        <ul style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; padding-left: 18px; line-height: 1.4;">
-          <li><strong>Lord Spey Universe Atlas:</strong> Multi-tier hierarchical mapping spanning Galaxy / Sector, Star System, World Surface, and Local / Station deckplans with breadcrumb navigation.</li>
-          <li><strong>Radial Solar Cores &amp; Orbital Guide Rings:</strong> Dedicated star system canvas with central luminous stars, concentric planetary orbit rings, and toggleable orbital paths.</li>
-          <li><strong>Celestial Pins &amp; Drill-Down Previews:</strong> Celestial pin classifications (Galaxies, Stars, Planets, Moons, Space Stations, Asteroid Belts) with deep-link realm previews.</li>
-          <li><strong>Hyperlane Route Pen:</strong> Cartographic hyperlane and trade route drawing between star systems with dashed energy styling.</li>
-          <li><strong>Ambient Animated Themes:</strong> Atmospheric canvas backdrops in Settings (Default Serene, Cosmic Starfield, Ethereal Nebula, Cozy Fireflies &amp; Embers, Midnight Rain &amp; Mist).</li>
+      <div class="whats-new-v111-patch" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px;">
+        <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-primary); margin-bottom: 6px;">v2.0.0 Obsidian Interface &amp; Universe Atlas</div>
+        <ul style="font-size: 0.82rem; color: var(--text-secondary); margin: 0; padding-left: 18px; line-height: 1.5;">
+          <li><strong>Obsidian-Style Activity Ribbon:</strong> Docked left navigation ribbon providing 1-click access to Vault File Tree, Search, Galaxy Graph, Universe Starcharts, Timelines, Codex, and Settings.</li>
+          <li><strong>Workspace Document Tabs:</strong> Elegant tabbed workspace displaying the active document title, close button (Esc), new note, reading mode toggle, and split view.</li>
+          <li><strong>Obsidian Status Bar:</strong> Bottom telemetry displaying live word count, character count, reading time, active document name, backlinks count, and editor status.</li>
+          <li><strong>Universe Starcharts &amp; Cosmic Atlas:</strong> Complete authorial freedom to map entire universes (galaxies, star systems with concentric planetary orbits, hyperlanes, and jump gates) instead of simple country maps. Includes 1-click Universe Template.</li>
+          <li><strong>Fluid 60fps Experience:</strong> Optimized transitions with hardware-accelerated cubic-bezier curves for silky smooth drawer slides, modal reveals, and canvas zoom.</li>
         </ul>
       </div>
       <div class="whats-new-grid">
@@ -12229,17 +12447,17 @@
     const downloadIcon = $('#btn-download-update-icon');
     const githubLink = $('#btn-view-release-github');
 
-    if (badgeEl) badgeEl.textContent = `WHAT'S NEW IN v${APP_VERSION}`;
-    if (titleEl) titleEl.textContent = `Lord Spey v${APP_VERSION} — New Features & UI Upgrades`;
+    if (badgeEl) badgeEl.textContent = `WHAT'S NEW IN v${APP_VERSION} — VERSION 2.0`;
+    if (titleEl) titleEl.textContent = `We finally made it to Version 2.0!`;
     if (curVerChip) curVerChip.textContent = `Installed: v${APP_VERSION}`;
     if (arrowEl) arrowEl.textContent = '✦';
     if (newVerChip) {
       newVerChip.textContent = `Latest Edition ✓`;
       newVerChip.className = 'update-version-chip update-chip-installed';
     }
-    if (notesHeadingEl) notesHeadingEl.textContent = `What's New in Lord Spey v${APP_VERSION}`;
+    if (notesHeadingEl) notesHeadingEl.textContent = `We finally made it to Version 2.0! — Release Highlights`;
     if (guaranteeEl) {
-      guaranteeEl.innerHTML = `<strong>Version v${APP_VERSION} Active:</strong> You are enjoying the latest release of Lord Spey! All manuscript drafts, vault lore, world maps, characters, and settings are active and safeguarded.`;
+      guaranteeEl.innerHTML = `<strong>We finally made it to Version 2.0!</strong> Built for serious novelists, worldbuilders, and story architects. All manuscript drafts, vault lore, world maps, characters, and settings are active and safeguarded.`;
     }
     if (dismissBtn) {
       dismissBtn.textContent = 'Close';

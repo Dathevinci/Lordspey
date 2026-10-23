@@ -4,7 +4,7 @@
 
 [![Website](https://img.shields.io/badge/website-dathevinci.github.io%2FLordspey-111116?style=for-the-badge&logo=github)](https://dathevinci.github.io/Lordspey/)
 [![Launch Web App](https://img.shields.io/badge/launch-web%20app-ef4444?style=for-the-badge)](https://dathevinci.github.io/Lordspey/app/)
-[![Release](https://img.shields.io/badge/release-v1.2.0-111116?style=for-the-badge)](https://github.com/Dathevinci/Lordspey/releases/tag/v1.2.0)
+[![Release](https://img.shields.io/badge/release-v2.0.0-111116?style=for-the-badge)](https://github.com/Dathevinci/Lordspey/releases/tag/v2.0.0)
 [![License](https://img.shields.io/badge/license-MIT-111116?style=for-the-badge)](LICENSE)
 
 ---
@@ -19,10 +19,12 @@
 
 ## ✨ Features
 
+- **Obsidian-Style Interface & Activity Ribbon**: Authentic left activity ribbon providing 1-click access to Vault File Tree, Search, Galaxy Graph, Universe Starcharts, Timelines, Codex, and Settings.
+- **Workspace Document Tabs & Status Bar**: Clean tabbed workspace with active document title synchronization, quick close (`Esc`), and live status bar tracking word count, characters, reading time, and backlinks.
 - **Obsidian-Style [[Wiki-Links]]**: Cross-reference characters, factions, and realms using `[[Note Title]]` or `[[Target|Custom Alias]]`. Click any link to jump directly or create the note instantly.
-- **Living Galaxy Graph (`Ctrl+G`)**: Dynamic, interactive constellation starfield mapping your entire story universe. Visualizes category hubs (**Chapters**, **Lore**, **World Building**, **Drafts**), orbital sub-branches, and photon pulse connections.
-- **Universe Atlas & Multi-Scale Cartography**: Map entire universes across nested tiers: **Galaxies / Sectors**, **Star Systems** (with radial celestial cores and concentric orbital guide rings), **World Maps** (continents & biomes), and **Station/Vessel Deckplans**. Jump seamlessly between realms using interactive breadcrumbs and one-click pin drill-downs (`[ 🪐 Enter Star System ]` / `[ 🗺️ View World Map ]`).
+- **Universe Atlas & Multi-Scale Starcharts**: Map entire universes across nested tiers: **Galaxies / Sectors**, **Star Systems** (with radial celestial cores and concentric orbital guide rings), **World Maps** (continents & biomes), and **Station/Vessel Deckplans**. Jump seamlessly between realms using interactive breadcrumbs and one-click pin drill-downs (`[ 🪐 Enter Star System ]` / `[ 🗺️ View World Map ]`). Includes 1-click Universe Template.
 - **Interactive Map Studio**: Full creative freedom to craft custom maps. Set custom canvas dimensions (16:9, 4:3, 1:1, custom px), paint coastlines with fractal terrain brushes, draw glowing interstellar hyperlanes, manage drawing layers, undo/redo, place celestial lore pins, and export high-res PNGs isolated to the active realm.
+- **Living Galaxy Graph (`Ctrl+G`)**: Dynamic, interactive constellation starfield mapping your entire story universe. Visualizes category hubs (**Chapters**, **Lore**, **World Building**, **Drafts**), orbital sub-branches, and photon pulse connections.
 - **Ambient Animated Themes**: Subtle, calm atmospheric backdrops in Settings designed for author immersion without distraction: **Cosmic Starfield** (gentle twinkling stars), **Ethereal Nebula** (slow-drifting celestial clouds), **Cozy Fireflies / Embers** (warm twilight glow), and **Midnight Rain & Mist** (peaceful rain streaks), with zero battery drain and complete `prefers-reduced-motion` support.
 - **Chronicle Timelines & Codex**: Organize historical story eras, character timelines, and deep codex dossiers with linked markdown notes.
 - **Live Side-by-Side Split View (`Ctrl+\`)**: Write in Markdown on the left, watch beautifully formatted typography render live on the right.
@@ -55,7 +57,7 @@ Open **`http://localhost:8095`** in your browser.
 All automated tests are organized cleanly in the `tests/` directory:
 
 ```bash
-# Run all 23 automated test suites (markdown, graph, timeline, map studio, universe atlas, etc.)
+# Run all 24 automated test suites (markdown, graph, timeline, map studio, universe atlas, obsidian ui, etc.)
 npm test
 ```
 
@@ -93,9 +95,9 @@ The compiled `.apk` will be in **`android/app/build/outputs/apk/debug/app-debug.
 ## 📱 Releases & Downloads
 
 Pre-built binaries for **Windows (`.exe`)** and **Android (`.apk`)** are available on the **[Releases](https://github.com/Dathevinci/Lordspey/releases)** page:
-- **[`Lord.Spey.Setup.1.2.0.exe`](https://github.com/Dathevinci/Lordspey/releases/download/v1.2.0/Lord.Spey.Setup.1.2.0.exe)**: Windows NSIS installer.
-- **[`Lord.Spey.1.2.0.exe`](https://github.com/Dathevinci/Lordspey/releases/download/v1.2.0/Lord.Spey.1.2.0.exe)**: Standalone portable Windows executable.
-- **[`Lord.Spey.apk`](https://github.com/Dathevinci/Lordspey/releases/download/v1.2.0/Lord.Spey.apk)**: Sideloadable Android package.
+- **[`Lord.Spey.Setup.2.0.0.exe`](https://github.com/Dathevinci/Lordspey/releases/download/v2.0.0/Lord.Spey.Setup.2.0.0.exe)**: Windows NSIS installer.
+- **[`Lord.Spey.2.0.0.exe`](https://github.com/Dathevinci/Lordspey/releases/download/v2.0.0/Lord.Spey.2.0.0.exe)**: Standalone portable Windows executable.
+- **[`Lord.Spey.apk`](https://github.com/Dathevinci/Lordspey/releases/download/v2.0.0/Lord.Spey.apk)**: Sideloadable Android package.
 
 ---
 
