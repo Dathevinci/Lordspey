@@ -25,30 +25,31 @@ async function main() {
   }
 
   const repo = 'Dathevinci/Lordspey';
-  const tag = 'v1.2.0';
-  const releaseName = 'Lord Spey v1.2.0 — Universe Atlas & Ambient Animated Themes';
-  const releaseBody = `## Lord Spey v1.2.0 — Universe Atlas & Ambient Animated Themes
+  const tag = 'v2.0.0';
+  const releaseName = 'Lord Spey v2.0.0 — Obsidian Studio, Universe Starcharts & Butter-Smooth UI';
+  const releaseBody = `## Lord Spey v2.0.0 — We finally made it to Version 2.0!
 
-Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding.
+A monumental release delivering an authentic Obsidian-grade interface, multi-tier Universe Starcharts, and buttery-smooth interactions.
 
-### ✦ What's New & Improved in v1.2.0
-- **🌌 Lord Spey Universe Atlas & Multi-Tier Cartography**:
-  - **Hierarchical Cosmic Mapping**: Seamless nested tier structure spanning Galaxy / Sector, Star System, World Surface, and Local / Station deckplans.
-  - **Radial Solar Cores & Concentric Orbital Rings**: Dedicated star system canvas featuring luminous radial central stars, concentric planetary orbital guide rings, and toggleable orbital paths.
-  - **Celestial Pins & Drill-Down Previews**: Rich celestial pin taxonomy (Galaxies, Stars, Planets, Moons, Space Stations, Asteroid Belts) with deep-link realm preview modals and one-click realm switching (\`[ 🪐 Enter Star System ]\` / \`[ 🗺️ View World Map ]\`).
-  - **Interstellar Hyperlane Route Pen**: Draw dashed luminous trade routes and hyperlanes directly connecting star systems.
-  - **Multiverse .spey Package Serialization**: Complete multi-map universe registry and child maps bundled into portable \`.spey\` projects with non-destructive merge and duplicate pin guards.
+### ✦ What's New & Improved in v2.0.0
+- **💎 Obsidian-Style Interface & Activity Ribbon**:
+  - **Activity Ribbon**: Docked left vertical toolstrip providing 1-click access to Vault File Tree (\`Ctrl+Shift+E\`), Quick Switcher (\`Ctrl+K\`), Galaxy Graph (\`Ctrl+G\`), Universe Atlas (\`Ctrl+M\`), Chronology Timelines (\`Ctrl+T\`), Character Codex (\`Ctrl+U\`), Daily Word Goals, Interactive Tutorial, and Settings (\`Ctrl+,\`).
+  - **Workspace Document Tabs Bar**: Sleek document tabs with live document title synchronization, quick close (\`Esc\`), new note (\`Ctrl+N\`), live reading mode toggle (\`Ctrl+Shift+P\`), split view (\`Ctrl+\\\`), and scene outline drawer (\`Alt+O\`).
+  - **Obsidian Bottom Status Bar**: Real-time telemetry displaying word count, character count, estimated reading time, active document name, backlinks count, editor mode, and instant save indicator.
+- **🌌 Universe Starcharts & Multi-Tier Cosmic Atlas**:
+  - Full authorial freedom to map entire universes instead of a single country map.
+  - Multi-tier hierarchy: **Galaxies / Sectors** (with galactic nucleus radiance, quadrant crosshairs, sector range rings, and coordinate labels), **Star Systems** (with radial solar cores, concentric planetary orbital rings, AU distance guides), **World Maps** (continents & biomes), and **Station / Vessel Deckplans**.
+  - **1-Click Universe Template Generator**: Generates the *Andromeda Expanse* with connected binary star systems, habitable worlds, and relic jump gates.
+- **⚡ Silky Smooth 60fps Experience**:
+  - Re-engineered transitions using hardware-accelerated cubic-bezier curves (\`cubic-bezier(0.16, 1, 0.3, 1)\`) for buttery smooth modals, sidebar collapse, and drawer slides.
 - **✨ Ambient Animated Themes**:
-  - **Distraction-Free Atmospheric Backdrops**: Five calm themes selectable in Settings: **Default Serene Obsidian**, **Cosmic Starfield** (gentle twinkling celestial stars), **Ethereal Nebula** (slow-drifting celestial auroras), **Cozy Fireflies & Embers** (warm twilight embers), and **Midnight Rain & Mist** (soothing rain streaks).
-  - **Lightweight Hardware Acceleration**: Zero CPU lag, smooth canvas particle rendering, auto-pauses during heavy operations, and honors \`prefers-reduced-motion\`.
-- **🎨 Photoshop-Style Map Studio & Custom Sizing**:
-  - Custom canvas sizing (500px to 4000px), multi-layer drawing system, terrain stampers, fractal landmass sculpting, and high-DPI PNG export.
-- **🛡️ Data Safety & Sovereign Vault**:
-  - Automatic pre-update backups, non-destructive sample vault merging, and 100% offline-first privacy.
+  - Five calm, distraction-free backdrops (Default Serene Obsidian, Cosmic Starfield, Ethereal Nebula, Cozy Embers, Midnight Rain & Mist).
+- **🛡️ 100% Local-First Sovereign Privacy**:
+  - Zero subscriptions, zero telemetry, local \`.spey\` and Markdown exports, and automatic pre-update safety snapshots.
 
 ### 📦 Downloads & Binaries
-- **Lord.Spey.Setup.1.2.0.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
-- **Lord.Spey.1.2.0.exe**: Portable standalone executable (no installation required).
+- **Lord.Spey.Setup.2.0.0.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
+- **Lord.Spey.2.0.0.exe**: Portable standalone executable (no installation required).
 - **Lord.Spey.apk / app-debug.apk**: Android package for mobile writing and worldbuilding.
 `;
 
@@ -142,8 +143,8 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
   }
 
   const assetsToUpload = [
-    { file: 'Lord.Spey.Setup.1.2.0.exe', altFile: 'Lord Spey Setup 1.2.0.exe', label: 'Lord.Spey.Setup.1.2.0.exe', contentType: 'application/x-msdos-program' },
-    { file: 'Lord.Spey.1.2.0.exe', altFile: 'Lord Spey 1.2.0.exe', label: 'Lord.Spey.1.2.0.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord.Spey.Setup.2.0.0.exe', altFile: 'Lord Spey Setup 2.0.0.exe', label: 'Lord.Spey.Setup.2.0.0.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord.Spey.2.0.0.exe', altFile: 'Lord Spey 2.0.0.exe', label: 'Lord.Spey.2.0.0.exe', contentType: 'application/x-msdos-program' },
     { file: 'Lord.Spey.apk', label: 'Lord.Spey.apk', contentType: 'application/vnd.android.package-archive' },
     { file: 'app-debug.apk', label: 'app-debug.apk', contentType: 'application/vnd.android.package-archive' }
   ];
@@ -202,7 +203,7 @@ Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding
     const uploadedAssetNames = (updatedRelease.assets || []).map(a => a.name);
     console.log(`Total release assets on GitHub: ${uploadedAssetNames.length}`);
     uploadedAssetNames.forEach(a => console.log(`  - ${a}`));
-    const expectedAssets = ['Lord.Spey.Setup.1.2.0.exe', 'Lord.Spey.1.2.0.exe', 'Lord.Spey.apk', 'app-debug.apk'];
+    const expectedAssets = ['Lord.Spey.Setup.2.0.0.exe', 'Lord.Spey.2.0.0.exe', 'Lord.Spey.apk', 'app-debug.apk'];
     const norm = n => (n || '').toLowerCase().replace(/[\s.]+/g, '.');
     let allFound = true;
     for (const exp of expectedAssets) {
