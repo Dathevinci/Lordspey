@@ -120,16 +120,27 @@ An eye-catching Author Studio upgrade combining a **Native Rust & Tauri v2 Core 
 
   const distDir = path.join(__dirname, '..', 'dist');
 
-  // Ensure Android APK assets exist in distDir for release bundle completeness
+  // Ensure Android APK assets in distDir are up to date (from local Gradle output or latest tag CI build)
+  const gradleApkPath = path.join(__dirname, '..', 'android', 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk');
   const apkFiles = ['Lord.Spey.apk', 'app-debug.apk'];
   for (const apkName of apkFiles) {
     const localApkPath = path.join(distDir, apkName);
-    if (!fs.existsSync(localApkPath)) {
-      console.log(`Downloading ${apkName} from release bundle...`);
+    if (fs.existsSync(gradleApkPath)) {
+      const gradleStat = fs.statSync(gradleApkPath);
+      if (!fs.existsSync(localApkPath) || gradleStat.mtimeMs > fs.statSync(localApkPath).mtimeMs) {
+        fs.copyFileSync(gradleApkPath, localApkPath);
+        console.log(`✓ Synced ${apkName} from local Gradle output (${gradleStat.size} bytes)`);
+      }
+    }
+    const existingRemoteApk = (release.assets || []).find(a => a.name === apkName);
+    const localSize = fs.existsSync(localApkPath) ? fs.statSync(localApkPath).size : 0;
+    const needsRemoteSync = !fs.existsSync(localApkPath) || (existingRemoteApk && existingRemoteApk.size !== localSize);
+    if (needsRemoteSync) {
+      console.log(`Synchronizing ${apkName} from release bundle...`);
       try {
         let apkRes = await fetch(`https://github.com/${repo}/releases/download/${tag}/${apkName}`, { headers, redirect: 'follow' });
-        if (!apkRes.ok) {
-          apkRes = await fetch(`https://github.com/${repo}/releases/download/v1.1.2/${apkName}`, { headers, redirect: 'follow' });
+        if (!apkRes.ok && !fs.existsSync(localApkPath)) {
+          apkRes = await fetch(`https://github.com/${repo}/releases/download/v2.1.2/${apkName}`, { headers, redirect: 'follow' });
         }
         if (apkRes.ok) {
           const arrayBuf = await apkRes.arrayBuffer();

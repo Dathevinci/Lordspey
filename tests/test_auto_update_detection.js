@@ -219,15 +219,18 @@ const path = require('path');
   const banner = getOrCreateElement('update-banner');
   const bannerVer = getOrCreateElement('update-banner-version');
   const sidebarBadge = getOrCreateElement('sidebar-update-badge');
+  const ribbonBadge = getOrCreateElement('ribbon-update-badge');
   const dashboardBadge = getOrCreateElement('dashboard-update-badge');
   const dashboardIndicator = getOrCreateElement('dashboard-update-indicator');
   const dashboardUpdateText = getOrCreateElement('dashboard-update-text');
   const btnGear = getOrCreateElement('btn-project-settings');
+  const btnRibbonSettings = getOrCreateElement('btn-ribbon-settings');
   const modalUpdate = getOrCreateElement('modal-update');
 
   // Initially all elements start hidden
   assert(banner.classList.contains('hidden'), 'Update banner must start hidden');
   assert(sidebarBadge.classList.contains('hidden'), 'Sidebar badge must start hidden');
+  assert(ribbonBadge.classList.contains('hidden'), 'Ribbon badge must start hidden');
   assert(dashboardBadge.classList.contains('hidden'), 'Dashboard badge must start hidden');
   assert(dashboardIndicator.classList.contains('hidden'), 'Dashboard update indicator must start hidden');
 
@@ -243,11 +246,13 @@ const path = require('path');
   assert(!banner.classList.contains('hidden'), 'Update banner must become visible');
   assert.strictEqual(bannerVer.textContent, 'v2.3.0', 'Update banner must show latest version tag');
   assert(!sidebarBadge.classList.contains('hidden'), 'Sidebar gear badge must become visible');
+  assert(!ribbonBadge.classList.contains('hidden'), 'Activity Ribbon gear badge must become visible');
   assert(!dashboardBadge.classList.contains('hidden'), 'Dashboard settings badge must become visible');
   assert(!dashboardIndicator.classList.contains('hidden'), 'Dashboard update indicator button must become visible');
   assert.strictEqual(dashboardUpdateText.textContent, 'Update to v2.3.0', 'Dashboard indicator text must show update target');
   assert(btnGear.classList.contains('has-update'), 'Sidebar gear button must have .has-update class');
-  console.log('✓ Banner, sidebar gear badge, and dashboard indicators successfully display new version v2.3.0');
+  assert(btnRibbonSettings.classList.contains('has-update'), 'Ribbon settings button must have .has-update class');
+  console.log('✓ Banner, sidebar/ribbon gear badges, and dashboard indicators successfully display new version v2.3.0');
 
   // 5. Testing Banner Interaction: [Update Now] opens #modal-update
   console.log('--- 5. Testing [Update Now] Banner Click & Modal Opening ---');
@@ -257,6 +262,7 @@ const path = require('path');
   assert(banner.classList.contains('hidden'), 'Banner must hide when [Update Now] is clicked');
   assert(!modalUpdate.classList.contains('hidden'), 'Modal update must open when [Update Now] is clicked');
   assert(!sidebarBadge.classList.contains('hidden'), 'Sidebar badge must stay visible while update is pending');
+  assert(!ribbonBadge.classList.contains('hidden'), 'Ribbon badge must stay visible while update is pending');
 
   const newVerChip = getOrCreateElement('update-new-version-chip');
   assert(newVerChip.textContent.includes('v2.3.0'), 'Version chip must display new version');
@@ -282,6 +288,7 @@ const path = require('path');
   btnBannerDismiss.click();
   assert(banner.classList.contains('hidden'), 'Dismissing banner must hide floating banner');
   assert(!sidebarBadge.classList.contains('hidden'), 'Sidebar gear badge must remain visible after banner dismissal');
+  assert(!ribbonBadge.classList.contains('hidden'), 'Ribbon gear badge must remain visible after banner dismissal');
   assert(!dashboardBadge.classList.contains('hidden'), 'Dashboard badge must remain visible after banner dismissal');
   console.log('✓ Dismissing floating banner keeps subtle gear and dashboard badges active');
 
@@ -422,6 +429,7 @@ const path = require('path');
   });
   assert(banner.classList.contains('hidden'), 'Up-to-date payload must hide banner');
   assert(sidebarBadge.classList.contains('hidden'), 'Up-to-date payload must hide sidebar badge');
+  assert(ribbonBadge.classList.contains('hidden'), 'Up-to-date payload must hide ribbon badge');
   assert(dashboardBadge.classList.contains('hidden'), 'Up-to-date payload must hide dashboard badge');
   const btnCheckVaultEl = getOrCreateElement('settings-btn-check-update-vault');
   assert.strictEqual(btnCheckVaultEl.disabled, false, 'settings-btn-check-update-vault must be re-enabled after IPC result');
@@ -436,7 +444,7 @@ const path = require('path');
   // Fallback version in modal must use APP_VERSION, never 1.1.0
   window.showLordSpeyUpdateModal({});
   const curVerChipTest = getOrCreateElement('update-current-version-chip');
-  assert(curVerChipTest.textContent.includes('v' + (window.LORD_SPEY_VERSION || '2.0.0')) || curVerChipTest.textContent.includes('v2.0.0') || curVerChipTest.textContent.includes('v1.2.0'), 'Modal current version chip must display current version');
+  assert(curVerChipTest.textContent.includes('v2.2.0'), 'Modal current version chip must display v2.2.0');
   window.closeLordSpeyUpdateModal();
 
   // Test notification preserves demo mode when clicked via dashboard indicator
@@ -446,6 +454,42 @@ const path = require('path');
   assert(updateBadgeEl.textContent.includes('DEMO'), 'Dashboard indicator must preserve demo state for test notifications');
   window.closeLordSpeyUpdateModal();
   console.log('✓ Settings update action, semver fallback, and demo state preservation verified');
+
+  // 13. Testing Platform-Specific Direct Binary Download & Markdown Release Notes in #modal-update
+  console.log('--- 13. Testing Windows (.exe) & Android (.apk) Direct Binary Resolution ---');
+  const releaseAssetsPayload = {
+    tag_name: 'v2.2.0',
+    name: 'Lord Spey v2.2.0 — Native Rust & Tauri v2 Core Engine',
+    body: '## Lord Spey v2.2.0\n- **Native Rust & Tauri v2 Core Engine**\n- **3D Luminescent Galaxy Graph**',
+    html_url: 'https://github.com/Dathevinci/Lordspey/releases/tag/v2.2.0',
+    assets: [
+      { name: 'app-debug.apk', browser_download_url: 'https://github.com/Dathevinci/Lordspey/releases/download/v2.2.0/app-debug.apk' },
+      { name: 'Lord.Spey.2.2.0.exe', browser_download_url: 'https://github.com/Dathevinci/Lordspey/releases/download/v2.2.0/Lord.Spey.2.2.0.exe' },
+      { name: 'Lord.Spey.apk', browser_download_url: 'https://github.com/Dathevinci/Lordspey/releases/download/v2.2.0/Lord.Spey.apk' },
+      { name: 'Lord.Spey.Setup.2.2.0.exe', browser_download_url: 'https://github.com/Dathevinci/Lordspey/releases/download/v2.2.0/Lord.Spey.Setup.2.2.0.exe' }
+    ]
+  };
+
+  // Windows platform: must select Lord.Spey.Setup.2.2.0.exe over portable .exe
+  window.navigator.platform = 'Win32';
+  window.navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)';
+  window.showLordSpeyUpdateModal(releaseAssetsPayload);
+  const dlBtnEl = getOrCreateElement('btn-download-update');
+  const dlTextEl = getOrCreateElement('btn-download-update-text');
+  const relNotesEl = getOrCreateElement('update-release-notes');
+  assert.strictEqual(dlBtnEl.href, 'https://github.com/Dathevinci/Lordspey/releases/download/v2.2.0/Lord.Spey.Setup.2.2.0.exe');
+  assert.strictEqual(dlTextEl.textContent, 'Download Installer (Lord.Spey.Setup.2.2.0.exe)');
+  assert(relNotesEl.innerHTML.includes('Native Rust &amp; Tauri v2 Core Engine') || relNotesEl.innerHTML.includes('Native Rust & Tauri v2 Core Engine'));
+  window.closeLordSpeyUpdateModal();
+
+  // Android platform: must prefer Lord.Spey.apk over app-debug.apk even when app-debug.apk is listed first alphabetically
+  window.navigator.platform = 'Linux armv8l';
+  window.navigator.userAgent = 'Mozilla/5.0 (Linux; Android 14; Pixel 8)';
+  window.showLordSpeyUpdateModal(releaseAssetsPayload);
+  assert.strictEqual(dlBtnEl.href, 'https://github.com/Dathevinci/Lordspey/releases/download/v2.2.0/Lord.Spey.apk');
+  assert.strictEqual(dlTextEl.textContent, 'Download Android APK (Lord.Spey.apk)');
+  window.closeLordSpeyUpdateModal();
+  console.log('✓ Windows NSIS installer and Android named APK direct download URLs verified');
 
   console.log('\n=== ALL AUTO-UPDATE DETECTION TESTS PASSED (100%) ===\n');
 })().catch(err => {

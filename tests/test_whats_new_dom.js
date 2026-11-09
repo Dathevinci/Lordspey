@@ -202,14 +202,19 @@ btnWhatsNewMenu.click();
 assert(!modalUpdate.classList.contains('hidden'), 'menu-btn-whats-new must open What\'s New modal');
 window.closeLordSpeyUpdateModal();
 
-console.log('✓ What\'s New buttons in Settings (Vault & Guides) and Dashboard all trigger modal');
+const sbVerEl = getOrCreateElement('sb-version');
+sbVerEl.click();
+assert(!modalUpdate.classList.contains('hidden'), 'sb-version must open What\'s New modal');
+window.closeLordSpeyUpdateModal();
+
+console.log('✓ What\'s New buttons in Settings (Vault & Guides), Dashboard, and Status Bar all trigger modal');
 
 console.log('--- 4. Testing Up-To-Date Check Automatically Opening What\'s New ---');
 // Simulate __handleUpdateCheckResult with up-to-date payload and userInitiated: true
 modalUpdate.classList.add('hidden');
 window.__handleUpdateCheckResult({
   hasUpdate: false,
-  latestVersion: 'v1.1.0',
+  latestVersion: 'v2.2.0',
   userInitiated: true
 });
 assert(!modalUpdate.classList.contains('hidden'), 'User initiated up-to-date check must display What\'s New modal');
@@ -227,7 +232,7 @@ const btnBannerView = getOrCreateElement('btn-banner-view-update');
 assert(updateBanner.classList.contains('hidden'));
 btnTestVault.click();
 assert(!updateBanner.classList.contains('hidden'), 'Banner must be visible after Test Notification click');
-assert(bannerVer.textContent.includes('v1.2.0') || bannerVer.textContent.includes('v1.3.0') || bannerVer.textContent.includes('v2.0.0') || bannerVer.textContent.includes('v2.1.0'), 'Banner must show preview version');
+assert(bannerVer.textContent.includes('v2.3.0'), 'Banner must show v2.3.0 preview version above installed v2.2.0');
 
 // Now click Update Now from banner
 btnBannerView.click();

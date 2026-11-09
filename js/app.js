@@ -12907,8 +12907,9 @@
     if (downloadBtn) {
       let downloadUrl = (releaseData && releaseData.html_url) || 'https://github.com/Dathevinci/Lordspey/releases';
       const assets = (releaseData && releaseData.assets) || [];
-      const isWin = typeof navigator !== 'undefined' && (/win/i.test(navigator.platform || '') || /windows/i.test(navigator.userAgent || ''));
-      const isAndroid = typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent || '');
+      const nav = (typeof window !== 'undefined' && window.navigator) ? window.navigator : (typeof navigator !== 'undefined' ? navigator : {});
+      const isAndroid = /android/i.test(nav.userAgent || '');
+      const isWin = !isAndroid && (/win/i.test(nav.platform || '') || /windows/i.test(nav.userAgent || ''));
 
       // Reset action button text and icon back to update mode
       if (downloadText) {
@@ -12929,10 +12930,11 @@
           if (downloadText) downloadText.textContent = `Download Windows Executable`;
         }
       } else if (isAndroid) {
-        const apk = assets.find(a => /\.apk$/i.test(a.name));
+        const namedApk = assets.find(a => /lord\.?spey.*\.apk$/i.test(a.name));
+        const apk = namedApk || assets.find(a => /\.apk$/i.test(a.name));
         if (apk) {
           downloadUrl = apk.browser_download_url;
-          if (downloadText) downloadText.textContent = `Download Android APK`;
+          if (downloadText) downloadText.textContent = `Download Android APK (${apk.name})`;
         }
       }
 
@@ -13044,6 +13046,9 @@
     const sidebarBadge = $('#sidebar-update-badge');
     if (sidebarBadge) sidebarBadge.classList.remove('hidden');
 
+    const ribbonBadge = $('#ribbon-update-badge');
+    if (ribbonBadge) ribbonBadge.classList.remove('hidden');
+
     const dashboardBadge = $('#dashboard-update-badge');
     if (dashboardBadge) dashboardBadge.classList.remove('hidden');
 
@@ -13056,6 +13061,9 @@
 
     const gearBtn = $('#btn-project-settings');
     if (gearBtn) gearBtn.classList.add('has-update');
+
+    const ribbonSettingsBtn = $('#btn-ribbon-settings');
+    if (ribbonSettingsBtn) ribbonSettingsBtn.classList.add('has-update');
 
     const menuSettingsBtn = $('#menu-btn-settings');
     if (menuSettingsBtn) menuSettingsBtn.classList.add('has-update-indicator');
@@ -13084,6 +13092,9 @@
     const sidebarBadge = $('#sidebar-update-badge');
     if (sidebarBadge) sidebarBadge.classList.add('hidden');
 
+    const ribbonBadge = $('#ribbon-update-badge');
+    if (ribbonBadge) ribbonBadge.classList.add('hidden');
+
     const dashboardBadge = $('#dashboard-update-badge');
     if (dashboardBadge) dashboardBadge.classList.add('hidden');
 
@@ -13092,6 +13103,9 @@
 
     const gearBtn = $('#btn-project-settings');
     if (gearBtn) gearBtn.classList.remove('has-update');
+
+    const ribbonSettingsBtn = $('#btn-ribbon-settings');
+    if (ribbonSettingsBtn) ribbonSettingsBtn.classList.remove('has-update');
 
     const menuSettingsBtn = $('#menu-btn-settings');
     if (menuSettingsBtn) menuSettingsBtn.classList.remove('has-update-indicator');
@@ -13109,9 +13123,9 @@
 
   function triggerTestUpdateNotification() {
     const demoPayload = {
-      tag_name: 'v1.3.0 (Preview)',
-      latestVersion: '1.3.0',
-      name: 'Lord Spey v1.3.0 (Demo)',
+      tag_name: 'v2.3.0 (Preview)',
+      latestVersion: '2.3.0',
+      name: 'Lord Spey v2.3.0 (Demo)',
       body: '### Update Preview\n- Preview of future updates and notifications\n- Seamless one-click background updates\n- Automated pre-update snapshot backup\n- Full vault safety guarantee',
       html_url: 'https://github.com/Dathevinci/Lordspey/releases',
       isDemo: true
@@ -13119,7 +13133,7 @@
     showUpdateNotification(demoPayload);
     const bannerVer = $('#update-banner-version');
     if (bannerVer) {
-      bannerVer.textContent = 'v1.3.0 (Preview)';
+      bannerVer.textContent = 'v2.3.0 (Preview)';
     }
     toast('Update notification preview banner triggered! Click "Update Now" to preview the update modal.', 'info');
   }
@@ -13294,11 +13308,20 @@
   }
 
   function initAutoUpdateSystem() {
-    // Current version displays in Settings
+    // Current version displays in Settings & Status Bar
     const vaultVerDisplay = $('#settings-vault-version-display');
     const guidesVerDisplay = $('#settings-guides-version-display');
+    const sbVerDisplay = $('#sb-version');
     if (vaultVerDisplay) vaultVerDisplay.textContent = `v${APP_VERSION}`;
     if (guidesVerDisplay) guidesVerDisplay.textContent = `v${APP_VERSION}`;
+    if (sbVerDisplay) {
+      sbVerDisplay.textContent = `v${APP_VERSION}`;
+      sbVerDisplay.style.cursor = 'pointer';
+      sbVerDisplay.title = `Lord Spey v${APP_VERSION} — Click to view What's New`;
+      sbVerDisplay.addEventListener('click', () => {
+        openWhatsNewModal();
+      });
+    }
 
     // Settings update check buttons
     const btnCheckVault = $('#settings-btn-check-update-vault');
@@ -13407,8 +13430,8 @@
           showUpdateModal(cachedLatestReleaseData);
         } else {
           showUpdateModal({
-            tag_name: 'v1.3.0',
-            name: 'Lord Spey v1.3.0 (Demo)',
+            tag_name: 'v2.3.0',
+            name: 'Lord Spey v2.3.0 (Demo)',
             body: '### Update Preview\n- Preview of future updates and notifications\n- Seamless one-click background updates\n- Automated pre-update snapshot backup\n- Full vault safety guarantee',
             html_url: 'https://github.com/Dathevinci/Lordspey/releases'
           }, true);

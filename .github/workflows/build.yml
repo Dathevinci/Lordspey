@@ -130,7 +130,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v2.2.0' }}
-          name: Lord Spey ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v2.2.0' }}
+          name: Lord Spey ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v2.2.0' }} — Native Rust & Tauri v2 Core Engine, Luminescent Graph/Codex Nodes, Atlas HUD Docks & Bento Settings
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             release-assets/windows/*.exe
