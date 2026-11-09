@@ -29,7 +29,8 @@ const testSuites = [
   'test_map_studio.js',
   'test_github_pages_site.js',
   'test_universe_atlas.js',
-  'test_v2_obsidian_ui.js'
+  'test_v2_obsidian_ui.js',
+  'test_rust_architecture.js'
 ];
 
 let passedCount = 0;

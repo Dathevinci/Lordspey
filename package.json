@@ -10,6 +10,9 @@
     "build:web": "node scripts/build-web.js",
     "build:pages": "node scripts/build-pages.js",
     "cap:sync": "node scripts/build-web.js && npx cap sync android",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "node scripts/build-web.js && tauri build",
+    "rust:test": "cargo test --manifest-path src-tauri/Cargo.toml",
     "test": "node scripts/build-web.js && node scripts/build-pages.js && node tests/run_all.js"
   },
   "keywords": [

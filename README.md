@@ -57,13 +57,27 @@ Open **`http://localhost:8095`** in your browser.
 All automated tests are organized cleanly in the `tests/` directory:
 
 ```bash
-# Run all 24 automated test suites (markdown, graph, timeline, map studio, universe atlas, obsidian ui, etc.)
+# Run all 25 automated test suites (markdown, graph, timeline, map studio, universe atlas, obsidian ui, rust architecture, etc.)
 npm test
 ```
 
 ---
 
 ## 🖥️ Building Desktop App (`.exe`)
+
+### Option A — Native Rust & Tauri v2 (`src-tauri/`)
+
+Lord Spey includes a native **Rust Core Engine** (`src-tauri/src/core.rs`) and **Tauri v2** desktop shell (`src-tauri/src/lib.rs`) for lightweight (~5 MB) native binaries, instant manuscript analytics, `[[Wiki-Link]]` graph indexing, and `.spey` project vault I/O:
+
+```bash
+# Run Rust unit tests for the manuscript & vault core engine
+npm run rust:test
+
+# Build native Rust desktop binary via Tauri v2
+npm run tauri:build
+```
+
+### Option B — Electron Builder
 
 ```bash
 # Install dependencies

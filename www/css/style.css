@@ -8509,30 +8509,350 @@ body[data-theme="sepia"][data-animated-theme]:not([data-animated-theme="none"]) 
   display: none;
 }
 
-/* Matte Obsidian Dashboard & Workspace Surfaces */
+/* ══════════════════════════════════════════════════════════════════════════════
+   LORD SPEY v2.1.2 — EYE-CATCHING AUTHOR UI, MAP HUD DOCKS & BENTO SETTINGS
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* 1. Eye-Catching Author Dashboard & Writing Pulse */
 .main-menu {
-  background: var(--bg-primary);
+  background:
+    radial-gradient(ellipse 68% 38% at 50% 0%, var(--red-glow, rgba(139, 92, 246, 0.14)), transparent 72%),
+    var(--bg-primary);
+}
+
+.dashboard-writing-pulse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px auto 6px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  transition: border-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-writing-pulse:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.dashboard-writing-pulse .pulse-stat strong {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-writing-pulse .pulse-sep {
+  color: var(--text-muted);
+  opacity: 0.5;
 }
 
 .menu-card,
 .menu-wb-card,
+.menu-recent-card,
 .menu-spey-banner {
-  background: var(--bg-secondary) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%), var(--bg-secondary) !important;
   border: 1px solid var(--border-subtle) !important;
-  box-shadow: none !important;
-  transition: background 150ms cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
-              transform 150ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              background 220ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .menu-card:hover,
-.menu-wb-card:hover {
+.menu-wb-card:hover,
+.menu-recent-card:hover {
   background: var(--bg-hover) !important;
-  border-color: var(--border) !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18) !important;
+  border-color: var(--accent) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28), 0 0 18px var(--red-glow, rgba(139, 92, 246, 0.16)) !important;
 }
 
+.hero-primary-btn {
+  border-color: var(--accent) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.26), 0 0 22px var(--red-glow, rgba(139, 92, 246, 0.18)) !important;
+}
 
+.hero-primary-btn:hover {
+  transform: translateY(-2px) scale(1.01) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.34), 0 0 28px var(--red-glow-strong, rgba(139, 92, 246, 0.32)) !important;
+}
 
+/* 2. De-clutter Editor Top Bar on Desktop (Activity Ribbon handles Worldbuilding views) */
+@media (min-width: 769px) {
+  .editor-toolbar .toolbar-wb-cluster,
+  .editor-toolbar .toolbar-wb-sep {
+    display: none !important;
+  }
+}
 
+/* 3. Redesigned Map Header & Floating Glassmorphic Viewport HUD Docks */
+.map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px !important;
+  min-height: 52px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.map-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.map-action-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.map-floating-filter-dock {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 22;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(13, 15, 23, 0.84);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
+  transition: top 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-viewport.paint-mode-active .map-floating-filter-dock,
+.map-viewport:has(#map-studio-toolbar:not(.hidden)) .map-floating-filter-dock {
+  top: 66px;
+}
+
+.map-placement-hint {
+  top: 62px !important;
+  z-index: 26 !important;
+}
+
+.map-floating-filter-dock:focus-within,
+.map-floating-filter-dock:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.52);
+}
+
+.map-floating-telemetry-dock {
+  position: absolute;
+  bottom: 14px;
+  right: 20px;
+  z-index: 22;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(13, 15, 23, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.42);
+}
+
+.map-pin-preview {
+  bottom: 62px !important;
+  right: 20px !important;
+  z-index: 28 !important;
+}
+
+@media (max-width: 768px) {
+  .map-floating-filter-dock {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    border-radius: 12px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .map-viewport.paint-mode-active .map-floating-filter-dock,
+  .map-viewport:has(#map-studio-toolbar:not(.hidden)) .map-floating-filter-dock {
+    top: 64px;
+  }
+  .map-floating-telemetry-dock {
+    bottom: 46px;
+    right: 10px;
+    padding: 4px 8px;
+  }
+  .map-pin-preview {
+    bottom: 92px !important;
+    right: 10px !important;
+    left: 10px !important;
+    width: auto !important;
+  }
+}
+
+/* 4. Semantic Map Pin Glyphs & Jewel Markers */
+.map-pin-head {
+  width: 24px;
+  height: 24px;
+}
+
+.map-pin-dot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-pin-glyph {
+  display: inline-block;
+  transform: rotate(45deg);
+  font-size: 11px;
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+  pointer-events: none;
+  user-select: none;
+}
+
+.map-pin-head.pin-station .map-pin-glyph {
+  color: #0f172a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.map-pin:hover .map-pin-dot {
+  transform: scale(1.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), 0 0 12px var(--accent);
+}
+
+.map-pin-label {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(11, 13, 20, 0.86) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 999px !important;
+  padding: 2px 9px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+/* 5. Redesigned Bento-Card Settings Modal & Live Typography Preview */
+.settings-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.settings-search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.settings-search-input {
+  width: 100%;
+  padding: 7px 10px 7px 30px;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 160ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.settings-search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--red-glow, rgba(139, 92, 246, 0.18));
+}
+
+.settings-search-empty {
+  padding: 36px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border-subtle);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+#project-settings-modal .settings-group {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              background 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#project-settings-modal .settings-group:hover {
+  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.settings-typography-preview {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.typography-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.typography-preview-badge {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.typography-preview-meta {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-secondary);
+}
+
+.typography-preview-sample {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.8;
+  transition: font-size 150ms ease, line-height 150ms ease;
+}

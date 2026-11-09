@@ -1511,6 +1511,28 @@
   function renderMainMenuRecent() {
     const all = Storage.getAllNotes();
     const menuEmptySection = $('#menu-empty-section');
+
+    // Update Author Writing Pulse summary strip on Dashboard
+    const pulseWordsEl = $('#pulse-total-words');
+    const pulseChaptersEl = $('#pulse-total-chapters');
+    const pulseLoreEl = $('#pulse-total-lore');
+    if (pulseWordsEl || pulseChaptersEl || pulseLoreEl) {
+      let totalWords = 0;
+      let totalChapters = 0;
+      let totalLore = 0;
+      for (const note of all) {
+        const bodyStr = (note.body || '').trim();
+        if (bodyStr) {
+          totalWords += bodyStr.split(/\s+/).filter(Boolean).length;
+        }
+        if (note.category === 'chapter') totalChapters++;
+        else if (note.category === 'lore' || note.category === 'world') totalLore++;
+      }
+      if (pulseWordsEl) pulseWordsEl.textContent = totalWords.toLocaleString();
+      if (pulseChaptersEl) pulseChaptersEl.textContent = String(totalChapters);
+      if (pulseLoreEl) pulseLoreEl.textContent = String(totalLore);
+    }
+
     if (all.length === 0) {
       if (menuRecentSection) menuRecentSection.classList.add('hidden');
       if (menuRecentGrid) menuRecentGrid.innerHTML = '';
@@ -2286,6 +2308,11 @@
     if (typeof window !== 'undefined') {
       window.__handleOpenedSpeyFile = function(payload) {
         if (!payload || !payload.content) return;
+        const sig = `${payload.filePath || payload.fileName || 'bundle.spey'}:${String(payload.content).length}`;
+        if (window.__LAST_STARTUP_SPEY_SIG__ && window.__LAST_STARTUP_SPEY_SIG__ === sig) {
+          return;
+        }
+        window.__LAST_STARTUP_SPEY_SIG__ = sig;
         try {
           processIncomingSpeyFile(payload.content, payload.fileName || 'bundle.spey');
         } catch (e) {
@@ -3353,7 +3380,87 @@
     });
   }
 
+  function updateSettingsTypographyPreview() {
+    const sampleEl = $('#settings-typography-sample');
+    const metaEl = $('#settings-typography-meta');
+    const fam = (settingFontFamily && settingFontFamily.value) || currentEditorFont || "'Lora', Georgia, serif";
+    const size = parseInt((settingFontSize && settingFontSize.value) || currentFontSize || 15, 10) || 15;
+    const lh = parseFloat((settingLineHeight && settingLineHeight.value) || currentLineHeight || 1.8) || 1.8;
+
+    if (sampleEl && sampleEl.style) {
+      sampleEl.style.fontFamily = fam;
+      sampleEl.style.fontSize = `${size}px`;
+      sampleEl.style.lineHeight = String(lh);
+    }
+    if (metaEl) {
+      const cleanName = fam.includes('Inter') ? 'Inter'
+        : fam.includes('JetBrains') ? 'JetBrains Mono'
+        : fam.includes('Playfair') ? 'Playfair Display'
+        : 'Lora';
+      metaEl.textContent = `${cleanName} · ${size}px · ${lh}×`;
+    }
+  }
+
+  function filterSettingsGroups(query) {
+    const q = (query || '').trim().toLowerCase();
+    const groups = $$('#project-settings-modal .settings-group');
+    const panes = $$('#project-settings-modal .settings-pane');
+    const emptyEl = $('#settings-search-empty');
+    if (!q) {
+      groups.forEach(g => { if (g.style) g.style.display = ''; });
+      const activeBtn = $('#project-settings-modal .settings-tab-btn.active');
+      const activeTab = (activeBtn && activeBtn.dataset && activeBtn.dataset.tab) || 'vault';
+      panes.forEach(p => {
+        p.classList.toggle('active', p.id === `settings-pane-${activeTab}`);
+      });
+      if (emptyEl) emptyEl.classList.add('hidden');
+      return;
+    }
+    let anyMatch = false;
+    panes.forEach(pane => {
+      let paneHasMatch = false;
+      const paneGroups = $$('.settings-group', pane);
+      paneGroups.forEach(g => {
+        const text = (g.textContent || '').toLowerCase();
+        const match = text.includes(q);
+        if (g.style) g.style.display = match ? '' : 'none';
+        if (match) {
+          paneHasMatch = true;
+          anyMatch = true;
+        }
+      });
+      pane.classList.toggle('active', paneHasMatch);
+    });
+    if (emptyEl) {
+      emptyEl.classList.toggle('hidden', anyMatch);
+    }
+  }
+
+  const settingsSearchInput = $('#settings-search-input');
+  if (settingsSearchInput) {
+    settingsSearchInput.addEventListener('input', () => {
+      filterSettingsGroups(settingsSearchInput.value);
+    });
+  }
+  if (settingFontFamily) {
+    settingFontFamily.addEventListener('change', updateSettingsTypographyPreview);
+  }
+  if (settingFontSize) {
+    settingFontSize.addEventListener('change', updateSettingsTypographyPreview);
+  }
+  if (settingLineHeight) {
+    settingLineHeight.addEventListener('change', updateSettingsTypographyPreview);
+  }
+
   function switchSettingsTab(tabName) {
+    if (settingsSearchInput && settingsSearchInput.value) {
+      settingsSearchInput.value = '';
+      $$('#project-settings-modal .settings-group').forEach(g => {
+        if (g.style) g.style.display = '';
+      });
+    }
+    const emptyEl = $('#settings-search-empty');
+    if (emptyEl) emptyEl.classList.add('hidden');
     $$('.settings-tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tab === tabName);
     });
@@ -3406,6 +3513,7 @@
     if (settingFocusAutohide) {
       settingFocusAutohide.checked = isFocusAutohideEnabled;
     }
+    updateSettingsTypographyPreview();
 
     // 3. Appearance & Accent Theme
     const isSkipIntro = (typeof localStorage !== 'undefined' && localStorage.getItem('lordspey_skip_intro') === 'true') ||
@@ -5797,7 +5905,7 @@
       const offsetY = ((camera.y % dotSpacing) + dotSpacing) % dotSpacing;
       const isLight = currentBaseTheme === 'light';
       const isSepia = currentBaseTheme === 'sepia';
-      ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.06)' : isSepia ? 'rgba(90, 60, 30, 0.08)' : 'rgba(255, 255, 255, 0.05)';
+      ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.06)' : isSepia ? 'rgba(90, 60, 30, 0.08)' : 'rgba(255, 255, 255, 0.045)';
       const dotR = Math.max(0.6, Math.min(1.2, 0.75 * camera.zoom));
       for (let gx = offsetX; gx < w; gx += dotSpacing) {
         for (let gy = offsetY; gy < h; gy += dotSpacing) {
@@ -5834,14 +5942,14 @@
       }
     }
 
-    // 3. Draw Edges (Hierarchy sub-branches, Wiki cross-links, Manual custom links)
+    // 3. Draw Edges (Hierarchy sub-branches, Wiki cross-links, Manual custom links + Photon Pulses)
     for (const e of graphEdges) {
       const isConn = connectedEdgeSet.has(e);
       let edgeAlpha;
       if (isHoverActive) {
-        edgeAlpha = isConn ? 0.90 : 0.06;
+        edgeAlpha = isConn ? 0.88 : 0.05;
       } else {
-        edgeAlpha = e.isHierarchy ? 0.22 : 0.15;
+        edgeAlpha = e.isHierarchy ? 0.26 : 0.20;
       }
 
       let strokeColor;
@@ -5850,7 +5958,7 @@
       } else if (e.isHierarchy) {
         strokeColor = getCategoryRgba(e.category, edgeAlpha);
       } else if (e.isWiki) {
-        strokeColor = `rgba(255, 255, 255, ${edgeAlpha})`;
+        strokeColor = `rgba(226, 232, 240, ${edgeAlpha})`;
       } else {
         strokeColor = e.color ? e.color : `rgba(161, 161, 170, ${edgeAlpha})`;
       }
@@ -5860,16 +5968,31 @@
       ctx.moveTo(e.source.x, e.source.y);
       ctx.lineTo(e.target.x, e.target.y);
       ctx.strokeStyle = strokeColor;
-      ctx.lineWidth = isConn ? 1.8 : 1.0;
+      ctx.lineWidth = isConn ? 1.85 : (e.isHierarchy ? 1.15 : 1.0);
 
       if (e.isWiki && !isConn) {
-        ctx.setLineDash([3, 4]);
-      } else if (e.isManualLink) {
+        ctx.setLineDash([3, 5]);
+      } else if (e.isManualLink && !isConn) {
         ctx.setLineDash([4, 4]);
       }
 
       ctx.stroke();
       ctx.restore();
+
+      // Traveling synaptic photon pulse along active / connected / wiki edges
+      if (isConn || (!isHoverActive && (e.isWiki || e.isManualLink || e.isHierarchy))) {
+        const pulseT = e.isHierarchy ? (e.flowProgress || 0) : (e.photonPulse || e.flowProgress || 0);
+        const px = e.source.x + (e.target.x - e.source.x) * pulseT;
+        const py = e.source.y + (e.target.y - e.source.y) * pulseT;
+        const pulseColor = e.color || (e.category && CATEGORY_META[e.category] ? CATEGORY_META[e.category].halo : '#38bdf8');
+        ctx.save();
+        ctx.globalAlpha = isConn ? 0.95 : 0.45;
+        ctx.fillStyle = isConn ? '#ffffff' : pulseColor;
+        ctx.beginPath();
+        ctx.arc(px, py, isConn ? 2.2 : 1.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
 
       // Manual edge label
       if (e.isManualLink && e.label && (!isHoverActive || isConn)) {
@@ -5877,7 +6000,7 @@
         const midY = (e.source.y + e.target.y) / 2;
         ctx.save();
         ctx.font = '500 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
-        ctx.fillStyle = isConn ? '#ffffff' : 'rgba(200, 200, 210, 0.7)';
+        ctx.fillStyle = isConn ? '#ffffff' : 'rgba(212, 212, 224, 0.78)';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(e.label, midX, midY - 6);
@@ -5885,64 +6008,111 @@
       }
     }
 
-    // 4. Draw Category Hub Nodes
+    // 4. Draw Category Hub Nodes (Multi-Layered Astral Anchor Suns)
     for (const n of graphNodes) {
       if (!n.isHub) continue;
       const meta = CATEGORY_META[n.category] || CATEGORY_META.chapter;
       const isHovered = n === hoveredNode;
       const isConn = !isHoverActive || connectedNodeSet.has(n);
-      const nodeAlpha = isConn ? 1.0 : 0.12;
+      const nodeAlpha = isConn ? 1.0 : 0.14;
 
       ctx.save();
       ctx.globalAlpha = nodeAlpha;
 
-      const baseR = n.radius + (n.hoverProgress || 0) * 3;
+      const hoverBoost = (n.hoverProgress || 0) * 3.5;
+      const baseR = n.radius + hoverBoost;
+      const pulse = Math.sin(galaxyTime * 1.5 + (n.pulseOffset || 0)) * 0.5 + 0.5;
 
-      // Outer focus ring on hover
-      if (isHovered) {
+      // 4a. Ambient radial corona halo
+      if (typeof ctx.createRadialGradient === 'function') {
+        const haloR = baseR * (isHovered ? 2.6 : 2.0 + pulse * 0.25);
+        const haloGrad = ctx.createRadialGradient(n.x, n.y, baseR * 0.25, n.x, n.y, haloR);
+        haloGrad.addColorStop(0, getCategoryRgba(n.category, isHovered ? 0.42 : 0.22));
+        haloGrad.addColorStop(0.55, getCategoryRgba(n.category, isHovered ? 0.14 : 0.06));
+        haloGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = haloGrad;
         ctx.beginPath();
-        ctx.arc(n.x, n.y, baseR + 5, 0, Math.PI * 2);
-        ctx.strokeStyle = meta.halo;
-        ctx.lineWidth = 1.8;
-        ctx.stroke();
+        ctx.arc(n.x, n.y, haloR, 0, Math.PI * 2);
+        ctx.fill();
       }
 
-      // Solid Category Hub disc
+      // 4b. Rotating orbital astrolabe ring
+      ctx.save();
+      ctx.translate(n.x, n.y);
+      ctx.rotate(galaxyTime * 0.35 + (n.pulseOffset || 0));
+      ctx.beginPath();
+      ctx.arc(0, 0, baseR + 5.5, 0, Math.PI * 2);
+      ctx.strokeStyle = isHovered ? meta.halo : getCategoryRgba(n.category, 0.45);
+      ctx.lineWidth = isHovered ? 1.6 : 1.1;
+      ctx.setLineDash([5, 6]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      // 4c. Jewel-gradient Category Hub core sphere
       ctx.beginPath();
       ctx.arc(n.x, n.y, baseR, 0, Math.PI * 2);
-      ctx.fillStyle = isHovered ? meta.halo : 'rgba(28, 28, 35, 0.96)';
+      if (typeof ctx.createRadialGradient === 'function') {
+        const coreGrad = ctx.createRadialGradient(
+          n.x - baseR * 0.28,
+          n.y - baseR * 0.28,
+          baseR * 0.1,
+          n.x,
+          n.y,
+          baseR
+        );
+        if (isHovered) {
+          coreGrad.addColorStop(0, '#ffffff');
+          coreGrad.addColorStop(0.35, meta.halo);
+          coreGrad.addColorStop(1, 'rgba(20, 22, 34, 0.96)');
+        } else {
+          coreGrad.addColorStop(0, getCategoryRgba(n.category, 0.42));
+          coreGrad.addColorStop(0.55, 'rgba(22, 24, 34, 0.95)');
+          coreGrad.addColorStop(1, 'rgba(12, 13, 20, 0.98)');
+        }
+        ctx.fillStyle = coreGrad;
+      } else {
+        ctx.fillStyle = isHovered ? meta.halo : 'rgba(22, 24, 34, 0.96)';
+      }
       ctx.fill();
       ctx.strokeStyle = meta.halo;
-      ctx.lineWidth = 2.0;
+      ctx.lineWidth = isHovered ? 2.2 : 1.75;
       ctx.stroke();
 
-      // Hub Category Initial
+      // 4d. Inner geometric ring
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, Math.max(4, baseR - 4), 0, Math.PI * 2);
+      ctx.strokeStyle = isHovered ? 'rgba(255, 255, 255, 0.55)' : getCategoryRgba(n.category, 0.28);
+      ctx.lineWidth = 0.9;
+      ctx.stroke();
+
+      // 4e. Hub Category Initial
       ctx.font = '700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = isHovered ? '#ffffff' : meta.halo;
+      ctx.fillStyle = '#ffffff';
       ctx.fillText(meta.name.charAt(0), n.x, n.y);
 
-      // Hub Category Title Badge
+      // 4f. Hub Category Title Badge (Sleek floating glass pill)
       const titleText = meta.name.toUpperCase();
       const countLabel = meta.key === 'chapter' ? (n.nodeCount === 1 ? '1 chapter' : `${n.nodeCount} chapters`)
         : meta.key === 'lore' ? (n.nodeCount === 1 ? '1 lore entry' : `${n.nodeCount} lore entries`)
         : meta.key === 'world' ? (n.nodeCount === 1 ? '1 location' : `${n.nodeCount} locations`)
         : (n.nodeCount === 1 ? '1 draft' : `${n.nodeCount} drafts`);
 
-      ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
+      ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
       const textWidth = ctx.measureText(titleText).width;
-      const pillW = Math.max(textWidth + 24, 90);
+      const pillW = Math.max(textWidth + 24, 92);
       n.hitWidth = pillW;
       const pillH = 22;
       const pillX = n.x - pillW / 2;
-      const pillY = n.y + baseR + 8;
+      const pillY = n.y + baseR + 9;
 
-      ctx.fillStyle = 'rgba(18, 18, 22, 0.92)';
-      ctx.strokeStyle = isHovered ? meta.halo : 'rgba(255, 255, 255, 0.14)';
-      ctx.lineWidth = 1;
+      ctx.fillStyle = 'rgba(13, 15, 23, 0.88)';
+      ctx.strokeStyle = isHovered ? meta.halo : getCategoryRgba(n.category, 0.35);
+      ctx.lineWidth = isHovered ? 1.3 : 1;
       ctx.beginPath();
-      drawRoundRect(ctx, pillX, pillY, pillW, pillH, 6);
+      drawRoundRect(ctx, pillX, pillY, pillW, pillH, 11);
       ctx.fill();
       ctx.stroke();
 
@@ -5953,45 +6123,105 @@
 
       // Sub-text count
       ctx.font = '500 9.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
-      ctx.fillStyle = 'rgba(161, 161, 170, 0.85)';
+      ctx.fillStyle = isHovered ? 'rgba(226, 232, 240, 0.95)' : 'rgba(161, 161, 170, 0.82)';
       ctx.fillText(countLabel, n.x, pillY + pillH + 11);
 
       ctx.restore();
     }
 
-    // 5. Draw Note & Manual Entity Nodes (Obsidian Solid Circular Dots)
+    // 5. Draw Note & Manual Entity Nodes (Luminescent Astral / Obsidian Nodes)
     for (const n of graphNodes) {
       if (n.isHub) continue;
 
       const isHovered = n === hoveredNode;
       const isCurrentActive = n.id === activeNoteId;
       const isConn = !isHoverActive || connectedNodeSet.has(n);
-      const nodeAlpha = isConn ? 1.0 : 0.12;
+      const nodeAlpha = isConn ? 1.0 : 0.14;
 
       ctx.save();
       ctx.globalAlpha = nodeAlpha;
 
-      const baseR = n.radius + (n.hoverProgress || 0) * 2.5;
+      const hoverProgress = n.hoverProgress || 0;
+      const baseR = n.radius + hoverProgress * 2.8;
+      const pulse = Math.sin(galaxyTime * 1.9 + (n.pulseOffset || 0)) * 0.5 + 0.5;
 
       if (n.isManualEntity) {
         const entColor = n.color || '#38bdf8';
+        if (typeof ctx.createRadialGradient === 'function') {
+          const entAuraR = baseR * (isHovered ? 2.7 : 2.1);
+          const entAura = ctx.createRadialGradient(n.x, n.y, baseR * 0.2, n.x, n.y, entAuraR);
+          entAura.addColorStop(0, entColor);
+          entAura.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.save();
+          ctx.globalAlpha = nodeAlpha * (isHovered ? 0.38 : 0.20);
+          ctx.fillStyle = entAura;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, entAuraR, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        if (isHovered || hoverProgress > 0.05) {
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, baseR + 4, 0, Math.PI * 2);
+          ctx.strokeStyle = isHovered ? '#ffffff' : entColor;
+          ctx.lineWidth = 1.4;
+          ctx.stroke();
+        }
+
+        // 3D Jewel entity orb
         ctx.beginPath();
         ctx.arc(n.x, n.y, baseR, 0, Math.PI * 2);
-        ctx.fillStyle = isHovered ? '#ffffff' : entColor;
+        if (typeof ctx.createRadialGradient === 'function') {
+          const entSphereGrad = ctx.createRadialGradient(
+            n.x - baseR * 0.3,
+            n.y - baseR * 0.3,
+            baseR * 0.08,
+            n.x,
+            n.y,
+            baseR
+          );
+          entSphereGrad.addColorStop(0, '#ffffff');
+          entSphereGrad.addColorStop(0.35, isHovered ? '#ffffff' : entColor);
+          entSphereGrad.addColorStop(1, entColor);
+          ctx.fillStyle = entSphereGrad;
+        } else {
+          ctx.fillStyle = isHovered ? '#ffffff' : entColor;
+        }
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = isHovered ? 2.0 : 1.2;
+        ctx.lineWidth = isHovered ? 2.0 : 1.3;
         ctx.stroke();
 
+        // Inner core pip
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, Math.max(2.2, baseR * 0.32), 0, Math.PI * 2);
+        ctx.fillStyle = isHovered ? entColor : '#ffffff';
+        ctx.fill();
+
+        // Floating pill backing for manual entity title
         ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
+        const entTitle = n.title.length > 28 ? n.title.slice(0, 26) + '…' : n.title;
+        const entTitleW = ctx.measureText(entTitle).width;
+        const entPillW = entTitleW + 16;
+        const entPillH = 18;
+        const entPillX = n.x - entPillW / 2;
+        const entPillY = n.y + baseR + 5;
+        n.hitWidth = Math.max(90, entPillW);
+
+        ctx.fillStyle = isHovered ? 'rgba(15, 17, 26, 0.92)' : 'rgba(10, 12, 18, 0.72)';
+        ctx.beginPath();
+        drawRoundRect(ctx, entPillX, entPillY, entPillW, entPillH, 6);
+        ctx.fill();
+
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-        ctx.fillText(n.title, n.x, n.y + baseR + 8);
+        ctx.fillText(entTitle, n.x, n.y + baseR + 8);
 
         ctx.font = '500 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
         ctx.fillStyle = entColor;
-        ctx.fillText((n.type || 'concept').toUpperCase(), n.x, n.y + baseR + 23);
+        ctx.fillText((n.type || 'concept').toUpperCase(), n.x, n.y + baseR + 25);
 
         ctx.restore();
         continue;
@@ -6000,42 +6230,90 @@
       const meta = CATEGORY_META[n.category] || CATEGORY_META.chapter;
       const nodeColor = meta.halo || meta.color;
 
-      // Active Note or Hover Outer Focus Ring (Clean Obsidian ring)
-      if (isHovered || isCurrentActive) {
+      // 5a. Soft Breathing Radial Aura around Note Node
+      if (typeof ctx.createRadialGradient === 'function') {
+        const auraR = baseR * (isHovered || isCurrentActive ? 2.8 : 1.95 + pulse * 0.25);
+        const auraGrad = ctx.createRadialGradient(n.x, n.y, baseR * 0.2, n.x, n.y, auraR);
+        auraGrad.addColorStop(0, getCategoryRgba(n.category, isHovered || isCurrentActive ? 0.45 : 0.24));
+        auraGrad.addColorStop(0.6, getCategoryRgba(n.category, isHovered || isCurrentActive ? 0.14 : 0.05));
+        auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = auraGrad;
         ctx.beginPath();
-        ctx.arc(n.x, n.y, baseR + 3.5, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, auraR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 5b. Active Note or Hover Outer Focus Halo Ring
+      if (isHovered || isCurrentActive || hoverProgress > 0.05) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, baseR + 4.2, 0, Math.PI * 2);
         ctx.strokeStyle = isHovered ? '#ffffff' : nodeColor;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = isHovered ? 1.6 : 1.2;
         ctx.stroke();
       }
 
-      // Solid Node Dot (Obsidian Signature)
+      // 5c. 3D Jewel Sphere Node Core
       ctx.beginPath();
       ctx.arc(n.x, n.y, baseR, 0, Math.PI * 2);
-      ctx.fillStyle = isHovered ? '#ffffff' : nodeColor;
+      if (typeof ctx.createRadialGradient === 'function') {
+        const sphereGrad = ctx.createRadialGradient(
+          n.x - baseR * 0.32,
+          n.y - baseR * 0.32,
+          baseR * 0.08,
+          n.x,
+          n.y,
+          baseR
+        );
+        sphereGrad.addColorStop(0, '#ffffff');
+        sphereGrad.addColorStop(0.32, isHovered ? '#ffffff' : nodeColor);
+        sphereGrad.addColorStop(1, nodeColor);
+        ctx.fillStyle = sphereGrad;
+      } else {
+        ctx.fillStyle = isHovered ? '#ffffff' : nodeColor;
+      }
       ctx.fill();
 
-      // Subtle edge definition
-      ctx.strokeStyle = isHovered ? nodeColor : 'rgba(0, 0, 0, 0.35)';
-      ctx.lineWidth = 1.0;
+      // Crisp specular rim
+      ctx.strokeStyle = isHovered || isCurrentActive ? '#ffffff' : 'rgba(255, 255, 255, 0.38)';
+      ctx.lineWidth = isHovered ? 1.6 : 1.0;
       ctx.stroke();
 
-      // Note Title Label
-      ctx.font = `${isHovered ? '600' : '500'} 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif`;
+      // Inner starlight core pip for connected / active notes
+      if ((n.connections || 0) > 1 || isCurrentActive || isHovered) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, Math.max(1.8, baseR * 0.28), 0, Math.PI * 2);
+        ctx.fillStyle = isHovered ? nodeColor : '#ffffff';
+        ctx.fill();
+      }
+
+      // 5d. Clean Floating Note Title Label with soft pill backing
+      ctx.font = `${isHovered || isCurrentActive ? '600' : '500'} 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
 
       const displayTitle = n.title.length > 28 ? n.title.slice(0, 26) + '…' : n.title;
       const titleW = ctx.measureText(displayTitle).width;
 
-      // Drop shadow backing for crisp legibility
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-      ctx.fillText(displayTitle, n.x + 1, n.y + baseR + 9);
+      const labelPadX = 8;
+      const labelPillW = titleW + labelPadX * 2;
+      const labelPillH = 18;
+      const labelPillX = n.x - labelPillW / 2;
+      const labelPillY = n.y + baseR + 5;
 
-      ctx.fillStyle = isHovered || isCurrentActive ? '#ffffff' : 'rgba(235, 235, 240, 0.92)';
+      ctx.fillStyle = isHovered || isCurrentActive ? 'rgba(15, 17, 26, 0.92)' : 'rgba(10, 12, 18, 0.68)';
+      ctx.beginPath();
+      drawRoundRect(ctx, labelPillX, labelPillY, labelPillW, labelPillH, 6);
+      ctx.fill();
+      if (isHovered || isCurrentActive) {
+        ctx.strokeStyle = getCategoryRgba(n.category, 0.45);
+        ctx.lineWidth = 0.9;
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = isHovered || isCurrentActive ? '#ffffff' : 'rgba(238, 240, 246, 0.94)';
       ctx.fillText(displayTitle, n.x, n.y + baseR + 8);
 
-      // Sub-branch Location Badge (e.g. "Chapters › Act 1")
+      // 5e. Subtle Sub-branch Caption (e.g. "Chapters › Act 1") — preserves exact +24px Y hit-box
       const branchLabel = `${meta.name} › ${n.subBranch}`;
       ctx.font = '500 9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif';
       const bWidth = ctx.measureText(branchLabel).width;
@@ -6046,15 +6324,17 @@
 
       n.hitWidth = Math.max(titleW, bPillW);
 
-      ctx.fillStyle = 'rgba(18, 18, 24, 0.88)';
-      ctx.strokeStyle = isHovered ? meta.halo : 'rgba(255, 255, 255, 0.12)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      drawRoundRect(ctx, bPillX, bPillY, bPillW, bPillH, 4);
-      ctx.fill();
-      ctx.stroke();
+      if (isHovered || isCurrentActive) {
+        ctx.fillStyle = 'rgba(18, 20, 28, 0.90)';
+        ctx.strokeStyle = meta.halo;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        drawRoundRect(ctx, bPillX, bPillY, bPillW, bPillH, 7);
+        ctx.fill();
+        ctx.stroke();
+      }
 
-      ctx.fillStyle = isHovered ? meta.halo : 'rgba(161, 161, 170, 0.85)';
+      ctx.fillStyle = isHovered || isCurrentActive ? meta.halo : 'rgba(148, 163, 184, 0.72)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(branchLabel, n.x, bPillY + bPillH / 2);
@@ -7062,9 +7342,9 @@
 
     if (isCosmic) {
       if (ctx.createRadialGradient) {
-        const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 50, w / 2, h / 2, Math.max(w, h) * 0.7);
-        bgGrad.addColorStop(0, '#090d1a');
-        bgGrad.addColorStop(0.5, '#050711');
+        const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 40, w / 2, h / 2, Math.max(w, h) * 0.72);
+        bgGrad.addColorStop(0, '#0a0f22');
+        bgGrad.addColorStop(0.45, '#050814');
         bgGrad.addColorStop(1, '#020308');
         ctx.fillStyle = bgGrad;
       } else {
@@ -7072,27 +7352,39 @@
       }
       if (typeof ctx.fillRect === 'function') ctx.fillRect(0, 0, w, h);
 
-      // Starfield (deterministic)
-      for (let i = 0; i < 180; i++) {
+      // Starfield (deterministic) + diffraction cross-flares on bright beacons
+      for (let i = 0; i < 200; i++) {
         const sx = ((i * 379) % (w - 30)) + 15;
         const sy = ((i * 617) % (h - 30)) + 15;
-        const sr = (i % 3 === 0) ? 1.5 : (i % 5 === 0 ? 2 : 0.8);
+        const sr = (i % 3 === 0) ? 1.5 : (i % 5 === 0 ? 2.1 : 0.85);
         const sa = 0.25 + ((i * 13) % 75) / 100;
-        ctx.fillStyle = (i % 7 === 0) ? '#bae6fd' : ((i % 11 === 0) ? '#fef08a' : '#ffffff');
+        const sColor = (i % 7 === 0) ? '#bae6fd' : ((i % 11 === 0) ? '#fef08a' : (i % 17 === 0 ? '#e9d5ff' : '#ffffff'));
+        ctx.fillStyle = sColor;
         ctx.globalAlpha = sa;
         if (typeof ctx.beginPath === 'function') {
           ctx.beginPath();
           if (typeof ctx.arc === 'function') ctx.arc(sx, sy, sr, 0, Math.PI * 2);
           if (typeof ctx.fill === 'function') ctx.fill();
         }
+        // Subtle 4-point diffraction spikes on bright stars
+        if (i % 19 === 0 && typeof ctx.beginPath === 'function' && typeof ctx.moveTo === 'function' && typeof ctx.lineTo === 'function' && typeof ctx.stroke === 'function') {
+          ctx.strokeStyle = sColor;
+          ctx.lineWidth = 0.75;
+          ctx.globalAlpha = sa * 0.55;
+          ctx.beginPath();
+          ctx.moveTo(sx - 6, sy); ctx.lineTo(sx + 6, sy);
+          ctx.moveTo(sx, sy - 6); ctx.lineTo(sx, sy + 6);
+          ctx.stroke();
+        }
       }
       ctx.globalAlpha = 1.0;
 
       // Interstellar Nebula clouds
       const nebulae = [
-        { x: w * 0.35, y: h * 0.45, r: 280, color: 'rgba(168, 85, 247, 0.14)' },
-        { x: w * 0.65, y: h * 0.55, r: 320, color: 'rgba(56, 189, 248, 0.13)' },
-        { x: w * 0.5, y: h * 0.35, r: 240, color: 'rgba(236, 72, 153, 0.10)' }
+        { x: w * 0.34, y: h * 0.44, r: 300, color: 'rgba(168, 85, 247, 0.15)' },
+        { x: w * 0.66, y: h * 0.56, r: 340, color: 'rgba(56, 189, 248, 0.14)' },
+        { x: w * 0.50, y: h * 0.36, r: 250, color: 'rgba(236, 72, 153, 0.11)' },
+        { x: w * 0.48, y: h * 0.64, r: 220, color: 'rgba(99, 102, 241, 0.10)' }
       ];
       nebulae.forEach(c => {
         if (typeof ctx.createRadialGradient === 'function') {
@@ -7105,13 +7397,38 @@
         }
       });
 
-      // Orbital Guide Rings (if star system or orbital rings enabled)
-      const showOrbitalRings = curMap.orbitalRings !== undefined ? curMap.orbitalRings : (curTier === 'system');
       const cx = w / 2;
       const cy = h / 2;
+
+      // Calibrated 360° Astrolabe Degree Ring around Cosmic Canvas
+      const astroR = Math.min(w, h) * 0.44;
+      if (typeof ctx.beginPath === 'function' && typeof ctx.arc === 'function' && typeof ctx.stroke === 'function') {
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.16)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(cx, cy, astroR, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 72 degree ticks around the astrolabe ring
+        if (typeof ctx.moveTo === 'function' && typeof ctx.lineTo === 'function') {
+          for (let deg = 0; deg < 360; deg += 5) {
+            const rad = (deg * Math.PI) / 180;
+            const isMajor = deg % 30 === 0;
+            const tickLen = isMajor ? 10 : 5;
+            ctx.strokeStyle = isMajor ? 'rgba(56, 189, 248, 0.34)' : 'rgba(148, 163, 184, 0.15)';
+            ctx.beginPath();
+            ctx.moveTo(cx + Math.cos(rad) * (astroR - tickLen), cy + Math.sin(rad) * (astroR - tickLen));
+            ctx.lineTo(cx + Math.cos(rad) * astroR, cy + Math.sin(rad) * astroR);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Orbital Guide Rings (if star system or orbital rings enabled)
+      const showOrbitalRings = curMap.orbitalRings !== undefined ? curMap.orbitalRings : (curTier === 'system');
       if (showOrbitalRings) {
         const ringRadii = [90, 160, 240, 330, 440, 560, 700];
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.22)';
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.24)';
         ctx.lineWidth = 1;
         if (ctx.setLineDash) ctx.setLineDash([6, 8]);
         ringRadii.forEach((r, idx) => {
@@ -7122,7 +7439,7 @@
           }
           if (typeof ctx.fillText === 'function') {
             ctx.font = "9px 'JetBrains Mono', monospace";
-            ctx.fillStyle = 'rgba(147, 197, 253, 0.4)';
+            ctx.fillStyle = 'rgba(147, 197, 253, 0.45)';
             ctx.fillText(`ORBIT ${idx + 1} (${r * 2} AU)`, cx + r - 12, cy - 6);
           }
         });
@@ -7132,42 +7449,42 @@
       // Central Luminary / Stellar Core (for system tier)
       if (curTier === 'system') {
         if (typeof ctx.createRadialGradient === 'function') {
-          const starGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 48);
+          const starGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 56);
           starGlow.addColorStop(0, '#ffffff');
-          starGlow.addColorStop(0.2, '#fef08a');
-          starGlow.addColorStop(0.5, 'rgba(245, 158, 11, 0.6)');
+          starGlow.addColorStop(0.22, '#fef08a');
+          starGlow.addColorStop(0.55, 'rgba(245, 158, 11, 0.62)');
           starGlow.addColorStop(1, 'rgba(245, 158, 11, 0)');
           ctx.fillStyle = starGlow;
-          if (typeof ctx.fillRect === 'function') ctx.fillRect(cx - 48, cy - 48, 96, 96);
+          if (typeof ctx.fillRect === 'function') ctx.fillRect(cx - 56, cy - 56, 112, 112);
         }
         ctx.fillStyle = '#fffbeb';
         if (typeof ctx.beginPath === 'function') {
           ctx.beginPath();
-          if (typeof ctx.arc === 'function') ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+          if (typeof ctx.arc === 'function') ctx.arc(cx, cy, 15, 0, Math.PI * 2);
           if (typeof ctx.fill === 'function') ctx.fill();
         }
         if (typeof ctx.fillText === 'function') {
           ctx.font = "bold 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
           ctx.fillStyle = '#fef08a';
           ctx.textAlign = 'center';
-          ctx.fillText('STELLAR CORE', cx, cy + 28);
+          ctx.fillText('STELLAR CORE', cx, cy + 30);
         }
       }
 
       // Universal Sector Grid & Coordinates (for galaxy or default cosmic canvas)
       if (curTier !== 'system') {
         if (typeof ctx.createRadialGradient === 'function') {
-          const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 140);
-          coreGlow.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
-          coreGlow.addColorStop(0.2, 'rgba(167, 139, 250, 0.45)');
-          coreGlow.addColorStop(0.5, 'rgba(56, 189, 248, 0.16)');
+          const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 150);
+          coreGlow.addColorStop(0, 'rgba(255, 255, 255, 0.88)');
+          coreGlow.addColorStop(0.22, 'rgba(167, 139, 250, 0.48)');
+          coreGlow.addColorStop(0.55, 'rgba(56, 189, 248, 0.18)');
           coreGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
           ctx.fillStyle = coreGlow;
-          if (typeof ctx.fillRect === 'function') ctx.fillRect(cx - 140, cy - 140, 280, 280);
+          if (typeof ctx.fillRect === 'function') ctx.fillRect(cx - 150, cy - 150, 300, 300);
         }
 
         // Galactic Sector Grid & Coordinates
-        ctx.strokeStyle = 'rgba(168, 85, 247, 0.16)';
+        ctx.strokeStyle = 'rgba(168, 85, 247, 0.18)';
         ctx.lineWidth = 1;
         if (ctx.setLineDash) ctx.setLineDash([4, 6]);
 
@@ -7193,7 +7510,7 @@
         // Sector Quadrant Names
         if (typeof ctx.fillText === 'function') {
           ctx.font = "bold 10px 'JetBrains Mono', monospace";
-          ctx.fillStyle = 'rgba(192, 132, 252, 0.42)';
+          ctx.fillStyle = 'rgba(192, 132, 252, 0.46)';
           ctx.textAlign = 'left';
           ctx.fillText('SECTOR ALPHA [COREWARD]', cx + 18, 50);
           ctx.fillText('SECTOR BETA [SPINWARD]', cx + 18, cy + 24);
@@ -7202,20 +7519,20 @@
           ctx.fillText('SECTOR DELTA [TRAILING]', cx - 18, cy + 24);
 
           ctx.font = "bold 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-          ctx.fillStyle = 'rgba(233, 213, 255, 0.78)';
+          ctx.fillStyle = 'rgba(233, 213, 255, 0.85)';
           ctx.textAlign = 'center';
           ctx.fillText((curMap.title && curMap.title !== 'The Known Realm') ? curMap.title.toUpperCase() : 'UNIVERSE NEXUS', cx, cy + 34);
 
           // Distance scale in parsecs / light-years
           ctx.textAlign = 'left';
           ctx.font = "10px 'JetBrains Mono', monospace";
-          ctx.fillStyle = 'rgba(148, 163, 184, 0.55)';
+          ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
           ctx.fillText('UNIVERSE ATLAS · PLACE GALAXIES, STAR SYSTEMS, WORLDS & REALMS', 30, h - 35);
         }
       }
 
-      // Outer cosmic border
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.28)';
+      // Outer cosmic border with corner bracket accents
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.30)';
       ctx.lineWidth = 1.5;
       if (typeof ctx.strokeRect === 'function') ctx.strokeRect(20, 20, w - 40, h - 40);
       return;
@@ -7226,7 +7543,7 @@
 
     // Clean blank Cartographic / Planetary Surface Grid (zero premade fake continents)
     if (ctx.createRadialGradient) {
-      const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, Math.max(w, h) * 0.6);
+      const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, Math.max(w, h) * 0.62);
       if (isLight) {
         bgGrad.addColorStop(0, '#f8fafc');
         bgGrad.addColorStop(0.6, '#edf2f7');
@@ -7253,7 +7570,7 @@
     const mapGlowColor = mapTheme.redGlowStrong || 'rgba(139, 92, 246, 0.45)';
 
     // Coordinate graticule grid lines
-    ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.05)' : isSepia ? 'rgba(90, 60, 30, 0.08)' : 'rgba(255, 255, 255, 0.05)';
+    ctx.strokeStyle = isLight ? 'rgba(0, 0, 0, 0.055)' : isSepia ? 'rgba(90, 60, 30, 0.085)' : 'rgba(255, 255, 255, 0.055)';
     ctx.lineWidth = 1;
     if (ctx.setLineDash) ctx.setLineDash([4, 6]);
 
@@ -7290,7 +7607,7 @@
       ctx.fill();
     });
 
-    // Compass Rose / Astrolabe at (1460, 860)
+    // Compass Rose / Mariner Astrolabe at (1460, 860)
     const astrolabeX = 1460;
     const astrolabeY = 860;
     if (ctx.save) ctx.save();
@@ -7298,6 +7615,9 @@
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.arc(astrolabeX, astrolabeY, 44, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(astrolabeX, astrolabeY, 36, 0, Math.PI * 2);
     ctx.stroke();
 
     for (let a = 0; a < 8; a++) {
@@ -7315,7 +7635,7 @@
 
     if (typeof ctx.fillText === 'function') {
       ctx.font = "bold 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-      ctx.fillStyle = isLight ? '#334155' : isSepia ? '#5c4028' : 'rgba(255, 255, 255, 0.75)';
+      ctx.fillStyle = isLight ? '#334155' : isSepia ? '#5c4028' : 'rgba(255, 255, 255, 0.78)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('N', astrolabeX, astrolabeY - 54);
@@ -7325,12 +7645,29 @@
 
       ctx.textAlign = 'left';
       ctx.font = "10px 'JetBrains Mono', monospace";
-      ctx.fillStyle = isLight ? 'rgba(51, 65, 85, 0.5)' : isSepia ? 'rgba(92, 64, 40, 0.5)' : 'rgba(148, 163, 184, 0.45)';
+      ctx.fillStyle = isLight ? 'rgba(51, 65, 85, 0.55)' : isSepia ? 'rgba(92, 64, 40, 0.55)' : 'rgba(148, 163, 184, 0.5)';
       ctx.fillText(`${(curMap.title || 'PLANETARY REALM').toUpperCase()} · CARTOGRAPHIC CANVAS`, 42, 955);
     }
     if (ctx.restore) ctx.restore();
     if (ctx.restore) ctx.restore();
   }
+
+  const MAP_PIN_GLYPHS = {
+    star: '✦',
+    planet: '◉',
+    gas_giant: '◎',
+    station: '❖',
+    jump_gate: '⬡',
+    asteroid: '☄',
+    nebula_cloud: '✧',
+    citadel: '♜',
+    peak: '▲',
+    city: '◈',
+    shrine: '✦',
+    water: '≈',
+    forest: '♣',
+    danger: '⚔'
+  };
 
   function renderMapPins() {
     if (!mapPinsContainer || typeof document === 'undefined' || typeof document.createElement !== 'function') return;
@@ -7364,13 +7701,16 @@
       pinEl.style.top = `${pin.y}%`;
 
       const customColor = pin.pinColor || pin.color || '';
+      const headStyle = customColor ? `style="background: ${customColor};"` : '';
       const dotStyle = customColor ? `style="background: ${customColor};"` : '';
       const pulseStyle = customColor ? `style="border-color: ${customColor};"` : '';
+      const pType = pin.pinType || 'citadel';
+      const glyph = MAP_PIN_GLYPHS[pType] || '◈';
 
       pinEl.innerHTML = `
-        <div class="map-pin-head pin-${pin.pinType || 'citadel'}">
+        <div class="map-pin-head pin-${pType}" ${headStyle}>
           <div class="map-pin-pulse" ${pulseStyle}></div>
-          <div class="map-pin-dot" ${dotStyle}></div>
+          <div class="map-pin-dot" ${dotStyle}><span class="map-pin-glyph" aria-hidden="true">${glyph}</span></div>
         </div>
         <div class="map-pin-label">${escText(pin.title || 'Landmark')}</div>
       `;
@@ -8654,51 +8994,134 @@
       ctx.stroke();
 
       if (!isDimmed && typeof ctx.fillText === 'function') {
-        ctx.font = "10px sans-serif";
-        ctx.fillStyle = color;
+        const relText = String(r.type || 'Linked');
+        ctx.font = "600 10px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        const relW = (typeof ctx.measureText === 'function' ? ctx.measureText(relText).width : relText.length * 6) + 14;
+        const relH = 18;
+        ctx.fillStyle = 'rgba(13, 15, 23, 0.88)';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        drawRoundRect(ctx, midX - relW / 2, midY - relH / 2, relW, relH, 9);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = isHighlighted ? '#ffffff' : color;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(r.type, midX, midY);
+        ctx.fillText(relText, midX, midY);
       }
       if (ctx.restore) ctx.restore();
     });
+
+    const ARCHETYPE_COLORS = {
+      protagonist: '#ef4444',
+      antagonist: '#a855f7',
+      mentor: '#f59e0b',
+      ally: '#10b981',
+      deity: '#38bdf8',
+      sovereign: '#ec4899',
+      wanderer: '#6366f1'
+    };
 
     charNodes.forEach(n => {
       const isHovered = hoveredCharId === n.char.id;
       const isDimmed = hoveredCharId && hoveredCharId !== n.char.id;
 
       if (ctx.save) ctx.save();
-      if (isDimmed) ctx.globalAlpha = 0.3;
+      if (isDimmed) ctx.globalAlpha = 0.25;
 
       const codexTheme = ACCENT_THEMES[currentAccentTheme] || ACCENT_THEMES['crimson'];
-      const codexAccentColor = codexTheme.accent;
-      const codexGlowColor = codexTheme.redGlowStrong || 'rgba(239, 68, 68, 0.5)';
-
-      ctx.shadowColor = codexAccentColor;
-      ctx.shadowBlur = isHovered ? 20 : 8;
+      const archKey = String(n.char.archetype || '').toLowerCase();
+      const nodeAccent = ARCHETYPE_COLORS[archKey] || codexTheme.accent || '#ef4444';
 
       const isLightBase = currentBaseTheme === 'light';
       const isSepiaBase = currentBaseTheme === 'sepia';
 
-      ctx.fillStyle = isLightBase ? '#ffffff' : isSepiaBase ? '#fbf0d9' : '#0f111a';
+      // 1. Soft radial aura halo around character node
+      if (typeof ctx.createRadialGradient === 'function') {
+        const auraR = n.r * (isHovered ? 2.1 : 1.65);
+        const codexAuraGrad = ctx.createRadialGradient(n.x, n.y, n.r * 0.3, n.x, n.y, auraR);
+        codexAuraGrad.addColorStop(0, nodeAccent);
+        codexAuraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        if (ctx.save) ctx.save();
+        ctx.globalAlpha = (isDimmed ? 0.25 : 1) * (isHovered ? 0.36 : 0.18);
+        ctx.fillStyle = codexAuraGrad;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, auraR, 0, Math.PI * 2);
+        ctx.fill();
+        if (ctx.restore) ctx.restore();
+      }
+
+      // 2. 3D Jewel Core Sphere
       ctx.beginPath();
       ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      if (typeof ctx.createRadialGradient === 'function') {
+        const codexCoreGrad = ctx.createRadialGradient(
+          n.x - n.r * 0.28,
+          n.y - n.r * 0.28,
+          n.r * 0.1,
+          n.x,
+          n.y,
+          n.r
+        );
+        if (isLightBase || isSepiaBase) {
+          codexCoreGrad.addColorStop(0, '#ffffff');
+          codexCoreGrad.addColorStop(1, isSepiaBase ? '#f5e6c8' : '#f1f5f9');
+        } else {
+          codexCoreGrad.addColorStop(0, isHovered ? nodeAccent : 'rgba(38, 43, 62, 0.96)');
+          codexCoreGrad.addColorStop(0.55, 'rgba(18, 21, 32, 0.96)');
+          codexCoreGrad.addColorStop(1, 'rgba(10, 12, 18, 0.98)');
+        }
+        ctx.fillStyle = codexCoreGrad;
+      } else {
+        ctx.fillStyle = isLightBase ? '#ffffff' : isSepiaBase ? '#fbf0d9' : '#0f111a';
+      }
       ctx.fill();
 
-      ctx.strokeStyle = isHovered ? codexAccentColor : codexGlowColor;
-      ctx.lineWidth = isHovered ? 3 : 2;
+      ctx.strokeStyle = isHovered ? '#ffffff' : nodeAccent;
+      ctx.lineWidth = isHovered ? 2.6 : 2.0;
+      ctx.stroke();
+
+      // 3. Inner geometric ring
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, Math.max(8, n.r - 5), 0, Math.PI * 2);
+      ctx.strokeStyle = nodeAccent;
+      ctx.lineWidth = 0.9;
       ctx.stroke();
 
       if (typeof ctx.fillText === 'function') {
-        ctx.font = "bold 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-        ctx.fillStyle = (isLightBase || isSepiaBase) ? codexAccentColor : '#fff';
+        ctx.font = "700 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        ctx.fillStyle = (isLightBase || isSepiaBase) ? nodeAccent : '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText((n.char.name || 'C').charAt(0), n.x, n.y);
 
-        ctx.font = "500 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-        ctx.fillStyle = isLightBase ? '#111827' : isSepiaBase ? '#2d241e' : (isHovered ? '#fff' : '#cbd5e1');
-        ctx.fillText(n.char.name, n.x, n.y + n.r + 16);
+        // 4. Floating glass pill for Character Name + Archetype caption
+        const charName = n.char.name || 'Character';
+        ctx.font = "600 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        const nameW = typeof ctx.measureText === 'function' ? ctx.measureText(charName).width : charName.length * 7;
+        const pillW = Math.max(84, nameW + 20);
+        const pillH = 20;
+        const pillX = n.x - pillW / 2;
+        const pillY = n.y + n.r + 7;
+
+        ctx.fillStyle = (isLightBase || isSepiaBase) ? 'rgba(255, 255, 255, 0.92)' : 'rgba(13, 15, 23, 0.88)';
+        ctx.strokeStyle = isHovered ? nodeAccent : 'rgba(255, 255, 255, 0.16)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        drawRoundRect(ctx, pillX, pillY, pillW, pillH, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = isLightBase ? '#111827' : isSepiaBase ? '#2d241e' : '#ffffff';
+        ctx.fillText(charName, n.x, pillY + pillH / 2);
+
+        if (n.char.archetype) {
+          ctx.font = "500 9.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+          ctx.fillStyle = nodeAccent;
+          ctx.fillText(String(n.char.archetype).toUpperCase(), n.x, pillY + pillH + 11);
+        }
       }
 
       if (ctx.restore) ctx.restore();
@@ -11078,6 +11501,7 @@
       }
       if (mapStudioToolbar) mapStudioToolbar.classList.remove('hidden');
       if (mapStage) mapStage.classList.add('paint-mode-active');
+      if (mapViewport) mapViewport.classList.add('paint-mode-active');
 
       ensurePaintCanvas();
       if (!mapStudioLayers || mapStudioLayers.length === 0) {
@@ -11092,6 +11516,7 @@
       if (mapStudioToolbar) mapStudioToolbar.classList.add('hidden');
       if (mapLayersPanel) mapLayersPanel.classList.add('hidden');
       if (mapStage) mapStage.classList.remove('paint-mode-active');
+      if (mapViewport) mapViewport.classList.remove('paint-mode-active');
 
       if (studioPolygonPoints && studioPolygonPoints.length > 0) {
         finishPolygonDrawing();
@@ -13175,6 +13600,255 @@
       window.updateAtlasNavigationUI = updateAtlasNavigationUI;
       window.applyAnimatedTheme = applyAnimatedTheme;
       window.getActiveAnimatedTheme = () => currentAnimatedTheme;
+
+      // ─────────────────────────────────────────────────────────────
+      // Native Rust / Tauri v2 Bridge (`window.RustBridge`)
+      // Automatically routes to Rust commands when running inside Tauri v2
+      // (`src-tauri/src/lib.rs` & `src-tauri/src/core.rs`), with seamless
+      // synchronous/Promise fallback in browser and Electron environments.
+      // ─────────────────────────────────────────────────────────────
+      const RustBridge = {
+        isTauri() {
+          if (typeof window === 'undefined') return false;
+          return Boolean(
+            (window.__TAURI_INTERNALS__ && typeof window.__TAURI_INTERNALS__.invoke === 'function') ||
+            (window.__TAURI__ && window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function')
+          );
+        },
+
+        async invoke(cmd, args = {}) {
+          if (typeof window !== 'undefined') {
+            if (window.__TAURI_INTERNALS__ && typeof window.__TAURI_INTERNALS__.invoke === 'function') {
+              return window.__TAURI_INTERNALS__.invoke(cmd, args);
+            }
+            if (window.__TAURI__ && window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function') {
+              return window.__TAURI__.core.invoke(cmd, args);
+            }
+          }
+          throw new Error(`Tauri Rust runtime not active for command: ${cmd}`);
+        },
+
+        async getRuntimeInfo() {
+          if (this.isTauri()) {
+            return this.invoke('rust_runtime_info');
+          }
+          return {
+            backend: (typeof window !== 'undefined' && window.electronAPI) ? 'electron' : 'web-js',
+            version: APP_VERSION,
+            arch: 'wasm-or-js',
+            os: 'browser'
+          };
+        },
+
+        formatDurationSeconds(seconds = 0) {
+          const sec = Math.max(0, Math.floor(Number(seconds) || 0));
+          if (sec === 0) return '0m';
+          if (sec < 60) return '< 1m';
+          const totalMins = Math.floor((sec + 30) / 60);
+          if (totalMins < 60) return `${totalMins}m`;
+          const hrs = Math.floor(totalMins / 60);
+          const remMins = totalMins % 60;
+          return remMins === 0 ? `${hrs}h` : `${hrs}h ${remMins}m`;
+        },
+
+        async computeMetrics(text = '') {
+          if (this.isTauri()) {
+            return this.invoke('rust_compute_metrics', { text: String(text || '') });
+          }
+          const raw = String(text || '');
+          const chars = Array.from(raw).length;
+          const charsNoSpaces = Array.from(raw.replace(/\s+/g, '')).length;
+          const wordsArr = raw.trim() ? raw.trim().split(/\s+/).filter(w => /[\p{L}\p{N}]/u.test(w)) : [];
+          const words = wordsArr.length;
+          if (words === 0) {
+            return {
+              words: 0,
+              chars,
+              charsNoSpaces,
+              sentences: 0,
+              paragraphs: 0,
+              avgSentenceLength: 0,
+              readingTimeSec: 0,
+              readingTimeFormatted: '0m',
+              speakingTimeSec: 0,
+              speakingTimeFormatted: '0m',
+              fleschReadingEase: 100,
+              readabilityLabel: 'N/A'
+            };
+          }
+          const sentences = Math.max(1, raw.split(/[.!?]+/).filter(s => /[\p{L}\p{N}]/u.test(s)).length);
+          const paragraphs = Math.max(1, raw.replace(/\r\n/g, '\n').split(/\n\s*\n/).filter(p => p.trim().length > 0).length);
+          const avgSentenceLength = Math.round((words / sentences) * 10) / 10;
+          const readingTimeSec = Math.ceil((words / 225) * 60);
+          const speakingTimeSec = Math.ceil((words / 130) * 60);
+
+          let totalSyllables = 0;
+          for (const w of wordsArr) {
+            totalSyllables += countSyllablesInWord(w);
+          }
+          const asl = words / sentences;
+          const asw = totalSyllables / words;
+          const rawFlesch = 206.835 - (1.015 * asl) - (84.6 * asw);
+          const fleschReadingEase = Math.round(Math.max(0, Math.min(100, rawFlesch)) * 10) / 10;
+          let readabilityLabel = 'Dense / Academic Lore';
+          if (fleschReadingEase >= 80) readabilityLabel = 'Accessible / Swift Pace';
+          else if (fleschReadingEase >= 60) readabilityLabel = 'Standard Literary Fiction';
+          else if (fleschReadingEase >= 40) readabilityLabel = 'Rich / Elevated Prose';
+
+          return {
+            words,
+            chars,
+            charsNoSpaces,
+            sentences,
+            paragraphs,
+            avgSentenceLength,
+            readingTimeSec,
+            readingTimeFormatted: this.formatDurationSeconds(readingTimeSec),
+            speakingTimeSec,
+            speakingTimeFormatted: this.formatDurationSeconds(speakingTimeSec),
+            fleschReadingEase,
+            readabilityLabel
+          };
+        },
+
+        async extractWikiLinks(markdown = '') {
+          if (this.isTauri()) {
+            return this.invoke('rust_extract_wiki_links', { markdown: String(markdown || '') });
+          }
+          const links = [];
+          const lines = String(markdown || '').replace(/\r\n/g, '\n').split('\n');
+          let inCode = false;
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (line.trim().startsWith('```')) {
+              inCode = !inCode;
+              continue;
+            }
+            if (inCode) continue;
+            // Strip inline code spans (`...`) so code examples don't produce phantom wiki-links
+            const cleanedLine = line.replace(/`[^`\n]*`/g, '');
+            const re = /\[\[([^|\[\]\n]+)(?:\|([^\[\]\n]*))?\]\]/g;
+            let m;
+            while ((m = re.exec(cleanedLine)) !== null) {
+              const target = (m[1] || '').trim();
+              const alias = (m[2] !== undefined ? m[2].trim() : '') || target;
+              if (target) {
+                links.push({ target, alias, line: i + 1 });
+              }
+            }
+          }
+          return links;
+        },
+
+        async extractOutline(markdown = '') {
+          if (this.isTauri()) {
+            return this.invoke('rust_extract_outline', { markdown: String(markdown || '') });
+          }
+          const entries = [];
+          const lines = String(markdown || '').replace(/\r\n/g, '\n').split('\n');
+          let inCode = false;
+          for (let i = 0; i < lines.length; i++) {
+            const trimmed = lines[i].trim();
+            if (trimmed.startsWith('```')) {
+              inCode = !inCode;
+              continue;
+            }
+            if (inCode) continue;
+            if (/^(?:\*\s*){3,}$/.test(trimmed) && /\s/.test(trimmed)) {
+              entries.push({ level: 0, text: '* * * (Scene Break)', line: i + 1, isSceneBreak: true });
+              continue;
+            }
+            const hm = trimmed.match(/^(#{1,6})\s+(.+)$/);
+            if (hm) {
+              entries.push({ level: hm[1].length, text: hm[2].trim(), line: i + 1, isSceneBreak: false });
+            }
+          }
+          return entries;
+        },
+
+        async renderMarkdown(markdown = '') {
+          if (this.isTauri()) {
+            return this.invoke('rust_render_markdown', { markdown: String(markdown || '') });
+          }
+          return (typeof Markdown !== 'undefined' && Markdown.render) ? Markdown.render(String(markdown || '')) : String(markdown || '');
+        },
+
+        async validateSpeyPackage(jsonStr = '') {
+          if (this.isTauri()) {
+            return this.invoke('rust_validate_spey_package', { jsonStr: String(jsonStr || '') });
+          }
+          const parsed = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
+          const notes = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.notes) ? parsed.notes : null);
+          if (!notes) throw new Error("Missing 'notes' array in .spey package");
+          let chapters = 0, lore = 0, world = 0, drafts = 0, wordCount = 0;
+          for (const n of notes) {
+            const c = String((n && n.category) || 'draft').toLowerCase();
+            if (c === 'chapter') chapters++;
+            else if (c === 'lore') lore++;
+            else if (c === 'world') world++;
+            else drafts++;
+            const body = String((n && n.body) || '').trim();
+            if (body) wordCount += body.split(/\s+/).filter(w => /[\p{L}\p{N}]/u.test(w)).length;
+          }
+          return {
+            valid: true,
+            format: (parsed && parsed.format) || 'lord-spey-package',
+            version: (parsed && parsed.version) || 1,
+            projectName: (parsed && parsed.projectName) || 'Untitled Project',
+            stats: {
+              totalNotes: notes.length,
+              chapters,
+              lore,
+              world,
+              drafts,
+              wordCount,
+              mapPins: (parsed && Array.isArray(parsed.mapPins)) ? parsed.mapPins.length : 0,
+              timelineEvents: (parsed && Array.isArray(parsed.timelineEvents)) ? parsed.timelineEvents.length : 0,
+              characters: (parsed && Array.isArray(parsed.characters)) ? parsed.characters.length : 0,
+              relationships: (parsed && Array.isArray(parsed.relationships)) ? parsed.relationships.length : 0
+            }
+          };
+        },
+
+        async readSpeyFile(filePath) {
+          return this.invoke('rust_read_spey_file', { path: String(filePath || '') });
+        },
+
+        async writeSpeyFile(filePath, content) {
+          const str = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
+          return this.invoke('rust_write_spey_file', { path: String(filePath || ''), content: str });
+        },
+
+        async compareVersions(v1, v2) {
+          if (this.isTauri()) {
+            return this.invoke('rust_compare_versions', { v1: String(v1 || ''), v2: String(v2 || '') });
+          }
+          return compareSemver(v1, v2);
+        },
+
+        async checkStartupSpeyFile() {
+          if (!this.isTauri()) return null;
+          try {
+            const payload = await this.invoke('rust_get_startup_spey');
+            if (payload && payload.content && typeof window !== 'undefined' && typeof window.__handleOpenedSpeyFile === 'function') {
+              const sig = `${payload.filePath || payload.fileName || 'bundle.spey'}:${String(payload.content).length}`;
+              if (!window.__LAST_STARTUP_SPEY_SIG__ || window.__LAST_STARTUP_SPEY_SIG__ !== sig) {
+                window.__LAST_STARTUP_SPEY_SIG__ = sig;
+                window.__handleOpenedSpeyFile(payload);
+              }
+            }
+            return payload || null;
+          } catch (_) {
+            return null;
+          }
+        }
+      };
+
+      window.RustBridge = RustBridge;
+      if (RustBridge.isTauri()) {
+        RustBridge.checkStartupSpeyFile();
+      }
+
       if (typeof window.addEventListener === 'function') {
         window.addEventListener('focus', onWindowFocusOrActive);
       }

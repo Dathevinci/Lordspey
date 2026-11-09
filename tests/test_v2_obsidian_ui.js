@@ -132,4 +132,39 @@ const solPins = StorageModule.getAllMapPins('sys-solitude');
 assert(solPins.some(p => p.pinType === 'planet' && p.subMapId === 'world-aethelgard'), 'Solitude system must link to habitable planet');
 console.log('✓ Storage.generateUniverseStarchartTemplate() functional test passed');
 
+// 9. Redesigned UI, Luminescent Graph Nodes, Map Floating HUD Docks & Bento Settings
+console.log('--- 9. Redesigned UI, Graph Nodes, Map HUD Docks & Bento Settings ---');
+assert(indexHtml.includes('id="dashboard-writing-pulse"'), 'Missing #dashboard-writing-pulse in index.html');
+assert(indexHtml.includes('id="pulse-total-words"'), 'Missing #pulse-total-words in index.html');
+assert(indexHtml.includes('id="pulse-total-chapters"'), 'Missing #pulse-total-chapters in index.html');
+assert(indexHtml.includes('id="pulse-total-lore"'), 'Missing #pulse-total-lore in index.html');
+assert(indexHtml.includes('class="map-floating-filter-dock"'), 'Missing .map-floating-filter-dock in index.html');
+assert(indexHtml.includes('class="map-floating-telemetry-dock"'), 'Missing .map-floating-telemetry-dock in index.html');
+assert(indexHtml.includes('id="settings-search-input"'), 'Missing #settings-search-input in index.html');
+assert(indexHtml.includes('id="settings-search-empty"'), 'Missing #settings-search-empty in index.html');
+assert(indexHtml.includes('id="settings-typography-preview"'), 'Missing #settings-typography-preview in index.html');
+assert(indexHtml.includes('id="settings-typography-sample"'), 'Missing #settings-typography-sample in index.html');
+assert(indexHtml.includes('id="settings-typography-meta"'), 'Missing #settings-typography-meta in index.html');
+
+assert(appJsRaw.includes('MAP_PIN_GLYPHS'), 'app.js must define MAP_PIN_GLYPHS for semantic landmark icons');
+assert(appJsRaw.includes('map-pin-glyph'), 'renderMapPins() must render .map-pin-glyph inside .map-pin-dot');
+assert(appJsRaw.includes('updateSettingsTypographyPreview'), 'app.js must implement updateSettingsTypographyPreview()');
+assert(appJsRaw.includes('filterSettingsGroups'), 'app.js must implement filterSettingsGroups()');
+assert(appJsRaw.includes('sphereGrad'), 'drawLivingGalaxy() must render 3D jewel sphere radial gradients on nodes');
+assert(appJsRaw.includes('haloGrad'), 'drawLivingGalaxy() must render radial corona halos on category hubs');
+assert(appJsRaw.includes('entSphereGrad'), 'drawLivingGalaxy() must render 3D jewel sphere radial gradients on manual entity nodes');
+assert(appJsRaw.includes('codexAuraGrad'), 'renderCodexWeb() must render radial aura halos on character web nodes');
+assert(appJsRaw.includes('codexCoreGrad'), 'renderCodexWeb() must render 3D jewel core spheres on character web nodes');
+
+assert(styleCss.includes('.dashboard-writing-pulse'), 'style.css must style .dashboard-writing-pulse');
+assert(styleCss.includes('.map-floating-filter-dock'), 'style.css must style .map-floating-filter-dock');
+assert(styleCss.includes('.map-viewport.paint-mode-active .map-floating-filter-dock'), 'style.css must shift .map-floating-filter-dock below #map-studio-toolbar in paint mode');
+assert(styleCss.includes('.map-floating-telemetry-dock'), 'style.css must style .map-floating-telemetry-dock');
+assert(styleCss.includes('.map-pin-glyph'), 'style.css must style .map-pin-glyph');
+assert(styleCss.includes('transform: rotate(45deg)'), 'style.css must counter-rotate .map-pin-glyph by 45deg against .map-pin-head');
+assert(styleCss.includes('.settings-typography-preview'), 'style.css must style .settings-typography-preview');
+assert(styleCss.includes('.settings-search-empty'), 'style.css must style .settings-search-empty');
+console.log('✓ Dashboard Writing Pulse, Luminescent Graph & Codex Nodes, Map HUD Docks & Bento Settings verified');
+
 console.log('\n=== ALL v2.0 OBSIDIAN UI & UNIVERSE ATLAS TESTS PASSED (100%) ===\n');
+

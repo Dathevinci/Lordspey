@@ -1,0 +1,40 @@
+[package]
+name = "lord-spey"
+version = "2.1.2"
+description = "Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding — Native Rust & Tauri v2 Core"
+authors = ["Lord Spey"]
+license = "MIT"
+repository = "https://github.com/Dathevinci/Lordspey"
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "lord_spey_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "lord-spey"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+wasm-bindgen = { version = "0.2", optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tauri = { version = "2", features = ["protocol-asset"] }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+wasm = ["dep:wasm-bindgen"]
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

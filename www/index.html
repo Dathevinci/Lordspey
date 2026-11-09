@@ -230,6 +230,15 @@
         <h2 class="menu-title font-cinzel">LORD SPEY</h2>
         <p class="menu-subtitle">Distraction-free workspace for crafting prose, connecting lore, and charting story worlds.</p>
 
+        <!-- Author Writing Pulse Summary Strip -->
+        <div id="dashboard-writing-pulse" class="dashboard-writing-pulse" aria-label="Manuscript Writing Pulse">
+          <span class="pulse-stat"><strong id="pulse-total-words">0</strong> words</span>
+          <span class="pulse-sep">·</span>
+          <span class="pulse-stat"><strong id="pulse-total-chapters">0</strong> chapters</span>
+          <span class="pulse-sep">·</span>
+          <span class="pulse-stat"><strong id="pulse-total-lore">0</strong> lore &amp; world</span>
+        </div>
+
         <!-- Serene Primary Hero Action & Quick Creation Cluster -->
         <div class="hero-actions">
           <button class="hero-primary-btn menu-card" id="menu-btn-chapter" data-action="new-chapter" title="Start writing a new manuscript chapter">
@@ -508,10 +517,10 @@
             </button>
           </div>
 
-          <span class="meta-separator">|</span>
+          <span class="meta-separator toolbar-wb-sep">|</span>
 
           <!-- Worldbuilding Systems Quick Launch -->
-          <div class="toolbar-cluster" title="Worldbuilding Systems">
+          <div class="toolbar-cluster toolbar-wb-cluster" title="Worldbuilding Systems">
             <button id="btn-toolbar-map" class="icon-btn toolbar-wb-btn" title="World Map (Ctrl+M)">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
             </button>
@@ -814,62 +823,39 @@
             <h3 id="map-modal-title">Universe Atlas &amp; Map Codex</h3>
             <nav id="map-atlas-breadcrumbs" class="map-atlas-breadcrumbs" aria-label="Universe Atlas Breadcrumbs"></nav>
           </div>
-          <div class="map-stats">
-            <span id="map-tier-badge" class="badge badge-atlas">World</span>
-            <span class="hud-sep">·</span>
-            <span id="map-pin-count">0 pins</span>
-            <span class="hud-sep">·</span>
-            <span id="map-coords-indicator">X: 50.0% · Y: 50.0%</span>
-            <span class="hud-sep">·</span>
-            <span id="map-zoom-level" class="map-zoom-level">100%</span>
+          <!-- Realm Tier Switcher Segmented Control -->
+          <div class="map-tier-segmented" role="radiogroup" aria-label="Atlas Scale Tier">
+            <button type="button" class="tier-seg-btn" id="tier-btn-galaxy" data-map-tier="galaxy" title="Galaxy / Universe Starchart">🌌 Universe</button>
+            <button type="button" class="tier-seg-btn" id="tier-btn-system" data-map-tier="system" title="Star System &amp; Planetary Orbits">☀️ Star System</button>
+            <button type="button" class="tier-seg-btn active" id="tier-btn-world" data-map-tier="world" title="Planetary Surface World Map">🪐 Planetary World</button>
+            <button type="button" class="tier-seg-btn" id="tier-btn-local" data-map-tier="local" title="Regional Realm, Citadel or Station">🏰 Realm / Citadel</button>
           </div>
+          <select id="map-atlas-select" class="form-select form-select-sm map-atlas-select" title="Universe Atlas: Switch Celestial Map &amp; Tier">
+            <option value="default">🌍 Known Realm (World)</option>
+          </select>
+          <button id="btn-atlas-new-map" class="btn btn-sm btn-ghost" title="Create child sub-map or sibling star system / world map">
+            <span>+ Sub-Map</span>
+          </button>
+          <button id="btn-atlas-delete-map" class="btn btn-sm btn-ghost btn-atlas-delete hidden" title="Delete current realm map from Atlas">
+            <span>🗑️</span>
+          </button>
         </div>
         <div class="map-controls">
-          <div class="map-search-wrap">
-            <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            <input type="text" id="map-pin-search" placeholder="Filter pins…" autocomplete="off" />
-          </div>
-          <div class="map-filter-tags">
-            <button class="filter-pill active" data-map-filter="all">All</button>
-            <button class="filter-pill" data-map-filter="chapter">Chapters</button>
-            <button class="filter-pill" data-map-filter="lore">Lore</button>
-            <button class="filter-pill" data-map-filter="world">World</button>
-            <button class="filter-pill" data-map-filter="draft">Drafts</button>
-          </div>
           <div class="map-action-btns">
-            <!-- Realm Tier Switcher Segmented Control -->
-            <div class="map-tier-segmented" role="radiogroup" aria-label="Atlas Scale Tier">
-              <button type="button" class="tier-seg-btn" id="tier-btn-galaxy" data-map-tier="galaxy" title="Galaxy / Universe Starchart">🌌 Universe</button>
-              <button type="button" class="tier-seg-btn" id="tier-btn-system" data-map-tier="system" title="Star System &amp; Planetary Orbits">☀️ Star System</button>
-              <button type="button" class="tier-seg-btn active" id="tier-btn-world" data-map-tier="world" title="Planetary Surface World Map">🪐 Planetary World</button>
-              <button type="button" class="tier-seg-btn" id="tier-btn-local" data-map-tier="local" title="Regional Realm, Citadel or Station">🏰 Realm / Citadel</button>
-            </div>
-            <select id="map-atlas-select" class="form-select form-select-sm map-atlas-select" title="Universe Atlas: Switch Celestial Map &amp; Tier">
-              <option value="default">🌍 Known Realm (World)</option>
-            </select>
-            <button id="btn-atlas-new-map" class="btn btn-sm btn-ghost" title="Create child sub-map or sibling star system / world map">
-              <span>🌌 + Sub-Map</span>
-            </button>
-            <button type="button" id="btn-generate-universe-map" class="btn btn-sm btn-ghost btn-universe-template" title="Populate Complete Universe Starchart with Star Systems, Planetary Bodies &amp; Hyperlanes">
-              <span>🌌 Universe Template</span>
-            </button>
-            <button id="btn-atlas-delete-map" class="btn btn-sm btn-ghost btn-atlas-delete hidden" title="Delete current realm map from Atlas">
-              <span>🗑️ Delete Map</span>
-            </button>
-
-            <div class="map-header-divider"></div>
-
             <button id="btn-map-drop-pin" class="btn btn-sm btn-primary" title="Click to enter pin drop mode or place a pin">
               <span>+ Add Pin</span>
             </button>
             <button id="btn-map-paint-mode" class="btn btn-sm btn-ghost" title="Toggle Map Drawing & Painting Studio">
               <span>🎨 Paint Studio</span>
             </button>
+            <button type="button" id="btn-generate-universe-map" class="btn btn-sm btn-ghost btn-universe-template" title="Populate Complete Universe Starchart with Star Systems, Planetary Bodies &amp; Hyperlanes">
+              <span>🌌 Universe Template</span>
+            </button>
 
             <!-- Quick Presets Dropdown Container -->
             <div class="map-dropdown-container">
               <button type="button" id="btn-quick-biome-menu" class="btn btn-sm btn-ghost" title="Instant 1-Click Biome &amp; Map Generators">
-                <span>✨ Quick Presets ▾</span>
+                <span>✨ Presets ▾</span>
               </button>
               <div id="map-quick-biomes-dropdown" class="map-floating-dropdown hidden">
                 <div class="dropdown-header">1-Click Biome Generators</div>
@@ -962,11 +948,6 @@
               </div>
             </div>
 
-            <div class="map-zoom-cluster" title="Map Zoom Controls">
-              <button id="btn-map-zoom-in" class="icon-btn btn-xs" title="Zoom in (+)">＋</button>
-              <button id="btn-map-zoom-out" class="icon-btn btn-xs" title="Zoom out (-)">－</button>
-              <button id="btn-map-zoom-reset" class="icon-btn btn-xs" title="Reset view">⊙</button>
-            </div>
             <button id="btn-close-map" class="icon-btn" title="Close Map (Esc)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -975,6 +956,39 @@
       </div>
 
       <div class="map-viewport" id="map-viewport">
+        <!-- Floating Top-Left Pin Search & Category Filter HUD Dock -->
+        <div class="map-floating-filter-dock" aria-label="Pin Search and Category Filters">
+          <div class="map-search-wrap">
+            <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="map-pin-search" placeholder="Filter pins…" autocomplete="off" />
+          </div>
+          <div class="map-filter-tags">
+            <button class="filter-pill active" data-map-filter="all">All</button>
+            <button class="filter-pill" data-map-filter="chapter">Chapters</button>
+            <button class="filter-pill" data-map-filter="lore">Lore</button>
+            <button class="filter-pill" data-map-filter="world">World</button>
+            <button class="filter-pill" data-map-filter="draft">Drafts</button>
+          </div>
+        </div>
+
+        <!-- Floating Bottom-Right Telemetry & Zoom Cluster HUD Dock -->
+        <div class="map-floating-telemetry-dock" aria-label="Atlas Coordinates and Zoom Controls">
+          <div class="map-stats">
+            <span id="map-tier-badge" class="badge badge-atlas">World</span>
+            <span class="hud-sep">·</span>
+            <span id="map-pin-count">0 pins</span>
+            <span class="hud-sep">·</span>
+            <span id="map-coords-indicator">X: 50.0% · Y: 50.0%</span>
+            <span class="hud-sep">·</span>
+            <span id="map-zoom-level" class="map-zoom-level">100%</span>
+          </div>
+          <div class="map-zoom-cluster" title="Map Zoom Controls">
+            <button id="btn-map-zoom-in" class="icon-btn btn-xs" title="Zoom in (+)">＋</button>
+            <button id="btn-map-zoom-out" class="icon-btn btn-xs" title="Zoom out (-)">－</button>
+            <button id="btn-map-zoom-reset" class="icon-btn btn-xs" title="Reset view">⊙</button>
+          </div>
+        </div>
+
         <!-- Floating placement banner when drop pin mode is on -->
         <div id="map-placement-hint" class="map-placement-hint hidden">
           <span>Pin Placement Mode: Click anywhere on the map to drop a pin.</span>
@@ -2116,6 +2130,10 @@
       <div class="settings-modal-body-wrapper">
         <!-- Obsidian Left Tab Navigation -->
         <nav class="settings-nav" aria-label="Settings Categories">
+          <div class="settings-search-box">
+            <svg class="settings-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="settings-search-input" class="settings-search-input" placeholder="Filter settings…" autocomplete="off" aria-label="Filter settings" />
+          </div>
           <button type="button" class="settings-tab-btn active" data-tab="vault">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             <span>Project &amp; Vault</span>
@@ -2136,6 +2154,9 @@
 
         <!-- Right Content Panes -->
         <div class="settings-panes">
+          <div id="settings-search-empty" class="settings-search-empty hidden" role="status">
+            No matching settings found. Try another keyword or clear the filter.
+          </div>
           <!-- ── Tab 1: Project & .spey Vault ── -->
           <div class="settings-pane active" id="settings-pane-vault">
             <div class="settings-group">
@@ -2306,6 +2327,17 @@
                   <option value="4">4 spaces</option>
                   <option value="8">8 spaces</option>
                 </select>
+              </div>
+
+              <!-- Live Manuscript Typography Preview Card -->
+              <div id="settings-typography-preview" class="settings-typography-preview" aria-label="Live Typography Preview">
+                <div class="typography-preview-header">
+                  <span class="typography-preview-badge">Live Manuscript Preview</span>
+                  <span id="settings-typography-meta" class="typography-preview-meta">Lora · 15px · 1.8×</span>
+                </div>
+                <p id="settings-typography-sample" class="typography-preview-sample">
+                  “Beyond the Obsidian Gate, the starlight of the Veil shimmered across the silent citadel—an ancient chronicle waiting to be written.”
+                </p>
               </div>
             </div>
 
