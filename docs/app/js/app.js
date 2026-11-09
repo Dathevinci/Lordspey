@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '2.1.2';
+  const APP_VERSION = '2.2.0';
   const UPDATE_API_URL = 'https://api.github.com/repos/Dathevinci/Lordspey/releases/latest';
 
   const ALIAS_SELECTORS = {
@@ -1349,10 +1349,11 @@
 
     showMainMenu();
 
-    // Version 2.1.2 Celebration Launch Announcement ("We finally made it to Version 2.1.2!")
-    // Ensures zero overlay stacking on launch: shows only the clean v2.1.2 release popup once.
+    // Version 2.2.0 Celebration Launch Announcement ("We finally made it to Version 2.2.0!")
+    // Ensures zero overlay stacking on launch: shows only the clean v2.2.0 release popup once.
     try {
-      if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_v2_1_2_seen')) {
+      if (typeof localStorage !== 'undefined' && !localStorage.getItem('lordspey_v2_2_0_seen')) {
+        localStorage.setItem('lordspey_v2_2_0_seen', 'true');
         localStorage.setItem('lordspey_v2_1_2_seen', 'true');
         localStorage.setItem('lordspey_v2_seen', 'true');
         localStorage.setItem('lordspey_tutorial_seen', 'true');
@@ -12815,14 +12816,16 @@
   function renderWhatsNewHtml(features = WHATS_NEW_V110_FEATURES) {
     return `
       <div class="whats-new-intro" style="font-size: 0.86rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
-        <strong>We finally made it to Version 2.1.2!</strong> A unified Obsidian-style workspace with docked views (zero overlay clutter), Universe-first starcharts, and fluid 60fps responsiveness:
+        <strong>We finally made it to Version 2.2.0!</strong> An eye-catching Author Studio powered by a Native Rust &amp; Tauri v2 Core Engine, 3D Luminescent Galaxy &amp; Codex Nodes, Floating Universe Atlas HUD Docks, and Bento Settings:
       </div>
       <div class="whats-new-v111-patch" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px;">
-        <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-primary); margin-bottom: 6px;">v2.1.2 Obsidian Workspace &amp; Universe Atlas</div>
+        <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-primary); margin-bottom: 6px;">v2.2.0 Native Rust Core, Luminescent Nodes, Atlas HUD Docks &amp; Bento Settings</div>
         <ul style="font-size: 0.82rem; color: var(--text-secondary); margin: 0; padding-left: 18px; line-height: 1.5;">
-          <li><strong>Docked Obsidian Workspace Views (Zero Overlay Slop):</strong> Galaxy Graph, Universe Atlas, Chronology Timeline, and Character Codex dock flush into the workspace pane right next to the 40px Activity Ribbon—no floating modal popups or stacked backdrops.</li>
-          <li><strong>Universe-First Cartography:</strong> Replaced hardcoded country maps with a blank Universe &amp; Cosmic Starchart canvas where authors map their own galaxies, star systems, planetary orbits, and realms. Includes 1-click Universe Generator &amp; Quick Biomes.</li>
-          <li><strong>Obsidian Activity Ribbon &amp; Status Bar:</strong> Instant 1-click switching between Vault Explorer, Graph, Universe Atlas, Timeline, and Codex with live word/character/backlink telemetry.</li>
+          <li><strong>Native Rust &amp; Tauri v2 Core Engine:</strong> Pure Rust manuscript engine (<code>src-tauri/</code> &amp; <code>window.RustBridge</code>) delivering instant word/sentence/paragraph metrics, Flesch-Kincaid readability, code-aware <code>[[Wiki-Link]]</code> &amp; outline indexing, and validated <code>.spey</code> vault I/O with seamless Web/Electron fallback.</li>
+          <li><strong>Eye-Catching Author UI &amp; Writing Pulse:</strong> Live Dashboard Writing Pulse strip tracking total vault words, chapters, lore entries, and daily word goals alongside a de-cluttered distraction-free editor top bar.</li>
+          <li><strong>3D Luminescent Galaxy Graph &amp; Codex Web Nodes:</strong> Radial 3D sphere lighting, specular highlights, and atmospheric corona halos across the Living Galaxy Graph and Character Relationship Web.</li>
+          <li><strong>Universe Atlas Floating HUD Docks &amp; Jewel Pins:</strong> Frosted-glass floating filter and coordinate telemetry docks on the map canvas with 12 bespoke vector landmark icons (<code>MAP_PIN_GLYPHS</code>) and Docked Obsidian Workspace Views.</li>
+          <li><strong>Bento Settings with Instant Filter Search &amp; Typography Preview:</strong> Real-time settings search bar and interactive manuscript typography preview card (<em>Lora</em>, <em>Inter</em>, <em>JetBrains Mono</em>, <em>Playfair Display</em>).</li>
         </ul>
       </div>
       <div class="whats-new-grid">
@@ -12981,17 +12984,17 @@
     const downloadIcon = $('#btn-download-update-icon');
     const githubLink = $('#btn-view-release-github');
 
-    if (badgeEl) badgeEl.textContent = `WHAT'S NEW IN v${APP_VERSION} — VERSION 2.1.2`;
-    if (titleEl) titleEl.textContent = `We finally made it to Version 2.1.2!`;
+    if (badgeEl) badgeEl.textContent = `WHAT'S NEW IN v${APP_VERSION} — VERSION 2.2.0`;
+    if (titleEl) titleEl.textContent = `We finally made it to Version 2.2.0!`;
     if (curVerChip) curVerChip.textContent = `Installed: v${APP_VERSION}`;
     if (arrowEl) arrowEl.textContent = '✦';
     if (newVerChip) {
       newVerChip.textContent = `Latest Edition ✓`;
       newVerChip.className = 'update-version-chip update-chip-installed';
     }
-    if (notesHeadingEl) notesHeadingEl.textContent = `We finally made it to Version 2.1.2! — Release Highlights`;
+    if (notesHeadingEl) notesHeadingEl.textContent = `We finally made it to Version 2.2.0! — Release Highlights`;
     if (guaranteeEl) {
-      guaranteeEl.innerHTML = `<strong>We finally made it to Version 2.1.2!</strong> Built for serious novelists, worldbuilders, and story architects. All manuscript drafts, vault lore, universe maps, characters, and settings are active and safeguarded.`;
+      guaranteeEl.innerHTML = `<strong>We finally made it to Version 2.2.0!</strong> Built for serious novelists, worldbuilders, and story architects. All manuscript drafts, vault lore, universe maps, characters, and settings are active and safeguarded.`;
     }
     if (dismissBtn) {
       dismissBtn.textContent = 'Close';

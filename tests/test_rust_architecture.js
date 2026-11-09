@@ -2,7 +2,7 @@
  * LORD SPEY — NATIVE RUST & TAURI v2 ARCHITECTURE TEST SUITE
  * Verifies:
  * 1. Rust crate & Tauri v2 project files (Cargo.toml, build.rs, tauri.conf.json, capabilities, main.rs, lib.rs, core.rs)
- * 2. Version 2.1.2 synchronization & .spey file association in tauri.conf.json and Cargo.toml
+ * 2. Version 2.2.0 synchronization & .spey file association in tauri.conf.json and Cargo.toml
  * 3. Lexical delimiter balance ({}, (), []) and command handler registration across all Rust source files
  * 4. Pure Rust core engine API coverage (ManuscriptMetrics, WikiLink, HeadingEntry, SpeyValidationResult, WASM exports, unit tests)
  * 5. Frontend window.RustBridge functional tests (both JS fallback mode and Tauri v2 IPC invoke mode + startup .spey file delivery)
@@ -38,7 +38,7 @@ const assert = require('assert');
     console.log(`✓ Verified ${relPath} (${stat.size} bytes)`);
   }
 
-  // 2. Verify Cargo.toml & tauri.conf.json metadata and version 2.1.2 synchronization
+  // 2. Verify Cargo.toml & tauri.conf.json metadata and version 2.2.0 synchronization
   console.log('--- 2. Cargo.toml & tauri.conf.json Configuration Verification ---');
   const pkg = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf8'));
   const cargoToml = fs.readFileSync(path.join(tauriDir, 'Cargo.toml'), 'utf8');
@@ -358,9 +358,9 @@ const assert = require('assert');
     'validateSpeyPackage must reject objects missing notes array'
   );
 
-  assert.strictEqual(await RustBridge.compareVersions('v2.1.2', '2.1.2'), 0);
-  assert.strictEqual(await RustBridge.compareVersions('2.2.0', '2.1.2'), 1);
-  assert.strictEqual(await RustBridge.compareVersions('2.0.0', '2.1.2'), -1);
+  assert.strictEqual(await RustBridge.compareVersions('v2.2.0', '2.2.0'), 0);
+  assert.strictEqual(await RustBridge.compareVersions('2.3.0', '2.2.0'), 1);
+  assert.strictEqual(await RustBridge.compareVersions('2.1.2', '2.2.0'), -1);
 
   // Verify Cargo.toml & lib.rs WASM target guards
   assert(
@@ -378,7 +378,7 @@ const assert = require('assert');
     invoke: async (cmd, args) => {
       invokedCommands.push({ cmd, args });
       if (cmd === 'rust_runtime_info') {
-        return { backend: 'tauri-rust-v2', version: '2.1.2', arch: 'x86_64', os: 'windows' };
+        return { backend: 'tauri-rust-v2', version: '2.2.0', arch: 'x86_64', os: 'windows' };
       }
       if (cmd === 'rust_get_startup_spey') {
         return {

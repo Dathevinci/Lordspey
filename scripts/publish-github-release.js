@@ -25,31 +25,33 @@ async function main() {
   }
 
   const repo = 'Dathevinci/Lordspey';
-  const tag = 'v2.0.0';
-  const releaseName = 'Lord Spey v2.0.0 — Obsidian Studio, Universe Starcharts & Butter-Smooth UI';
-  const releaseBody = `## Lord Spey v2.0.0 — We finally made it to Version 2.0!
+  const tag = 'v2.2.0';
+  const releaseName = 'Lord Spey v2.2.0 — Native Rust & Tauri v2 Core Engine, Luminescent Graph/Codex Nodes, Atlas HUD Docks & Bento Settings';
+  const releaseBody = `## Lord Spey v2.2.0 — We finally made it to Version 2.2.0!
 
-A monumental release delivering an authentic Obsidian-grade interface, multi-tier Universe Starcharts, and buttery-smooth interactions.
+An eye-catching Author Studio upgrade combining a **Native Rust & Tauri v2 Core Engine**, **3D Luminescent Galaxy & Codex Web Nodes**, **Floating Universe Atlas HUD Docks**, **Bento Settings**, and a **Dashboard Writing Pulse** strip.
 
-### ✦ What's New & Improved in v2.0.0
-- **💎 Obsidian-Style Interface & Activity Ribbon**:
-  - **Activity Ribbon**: Docked left vertical toolstrip providing 1-click access to Vault File Tree (\`Ctrl+Shift+E\`), Quick Switcher (\`Ctrl+K\`), Galaxy Graph (\`Ctrl+G\`), Universe Atlas (\`Ctrl+M\`), Chronology Timelines (\`Ctrl+T\`), Character Codex (\`Ctrl+U\`), Daily Word Goals, Interactive Tutorial, and Settings (\`Ctrl+,\`).
-  - **Workspace Document Tabs Bar**: Sleek document tabs with live document title synchronization, quick close (\`Esc\`), new note (\`Ctrl+N\`), live reading mode toggle (\`Ctrl+Shift+P\`), split view (\`Ctrl+\\\`), and scene outline drawer (\`Alt+O\`).
-  - **Obsidian Bottom Status Bar**: Real-time telemetry displaying word count, character count, estimated reading time, active document name, backlinks count, editor mode, and instant save indicator.
-- **🌌 Universe Starcharts & Multi-Tier Cosmic Atlas**:
-  - Full authorial freedom to map entire universes instead of a single country map.
-  - Multi-tier hierarchy: **Galaxies / Sectors** (with galactic nucleus radiance, quadrant crosshairs, sector range rings, and coordinate labels), **Star Systems** (with radial solar cores, concentric planetary orbital rings, AU distance guides), **World Maps** (continents & biomes), and **Station / Vessel Deckplans**.
-  - **1-Click Universe Template Generator**: Generates the *Andromeda Expanse* with connected binary star systems, habitable worlds, and relic jump gates.
-- **⚡ Silky Smooth 60fps Experience**:
-  - Re-engineered transitions using hardware-accelerated cubic-bezier curves (\`cubic-bezier(0.16, 1, 0.3, 1)\`) for buttery smooth modals, sidebar collapse, and drawer slides.
-- **✨ Ambient Animated Themes**:
-  - Five calm, distraction-free backdrops (Default Serene Obsidian, Cosmic Starfield, Ethereal Nebula, Cozy Embers, Midnight Rain & Mist).
-- **🛡️ 100% Local-First Sovereign Privacy**:
-  - Zero subscriptions, zero telemetry, local \`.spey\` and Markdown exports, and automatic pre-update safety snapshots.
+### ✦ What's New & Improved in v2.2.0
+- **🦀 Native Rust & Tauri v2 Core Engine (\`src-tauri/\` & \`window.RustBridge\`)**:
+  - Pure Rust manuscript analytics engine (\`compute_manuscript_metrics\`) calculating words, characters, sentences, paragraphs, reading/speaking duration, and Flesch-Kincaid readability scores.
+  - Code-aware \`[[Wiki-Link]]\` and \`# Heading\` / \`* * *\` scene-break outline indexer (\`extract_wiki_links\`, \`extract_outline\`, \`render_markdown\`).
+  - Validated native \`.spey\` project bundle I/O (\`validate_spey_package\`, \`rust_read_spey_file\`, \`rust_write_spey_file\`, \`rust_get_startup_spey\`) with seamless Web/Electron fallback.
+- **✍️ Eye-Catching Author UI & Dashboard Writing Pulse**:
+  - **Dashboard Writing Pulse Strip (\`#dashboard-writing-pulse\`)**: Live telemetry for total vault words, chapters, lore entries, and daily word goal progress.
+  - **De-Cluttered Distraction-Free Editor**: Streamlined top bar keeping your focus on prose while secondary tools live cleanly in the Obsidian Activity Ribbon & Status Bar.
+- **🔮 3D Luminescent Galaxy Graph & Codex Web Nodes**:
+  - Radial 3D sphere lighting, specular highlights, and atmospheric corona halos across the Living Galaxy Graph (\`drawLivingGalaxy\`) and Character Relationship Web (\`renderCodexWeb\`).
+- **🗺️ Universe Atlas Floating HUD Docks & Semantic Jewel Pins**:
+  - Frosted-glass floating filter dock (\`.map-floating-filter-dock\`) and coordinate telemetry dock (\`.map-floating-telemetry-dock\`) over a full-bleed cartographic canvas.
+  - 12 bespoke vector landmark icons (\`MAP_PIN_GLYPHS\`) inside jewel-styled map pins.
+- **⚙️ Bento Settings with Instant Filter Search & Live Typography Preview**:
+  - Real-time settings search filter (\`#settings-search-input\`) and interactive manuscript typography preview card (\`#settings-typography-preview\`) for *Lora*, *Inter*, *JetBrains Mono*, and *Playfair Display*.
+- **💎 Docked Obsidian Workspace Views & 100% Local-First Privacy**:
+  - Zero overlay clutter, local \`.spey\` and Markdown exports, and automatic pre-update safety snapshots.
 
 ### 📦 Downloads & Binaries
-- **Lord.Spey.Setup.2.0.0.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
-- **Lord.Spey.2.0.0.exe**: Portable standalone executable (no installation required).
+- **Lord.Spey.Setup.2.2.0.exe**: Complete Windows installer (NSIS) with desktop shortcuts & auto-update support.
+- **Lord.Spey.2.2.0.exe**: Portable standalone executable (no installation required).
 - **Lord.Spey.apk / app-debug.apk**: Android package for mobile writing and worldbuilding.
 `;
 
@@ -143,8 +145,8 @@ A monumental release delivering an authentic Obsidian-grade interface, multi-tie
   }
 
   const assetsToUpload = [
-    { file: 'Lord.Spey.Setup.2.0.0.exe', altFile: 'Lord Spey Setup 2.0.0.exe', label: 'Lord.Spey.Setup.2.0.0.exe', contentType: 'application/x-msdos-program' },
-    { file: 'Lord.Spey.2.0.0.exe', altFile: 'Lord Spey 2.0.0.exe', label: 'Lord.Spey.2.0.0.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord.Spey.Setup.2.2.0.exe', altFile: 'Lord Spey Setup 2.2.0.exe', label: 'Lord.Spey.Setup.2.2.0.exe', contentType: 'application/x-msdos-program' },
+    { file: 'Lord.Spey.2.2.0.exe', altFile: 'Lord Spey 2.2.0.exe', label: 'Lord.Spey.2.2.0.exe', contentType: 'application/x-msdos-program' },
     { file: 'Lord.Spey.apk', label: 'Lord.Spey.apk', contentType: 'application/vnd.android.package-archive' },
     { file: 'app-debug.apk', label: 'app-debug.apk', contentType: 'application/vnd.android.package-archive' }
   ];
@@ -203,7 +205,7 @@ A monumental release delivering an authentic Obsidian-grade interface, multi-tie
     const uploadedAssetNames = (updatedRelease.assets || []).map(a => a.name);
     console.log(`Total release assets on GitHub: ${uploadedAssetNames.length}`);
     uploadedAssetNames.forEach(a => console.log(`  - ${a}`));
-    const expectedAssets = ['Lord.Spey.Setup.2.0.0.exe', 'Lord.Spey.2.0.0.exe', 'Lord.Spey.apk', 'app-debug.apk'];
+    const expectedAssets = ['Lord.Spey.Setup.2.2.0.exe', 'Lord.Spey.2.2.0.exe', 'Lord.Spey.apk', 'app-debug.apk'];
     const norm = n => (n || '').toLowerCase().replace(/[\s.]+/g, '.');
     let allFound = true;
     for (const exp of expectedAssets) {

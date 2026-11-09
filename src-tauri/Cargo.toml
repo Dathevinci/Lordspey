@@ -1,6 +1,6 @@
 [package]
 name = "lord-spey"
-version = "2.1.2"
+version = "2.2.0"
 description = "Minimal Obsidian-inspired author's workspace for drafts, lore, and worldbuilding — Native Rust & Tauri v2 Core"
 authors = ["Lord Spey"]
 license = "MIT"
